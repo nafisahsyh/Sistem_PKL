@@ -8,6 +8,7 @@
         <meta name="author" content="" />
         <title>Dashboard Admin Plasma Koperasi Sawit Makmur</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link href="{{ asset('theme/css/styles.css') }}" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 
@@ -15,6 +16,10 @@
             .sb-nav-fixed{
                 background-color: #F5F6FA;
             }
+            * {
+                font-family: 'Poppins', sans-serif !important;
+            }
+
         </style>
 
     </head>

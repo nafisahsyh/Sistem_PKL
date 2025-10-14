@@ -1,0 +1,94 @@
+/* ============ CUSTOM COLOR & TEXT ============ */
+.custom {
+    color: white !important;
+}
+
+.bg-brown-custom {
+    background-color: #02834E !important;
+}
+
+.sidebarToggle {
+    color: white !important;
+}
+
+.navbarDropdown {
+    color: white !important;
+}
+
+/* ============ SWEETALERT UKURAN KECIL ============ */
+.swal2-xs {
+    max-width: 300px !important;
+    font-size: 12px !important;
+    padding: 10px !important;
+}
+
+/* ============ LATAR LOGO MELENGKUNG ============ */
+.logo-container {
+    position: relative;
+    width: 80px;
+    height: 90px;
+    background-color: #cce1d7;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.logo-container img {
+    width: 70%;
+    height: auto;
+}
+.brand-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff; /* biar kontras di navbar-dark */
+    letter-spacing: 0.5px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .logo-container {
+        width: 60px;
+        height: 70px;
+        border-bottom-left-radius: 45px;
+        border-bottom-right-radius: 45px;
+    }
+
+    .logo-container img {
+        width: 65%;
+    }
+}
+.bg-brown-custom{
+    background-color: #02834E;
+}
+
+.sb-nav-link-icon {
+    color: white; /*mengubah warna ikon menjadi putih*/
+}
+
+.nav-link {
+    color: white;
+}
+
+.nav-link:hover {
+    color: white; /* Ensure text remains white when hovering */
+}
+
+.sb-sidenav-menu-heading{
+    color: white;
+}
+
+.sb-sidenav-menu-heading {
+    font-size: 1rem;
+}
+
+.sb-sidenav .nav-link {
+    font-size: 0.9rem;
+}
+
+.sb-nav-link-icon {
+    font-size: 0.9rem;
+}

@@ -1,11 +1,69 @@
-@import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Sidebar background dan font global */
+.sb-sidenav {
+    background-color: #02834E; /* warna sidebar */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Sidebar headings (Core, Interface, dll) */
+.sb-sidenav-menu-heading {
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    padding: 1rem 1rem 0.5rem;
+}
+
+/* Sidebar links utama */
+.sb-sidenav .nav-link {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: white;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Hover effect pada link */
+.sb-sidenav .nav-link:hover {
+    background-color: #02603B; /* warna hover */
+    color: white;
+}
+
+/* Ikon di sebelah teks link */
+.sb-nav-link-icon {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* Collapse links (Transaksi, Laporan) */
+.sb-sidenav-menu-nested .nav-link {
+    font-size: 0.85rem;
+    font-weight: 400;
+    padding-left: 2rem; /* indentasi nested */
+    color: white;
+}
+
+.sb-sidenav-menu-nested .nav-link:hover {
+    background-color: #024A32;
+}
+
+/* Footer sidebar */
+.sb-sidenav-footer {
+    font-size: 0.8rem;
+    color: white;
+    padding: 1rem;
+}
+
+/* Optional: scroll behavior untuk sidebar panjang */
+.sb-sidenav {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Memaksa font Poppins di seluruh sidebar */
+.sb-sidenav, 
+.sb-sidenav * {
+    font-family: 'Poppins', sans-serif !important;
 }

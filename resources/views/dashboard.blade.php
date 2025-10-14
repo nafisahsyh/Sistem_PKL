@@ -1,9 +1,9 @@
 @extends('theme.default')
 
 @section('content')
-<div class="container-fluid px-4 mt-4">
-    <h1 class="mt-4 text-brown">Dashboard Admin</h1>
-    <h5>Selamat datang di <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong></h5>
+<div class="container-fluid px-4 mt-5">
+    <h2 class="mt-4 text-brown">Dashboard Admin</h2>
+    <h6>Selamat datang di <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong></h6>
 
     <div class="row mt-4">
         <div class="col-xl-3 col-md-6">
