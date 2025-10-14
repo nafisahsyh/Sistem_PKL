@@ -1,37 +1,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
-<style>
-    .nav-link {
-        color: white;
-        border-radius: 8px;
-        margin: 4px 8px;
-        transition: all 0.3s ease;
-    }
-
-    .nav-link:hover {
-        background-color: #02663C; 
-        color: #fff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    .nav-link.active {
-        background-color: #014C2D;
-        color: #fff;
-        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .sb-sidenav-footer{
-        color: #fff;
-    }
-
-       
-   .sb-sidenav .nav-link.collapsed,
-    .sb-sidenav .nav-link[aria-expanded="true"] {
-        color: white !important;
-    }
-</style>
-
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion bg-brown-custom" id="sidenavAccordion">
         <div class="sb-sidenav-menu">

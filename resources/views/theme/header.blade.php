@@ -1,69 +1,29 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-<style>
-
-    .custom {
-    color: white !important;
-    }
-
-    .bg-brown-custom {
-        background-color: #02834E;
-    }
-
-    .sidebarToggle {
-        color: white; /* mengubah warna ikon menjadi putih */
-    }
-
-    .avbarDropdown {
-        color: white;
-    }
-        /* SweetAlert ukuran lebih kecil */
-    .swal2-xs {
-    max-width: 300px !important; /* Lebar lebih kecil */
-    font-size: 12px !important;  /* Ukuran font lebih kecil */
-    padding: 10px !important;    /* Padding lebih kecil */
-    }
-    .custom{
-        color: #543A28;
-    }
-
-
-
-
-</style>
+<link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-brown-custom">
-    <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="/dashboard">
-       
+    <!-- Navbar Brand dengan logo berlatarkan lengkung -->
+    <a class="navbar-brand ps-3 d-flex align-items-center" href="/dashboard">
+        <div class="logo-container mr-2">
+            <img src="{{ asset('/storage/img/logo.png') }}" alt="logo">
+        </div>
+        <span class="brand-text">SisPlasma</span>
     </a>
-    <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars custom"></i></button>
-    <!-- Navbar Search-->
 
-    <!-- Navbar-->
-    <div class="d-flex justify-content-end w-100">
-        <a href="#" onclick="event.preventDefault(); 
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: 'Anda tidak akan bisa membatalkannya!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, logout!',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('logoutForm').submit();
-                    Swal.fire({
-                        title: 'Logout berhasil!',
-                        text: 'Anda telah berhasil logout.',
-                        icon: 'success'
-                    });
-                }
-            });" class="btn btn-sm btn-danger">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
+    <!-- Sidebar Toggle -->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" 
+            id="sidebarToggle" 
+            href="#!">
+        <i class="fas fa-bars custom"></i>
+    </button>
+
+    <!-- Navbar Right (Logout) -->
+    <div class="ml-auto pr-3">
+        <a href="#" 
+            onclick="event.preventDefault(); confirmLogout();" 
+            class="btn btn-sm btn-danger">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </div>
 
@@ -73,35 +33,40 @@
 
 </nav>
 
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.getElementById('logoutButton').addEventListener('click', function (e) {
-        e.preventDefault(); // Mencegah aksi default tombol
+    function confirmLogout() {
         Swal.fire({
-            title: "Apakah Anda yakin ingin logout?",
-            text: "Anda harus login kembali untuk mengakses sistem!",
+            title: "<h3 style='font-size:16px; margin-bottom:5px;'>Apakah Anda yakin ingin logout?</h3>",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Ya, Logout",
             cancelButtonText: "Batal",
+            width: '360px', // ukuran popup
+            padding: '0.8em',
         }).then((result) => {
             if (result.isConfirmed) {
-                // Tampilkan notifikasi logout berhasil
+                // notifikasi logout berhasil
+                document.getElementById('logoutForm').submit();
                 Swal.fire({
-                    title: "Berhasil Logout!",
-                    text: "Anda telah keluar dari sistem.",
+                    title: "<h3 style='font-size:16px; margin-bottom:5px;'>Berhasil Logout!</h3>",
+                    html: "<p style='font-size:14px; margin:0;'>Anda telah keluar dari sistem.</p>",
                     icon: "success",
-                    timer: 2000, // Notifikasi otomatis hilang setelah 2 detik
+                    timer: 2000,
                     showConfirmButton: false,
+                    width: '340px',
+                    padding: '0.8em',
                 }).then(() => {
-                    // Redirect ke halaman login atau logout setelah notifikasi selesai
-                    window.location.href = "/login"; // Sesuaikan dengan rute logout Anda
+                    window.location.href = "/login";
                 });
             }
         });
-    });
+    }
 </script>
 
 <script>

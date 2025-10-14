@@ -1,25 +1,5 @@
 @extends('theme.default')
-<style>
-    .bg-green{
-        background-color: #02834E !important;
-    }
-
-    .bg-red {
-    background-color: #C8102E !important;
-    }
-
-    .bg-yellow {
-        background-color: #C4A000 !important;
-    }
-
-    .bg-brown {
-        background-color: #A67C52 !important; 
-    }
-
-    .bg-blue{
-        background-color: #007BFF !important; 
-    }
-</style>
+<link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
 @section('content')
 <div class="container-fluid px-4 mt-5">

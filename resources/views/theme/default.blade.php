@@ -7,6 +7,7 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Dashboard Admin</title>
+        <link rel="icon" type="image/png" href="{{ asset('storage/img/logo.png') }}">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link href="{{ asset('theme/css/styles.css') }}" rel="stylesheet" />
@@ -73,7 +74,7 @@
             @section('scripts')
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
-                   Swal.fire({
+                Swal.fire({
                     title: "Are you sure?",
                     text: "You won't be able to revert this!",
                     icon: "warning",
