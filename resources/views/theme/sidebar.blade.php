@@ -1,46 +1,81 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
+<style>
+    .nav-link {
+        color: white;
+        border-radius: 8px;
+        margin: 4px 8px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: #02663C; 
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-link.active {
+        background-color: #014C2D;
+        color: #fff;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sb-sidenav-footer{
+        color: #fff;
+    }
+
+       
+   .sb-sidenav .nav-link.collapsed,
+    .sb-sidenav .nav-link[aria-expanded="true"] {
+        color: white !important;
+    }
+</style>
+
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion bg-brown-custom" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
             <div class="nav">
 
                 <div class="sb-sidenav-menu-heading">Core</div>
-                <a class="nav-link" 
-                
-                href="">
+
+                <a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}" href="/dashboard">
                     <div class="sb-nav-link-icon"><i class="fas fa-house"></i></div>
                     Dashboard
                 </a>
+
                 <div class="sb-sidenav-menu-heading">Interface</div>
                 
-                <a class="nav-link" href="/users">
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/users">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     Pengguna
                 </a>
             
-                <a class="nav-link" href="/brands">
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/brands">
                     <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
                     Kecamatan
                 </a>
-                <a class="nav-link" href="/categories">
+
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/categories">
                     <div class="sb-nav-link-icon"><i class="fas fa-map"></i></div>
                     Desa
                 </a>
-                <a class="nav-link" href="/barang">
+
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/barang">
                     <div class="sb-nav-link-icon"><i class="fas fa-seedling"></i></div>
                     Tahun Tanam
                 </a>
-                <a class="nav-link" href="/barang">
+
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/barang">
                     <div class="sb-nav-link-icon"><i class="fas fa-tractor"></i></div>
                     Petani
                 </a>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
+
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
                     <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
                     Transaksi
                 </a>
-                <div class="collapse" id="collapseTransaksi" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+                <div class="collapse" id="collapseTransaksi">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/pembelian">
                             <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
@@ -52,11 +87,12 @@
                         </a>
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
+
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
                     <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
                     Laporan
                 </a>
-                <div class="collapse" id="collapseLaporan" aria-labelledby="headingLaporan" data-parent="#sidenavAccordion">
+                <div class="collapse" id="collapseLaporan">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/laporan_pembelian">
                             <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
@@ -69,7 +105,6 @@
                     </nav>
                 </div>
 
-
                 <div class="sb-sidenav-footer">
                     @if (Auth::check())
                         <div class="small">Masuk sebagai:</div>
@@ -81,36 +116,6 @@
 
             </nav>
         </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Pastikan SweetAlert di-load -->
-<script>
-    document.getElementById('logoutButton').addEventListener('click', function (e) {
-        e.preventDefault(); // Mencegah navigasi default
-        Swal.fire({
-            title: "Apakah Anda yakin ingin logout?",
-            text: "Anda harus login kembali untuk mengakses sistem!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Ya, Logout",
-            cancelButtonText: "Batal",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: "Berhasil Logout!",
-                    text: "Anda telah keluar dari sistem.",
-                    icon: "success",
-                    timer: 2000,
-                    showConfirmButton: false,
-                }).then(() => {
-                    // Redirect ke halaman logout atau login
-                    window.location.href = "/logout"; // Sesuaikan dengan rute logout Anda
-                });
-            }
-        });
-    });
-</script>
 
 
 
