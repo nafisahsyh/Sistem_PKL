@@ -24,7 +24,9 @@
                 <tbody>
                     @forelse ($desa as $index => $item)
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">
+                                {{ ($desa->currentPage() - 1) * $desa->perPage() + $loop->iteration }}
+                            </td>
                             <td>{{ $item->desa }}</td>
                             <td>{{ $item->kecamatan->kecamatan ?? '-' }}</td>
                             <td class="text-center">
@@ -52,7 +54,8 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+       <div class="d-flex justify-content-end mt-3">
+        {{ $desa->links('pagination::bootstrap-5') }}
     </div>
 </div>
 

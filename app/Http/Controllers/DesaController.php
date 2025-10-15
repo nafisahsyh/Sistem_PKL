@@ -12,7 +12,7 @@ class DesaController extends Controller
     public function index()
     {
         // Ambil semua desa beserta relasi kecamatannya
-        $desa = Desa::with('kecamatan')->get();
+        $desa = Desa::with('kecamatan')->paginate(10);
         return view('desa.index', compact('desa'));
     }
 

@@ -270,3 +270,26 @@
 .btn+.btn {
     margin-left: 5px;
 }
+
+/* Pagination hijau */
+    .pagination .page-link {
+        color: #02663C; /* hijau Bootstrap */
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #02663C;
+        color: #fff;
+    }
+
+    .pagination .active .page-link {
+        background-color: #02663C;
+        border-color: #02663C;
+        color: #fff;
+    }
+
+    .pagination .disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Kecamatan;
+use App\Models\Desa;
 
 class DashboardController extends Controller
 {
@@ -13,7 +15,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Mengembalikan view dashboard
-        return view('dashboard');
+       // Hitung jumlah data di tabel kecamatan
+        $jumlahKecamatan = Kecamatan::count();
+
+        $jumlahDesa = Desa::count();
+
+        // Kirim data ke view
+        return view('dashboard', compact('jumlahKecamatan', 'jumlahDesa'));
     }
 }
