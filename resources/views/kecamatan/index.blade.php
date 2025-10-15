@@ -1,0 +1,101 @@
+@extends('theme.default')
+
+@section('content')
+<link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
+
+<div class="container-fluid px-4 mt-5">
+    <h3 class="mt-4 text-brown">Data Kecamatan</h3>
+
+    <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+            <a href="{{ route('kecamatan.create') }}" class="btn btn-success mb-3">
+                <i class="fas fa-plus"></i>
+            </a>
+
+            <table class="table table-bordered table-striped align-middle table-custom">
+                <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
+                    <tr>
+                        <th style="width: 50px;">No</th>
+                        <th>Nama Kecamatan</th>
+                        <th style="width: 150px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($kecamatan as $index => $item)
+                        <tr>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $item->kecamatan }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('kecamatan.edit', $item->id_kecamatan) }}"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form action="{{ route('kecamatan.destroy', $item->id_kecamatan) }}" method="POST"
+                                    class="d-inline delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-danger btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data kecamatan</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{-- SweetAlert --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const form = this.closest('.delete-form');
+
+                Swal.fire({
+                    title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;'>Yakin ingin menghapus?</h3>",
+                    html: "<p style='font-size:14px;margin:0;'>Data yang dihapus tidak dapat dikembalikan!</p>",
+                    icon: 'warning',
+                    iconColor: '#dc3545',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+{{-- Notifikasi sukses --}}
+@if (session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: "<h3 style='font-size:15px;margin-bottom:0;'>Berhasil Hapus</h3>",
+            text: "{{ session('success') }}",
+            confirmButtonColor: '#198754',
+            timer: 1800,
+            showConfirmButton: false
+        });
+    </script>
+@endif
+@endsection

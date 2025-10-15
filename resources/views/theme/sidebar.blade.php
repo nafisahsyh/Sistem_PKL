@@ -20,7 +20,7 @@
                     Pengguna
                 </a>
             
-                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/brands">
+                <a class="nav-link {{ Request::is('kecamatan') ? 'active' : '' }}" href="/kecamatan">
                     <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
                     Kecamatan
                 </a>

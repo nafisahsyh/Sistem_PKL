@@ -12,18 +12,14 @@
     </a>
 
     <!-- Sidebar Toggle -->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" 
-            id="sidebarToggle" 
-            href="#!">
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
         <i class="fas fa-bars custom"></i>
     </button>
 
     <!-- Navbar Right (Logout) -->
     <div class="ml-auto pr-3">
-        <a href="#" 
-            onclick="event.preventDefault(); confirmLogout();" 
-            class="btn btn-sm btn-danger">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
+        <a href="#" onclick="event.preventDefault(); confirmLogout();" class="btn btn-sm btn-danger">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </div>
 
@@ -34,33 +30,29 @@
 </nav>
 
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
     function confirmLogout() {
         Swal.fire({
-            title: "<h3 style='font-size:16px; margin-bottom:5px;'>Apakah Anda yakin ingin logout?</h3>",
+            title: "<h3 style='font-size:15px;margin-bottom:5px;'>Apakah anda yakin ingin logout?</h3>",
             icon: "warning",
+            iconColor: '#dc3545',
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Ya, Logout",
-            cancelButtonText: "Batal",
-            width: '360px', // ukuran popup
-            padding: '0.8em',
+            confirmButtonColor: "#198754",
+            cancelButtonColor: "#dc3545",
+            confirmButtonText: "Logout",
+            cancelButtonText: "Batal"
         }).then((result) => {
             if (result.isConfirmed) {
-                // notifikasi logout berhasil
                 document.getElementById('logoutForm').submit();
+
                 Swal.fire({
-                    title: "<h3 style='font-size:16px; margin-bottom:5px;'>Berhasil Logout!</h3>",
-                    html: "<p style='font-size:14px; margin:0;'>Anda telah keluar dari sistem.</p>",
                     icon: "success",
-                    timer: 2000,
+                    title: "<h3 style='font-size:15px;margin-bottom:5px;'>Berhasil Logout!</h3>",
+                    html: "<p style='font-size:14px;margin:0;'>Anda telah keluar dari sistem.</p>",
                     showConfirmButton: false,
-                    width: '340px',
-                    padding: '0.8em',
+                    timer: 1800,
+                    confirmButtonColor: "#198754"
                 }).then(() => {
                     window.location.href = "/login";
                 });
@@ -70,11 +62,12 @@
 </script>
 
 <script>
-    @if($message = Session::get('success'))
-        <script>
-            Swal.fire('{{$message}}');
-        </script>
-    @endif
+    @if ($message = Session::get('success'))
+        <
+        script >
+            Swal.fire('{{ $message }}');
+</script>
+@endif
 </script>
 <script>
     $(document).ready(function() {
@@ -82,7 +75,7 @@
         $('#btnNavbarSearch').on('click', function() {
             let query = $('#searchInput').val(); // Ambil input pencarian
 
-            if(query) {
+            if (query) {
                 search(query);
             }
         });
@@ -91,7 +84,7 @@
         $('#searchInput').on('keypress', function(e) {
             if (e.which == 13) { // Jika tombol Enter ditekan
                 let query = $(this).val();
-                if(query) {
+                if (query) {
                     search(query);
                 }
             }
@@ -102,7 +95,9 @@
             $.ajax({
                 url: '/search', // Ganti dengan URL endpoint pencarian di server
                 method: 'GET',
-                data: { q: query },
+                data: {
+                    q: query
+                },
                 success: function(response) {
                     // Misalnya Anda bisa menampilkan hasil pencarian di suatu bagian halaman
                     // Ganti #searchResults dengan elemen tempat hasil pencarian ditampilkan
