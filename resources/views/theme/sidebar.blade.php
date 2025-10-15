@@ -26,7 +26,7 @@
                     Kecamatan
                 </a>
 
-                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/categories">
+                <a class="nav-link {{ Request::is('desa') ? 'active' : '' }}" href="/desa">
                     <div class="sb-nav-link-icon"><i class="fas fa-map"></i></div>
                     Desa
                 </a>
