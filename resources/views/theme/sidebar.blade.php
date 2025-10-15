@@ -1,4 +1,5 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
 <div id="layoutSidenav_nav">
@@ -30,7 +31,7 @@
                     Desa
                 </a>
 
-                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/barang">
+                <a class="nav-link {{ Request::is('tahun_tanam') ? 'active' : '' }}" href="/tahun_tanam">
                     <div class="sb-nav-link-icon"><i class="fas fa-seedling"></i></div>
                     Tahun Tanam
                 </a>
@@ -48,11 +49,11 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/pembelian">
                             <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
-                            Pembelian
+                            Pemasukan
                         </a>
                         <a class="nav-link" href="/penjualan">
                             <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                            Penjualan
+                            Pengeluaran
                         </a>
                     </nav>
                 </div>
@@ -65,11 +66,11 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/laporan_pembelian">
                             <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
-                            Pembelian
+                            Pemasukan
                         </a>
                         <a class="nav-link" href="/laporan_penjualan">
                             <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                            Penjualan
+                            Pengeluaran
                         </a>
                     </nav>
                 </div>
@@ -85,7 +86,3 @@
 
             </nav>
         </div>
-
-
-
-
