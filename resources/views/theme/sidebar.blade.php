@@ -48,11 +48,11 @@
                 <div class="collapse" id="collapseTransaksi">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/pembelian">
-                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
                             Pemasukan
                         </a>
                         <a class="nav-link" href="/penjualan">
-                            <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
                             Pengeluaran
                         </a>
                     </nav>
@@ -65,11 +65,11 @@
                 <div class="collapse" id="collapseLaporan">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="/laporan_pembelian">
-                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
                             Pemasukan
                         </a>
                         <a class="nav-link" href="/laporan_penjualan">
-                            <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
                             Pengeluaran
                         </a>
                     </nav>
