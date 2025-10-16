@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h2 class="mt-4 text-brown">Edit Tahun</h2>
+        <h4 class="mt-4 text-brown">Edit Tahun Tanam</h4>
 
         <div class="card p-4 shadow-sm rounded-3">
             <form action="{{ route('tahun_tanam.update', $tahun_tanam->id_tahun_tanam) }}" method="POST">
@@ -11,9 +11,9 @@
                 @method('PUT')
 
                 <div class="mb-3">
-                    <label for="tahun" class="form-label">Tahun</label>
-                    <input type="text" class="form-control @error('tahun') is-invalid @enderror" id="tahun"
-                        name="tahun" value="{{ old('tahun', $tahun_tanam->tahun) }}" required>
+                    <label for="tahun" class="form-label">Tahun Tanam</label>
+                    <input type="text" class="form-control text-kecil @error('tahun') is-invalid @enderror" id="tahun"
+                        name="tahun" value="{{ old('tahun', $tahun_tanam->tahun) }}" placeholder="Perbarui tahun tanam" required>
                     @error('tahun')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

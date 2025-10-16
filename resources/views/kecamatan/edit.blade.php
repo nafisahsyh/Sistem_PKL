@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h2 class="mt-4 text-brown">Edit Kecamatan</h2>
+        <h4 class="mt-4 text-brown">Edit Kecamatan</h4>
 
         <div class="card p-4">
             <form action="{{ route('kecamatan.update', $kecamatan->id_kecamatan) }}" method="POST">
@@ -11,8 +11,8 @@
                 @method('PUT')
                 <div class="mb-3">
                     <label for="kecamatan" class="form-label">Nama Kecamatan</label>
-                    <input type="text" class="form-control @error('kecamatan') is-invalid @enderror" id="kecamatan"
-                        name="kecamatan" value="{{ old('kecamatan', $kecamatan->kecamatan) }}" required>
+                    <input type="text" class="form-control text-kecil @error('kecamatan') is-invalid @enderror" id="kecamatan"
+                        name="kecamatan" value="{{ old('kecamatan', $kecamatan->kecamatan) }}" placeholder="Perbarui nama kecamatan" required>
                     {{-- Pesan error di bawah input --}}
                     @error('kecamatan')
                         <div class="invalid-feedback">

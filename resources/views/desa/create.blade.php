@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h3 class="mt-4 text-brown">Tambah Desa</h3>
+        <h4 class="mt-4 text-brown">Tambah Desa</h4>
 
         <div class="card p-4">
             <form action="{{ route('desa.store') }}" method="POST">
@@ -13,8 +13,8 @@
                 <div class="mb-3">
                     <label for="id_kecamatan" class="form-label">Kecamatan</label>
                     <select name="id_kecamatan" id="id_kecamatan"
-                        class="form-select @error('id_kecamatan') is-invalid @enderror" required>
-                        <option value="">-- Pilih Kecamatan --</option>
+                        class="form-select text-kecil @error('id_kecamatan') is-invalid @enderror" required>
+                        <option value="" disabled selected hidden>Pilih Kecamatan</option>
                         @foreach ($kecamatan as $item)
                             <option value="{{ $item->id_kecamatan }}"
                                 {{ old('id_kecamatan') == $item->id_kecamatan ? 'selected' : '' }}>
@@ -30,8 +30,8 @@
                 {{-- Nama Desa --}}
                 <div class="mb-3">
                     <label for="desa" class="form-label">Nama Desa</label>
-                    <input type="text" class="form-control @error('desa') is-invalid @enderror" id="desa"
-                        name="desa" value="{{ old('desa') }}" required>
+                    <input type="text" class="form-control text-kecil @error('desa') is-invalid @enderror" id="desa"
+                        name="desa" value="{{ old('desa') }}" placeholder="Masukkan nama desa" required>
                     @error('desa')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
