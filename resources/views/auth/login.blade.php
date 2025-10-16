@@ -31,7 +31,7 @@
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
                 <div class="forgot mb-3 text-end">
-                    <a href="#">Lupa password?</a>
+                    <a href="\reset">Lupa password?</a>
                 </div>
                 <button type="submit" class="btn-login">Login</button>
             </form>

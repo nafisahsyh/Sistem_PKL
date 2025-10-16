@@ -19,5 +19,9 @@ Route::resource('desa', DesaController::class);
 Route::get('/login', function () {
     return view('auth.login');
 });
+
+Route::get('/reset', function () {
+    return view('auth.reset');
+});
 //route logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
