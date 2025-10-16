@@ -19,7 +19,6 @@ class DesaController extends Controller
     // Menampilkan form tambah desa
     public function create()
     {
-        // Ambil semua kecamatan untuk dropdown
         $kecamatan = Kecamatan::all();
         return view('desa.create', compact('kecamatan'));
     }
@@ -28,8 +27,13 @@ class DesaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'desa' => 'required',
+            'desa' => 'required|unique:desa,desa,NULL,id,id_kecamatan,' . $request->id_kecamatan,
             'id_kecamatan' => 'required|exists:kecamatan,id_kecamatan',
+        ], [
+            'desa.required' => 'Nama desa wajib diisi.',
+            'desa.unique' => 'Nama desa sudah ada di kecamatan ini.',
+            'id_kecamatan.required' => 'Kecamatan wajib dipilih.',
+            'id_kecamatan.exists' => 'Kecamatan tidak valid.',
         ]);
 
         Desa::create([
@@ -52,8 +56,13 @@ class DesaController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'desa' => 'required',
+            'desa' => 'required|unique:desa,desa,' . $id . ',id_desa,id_kecamatan,' . $request->id_kecamatan,
             'id_kecamatan' => 'required|exists:kecamatan,id_kecamatan',
+        ], [
+            'desa.required' => 'Nama desa wajib diisi.',
+            'desa.unique' => 'Nama desa sudah ada di kecamatan ini.',
+            'id_kecamatan.required' => 'Kecamatan wajib dipilih.',
+            'id_kecamatan.exists' => 'Kecamatan tidak valid.',
         ]);
 
         $desa = Desa::findOrFail($id);

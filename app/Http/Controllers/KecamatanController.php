@@ -24,7 +24,10 @@ class KecamatanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kecamatan' => 'required'
+            'kecamatan' => 'required|unique:kecamatan,kecamatan',
+        ], [
+            'kecamatan.required' => 'Nama kecamatan wajib diisi.',
+            'kecamatan.unique' => 'Nama kecamatan sudah ada, silakan masukkan nama lain.',
         ]);
 
         Kecamatan::create([
@@ -45,7 +48,11 @@ class KecamatanController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kecamatan' => 'required'
+            // validasi unique, tapi abaikan data yang sedang diedit
+            'kecamatan' => 'required|unique:kecamatan,kecamatan,' . $id . ',id_kecamatan',
+        ], [
+            'kecamatan.required' => 'Nama kecamatan wajib diisi.',
+            'kecamatan.unique' => 'Nama kecamatan sudah ada, silakan masukkan nama lain.',
         ]);
 
         $kecamatan = Kecamatan::findOrFail($id);
