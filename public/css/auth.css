@@ -1,0 +1,151 @@
+        body {
+            background: linear-gradient(to right, #0f7a4d, #b7d0c0);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .login-container {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            width: 800px;
+            max-width: 95%;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .login-container:hover {
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.35);
+            /* efek hover halus */
+        }
+
+
+        .login-form {
+            flex: 1;
+            padding: 70px 60px;
+        }
+
+        .login-image {
+            flex: 1.2;
+            position: relative;
+            background: url('/storage/img/sawit.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            border-top-left-radius: 120px;
+            border-bottom-left-radius: 120px;
+            overflow: hidden;
+        }
+
+
+        /* Overlay hijau transparan */
+        .login-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-color: rgba(15, 122, 77, 0.45);
+        }
+
+        /* Tulisan di tengah gambar */
+        .login-image .overlay-text {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .login-image h2 {
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        .login-image p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            background-color: #e8e8e8;
+            border: none;
+            padding: 12px 40px;
+        }
+
+        .form-control:focus {
+            background-color: #e8e8e8;
+            box-shadow: none;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            background-color: #e8e8e8;
+            border: none;
+            padding: 10px 15px 10px 40px;
+            /* biar teks tidak nabrak icon */
+            font-size: 0.9rem;
+            /* kecilin ukuran teks */
+            line-height: 1.5;
+            /* biar teks lebih pas tinggi nya */
+        }
+
+        .form-control::placeholder {
+            color: #b9b8b8;
+            font-size: 0.9rem;
+        }
+
+        .login-logo {
+            width: 90px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        @media (max-width: 576px) {
+            .login-logo {
+                width: 70px;
+            }
+        }
+
+        .btn-login {
+            background-color: #0f7a4d;
+            color: white;
+            border-radius: 10px;
+            width: 100%;
+            padding: 10px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .forgot {
+            text-align: right;
+            font-size: 0.8rem;
+            margin-top: -10px;
+        }
+
+        .forgot a {
+            color: #888;
+        }
+
+        .forgot a:hover {
+            text-decoration: underline;
+            font-weight: 500;
+        }

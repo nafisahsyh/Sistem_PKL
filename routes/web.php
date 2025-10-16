@@ -16,5 +16,8 @@ Route::resource('kecamatan', KecamatanController::class);
 Route::resource('tahun_tanam', TahunTanamController::class);
 Route::resource('desa', DesaController::class);
 
+Route::get('/login', function () {
+    return view('auth.login');
+});
 //route logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
