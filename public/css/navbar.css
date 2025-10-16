@@ -265,6 +265,7 @@
     font-size: 13px;
     padding: 6px 14px;
 }
+
 .form-label {
     font-size: 1rem;
     /* atau 15px */
@@ -273,10 +274,13 @@
     color: #000;
     /* warna teks seragam */
 }
-.form-control, 
+
+.form-control,
 .form-select {
-    background-color: #f6f5f5; /* samain warna */
-    height: 42px; /* samain tinggi */
+    background-color: #f6f5f5;
+    /* samain warna */
+    height: 42px;
+    /* samain tinggi */
     font-size: 0.9rem;
     padding: 8px 12px;
     border: 1px solid #ccc;
@@ -298,6 +302,14 @@
 .btn+.btn {
     margin-left: 5px;
 }
+
+.form-control-search {
+    height: 34px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0 12px;
+}
+
 
 /* Pagination hijau */
 .pagination .page-link {

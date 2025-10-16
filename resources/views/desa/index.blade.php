@@ -8,27 +8,23 @@
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex justify-content-between mb-1">
                     {{-- Tombol Tambah --}}
-                    <a href="{{ route('desa.create') }}" class="btn btn-success" title="Tambah Desa">
+                    <a href="{{ route('desa.create') }}" class="btn btn-success mb-3" title="Tambah Desa">
                         <i class="fas fa-plus"></i>
                     </a>
-
                     {{-- Form Search --}}
-                    <form action="{{ route('desa.index') }}" method="GET" class="d-flex">
-                        <input type="text" name="search" class="form-control form-control-sm me-2"
+                    <form action="{{ route('desa.index') }}" method="GET" class="d-flex align-items-start mb-3">
+                        <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari desa atau kecamatan..." value="{{ request('search') }}" style="width: 300px;">
-                        {{-- Tombol Search --}}
-                        <button class="btn btn-success btn-sm" type="submit" title="Search">
+                        <button class="btn btn-success" type="submit" title="Search">
                             <i class="fas fa-search"></i>
                         </button>
-                        {{-- Tombol Reset --}}
-                        <a href="{{ route('desa.index') }}" class="btn btn-primary btn-sm ms-2" title="Reset">
+                        <a href="{{ route('desa.index') }}" class="btn btn-primary ms-2" title="Reset">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>
                 </div>
-
 
                 <table class="table table-bordered table-striped align-middle table-custom">
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
