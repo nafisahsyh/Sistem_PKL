@@ -8,22 +8,33 @@ use Illuminate\Http\Request;
 
 class DesaController extends Controller
 {
-    // Menampilkan semua data desa
-    public function index()
+    // Menampilkan semua data desa + search
+    public function index(Request $request)
     {
-        // Ambil semua desa beserta relasi kecamatannya
-        $desa = Desa::with('kecamatan')->paginate(10);
+        $query = Desa::with('kecamatan');
+
+        // Filter jika ada keyword search
+        if ($request->has('search') && !empty($request->search)) {
+            $keyword = $request->search;
+            $query->where('desa', 'like', "%{$keyword}%")
+                ->orWhereHas('kecamatan', function($q) use ($keyword) {
+                    $q->where('kecamatan', 'like', "%{$keyword}%");
+                });
+        }
+
+        $desa = $query->paginate(10)->withQueryString(); // keep search in pagination links
+
         return view('desa.index', compact('desa'));
     }
 
-    // Menampilkan form tambah desa
+    // Form tambah desa
     public function create()
     {
         $kecamatan = Kecamatan::all();
         return view('desa.create', compact('kecamatan'));
     }
 
-    // Menyimpan data desa baru
+    // Simpan data desa baru
     public function store(Request $request)
     {
         $request->validate([
@@ -44,7 +55,7 @@ class DesaController extends Controller
         return redirect()->route('desa.index')->with('success', 'Data desa berhasil ditambahkan.');
     }
 
-    // Menampilkan form edit desa
+    // Form edit desa
     public function edit($id)
     {
         $desa = Desa::findOrFail($id);
@@ -52,7 +63,7 @@ class DesaController extends Controller
         return view('desa.edit', compact('desa', 'kecamatan'));
     }
 
-    // Mengupdate data desa
+    // Update data desa
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -74,7 +85,7 @@ class DesaController extends Controller
         return redirect()->route('desa.index')->with('success', 'Data desa berhasil diperbarui.');
     }
 
-    // Menghapus data desa
+    // Hapus data desa
     public function destroy($id)
     {
         $desa = Desa::findOrFail($id);
