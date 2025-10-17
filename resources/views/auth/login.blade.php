@@ -20,21 +20,75 @@
 
             <h3 class="fw-bold mb-4">Login</h3>
 
-            <form action="/dashboard" method="GET">
+            {{-- Pesan sukses (misal setelah logout) --}}
+            @if (session('success'))
+                <div id="flash-message" class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+
+                <script>
+                    // Hapus pesan setelah 3 detik dengan fade out
+                    setTimeout(function() {
+                        let msg = document.getElementById('flash-message');
+                        if (msg) {
+                            msg.style.transition = "opacity 0.5s";
+                            msg.style.opacity = "0";
+                            setTimeout(() => msg.remove(), 500);
+                        }
+                    }, 3000);
+                </script>
+            @endif
+
+            <form action="{{ url('/login') }}" method="POST" novalidate>
                 @csrf
-                <div class="form-group">
+
+                <div class="form-group text-start">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="username" class="form-control" placeholder="Username/Email">
+                    <input type="text" name="login" class="form-control" placeholder="Username / Email"
+                        value="{{ old('login') }}" required autofocus>
+                    @error('login')
+                        <p class="error-text">{{ $message }}</p>
+                    @enderror
                 </div>
-                <div class="form-group">
+
+                <div class="form-group text-start position-relative">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="password" class="form-control" placeholder="Password">
+                    <input type="password" id="password" name="password" class="form-control password-input"
+                        placeholder="Password" required>
+
+                    {{-- Tombol toggle mata --}}
+                    <span id="toggle-password" class="password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </span>
+
+                    @error('password')
+                        <p class="error-text">{{ $message }}</p>
+                    @enderror
+
+                    @if ($errors->has('login_failed'))
+                        <p class="error-text">{{ $errors->first('login_failed') }}</p>
+                    @endif
                 </div>
+
                 <div class="forgot mb-3 text-end">
-                    <a href="\reset">Lupa password?</a>
+                    <a href="/reset">Lupa password?</a>
                 </div>
+
                 <button type="submit" class="btn-login">Login</button>
             </form>
+
+            {{-- Script toggle password --}}
+            <script>
+                const togglePassword = document.getElementById('toggle-password');
+                const password = document.getElementById('password');
+
+                togglePassword.addEventListener('click', function() {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' :
+                    '<i class="fas fa-eye-slash"></i>';
+                });
+            </script>
         </div>
 
         <!-- Bagian kanan (gambar + overlay teks) -->

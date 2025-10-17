@@ -44,31 +44,14 @@
             cancelButtonText: "Batal"
         }).then((result) => {
             if (result.isConfirmed) {
+                // Langsung submit form logout tanpa notifikasi tambahan
                 document.getElementById('logoutForm').submit();
-
-                Swal.fire({
-                    icon: "success",
-                    title: "<h3 style='font-size:15px;margin-bottom:5px;'>Berhasil Logout!</h3>",
-                    html: "<p style='font-size:14px;margin:0;'>Anda telah keluar dari sistem.</p>",
-                    showConfirmButton: false,
-                    timer: 1800,
-                    confirmButtonColor: "#198754"
-                }).then(() => {
-                    window.location.href = "/login";
-                });
             }
         });
     }
 </script>
 
-<script>
-    @if ($message = Session::get('success'))
-        <
-        script >
-            Swal.fire('{{ $message }}');
-</script>
-@endif
-</script>
+
 <script>
     $(document).ready(function() {
         // Menangani pencarian saat tombol search diklik
