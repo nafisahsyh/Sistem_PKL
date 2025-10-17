@@ -42,7 +42,15 @@ class AuthController extends Controller
             Auth::login($user);
             $request->session()->regenerate();
 
-            return redirect()->route('dashboard');
+            switch ($user->role) {
+                case 'super_admin':
+                    return redirect()->route('dashboard.super')->with('success', 'Selamat datang Super Admin!');
+                case 'admin':
+                    return redirect()->route('dashboard.admin')->with('success', 'Selamat datang Admin!');
+                default:
+                    Auth::logout();
+                    return redirect('/login')->withErrors(['login' => 'Role tidak dikenali.']);
+            }
         }
 
         // Jika gagal login, tampilkan error di bawah input password

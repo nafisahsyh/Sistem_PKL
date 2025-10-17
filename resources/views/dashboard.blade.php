@@ -15,7 +15,9 @@
         <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong>
     </h6>
 
+    @if(in_array(Auth::user()->role, ['admin', 'super_admin']))
     <div class="row mt-4">
+        @if(Auth::user()->role == 'super_admin')
         <div class="col-xl-3 col-md-6">
             <div class="card bg-blue text-white mb-4">
                 <div class="card-body d-flex align-items-center justify-content-between">
@@ -34,11 +36,12 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="/pengguna">Lihat Detail</a>
+                    <a class="small text-white stretched-link" href="/user">Lihat Detail</a>
                     <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
+        @endif
 
         <div class="col-xl-3 col-md-6">
             <div class="card bg-red text-white mb-4">
@@ -111,7 +114,7 @@
                 </div>
             </div>
         </div>
-
+        @endif
 
     </div>
 </div>

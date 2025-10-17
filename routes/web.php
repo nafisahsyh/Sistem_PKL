@@ -24,9 +24,16 @@ Route::get('/reset', function () {
 });
 
 Route::middleware(['auth','checkrole:super_admin'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/super', [DashboardController::class, 'index'])->name('dashboard.super');
     Route::resource('kecamatan', KecamatanController::class);
     Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('desa', DesaController::class);
     Route::resource('user', UserController::class);  
+});
+
+Route::middleware(['auth', 'checkrole:admin'])->group(function () {
+    Route::get('/dashboard/admin', [DashboardController::class, 'index'])->name('dashboard.admin');
+    Route::resource('kecamatan', KecamatanController::class);
+    Route::resource('desa', DesaController::class);
+    Route::resource('tahun_tanam', TahunTanamController::class);
 });
