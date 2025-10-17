@@ -78,7 +78,7 @@
                 <div class="sb-sidenav-footer">
                     @if (Auth::check())
                         <div class="small">Masuk sebagai:</div>
-                        {{ Auth::user()->name }}
+                        {{ Auth::user()->nama }}
                     @else
                         <div class="small">Anda belum login</div>
                     @endif

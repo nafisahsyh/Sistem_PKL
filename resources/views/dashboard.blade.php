@@ -3,8 +3,17 @@
 
 @section('content')
 <div class="container-fluid px-4 mt-5">
-    <h2 class="mt-4 text-brown">Dashboard Admin</h2>
-    <h6>Selamat datang di <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong></h6>
+    <h2 class="mt-4 text-brown"> 
+        @if (Auth::check() && Auth::user()->role === 'super_admin')
+        Dashboard Super Admin
+        @else
+            Dashboard Admin
+        @endif
+    </h2>
+    <h6>
+        Selamat datang <strong>{{ Auth::user()->nama ?? 'Tamu' }}</strong> di 
+        <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong>
+    </h6>
 
     <div class="row mt-4">
         <div class="col-xl-3 col-md-6">

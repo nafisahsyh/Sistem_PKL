@@ -9,30 +9,22 @@ use App\Http\Controllers\AuthController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
-
-//route dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::resource('kecamatan', KecamatanController::class);
-Route::resource('tahun_tanam', TahunTanamController::class);
-Route::resource('desa', DesaController::class);
 
 //route auth login
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::get('/', function () {
-        return redirect('/dashboard');
-    });
-});
-
+// Route reset password
 Route::get('/reset', function () {
     return view('auth.reset');
+});
+
+Route::middleware(['auth','checkrole:super_admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('kecamatan', KecamatanController::class);
+    Route::resource('tahun_tanam', TahunTanamController::class);
+    Route::resource('desa', DesaController::class);  
 });
