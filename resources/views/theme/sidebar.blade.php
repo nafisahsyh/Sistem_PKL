@@ -16,7 +16,7 @@
 
                 <div class="sb-sidenav-menu-heading">Interface</div>
                 
-                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="/users">
+                <a class="nav-link {{ Request::is('user') ? 'active' : '' }}" href="/user">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     Pengguna
                 </a>

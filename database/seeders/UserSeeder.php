@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             'nama' => 'Nafisaida',
             'username' => 'adminkece',
             'email' => 'aidasekarningrum@gmail.com',
-            'password' => 'admin123',
+            'password' => 'ksm1945',
             'role' => 'super_admin',
         ]);
     }

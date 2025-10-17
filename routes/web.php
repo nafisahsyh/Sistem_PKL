@@ -6,6 +6,7 @@ use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\DesaController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 
 Route::get('/', function () {
@@ -26,5 +27,6 @@ Route::middleware(['auth','checkrole:super_admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('kecamatan', KecamatanController::class);
     Route::resource('tahun_tanam', TahunTanamController::class);
-    Route::resource('desa', DesaController::class);  
+    Route::resource('desa', DesaController::class);
+    Route::resource('user', UserController::class);  
 });
