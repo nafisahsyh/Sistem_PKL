@@ -31,16 +31,16 @@
       <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
       <h3 class="fw-bold mb-4">Reset Password</h3>
 
-      <form action="/send-reset-link" method="POST">
-        @csrf
-        <div class="form-group">
-          <i class="fas fa-user"></i>
-          <input type="text" name="email" class="form-control" placeholder="Email" required>
-        </div>
-        <button type="submit" class="btn-login">Kirim Email</button>
-        <div class="back-login">
-            <a href="\login">Kembali ke login</a>
-        </div>
+      <form action="{{ route('password.email') }}" method="POST">
+          @csrf
+          <div class="form-group">
+              <i class="fas fa-user"></i>
+              <input type="text" name="email" class="form-control" placeholder="Email" required>
+          </div>
+          <button type="submit" class="btn-login">Kirim Email</button>
+          <div class="back-login">
+              <a href="\login">Kembali ke login</a>
+          </div>
       </form>
     </div>
   </div>

@@ -6,11 +6,15 @@
     <nav class="sb-sidenav accordion bg-brown-custom" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
             <div class="nav">
-
+                {{--pemisahan dashboard sesuai role--}}
                 <div class="sb-sidenav-menu-heading">Core</div>
-
+                @php
+                    $dashboardRoute = Auth::user()->role === 'super_admin' 
+                        ? route('dashboard.super') 
+                        : route('dashboard.admin');
+                @endphp
                 {{-- Semua role bisa akses Dashboard --}}
-                <a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}" href="/dashboard">
+                <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{$dashboardRoute}}">
                     <div class="sb-nav-link-icon"><i class="fas fa-house"></i></div>
                     Dashboard
                 </a>

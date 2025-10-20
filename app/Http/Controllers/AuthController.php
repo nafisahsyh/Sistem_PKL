@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -13,7 +14,19 @@ class AuthController extends Controller
      * Tampilkan halaman login
      */
     public function showLoginForm()
-    {
+    { 
+        if (Auth::check()) {
+        // Kalau user sudah login, arahkan langsung sesuai role
+        $user = Auth::user();
+        switch ($user->role) {
+            case 'super_admin':
+                return redirect()->route('dashboard.super');
+            case 'admin':
+                return redirect()->route('dashboard.admin');
+            default:
+                return redirect()->route('login');
+            }
+        }
         return view('auth.login');
     }
 
@@ -49,7 +62,7 @@ class AuthController extends Controller
                     return redirect()->route('dashboard.admin')->with('success', 'Selamat datang Admin!');
                 default:
                     Auth::logout();
-                    return redirect('/login')->withErrors(['login' => 'Role tidak dikenali.']);
+                return redirect('/login')->withErrors(['login' => 'Role tidak dikenali.']);
             }
         }
 
@@ -72,4 +85,61 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Anda telah logout');
     }
+
+    public function showLinkRequestForm()
+    {
+        return view('auth.reset'); // <-- sesuai folder dan nama file kamu
+    }
+
+    // Kirim link reset
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $status = \Illuminate\Support\Facades\Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT
+            ? back()->with('status', 'Link reset password telah dikirim ke email Anda!')
+            : back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
+    }
+
+    public function showResetForm($token)
+    {
+        return view('auth.form', [
+            'token' => $token,
+            'email' => request('email'),
+        ]);
+    }
+
+    public function reset(Request $request)
+    {
+
+        // Validasi input
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        // Reset password
+        $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            // Jangan hash di sini karena mutator di model sudah handle
+            $user->password = $password;
+            $user->save();
+        }
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('success', 'Password berhasil diubah!');
+        } else {
+            return back()->withErrors(['email' => __($status)]);
+        }
+    }
+
 }
