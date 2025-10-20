@@ -1,5 +1,7 @@
 @extends('theme.default')
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -17,8 +19,10 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-success">Simpan</button>
-                <a href="{{ route('tahun_tanam.index') }}" class="btn btn-danger">Batal</a>
+                <div class="text-start mt-3">
+                    <button type="submit" class="btn btn-success me-2">Simpan</button>
+                    <a href="{{ route('tahun_tanam.index') }}" class="btn btn-danger">Batal</a>
+                </div>
             </form>
         </div>
     </div>

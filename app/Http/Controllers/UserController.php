@@ -18,9 +18,11 @@ class UserController extends Controller
         // Filter search
         if ($request->has('search') && !empty($request->search)) {
             $keyword = $request->search;
-            $query->where('nama', 'like', "%{$keyword}%")
-                ->orWhere('username', 'like', "%{$keyword}%")
-                ->orWhere('role', 'like', "%{$keyword}%");
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama', 'like', "%{$keyword}%")
+                    ->orWhere('username', 'like', "%{$keyword}%")
+                    ->orWhere('role', 'like', "%{$keyword}%");
+            });
         }
 
         // Pagination 10 per halaman, keep query string untuk search
@@ -50,7 +52,7 @@ class UserController extends Controller
             'role' => ['required', Rule::in(['super_admin', 'admin', 'karyawan'])],
         ]);
 
-        User::create($request->only('nama','username','email','role','password'));
+        User::create($request->only('nama', 'username', 'email', 'role', 'password'));
 
         return redirect()->route('user.index')->with('success', 'User berhasil dibuat.');
     }
@@ -60,7 +62,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('user.edit', compact('user'));
+        // Hitung total super_admin
+        $superAdminCount = User::where('role', 'super_admin')->count();
+
+        return view('user.edit', compact('user', 'superAdminCount'));
     }
 
     /**
@@ -68,10 +73,17 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $superAdminCount = User::where('role', 'super_admin')->count();
+
+        // Cegah perubahan role jika ini adalah super admin terakhir
+        if ($user->role === 'super_admin' && $superAdminCount === 1 && $request->role !== 'super_admin') {
+            return back()->with('error', 'Tidak dapat mengubah role satu-satunya Super Admin.');
+        }
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'username' => ['required', 'string', 'max:20', Rule::unique('users')->ignore($user->id_user, 'id_user')],
-            'email' => ['required','email', Rule::unique('users')->ignore($user->id_user, 'id_user')],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id_user, 'id_user')],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => ['required', Rule::in(['super_admin', 'admin', 'karyawan'])],
         ]);
@@ -95,7 +107,24 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        // Cegah user menghapus dirinya sendiri
+        if (auth()->id() === $user->id_user) {
+            return redirect()->route('user.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        // Jika user yang mau dihapus adalah super_admin
+        if ($user->role === 'super_admin') {
+            $totalSuperAdmin = User::where('role', 'super_admin')->count();
+
+            // Kalau hanya ada 1 super_admin, larang hapus
+            if ($totalSuperAdmin <= 1) {
+                return redirect()->route('user.index')->with('error', 'Super Admin terakhir tidak boleh dihapus.');
+            }
+        }
+
+        // Lanjut hapus jika aman
         $user->delete();
+
         return redirect()->route('user.index')->with('success', 'User berhasil dihapus.');
     }
 }

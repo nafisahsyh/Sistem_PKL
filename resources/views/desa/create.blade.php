@@ -1,5 +1,7 @@
 @extends('theme.default')
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -9,37 +11,56 @@
             <form action="{{ route('desa.store') }}" method="POST">
                 @csrf
 
-                {{-- Pilihan Kecamatan --}}
-                <div class="mb-3">
-                    <label for="id_kecamatan" class="form-label">Kecamatan</label>
-                    <select name="id_kecamatan" id="id_kecamatan"
-                        class="form-select text-kecil @error('id_kecamatan') is-invalid @enderror" required>
-                        <option value="" disabled selected hidden>Pilih Kecamatan</option>
-                        @foreach ($kecamatan as $item)
-                            <option value="{{ $item->id_kecamatan }}"
-                                {{ old('id_kecamatan') == $item->id_kecamatan ? 'selected' : '' }}>
-                                {{ $item->kecamatan }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('id_kecamatan')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <div class="row">
+                    {{-- Pilihan Kecamatan --}}
+                    <div class="col-md-6 mb-3">
+                        <label for="id_kecamatan" class="form-label">Kecamatan</label>
+                        <select name="id_kecamatan" id="id_kecamatan"
+                            class="form-select text-kecil @error('id_kecamatan') is-invalid @enderror" required>
+                            <option value="" disabled selected hidden>Pilih Kecamatan</option>
+                            @foreach ($kecamatan as $item)
+                                <option value="{{ $item->id_kecamatan }}"
+                                    {{ old('id_kecamatan') == $item->id_kecamatan ? 'selected' : '' }}>
+                                    {{ $item->kecamatan }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_kecamatan')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Nama Desa --}}
+                    <div class="col-md-6 mb-3">
+                        <label for="desa" class="form-label">Nama Desa</label>
+                        <input type="text" class="form-control text-kecil @error('desa') is-invalid @enderror"
+                            id="desa" name="desa" value="{{ old('desa') }}" placeholder="Masukkan nama desa" required>
+                        @error('desa')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
-                {{-- Nama Desa --}}
-                <div class="mb-3">
-                    <label for="desa" class="form-label">Nama Desa</label>
-                    <input type="text" class="form-control text-kecil @error('desa') is-invalid @enderror" id="desa"
-                        name="desa" value="{{ old('desa') }}" placeholder="Masukkan nama desa" required>
-                    @error('desa')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <div class="text-start mt-3">
+                    <button type="submit" class="btn btn-success me-2">Simpan</button>
+                    <a href="{{ route('desa.index') }}" class="btn btn-danger">Batal</a>
                 </div>
-
-                <button type="submit" class="btn btn-success">Simpan</button>
-                <a href="{{ route('desa.index') }}" class="btn btn-danger">Batal</a>
             </form>
         </div>
     </div>
+
+    {{-- Script untuk inisialisasi Choices.js --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const kecamatanSelect = document.getElementById('id_kecamatan');
+            new Choices(kecamatanSelect, {
+                searchEnabled: false,
+                itemSelectText: '',
+                shouldSort: false,
+                placeholder: true,
+                placeholderValue: 'Pilih Kecamatan',
+                allowHTML: true
+            });
+        });
+    </script>
 @endsection
