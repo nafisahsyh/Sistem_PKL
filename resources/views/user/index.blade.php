@@ -93,8 +93,8 @@
                 const form = this.closest('.delete-form');
 
                 Swal.fire({
-                    title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;'>Yakin ingin menghapus?</h3>",
-                    html: "<p style='font-size:14px;margin:0;'>Data yang dihapus tidak dapat dikembalikan!</p>",
+                    title: "Yakin ingin menghapus?",
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
                     icon: 'warning',
                     iconColor: '#dc3545',
                     showCancelButton: true,
@@ -112,16 +112,27 @@
     });
 </script>
 
-{{-- Notifikasi sukses --}}
+{{-- Notifikasi sukses & error --}}
 @if (session('success'))
 <script>
     Swal.fire({
         icon: 'success',
-        title: "<h3 style='font-size:15px;margin-bottom:0;'>Berhasil</h3>",
+        title: "Berhasil",
         text: "{{ session('success') }}",
         confirmButtonColor: '#198754',
         timer: 1800,
         showConfirmButton: false
+    });
+</script>
+@endif
+
+@if (session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: "Gagal",
+        text: "{{ session('error') }}",
+        confirmButtonColor: '#dc3545',
     });
 </script>
 @endif

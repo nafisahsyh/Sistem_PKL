@@ -267,7 +267,7 @@
 }
 
 .form-label {
-    font-size: 1rem;
+    font-size: 0.9rem;
     /* atau 15px */
     font-weight: 500;
     /* biar konsisten tebalnya */
@@ -279,7 +279,7 @@
 .form-select {
     background-color: #f6f5f5;
     /* samain warna */
-    height: 42px;
+    height: 35px;
     /* samain tinggi */
     font-size: 0.9rem;
     padding: 8px 12px;
@@ -289,15 +289,40 @@
 
 /* Mengecilkan teks di dalam input */
 .text-kecil {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 /* Placeholder juga ikut kecil */
 .text-kecil::placeholder {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #b9b8b8;
 }
 
+/* Kurangi jarak antar input */
+.form-group,
+.mb-3 {
+    margin-bottom: 10px !important; /* default Bootstrap 16px–24px, ini kita rapatin */
+}
+
+.form-label {
+    margin-bottom: 5px;
+}
+
+/* rapatkan antar kolom kiri-kanan */
+.row .col-md-6 {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+/* jarak antar baris input */
+.mb-3 {
+    margin-bottom: 12px;
+}
+
+/* jarak tombol dari input terakhir */
+.mt-3 {
+    margin-top: 20px !important;
+}
 /* Biar jarak antar tombol sedikit lega */
 .btn+.btn {
     margin-left: 5px;
@@ -309,7 +334,6 @@
     border-radius: 8px;
     padding: 0 12px;
 }
-
 
 /* Pagination hijau */
 .pagination .page-link {
@@ -333,4 +357,61 @@
 .pagination .disabled .page-link {
     color: #6c757d;
     background-color: #f8f9fa;
+}
+
+/* === Samakan tinggi dan tampilan dropdown dengan input lainnya === */
+div.choices[data-type*="select-one"] .choices__inner {
+    background-color: #f6f5f5 !important;
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    height: 38px !important;
+    padding: 4px 8px !important;
+    font-size: 0.9rem !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+}
+
+/* === Placeholder tetap abu-abu === */
+div.choices[data-type*="select-one"] .choices__placeholder {
+    color: #b9b8b8 !important;
+    opacity: 1 !important;
+}
+
+/* === Warna hover item (biru) === */
+div.choices[data-type*="select-one"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+/* === Dropdown list tampak rapi === */
+div.choices[data-type*="select-one"] .choices__list--dropdown {
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    background-color: #fff !important;
+}
+
+/* === Ubah ukuran dropdown === */
+div.choices[data-type*="select-one"] .choices__inner {
+    min-height: 35px !important;
+    height: 35px !important;
+    padding: 6px 10px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* === Panah posisi tengah (jangan terlalu mepet atas) === */
+div.choices[data-type*="select-one"]::after {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+
+.text-muted-small {
+    font-size: 0.8rem;
+    color: #6c757d;
+    display: block;
+    font-style: italic;
+    margin-top: 5px;
 }
