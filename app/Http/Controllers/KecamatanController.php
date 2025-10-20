@@ -10,7 +10,7 @@ class KecamatanController extends Controller
     // Menampilkan semua data kecamatan
     public function index()
     {
-        $kecamatan = Kecamatan::all();
+        $kecamatan = Kecamatan::orderBy('id_kecamatan', 'desc')->get();
         return view('kecamatan.index', compact('kecamatan'));
     }
 

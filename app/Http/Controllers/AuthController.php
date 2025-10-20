@@ -103,8 +103,8 @@ class AuthController extends Controller
         );
 
         return $status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT
-            ? back()->with('status', 'Link reset password telah dikirim ke email Anda!')
-            : back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
+            ? back()->with('status', 'Tautan ubah kata sandi berhasil dikirim ke email Anda!')
+            : back()->withErrors(['email' => 'Gagal mengirim link ubah kata sandi.']);
     }
 
     public function showResetForm($token)
@@ -136,7 +136,7 @@ class AuthController extends Controller
         );
 
         if ($status == Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('success', 'Password berhasil diubah!');
+            return redirect()->route('login')->with('success', 'Kata sandi berhasil diubah!');
         } else {
             return back()->withErrors(['email' => __($status)]);
         }

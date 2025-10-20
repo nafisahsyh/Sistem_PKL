@@ -31,6 +31,23 @@
       <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
       <h3 class="fw-bold mb-4">Ubah Kata Sandi</h3>
 
+      {{-- Notifikasi sukses --}}
+      @if(session('status'))
+        <div id="flash-message" class="alert alert-success" style="transition: opacity 0.5s;">
+            {{ session('status') }}
+        </div>
+
+        <script>
+            setTimeout(function() {
+                const msg = document.getElementById('flash-message');
+                if (msg) {
+                    msg.style.opacity = "0"; // mulai fade out
+                    setTimeout(() => msg.remove(), 500); // hapus elemen setelah 0.5s
+                }
+            }, 3000); // tampil 3 detik sebelum fade
+        </script>
+    @endif
+
       <form action="{{ route('password.email') }}" method="POST">
           @csrf
           <div class="form-group">
@@ -45,5 +62,6 @@
     </div>
   </div>
 </body>
-
 </html>
+
+

@@ -10,7 +10,7 @@ class TahunTanamController extends Controller
     // Menampilkan semua data tahun
     public function index()
     {
-        $tahun_tanam = Tahun_Tanam::all();
+        $tahun_tanam = Tahun_Tanam::orderBy('id_tahun_tanam', 'desc')->get();
         return view('tahun_tanam.index', compact('tahun_tanam'));
     }
 

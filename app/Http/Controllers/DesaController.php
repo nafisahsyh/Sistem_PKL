@@ -22,7 +22,7 @@ class DesaController extends Controller
                 });
         }
 
-        $desa = $query->paginate(10)->withQueryString(); // keep search in pagination links
+       $desa = $query->orderBy('id_desa', 'desc')->paginate(10)->withQueryString(); // keep search in pagination links
 
         return view('desa.index', compact('desa'));
     }
