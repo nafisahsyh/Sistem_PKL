@@ -25,7 +25,7 @@
     <!-- Form kanan -->
     <div class="login-form text-center">
       <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
-      <h3 class="fw-bold mb-4">Reset Password Baru</h3>
+      <h3 class="fw-bold mb-4">Ubah Kata Sandi</h3>
 
       {{-- Alert error --}}
       @if($errors->any())
@@ -54,7 +54,7 @@
               <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
           </div>
 
-          <button type="submit" class="btn-login">Reset Password</button>
+          <button type="submit" class="btn-login">Ubah Kata Sandi</button>
 
           <div class="back-login mt-3">
               <a href="{{ route('login') }}">Kembali ke login</a>

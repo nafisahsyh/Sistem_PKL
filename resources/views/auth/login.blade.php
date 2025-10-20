@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="forgot mb-3 text-end">
-                    <a href="/reset">Lupa password?</a>
+                    <a href="/reset">Lupa Kata Sandi?</a>
                 </div>
 
                 <button type="submit" class="btn-login">Login</button>

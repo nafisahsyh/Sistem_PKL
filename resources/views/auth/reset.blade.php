@@ -29,7 +29,7 @@
     <!-- Form kanan -->
     <div class="login-form text-center">
       <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
-      <h3 class="fw-bold mb-4">Reset Password</h3>
+      <h3 class="fw-bold mb-4">Ubah Kata Sandi</h3>
 
       <form action="{{ route('password.email') }}" method="POST">
           @csrf

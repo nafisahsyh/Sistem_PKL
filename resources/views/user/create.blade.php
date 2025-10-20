@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="container-fluid px-4 mt-5">
-    <h4 class="mt-4 text-brown">Tambah User</h4>
+    <h4 class="mt-4 text-brown">Tambah Pengguna</h4>
 
     <div class="card p-4">
         <form action="{{ route('user.store') }}" method="POST">
