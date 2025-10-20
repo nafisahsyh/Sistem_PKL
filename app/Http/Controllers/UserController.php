@@ -15,14 +15,16 @@ class UserController extends Controller
     {
         $query = User::query();
 
-        // Filter search
-        if ($request->has('search') && !empty($request->search)) {
-            $keyword = $request->search;
-            $query->where(function ($q) use ($keyword) {
-                $q->where('nama', 'like', "%{$keyword}%")
-                    ->orWhere('username', 'like', "%{$keyword}%")
-                    ->orWhere('role', 'like', "%{$keyword}%");
-            });
+    // Filter search
+    if ($request->has('search') && !empty($request->search)) {
+        $keyword = $request->search;
+
+        // Ganti query lama dengan ini
+        $query->where(function ($q) use ($keyword) {
+            $q->where('nama', 'like', "%{$keyword}%")
+                ->orWhere('username', 'like', "%{$keyword}%")
+                ->orWhereRaw("REPLACE(role, '_', ' ') LIKE ?", ["%{$keyword}%"]);
+        });
         }
 
         // Pagination 10 per halaman, keep query string untuk search
