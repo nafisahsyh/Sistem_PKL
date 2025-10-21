@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Kecamatan;
 use App\Models\Desa;
 use App\Models\User;
+use App\Models\Petani;
 
 class DashboardController extends Controller
 {
@@ -23,7 +24,9 @@ class DashboardController extends Controller
 
         $jumlahPengguna = User::count();
 
+        $jumlahPetani = Petani::count();
+
         // Kirim data ke view
-        return view('dashboard', compact('jumlahKecamatan', 'jumlahDesa', 'jumlahPengguna'));
+        return view('dashboard', compact('jumlahKecamatan', 'jumlahDesa', 'jumlahPengguna', 'jumlahPetani'));
     }
 }

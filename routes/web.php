@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KepemilikanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KecamatanController;
@@ -54,6 +55,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::resource('desa', DesaController::class);
     Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('petani', PetaniController::class);
+    Route::resource('kepemilikan', KepemilikanController::class);
 });
 
 // hanya super admin

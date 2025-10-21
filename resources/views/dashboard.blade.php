@@ -95,7 +95,7 @@
             <div class="card bg-green text-white mb-4">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-tractor fa-2x"></i>
+                        <i class="fas fa-user fa-2x"></i>
                         <div>
                             <h6 class="mb-0">Petani</h6>
                             <h3 class="mb-0">
