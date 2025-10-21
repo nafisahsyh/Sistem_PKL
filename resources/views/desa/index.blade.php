@@ -8,7 +8,7 @@
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
-                <div class="d-flex justify-content-between mb-1">
+                <div class="d-flex justify-content-between mb-0">
                     {{-- Tombol Tambah --}}
                     <a href="{{ route('desa.create') }}" class="btn btn-success mb-3" title="Tambah Desa">
                         <i class="fas fa-plus"></i>

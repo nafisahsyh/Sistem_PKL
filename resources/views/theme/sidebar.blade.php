@@ -6,25 +6,24 @@
     <nav class="sb-sidenav accordion bg-brown-custom" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
             <div class="nav">
-                {{--pemisahan dashboard sesuai role--}}
+                {{-- pemisahan dashboard sesuai role --}}
                 <div class="sb-sidenav-menu-heading">Core</div>
                 @php
-                    $dashboardRoute = Auth::user()->role === 'super_admin' 
-                        ? route('dashboard.super') 
-                        : route('dashboard.admin');
+                    $dashboardRoute =
+                        Auth::user()->role === 'super_admin' ? route('dashboard.super') : route('dashboard.admin');
                 @endphp
                 {{-- Semua role bisa akses Dashboard --}}
-                <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{$dashboardRoute}}">
+                <a class="nav-link {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{ $dashboardRoute }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-house"></i></div>
                     Dashboard
                 </a>
 
                 {{-- Bagian Interface --}}
-                @if(in_array(Auth::user()->role, ['admin', 'super_admin']))
+                @if (in_array(Auth::user()->role, ['admin', 'super_admin']))
                     <div class="sb-sidenav-menu-heading">Interface</div>
 
                     {{-- Pengguna: hanya super admin --}}
-                    @if(Auth::user()->role == 'super_admin')
+                    @if (Auth::user()->role == 'super_admin')
                         <a class="nav-link {{ Request::is('user') ? 'active' : '' }}" href="/user">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Pengguna
@@ -47,13 +46,19 @@
                         Tahun Tanam
                     </a>
 
-                    <a class="nav-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tractor"></i></div>
+                    <a class="nav-link {{ Request::is('petani') ? 'active' : '' }}" href="/petani">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                         Petani
                     </a>
 
+                    <a class="nav-link {{ Request::is('kepemilikan') ? 'active' : '' }}" href="/kepemilikan">
+                        <div class="sb-nav-link-icon"><i class="fas fa-file-contract"></i></div>
+                        Kepemilikan
+                    </a>
+
                     {{-- Transaksi --}}
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
                         <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
                         Transaksi
                     </a>
@@ -71,7 +76,8 @@
                     </div>
 
                     {{-- Laporan --}}
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
                         <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
                         Laporan
                     </a>

@@ -7,6 +7,8 @@ use App\Http\Controllers\DesaController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PetaniController;
+
 
 
 Route::get('/', function () {
@@ -51,6 +53,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::resource('kecamatan', KecamatanController::class);
     Route::resource('desa', DesaController::class);
     Route::resource('tahun_tanam', TahunTanamController::class);
+    Route::resource('petani', PetaniController::class);
 });
 
 // hanya super admin
