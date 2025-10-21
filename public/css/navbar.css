@@ -434,3 +434,8 @@ div.choices[data-type*="select-one"]::after {
 input.form-control {
     padding-right: 2.5rem !important; /* kasih ruang untuk ikon mata */
 }
+
+/* HUMBERGER BAR */
+.custom {
+  font-size: 20px; /* ubah sesuai kebutuhan */
+}
