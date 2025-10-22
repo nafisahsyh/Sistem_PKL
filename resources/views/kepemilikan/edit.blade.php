@@ -2,8 +2,8 @@
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
 @section('content')
-    <div class="container">
-        <h3>Edit Data Kepemilikan</h3>
+    <div class="container-fluid px-4 mt-5">
+        <h4 class="mt-4 text-brown">Edit Data Kepemilikan</h4>
 
         {{-- ALERT PESAN --}}
         @if (session('success'))
@@ -27,61 +27,66 @@
             @method('PUT')
 
             {{-- ===================== DATA PETANI ===================== --}}
-            <div class="card p-3 mb-3 bg-light">
-                <h5>Data Petani</h5>
+            <div class="card p-4 mb-4 shadow-sm rounded-3">
+                <h5 class="text-brown mb-3">Data Petani</h5>
 
-                <div class="mb-3">
-                    <label for="id_petani" class="form-label">Nomor Plasma</label>
-                    <select id="id_petani" name="id_petani" class="form-control" onchange="tampilDataPetani()">
-                        <option value="">-- Pilih Nomor Plasma --</option>
-                        @foreach ($petani as $p)
-                            <option value="{{ $p->id_petani }}" data-nama="{{ $p->nama }}"
-                                data-nik="{{ $p->NIK }}" data-anggota="{{ $p->nomor_anggota_koperasi }}"
-                                data-alamat="{{ $p->alamat }}"
-                                {{ $kepemilikan->id_petani == $p->id_petani ? 'selected' : '' }}>
-                                {{ $p->nomor_anggota_plasma }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nomor Anggota Plasma</label>
+                        <select id="id_petani" name="id_petani" class="form-select text-kecil"
+                            onchange="tampilDataPetani()">
+                            <option value="">-- Pilih Nomor Plasma --</option>
+                            @foreach ($petani as $p)
+                                <option value="{{ $p->id_petani }}" data-nama="{{ $p->nama }}"
+                                    data-nik="{{ $p->NIK }}" data-anggota="{{ $p->nomor_anggota_koperasi }}"
+                                    data-alamat="{{ $p->alamat }}"
+                                    {{ $kepemilikan->id_petani == $p->id_petani ? 'selected' : '' }}>
+                                    {{ $p->nomor_anggota_plasma }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="anggota" class="form-label">Nomor Anggota Koperasi</label>
+                        <input type="text" id="anggota" class="form-control text-kecil"
+                            value="{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '' }}" readonly>
+                    </div>
                 </div>
 
-                <div class="mb-2">
-                    <label>No. Anggota Koperasi</label>
-                    <input type="text" id="anggota" class="form-control"
-                        value="{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '' }}" readonly>
-                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="nik" class="form-label">NIK</label>
+                        <input type="text" id="nik" class="form-control text-kecil"
+                            value="{{ $kepemilikan->petani->NIK ?? '' }}" readonly>
+                    </div>
 
-                <div class="mb-2">
-                    <label>NIK</label>
-                    <input type="text" id="nik" class="form-control" value="{{ $kepemilikan->petani->NIK ?? '' }}"
-                        readonly>
-                </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="nama" class="form-label">Nama</label>
+                        <input type="text" id="nama" class="form-control text-kecil"
+                            value="{{ $kepemilikan->petani->nama ?? '' }}" readonly>
+                    </div>
 
-                <div class="mb-2">
-                    <label>Nama</label>
-                    <input type="text" id="nama" class="form-control"
-                        value="{{ $kepemilikan->petani->nama ?? '' }}" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>Alamat</label>
-                    <textarea id="alamat" class="form-control" rows="2" readonly>{{ $kepemilikan->petani->alamat ?? '' }}</textarea>
+                    <div class="col-md-4 mb-3">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <textarea id="alamat" class="form-control text-kecil" rows="1" readonly>{{ $kepemilikan->petani->alamat ?? '' }}</textarea>
+                    </div>
                 </div>
             </div>
 
-            {{-- ===================== DATA LAHAN & DETAIL KEPEMILIKAN ===================== --}}
-            <div class="card p-3 mb-3 bg-light">
-                <h5>Data Lahan & Detail Kepemilikan</h5>
+            {{-- ===================== DATA LAHAN ===================== --}}
+            <div class="card p-4 mb-4 shadow-sm rounded-3">
+                <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
 
                 <div id="lahan-container">
                     @foreach ($kepemilikan->detailKepemilikan as $index => $detail)
-                        <div class="lahan-item border p-3 mb-3 rounded bg-white">
-                            <h6 class="text-success">Lahan {{ $index + 1 }}</h6>
+                        <div class="border rounded p-3 mb-4 bg-light">
+                            <h6 class="text-brown mb-3">Lahan {{ $index + 1 }}</h6>
 
                             <div class="row">
-                                <div class="col-md-4 mb-2">
-                                    <label>Desa</label>
-                                    <select name="lahan[{{ $index }}][id_desa]" class="form-control">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Desa</label>
+                                    <select name="lahan[{{ $index }}][id_desa]" class="form-select text-kecil">
                                         <option value="">-- Pilih Desa --</option>
                                         @foreach ($desa as $d)
                                             <option value="{{ $d->id_desa }}"
@@ -92,9 +97,10 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4 mb-2">
-                                    <label>Tahun Tanam</label>
-                                    <select name="lahan[{{ $index }}][id_tahun_tanam]" class="form-control">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tahun Tanam</label>
+                                    <select name="lahan[{{ $index }}][id_tahun_tanam]"
+                                        class="form-select text-kecil">
                                         <option value="">-- Pilih Tahun --</option>
                                         @foreach ($tahun_tanam as $t)
                                             <option value="{{ $t->id_tahun_tanam }}"
@@ -105,44 +111,44 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4 mb-2">
-                                    <label>Luas Tanah (Peta)</label>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Luas Tanah (Peta)</label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
-                                        class="form-control" value="{{ $detail->lahan->luas_peta }}">
+                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
                                 </div>
                             </div>
 
-                            <hr>
-                            <h6>Detail Kepemilikan Lahan Ini</h6>
                             <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <label>Nomor SHM</label>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nomor SHM</label>
                                     <input type="text" name="lahan[{{ $index }}][nomor_SHM]"
-                                        class="form-control" value="{{ $detail->nomor_SHM }}">
+                                        class="form-control text-kecil" value="{{ $detail->nomor_SHM }}">
                                 </div>
 
-                                <div class="col-md-6 mb-2">
-                                    <label>Nomor Sporadik</label>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nomor Sporadik</label>
                                     <input type="text" name="lahan[{{ $index }}][nomor_sporadik]"
-                                        class="form-control" value="{{ $detail->nomor_sporadik }}">
+                                        class="form-control text-kecil" value="{{ $detail->nomor_sporadik }}">
                                 </div>
 
-                                <div class="col-md-4 mb-2">
-                                    <label>Luas Surat (m²)</label>
-                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
-                                        class="form-control" value="{{ $detail->luas_surat }}">
-                                </div>
-
-                                <div class="col-md-4 mb-2">
-                                    <label>Nomor PBB</label>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nomor PBB</label>
                                     <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
-                                        class="form-control" value="{{ $detail->nomor_pbb }}">
+                                        class="form-control text-kecil" value="{{ $detail->nomor_pbb }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Luas Surat (m²)</label>
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
+                                        class="form-control text-kecil" value="{{ $detail->luas_surat }}">
                                 </div>
 
-                                <div class="col-md-4 mb-2">
-                                    <label>Jumlah PBB (Rp)</label>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Jumlah PBB (Rp)</label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
-                                        class="form-control" value="{{ $detail->jumlah_pbb }}">
+                                        class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
                                 </div>
                             </div>
                         </div>
@@ -153,29 +159,31 @@
             </div>
 
             {{-- ===================== STATUS KEPEMILIKAN ===================== --}}
-            <div class="card p-3 mb-3 bg-light">
-                <h5>Status Kepemilikan</h5>
+            <div class="card p-4 mb-4 shadow-sm rounded-3">
+                <h5 class="text-brown mb-3">Status Kepemilikan</h5>
 
-                <div class="mb-2">
-                    <label>Status</label>
-                    <select name="status_kepemilikan" class="form-control">
-                        <option value="aktif" {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
-                        </option>
-                        <option value="nonaktif" {{ $kepemilikan->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>
-                            Non-Aktif</option>
-                    </select>
-                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status_kepemilikan" class="form-select text-kecil">
+                            <option value="aktif" {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'selected' : '' }}>
+                                Aktif</option>
+                            <option value="nonaktif"
+                                {{ $kepemilikan->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Non-Aktif</option>
+                        </select>
+                    </div>
 
-                <div class="mb-2">
-                    <label>Tanggal Mulai</label>
-                    <input type="date" name="tanggal_mulai" class="form-control"
-                        value="{{ $kepemilikan->tanggal_mulai }}">
-                </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="date" name="tanggal_mulai" class="form-control text-kecil"
+                            value="{{ $kepemilikan->tanggal_mulai }}">
+                    </div>
 
-                <div class="mb-2">
-                    <label>Tanggal Selesai</label>
-                    <input type="date" name="tanggal_selesai" class="form-control"
-                        value="{{ $kepemilikan->tanggal_selesai }}">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tanggal Selesai</label>
+                        <input type="date" name="tanggal_selesai" class="form-control text-kecil"
+                            value="{{ $kepemilikan->tanggal_selesai }}">
+                    </div>
                 </div>
             </div>
 

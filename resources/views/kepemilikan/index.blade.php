@@ -17,7 +17,7 @@
                     {{-- Form Search --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET" class="d-flex align-items-start">
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari nama petani, nomor PBB, atau SHM..." value="{{ request('search') }}"
+                            placeholder="Cari nama petani, nomor plasma, atau desa..." value="{{ request('search') }}"
                             style="width: 300px;">
                         <button class="btn btn-success" type="submit" title="Cari">
                             <i class="fas fa-search"></i>
@@ -32,10 +32,11 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
+                            <th>Nomor Plasma</th>
                             <th>Nama Petani</th>
-                            <th>Nomor PBB</th>
-                            <th>Luas Surat (m²)</th>
-                            <th>Status Kepemilikan</th>
+                            <th>Desa (Kecamatan)</th>
+                            <th>Tahun Tanam</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -46,24 +47,42 @@
                                     {{ ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage() + $loop->iteration }}
                                 </td>
 
+                                {{-- Nomor Plasma --}}
+                                <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
+
                                 {{-- Nama Petani --}}
                                 <td>{{ $k->petani->nama ?? '-' }}</td>
 
-                                {{-- Nomor PBB: ambil dari detail kepemilikan --}}
+                                {{-- Desa (Kecamatan) --}}
                                 <td>
-                                    @forelse ($k->detailKepemilikan as $detail)
-                                        <div>{{ $detail->nomor_pbb ?? '-' }}</div>
-                                    @empty
-                                        <span class="text-muted">-</span>
-                                    @endforelse
+                                    @php
+                                        $desaList = $k->detailKepemilikan
+                                            ->pluck('lahan.desa.desa')
+                                            ->filter()
+                                            ->unique()
+                                            ->implode(', ');
+                                        $kecamatanList = $k->detailKepemilikan
+                                            ->pluck('lahan.desa.kecamatan.kecamatan')
+                                            ->filter()
+                                            ->unique()
+                                            ->implode(', ');
+                                    @endphp
+                                    {{ $desaList ?: '-' }} ({{ $kecamatanList ?: '-' }})
                                 </td>
 
-                                {{-- Luas surat: total dari semua detail --}}
-                                <td class="text-end">
-                                    {{ number_format($k->detailKepemilikan->sum('luas_surat'), 2, ',', '.') }}
+                                {{-- Tahun Tanam --}}
+                                <td class="text-center">
+                                    @php
+                                        $tahunTanam = $k->detailKepemilikan
+                                            ->pluck('lahan.tahunTanam.tahun')
+                                            ->filter()
+                                            ->unique()
+                                            ->implode(', ');
+                                    @endphp
+                                    {{ $tahunTanam ?: '-' }}
                                 </td>
 
-                                {{-- Status kepemilikan --}}
+                                {{-- Status --}}
                                 <td class="text-center">
                                     <span
                                         class="badge {{ $k->status_kepemilikan === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
@@ -73,12 +92,12 @@
 
                                 {{-- Aksi --}}
                                 <td class="text-center">
-                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}" class="btn btn-info btn-sm"
-                                        title="Detail">
+                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}"
+                                        class="btn btn-info btn-sm" title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}" class="btn btn-warning btn-sm"
-                                        title="Edit">
+                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}"
+                                        class="btn btn-warning btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}" method="POST"
@@ -93,7 +112,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
                                     <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data kepemilikan</p>
                                 </td>
@@ -113,10 +132,10 @@
     {{-- Konfirmasi Hapus --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const form = this.closest('.delete-form');
                     Swal.fire({
                         title: "Yakin ingin menghapus?",
