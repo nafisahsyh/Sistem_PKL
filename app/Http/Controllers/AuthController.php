@@ -48,7 +48,7 @@ class AuthController extends Controller
         $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         // Coba cari user
-        $user = \App\Models\User::where($loginType, $request->login)->first();
+        $user = User::where($loginType, $request->login)->first();
 
         // Jika user ditemukan dan password cocok
         if ($user && Hash::check($request->password, $user->password)) {
@@ -98,13 +98,13 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email',
         ]);
 
-        $status = \Illuminate\Support\Facades\Password::sendResetLink(
+        $status = Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT
+        return $status === Password::RESET_LINK_SENT
             ? back()->with('status', 'Tautan ubah kata sandi berhasil dikirim ke email Anda!')
-            : back()->withErrors(['email' => 'Gagal mengirim link ubah kata sandi.']);
+            : back()->withErrors(['email' => 'Gagal mengirim tautan ubah kata sandi.']);
     }
 
     public function showResetForm($token)

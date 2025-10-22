@@ -56,7 +56,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('petani', PetaniController::class);
     Route::resource('kepemilikan', KepemilikanController::class);
-    Route::get('/kepemilikan/{id}', [KepemilikanController::class, 'show'])->name('kepemilikan.show');
+    Route::get('/kepemilikan/{id}/pdf', [KepemilikanController::class, 'cetakPDF'])
+    ->name('kepemilikan.pdf');
 });
 
 // hanya super admin

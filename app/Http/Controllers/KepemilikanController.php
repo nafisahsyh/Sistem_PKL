@@ -8,6 +8,11 @@ use App\Models\Petani;
 use App\Models\Lahan;
 use App\Models\Desa;
 use App\Models\Tahun_Tanam;
+
+use Barryvdh\DomPDF\Facade\Pdf;
+use setasign\Fpdi\Fpdi;
+use FPDF;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +29,7 @@ class KepemilikanController extends Controller
             $search = $request->search;
             $query->whereHas('petani', function ($q) use ($search) {
                 $q->where('nama_petani', 'like', "%{$search}%")
-                  ->orWhere('nik', 'like', "%{$search}%");
+                    ->orWhere('nik', 'like', "%{$search}%");
             });
         }
 
@@ -220,4 +225,72 @@ class KepemilikanController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    /*
+     * function untuk menampilkan detail
+     */
+    public function show($id_kepemilikan)
+    {
+        $kepemilikan = Kepemilikan::with([
+            'petani',
+            'detailKepemilikan.lahan.desa.kecamatan',
+            'detailKepemilikan.lahan.tahunTanam'
+        ])->findOrFail($id_kepemilikan);
+
+        return view('kepemilikan.detail', compact('kepemilikan'));
+    }
+
+    public function cetakPDF($id)
+    {
+        // 1️⃣ Ambil data kepemilikan
+        $kepemilikan = Kepemilikan::with([
+            'petani',
+            'detailKepemilikan.lahan.desa.kecamatan',
+            'detailKepemilikan.lahan.tahun_tanam'
+        ])->findOrFail($id);
+
+        // 2️⃣ Generate PDF utama dari view (DomPDF) dan simpan sementara
+        $pdf = Pdf::loadView('kepemilikan.pdf', compact('kepemilikan'))
+            ->setPaper('a4', 'portrait');
+
+        $pathMain = storage_path('app/public/kepemilikan.pdf'); // simpan sementara
+        $pdf->save($pathMain);
+
+        // 3️⃣ Ambil semua lampiran PDF dari detail
+        $lampiranFiles = [];
+        if (
+            $kepemilikan->petani->pdf_scan_ktp &&
+            file_exists(storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp))
+        ) {
+            $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp);
+        }
+
+        // 4️⃣ Merge PDF utama + lampiran (pakai FPDI)
+        $pdfMerger = new Fpdi();
+
+        // Tambahkan halaman dari PDF utama
+        $pageCount = $pdfMerger->setSourceFile($pathMain);
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $pdfMerger->AddPage();
+            $tpl = $pdfMerger->importPage($i);
+            $pdfMerger->useTemplate($tpl);
+        }
+
+        // Tambahkan halaman dari semua lampiran
+        foreach ($lampiranFiles as $file) {
+            $pageCount = $pdfMerger->setSourceFile($file);
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $pdfMerger->AddPage();
+                $tpl = $pdfMerger->importPage($i);
+                $pdfMerger->useTemplate($tpl);
+            }
+        }
+
+        // 5️⃣ Simpan PDF gabungan & download
+        $finalPath = storage_path('app/public/kepemilikan_gabungan.pdf');
+        $pdfMerger->Output($finalPath, 'F');
+
+        return response()->download($finalPath, 'Data_Kepemilikan_' . $kepemilikan->petani->nama . '.pdf');
+    }
+
 }

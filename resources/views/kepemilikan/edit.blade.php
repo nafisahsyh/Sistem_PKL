@@ -5,6 +5,23 @@
     <div class="container">
         <h3>Edit Data Kepemilikan</h3>
 
+        {{-- ALERT PESAN --}}
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('kepemilikan.update', $kepemilikan->id_kepemilikan) }}" method="POST">
             @csrf
             @method('PUT')
@@ -64,7 +81,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-2">
                                     <label>Desa</label>
-                                    <select name="detail[{{ $index }}][id_desa]" class="form-control">
+                                    <select name="lahan[{{ $index }}][id_desa]" class="form-control">
                                         <option value="">-- Pilih Desa --</option>
                                         @foreach ($desa as $d)
                                             <option value="{{ $d->id_desa }}"
@@ -77,7 +94,7 @@
 
                                 <div class="col-md-4 mb-2">
                                     <label>Tahun Tanam</label>
-                                    <select name="detail[{{ $index }}][id_tahun_tanam]" class="form-control">
+                                    <select name="lahan[{{ $index }}][id_tahun_tanam]" class="form-control">
                                         <option value="">-- Pilih Tahun --</option>
                                         @foreach ($tahun_tanam as $t)
                                             <option value="{{ $t->id_tahun_tanam }}"
@@ -90,7 +107,7 @@
 
                                 <div class="col-md-4 mb-2">
                                     <label>Luas Tanah (Peta)</label>
-                                    <input type="number" step="0.01" name="detail[{{ $index }}][luas_peta]"
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
                                         class="form-control" value="{{ $detail->lahan->luas_peta }}">
                                 </div>
                             </div>
@@ -100,31 +117,31 @@
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Nomor SHM</label>
-                                    <input type="text" name="detail[{{ $index }}][nomor_SHM]"
+                                    <input type="text" name="lahan[{{ $index }}][nomor_SHM]"
                                         class="form-control" value="{{ $detail->nomor_SHM }}">
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Nomor Sporadik</label>
-                                    <input type="text" name="detail[{{ $index }}][nomor_sporadik]"
+                                    <input type="text" name="lahan[{{ $index }}][nomor_sporadik]"
                                         class="form-control" value="{{ $detail->nomor_sporadik }}">
                                 </div>
 
                                 <div class="col-md-4 mb-2">
                                     <label>Luas Surat (m²)</label>
-                                    <input type="number" step="0.01" name="detail[{{ $index }}][luas_surat]"
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
                                         class="form-control" value="{{ $detail->luas_surat }}">
                                 </div>
 
                                 <div class="col-md-4 mb-2">
                                     <label>Nomor PBB</label>
-                                    <input type="text" name="detail[{{ $index }}][nomor_pbb]"
+                                    <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
                                         class="form-control" value="{{ $detail->nomor_pbb }}">
                                 </div>
 
                                 <div class="col-md-4 mb-2">
                                     <label>Jumlah PBB (Rp)</label>
-                                    <input type="number" step="0.01" name="detail[{{ $index }}][jumlah_pbb]"
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
                                         class="form-control" value="{{ $detail->jumlah_pbb }}">
                                 </div>
                             </div>
@@ -164,12 +181,13 @@
 
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                <a href="{{ route('kecamatan.index') }}" class="btn btn-danger">Batal</a>
+                <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
             </div>
         </form>
     </div>
 
     <script>
+        // tampilkan info petani otomatis
         function tampilDataPetani() {
             const select = document.getElementById('id_petani');
             const opt = select.options[select.selectedIndex];
@@ -179,6 +197,7 @@
             document.getElementById('alamat').value = opt.getAttribute('data-alamat') || '';
         }
 
+        // duplikasi lahan baru
         let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
 
         function tambahLahan() {
@@ -188,6 +207,7 @@
             first.querySelectorAll('input, select').forEach(el => {
                 el.name = el.name.replace(/\d+/, lahanIndex);
                 el.value = '';
+                if (el.tagName === 'SELECT') el.selectedIndex = 0;
             });
 
             first.querySelector('h6.text-success').innerText = 'Lahan ' + (lahanIndex + 1);
