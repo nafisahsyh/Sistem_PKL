@@ -23,4 +23,15 @@ class Petani extends Model
         'status',
         'pdf_scan_ktp',
     ];
+
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class, 'id_desa', 'id_desa');
+    }
+
+    public function kepemilikan()
+    {
+        return $this->hasMany(Kepemilikan::class, 'id_petani', 'id_petani');
+    }
 }
+

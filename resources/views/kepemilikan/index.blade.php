@@ -45,27 +45,47 @@
                                 <td class="text-center">
                                     {{ ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage() + $loop->iteration }}
                                 </td>
+
+                                {{-- Nama Petani --}}
                                 <td>{{ $k->petani->nama ?? '-' }}</td>
-                                <td>{{ $k->nomor_pbb }}</td>
-                                <td class="text-end">{{ number_format($k->luas_surat, 2, ',', '.') }}</td>
+
+                                {{-- Nomor PBB: ambil dari detail kepemilikan --}}
+                                <td>
+                                    @forelse ($k->detailKepemilikan as $detail)
+                                        <div>{{ $detail->nomor_pbb ?? '-' }}</div>
+                                    @empty
+                                        <span class="text-muted">-</span>
+                                    @endforelse
+                                </td>
+
+                                {{-- Luas surat: total dari semua detail --}}
+                                <td class="text-end">
+                                    {{ number_format($k->detailKepemilikan->sum('luas_surat'), 2, ',', '.') }}
+                                </td>
+
+                                {{-- Status kepemilikan --}}
                                 <td class="text-center">
                                     <span
                                         class="badge {{ $k->status_kepemilikan === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
                                         {{ ucfirst($k->status_kepemilikan) }}
                                     </span>
                                 </td>
+
+                                {{-- Aksi --}}
                                 <td class="text-center">
-                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}" class="btn btn-info btn-sm">
+                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}" class="btn btn-info btn-sm"
+                                        title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}" class="btn btn-warning btn-sm">
+                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}" class="btn btn-warning btn-sm"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}" method="POST"
                                         class="d-inline delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger btn-sm btn-delete">
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -82,6 +102,7 @@
                     </tbody>
                 </table>
 
+                {{-- Pagination --}}
                 <div class="d-flex justify-content-end mt-3">
                     {{ $kepemilikan->links('pagination::bootstrap-5') }}
                 </div>
@@ -92,10 +113,10 @@
     {{-- Konfirmasi Hapus --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const form = this.closest('.delete-form');
                     Swal.fire({
                         title: "Yakin ingin menghapus?",

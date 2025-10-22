@@ -35,4 +35,14 @@ class Lahan extends Model
     {
         return $this->hasMany(Kepemilikan::class, 'id_lahan', 'id_lahan');
     }
+
+    public function tahun_tanam()
+    {
+        return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam', 'id_tahun_tanam');
+    }
+
+    public function detailKepemilikan()
+    {
+        return $this->hasMany(DetailKepemilikan::class, 'id_lahan', 'id_lahan');
+    }
 }

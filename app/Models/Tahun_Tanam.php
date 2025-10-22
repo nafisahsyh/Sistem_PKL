@@ -17,4 +17,5 @@ class Tahun_Tanam extends Model
 
     // kalau BIGINT, Laravel sudah otomatis baca sebagai int (bukan string)
     protected $keyType = 'int';
+    
 }

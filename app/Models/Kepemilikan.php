@@ -8,20 +8,14 @@ class Kepemilikan extends Model
 {
     protected $table = 'kepemilikan';
     protected $primaryKey = 'id_kepemilikan';
-    public $timestamps = false; // karena tabel tidak memiliki kolom created_at & updated_at
 
     protected $fillable = [
         'id_petani',
-        'id_lahan',
-        'nomor_SHM',
-        'nomor_sporadik',
-        'luas_surat',
-        'nomor_pbb',
-        'jumlah_pbb',
         'status_kepemilikan',
         'tanggal_mulai',
         'tanggal_selesai',
     ];
+
 
     /**
      * Relasi ke model Petani
@@ -32,12 +26,11 @@ class Kepemilikan extends Model
         return $this->belongsTo(Petani::class, 'id_petani', 'id_petani');
     }
 
-    /**
-     * Relasi ke model Lahan
-     * Setiap kepemilikan terkait dengan satu lahan
-     */
-    public function lahan()
+     /**
+      * relasi ke model Detail Lahan
+      */
+     public function detailKepemilikan()
     {
-        return $this->belongsTo(Lahan::class, 'id_lahan', 'id_lahan');
+        return $this->hasMany(DetailKepemilikan::class, 'id_kepemilikan', 'id_kepemilikan');
     }
 }
