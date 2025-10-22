@@ -8,7 +8,6 @@ class Kepemilikan extends Model
 {
     protected $table = 'kepemilikan';
     protected $primaryKey = 'id_kepemilikan';
-
     protected $fillable = [
         'id_petani',
         'status_kepemilikan',
@@ -16,20 +15,14 @@ class Kepemilikan extends Model
         'tanggal_selesai',
     ];
 
+    protected $with = ['detailKepemilikan.lahan', 'petani']; // auto load
 
-    /**
-     * Relasi ke model Petani
-     * Setiap kepemilikan dimiliki oleh satu petani
-     */
     public function petani()
     {
         return $this->belongsTo(Petani::class, 'id_petani', 'id_petani');
     }
 
-     /**
-      * relasi ke model Detail Lahan
-      */
-     public function detailKepemilikan()
+    public function detailKepemilikan()
     {
         return $this->hasMany(DetailKepemilikan::class, 'id_kepemilikan', 'id_kepemilikan');
     }
