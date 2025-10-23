@@ -8,14 +8,10 @@
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    {{-- Tombol Tambah --}}
-                    <a href="{{ route('kepemilikan.create') }}" class="btn btn-success" title="Tambah Kepemilikan">
-                        <i class="fas fa-plus"></i>
-                    </a>
-
-                    {{-- Form Search --}}
-                    <form action="{{ route('kepemilikan.index') }}" method="GET" class="d-flex align-items-start">
+                {{-- Baris atas: search di kanan --}}
+                <div class="d-flex justify-content-end mb-3">
+                    <form action="{{ route('kepemilikan.index') }}" method="GET"
+                        class="d-flex align-items-start flex-wrap justify-content-end">
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari nama petani, nomor plasma, atau desa..." value="{{ request('search') }}"
                             style="width: 300px;">
@@ -28,16 +24,17 @@
                     </form>
                 </div>
 
+                {{-- Tabel Data --}}
                 <table class="table table-bordered table-striped align-middle table-custom">
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
-                            <th>No</th>
-                            <th>Nomor Plasma</th>
-                            <th>Nama Petani</th>
-                            <th>Desa (Kecamatan)</th>
-                            <th>Tahun Tanam</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th style="width: 50px;">No</th>
+                            <th style="width: 130px;">Nomor Plasma</th>
+                            <th style="width: 160px;">Nama Petani</th>
+                            <th style="width: 200px;">Desa (Kecamatan)</th>
+                            <th style="width: 100px;">Tahun Tanam</th>
+                            <th style="width: 90px;">Status</th>
+                            <th style="width: 110px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,12 +89,12 @@
 
                                 {{-- Aksi --}}
                                 <td class="text-center">
-                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}"
-                                        class="btn btn-info btn-sm" title="Detail">
+                                    <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}" class="btn btn-info btn-sm"
+                                        title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}"
-                                        class="btn btn-warning btn-sm" title="Edit">
+                                    <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}" class="btn btn-warning btn-sm"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}" method="POST"
@@ -132,10 +129,10 @@
     {{-- Konfirmasi Hapus --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const form = this.closest('.delete-form');
                     Swal.fire({
                         title: "Yakin ingin menghapus?",
@@ -154,6 +151,7 @@
         });
     </script>
 
+    {{-- Alert sukses --}}
     @if (session('success'))
         <script>
             Swal.fire({

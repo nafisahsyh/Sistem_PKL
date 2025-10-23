@@ -28,8 +28,9 @@ class KepemilikanController extends Controller
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->whereHas('petani', function ($q) use ($search) {
-                $q->where('nama_petani', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%");
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
+                    ->orWhere('nomor_anggota_koperasi','like', "%{$search}%");
             });
         }
 

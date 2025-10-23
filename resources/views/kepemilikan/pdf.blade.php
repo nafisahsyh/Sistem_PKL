@@ -93,7 +93,7 @@
 
     <div class="header">
         {{-- Logo perusahaan / koperasi --}}
-        <img src="{{ public_path('img/logo.png') }}" alt="Logo">
+        <img src="{{ public_path('logo.png') }}" alt="Logo" style="width: 80px;">
         <h2><strong>DATA KEPEMILIKAN LAHAN PLASMA</strong></h2>
         <p><em>Dicetak tanggal {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</em></p>
         <hr>

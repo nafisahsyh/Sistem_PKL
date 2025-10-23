@@ -38,7 +38,7 @@
                             <th>Nama</th>
                             <th>Status</th>
                             <th>PDF DOC</th>
-                            <th style="width: 120px;">Aksi</th>
+                            <th style="width: 180px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,6 +66,9 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
+                                    <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i></i>
+                                    </a>
                                     <a href="{{ route('petani.edit', $p->id_petani) }}" class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
