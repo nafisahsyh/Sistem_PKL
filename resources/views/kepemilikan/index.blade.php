@@ -28,13 +28,13 @@
                 <table class="table table-bordered table-striped align-middle table-custom">
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
-                            <th style="width: 50px;">No</th>
-                            <th style="width: 130px;">Nomor Plasma</th>
-                            <th style="width: 160px;">Nama Petani</th>
-                            <th style="width: 200px;">Desa (Kecamatan)</th>
-                            <th style="width: 100px;">Tahun Tanam</th>
-                            <th style="width: 90px;">Status</th>
-                            <th style="width: 110px;">Aksi</th>
+                            <th>No</th>
+                            <th>Nomor Plasma</th>
+                            <th>Nama Petani</th>
+                            <th>Desa (Kecamatan)</th>
+                            <th>Tahun Tanam</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
