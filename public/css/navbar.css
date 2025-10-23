@@ -416,6 +416,15 @@ div.choices[data-type*="select-one"]::after {
     margin-top: 5px;
 }
 
+.text-normal {
+    font-size: 0.9rem;
+    font-weight: 600; /* normal */
+}
+
+.text-normal-sm {
+    font-size: 0.9rem;
+}
+
 .password-toggle {
     position: absolute;
     top: 70%;
