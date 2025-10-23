@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,159 +8,228 @@
 
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: Arial, sans-serif;
             font-size: 12px;
-            color: #333;
+            color: #000;
             margin: 25px;
         }
 
-        h2, h3, h4 {
+        h2,
+        h3,
+        h4 {
             text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* === KOP SURAT === */
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .header table {
+            width: 100%;
+            border: none;
+            border-collapse: collapse;
+        }
+
+        .header td {
+            border: none;
+            vertical-align: middle;
+        }
+
+        .header img {
+            width: 80px;
+            height: auto;
+        }
+
+        .kop-line {
+            border-top: 2px solid #000;
+            border-bottom: 1px solid #000;
+            height: 2px;
+            margin-top: 5px;
             margin-bottom: 10px;
         }
 
-        .section-title {
-            background-color: #28a745;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 5px;
-            font-size: 13px;
-            margin-top: 20px;
-        }
-
-        .section-title.yellow {
-            background-color: #ffc107;
-            color: #222;
-        }
-
+        /* TABEL */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
 
-        th, td {
-            border: 1px solid #aaa;
+        th,
+        td {
+            border: 1px solid #000;
             padding: 6px 8px;
             text-align: left;
         }
 
         th {
-            background-color: #f8f9fa;
+            background: none;
+            font-weight: bold;
         }
 
-        .no-border th, .no-border td {
+        .no-border th,
+        .no-border td {
             border: none;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 11px;
-        }
-
-        .bg-success { background-color: #28a745; }
-        .bg-secondary { background-color: #6c757d; }
-
+        /* CARD LAHAN */
         .card {
-            border: 1px solid #aaa;
-            border-radius: 5px;
+            border: 1px solid #000;
+            border-radius: 4px;
             margin-bottom: 10px;
             padding: 10px;
         }
 
         .card-header {
-            background-color: #e9f7ef;
             font-weight: bold;
-            color: #28a745;
-            padding: 6px 8px;
-            border-bottom: 1px solid #aaa;
+            padding: 5px 8px;
+            border-bottom: 1px solid #000;
+            background: none;
+            color: #000;
         }
 
+        /* BAGIAN JUDUL */
+        .section-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* TANDA TANGAN */
         .signature {
             width: 100%;
-            margin-top: 50px;
+            margin-top: 40px;
             text-align: right;
         }
 
         .signature p {
-            margin-bottom: 80px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .header img {
-            width: 70px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        hr {
-            border: 1px solid #000;
+            margin-bottom: 60px;
         }
     </style>
 </head>
+
 <body>
 
+    <!-- === KOP SURAT TANPA BORDER === -->
     <div class="header">
-        <img src="{{ public_path('logo.png') }}" alt="Logo" style="width: 80px;">
-        <h2><strong>DATA KEPEMILIKAN LAHAN PLASMA</strong></h2>
-        <p><em>Dicetak tanggal {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</em></p>
-        <hr>
+        <table>
+            <tr>
+                <td width="15%" style="text-align: center;">
+                    <img src="{{ public_path('logo.png') }}" alt="Logo">
+                </td>
+                <td style="text-align: center;">
+                    <h2 style="font-size: 18px;"><strong>KOPERASI SAWIT MAKMUR</strong></h2>
+                    <h3 style="font-size: 15px;">KABUPATEN TANAH LAUT</h3>
+                    <h4 style="font-size: 14px;">KALIMANTAN SELATAN</h4>
+                    <p style="font-size: 11px; margin: 2px 0 0 0;">
+                        Alamat: Jl. A. Yani Kel. Sarang Halang RT. 04 Kec. Pelaihari
+                    </p>
+                    <p style="font-size: 11px; margin: 0;">
+                        Email: <strong>kop.sm.13@gmail.com</strong>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <div class="kop-line"></div>
     </div>
+
+    <!-- JUDUL -->
+    <h2 style="text-align: center; margin-top: 10px; margin-bottom: 15px;">
+        <strong>DATA KEPEMILIKAN LAHAN PLASMA</strong>
+    </h2>
 
     {{-- Data Petani --}}
     <div class="section-title">Data Petani</div>
     <table class="no-border">
-        <tr><th width="30%">Nama</th><td>{{ $kepemilikan->petani->nama ?? '-' }}</td></tr>
-        <tr><th>NIK</th><td>{{ $kepemilikan->petani->NIK ?? '-' }}</td></tr>
-        <tr><th>Nomor Anggota Koperasi</th><td>{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td></tr>
-        <tr><th>Nomor Anggota Plasma</th><td>{{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td></tr>
-        <tr><th>Status Kepemilikan</th>
-            <td>
-                <span class="badge {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                    {{ ucfirst($kepemilikan->status_kepemilikan) }}
-                </span>
-            </td>
+        <tr>
+            <th width="30%">Nama</th>
+            <td>: {{ $kepemilikan->petani->nama ?? '-' }}</td>
         </tr>
-        <tr><th>Alamat</th><td>{{ $kepemilikan->petani->alamat ?? '-' }}</td></tr>
+        <tr>
+            <th>NIK</th>
+            <td>: {{ $kepemilikan->petani->NIK ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Anggota Koperasi</th>
+            <td>: {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Anggota Plasma</th>
+            <td>: {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Status Kepemilikan</th>
+            <td>: {{ ucfirst($kepemilikan->status_kepemilikan) }}</td>
+        </tr>
+        <tr>
+            <th>Alamat</th>
+            <td>: {{ $kepemilikan->petani->alamat ?? '-' }}</td>
+        </tr>
     </table>
 
     {{-- Data Kepemilikan & Lahan --}}
-    <div class="section-title yellow">Data Kepemilikan & Lahan</div>
+    <div class="section-title">Data Kepemilikan & Lahan</div>
 
     @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
         <div class="card">
             <div class="card-header">Lahan {{ $index + 1 }}</div>
             <table>
-                <tr><th width="35%">Desa</th><td>{{ $detail->lahan->desa->desa ?? '-' }}</td></tr>
-                <tr><th>Kecamatan</th><td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td></tr>
-                <tr><th>Tahun Tanam</th><td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td></tr>
-                <tr><th>Luas Peta</th><td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td></tr>
-                <tr><th>Nomor SHM</th><td>{{ $detail->nomor_SHM ?? '-' }}</td></tr>
-                <tr><th>Nomor Sporadik</th><td>{{ $detail->nomor_sporadik ?? '-' }}</td></tr>
-                <tr><th>Nomor PBB</th><td>{{ $detail->nomor_pbb ?? '-' }}</td></tr>
-                <tr><th>Jumlah PBB</th><td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td></tr>
-                <tr><th>Tanggal Mulai</th><td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td></tr>
+                <tr>
+                    <th width="35%">Desa</th>
+                    <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Kecamatan</th>
+                    <td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Tahun Tanam</th>
+                    <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Luas Peta</th>
+                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
+                </tr>
+                <tr>
+                    <th>Nomor SHM</th>
+                    <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nomor Sporadik</th>
+                    <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nomor PBB</th>
+                    <td>{{ $detail->nomor_pbb ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Jumlah PBB</th>
+                    <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <th>Tanggal Mulai</th>
+                    <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+                </tr>
                 <tr>
                     <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                    </td>
                 </tr>
             </table>
         </div>
     @empty
-        <p class="text-muted">Belum ada detail lahan untuk kepemilikan ini.</p>
+        <p>Belum ada detail lahan untuk kepemilikan ini.</p>
     @endforelse
 
     <div class="signature">
         <p>Mengetahui,</p>
-        <strong>....................................</strong><br>
-        <span><em>(Pihak Pengelola Koperasi)</em></span>
+        <strong>{{ Auth::user()->nama }}</strong><br>
     </div>
 
 </body>

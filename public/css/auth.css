@@ -253,7 +253,8 @@ body {
 
 /* Padding kanan lebih lega supaya ikon tidak menutupi teks */
 .password-input {
-    padding-right: 3rem; /* bisa ditambah jika perlu */
+    padding-right: 3rem;
+    /* bisa ditambah jika perlu */
 }
 
 /* Ikon mata */
@@ -264,7 +265,8 @@ body {
     transform: translateY(-50%);
     cursor: pointer;
     color: #555;
-    width: 2.2rem;   /* tambah area klik */
+    width: 2.2rem;
+    /* tambah area klik */
     height: 100%;
     display: flex;
     align-items: center;
@@ -272,14 +274,14 @@ body {
 }
 
 .position-relative {
-      position: relative;
-    }
-    .password-toggle {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #888;
-    }
+    position: relative;
+}
 
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+}
