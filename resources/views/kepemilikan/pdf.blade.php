@@ -52,7 +52,7 @@
             margin-bottom: 10px;
         }
 
-        /* TABEL */
+        /* TABEL UMUM */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -81,15 +81,21 @@
             border: 1px solid #000;
             border-radius: 4px;
             margin-bottom: 10px;
-            padding: 10px;
+            border-collapse: collapse;
+            width: 100%;
         }
 
         .card-header {
             font-weight: bold;
-            padding: 5px 8px;
+            text-align: left;
             border-bottom: 1px solid #000;
+            padding: 5px 8px;
             background: none;
             color: #000;
+        }
+
+        thead {
+            display: table-header-group; /* kunci utama: agar header muncul ulang di halaman baru */
         }
 
         /* BAGIAN JUDUL */
@@ -120,8 +126,8 @@
     <div class="header">
         <table>
             <tr>
-                <td width="15%" style="text-align: center;">
-                    <img src="{{ public_path('logo.png') }}" alt="Logo">
+                <td width="15%" style="text-align: center; padding-right: 0px; padding-left: 15px">
+                    <img src="{{ public_path('logo.png') }}" alt="Logo" style="width: 95px; height: auto;">
                 </td>
                 <td style="text-align: center;">
                     <h2 style="font-size: 18px;"><strong>KOPERASI SAWIT MAKMUR</strong></h2>
@@ -177,9 +183,13 @@
     <div class="section-title">Data Kepemilikan & Lahan</div>
 
     @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
-        <div class="card">
-            <div class="card-header">Lahan {{ $index + 1 }}</div>
-            <table>
+        <table class="card">
+            <thead>
+                <tr>
+                    <th colspan="2" class="card-header">Lahan {{ $index + 1 }}</th>
+                </tr>
+            </thead>
+            <tbody>
                 <tr>
                     <th width="35%">Desa</th>
                     <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
@@ -193,8 +203,12 @@
                     <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <th>Luas Peta</th>
+                    <th>Luas Lahan Berdasarkan Peta</th>
                     <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
+                </tr>
+                <tr>
+                    <th>Luas Lahan Berdasarkan Surat</th>
+                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} m²</td>
                 </tr>
                 <tr>
                     <th>Nomor SHM</th>
@@ -218,11 +232,10 @@
                 </tr>
                 <tr>
                     <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
-                    </td>
+                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
                 </tr>
-            </table>
-        </div>
+            </tbody>
+        </table>
     @empty
         <p>Belum ada detail lahan untuk kepemilikan ini.</p>
     @endforelse
@@ -231,6 +244,6 @@
         <p>Mengetahui,</p>
         <strong>{{ Auth::user()->nama }}</strong><br>
     </div>
-
 </body>
+
 </html>

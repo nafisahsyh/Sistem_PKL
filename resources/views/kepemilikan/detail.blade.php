@@ -116,9 +116,14 @@
                                             {{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
                                     </tr>
                                     <tr>
-                                        <th class="text-normal text-start ps-3">Luas Peta</th>
+                                        <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Peta</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             {{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Surat</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                           {{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} m²</td>
                                     </tr>
                                     <tr>
                                         <th class="text-normal text-start ps-3">Nomor SHM</th>
