@@ -15,6 +15,7 @@ class DetailKepemilikan extends Model
         'nama_SHM',
         'nomor_sporadik',
         'nama_sporadik',
+        'nomor_kavling',
         'luas_surat',
         'nomor_pbb',
         'jumlah_pbb',

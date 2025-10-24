@@ -83,7 +83,8 @@
                                     <option value="">-- Pilih Desa --</option>
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}">{{ $d->desa }}
-                                            ({{ $d->kecamatan->kecamatan }})</option>
+                                            ({{ $d->kecamatan->kecamatan }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -119,6 +120,10 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor Kavling</label>
+                                <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil">
+                            </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Luas Surat (m²)</label>
                                 <input type="number" step="0.01" name="lahan[0][luas_surat]"

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('nama_SHM',100)->nullable();
             $table->string('nomor_sporadik', 100)->nullable();
             $table->string('nama_sporadik',100)->nullable();
+            $table->string('nomor_kavling', 100)->nullable();
             $table->decimal('luas_surat', 10, 2)->nullable();
             $table->string('nomor_pbb', 100)->nullable();
             $table->decimal('jumlah_pbb', 10, 2)->nullable();

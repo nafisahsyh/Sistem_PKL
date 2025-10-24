@@ -1,5 +1,6 @@
 @extends('theme.default')
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -13,7 +14,8 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nomor_anggota_plasma" class="form-label">Nomor Anggota Plasma</label>
-                        <input type="text" class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
+                        <input type="text"
+                            class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             id="nomor_anggota_plasma" name="nomor_anggota_plasma"
                             value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}" required>
                         @error('nomor_anggota_plasma')
@@ -23,7 +25,8 @@
 
                     <div class="col-md-6 mb-3">
                         <label for="nomor_anggota_koperasi" class="form-label">Nomor Anggota Koperasi</label>
-                        <input type="text" class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
+                        <input type="text"
+                            class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
                             id="nomor_anggota_koperasi" name="nomor_anggota_koperasi"
                             value="{{ old('nomor_anggota_koperasi', $petani->nomor_anggota_koperasi) }}" required>
                         @error('nomor_anggota_koperasi')
@@ -55,8 +58,7 @@
                 <div class="mb-3">
                     <label for="alamat" class="form-label">Alamat</label>
                     <textarea name="alamat" id="alamat" rows="3"
-                        class="form-control text-kecil @error('alamat') is-invalid @enderror"
-                        required>{{ old('alamat', $petani->alamat) }}</textarea>
+                        class="form-control text-kecil @error('alamat') is-invalid @enderror" required>{{ old('alamat', $petani->alamat) }}</textarea>
                     @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -67,8 +69,12 @@
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status"
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
-                            <option value="aktif" {{ old('status', $petani->status) == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="tidak_aktif" {{ old('status', $petani->status) == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                            <option value="" disabled hidden>Pilih Status</option>
+                            <option value="aktif" {{ old('status', $petani->status) == 'aktif' ? 'selected' : '' }}>Aktif
+                            </option>
+                            <option value="tidak_aktif"
+                                {{ old('status', $petani->status) == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif
+                            </option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -101,4 +107,22 @@
             </form>
         </div>
     </div>
+
+    {{-- Script Choices.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusSelect = document.getElementById('status');
+            if (statusSelect) {
+                new Choices(statusSelect, {
+                    searchEnabled: false,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    placeholder: true,
+                    placeholderValue: 'Pilih Status',
+                    allowHTML: true
+                });
+            }
+        });
+    </script>
 @endsection
