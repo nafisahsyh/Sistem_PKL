@@ -124,7 +124,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Luas Lahan Berdasarkan Peta</label>
+                                <label class="form-label">Luas Lahan Berdasarkan Surat</label>
                                 <input type="number" step="0" name="lahan[0][luas_surat]" class="form-control text-kecil"
                                     min="0">
                             </div>

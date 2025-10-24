@@ -17,23 +17,22 @@ class PetaniController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Petani::query();
+        $query = Petani::withCount('kepemilikan');
 
-        // Fitur search
         if ($request->filled('search')) {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('nama', 'like', "%{$keyword}%")
-                    ->orWhere('NIK', 'like', "%{$keyword}%")
-                    ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
-                    ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
+                ->orWhere('NIK', 'like', "%{$keyword}%")
+                ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
+                ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
             });
         }
 
         $petani = $query->orderBy('nama')->paginate(10);
-
         return view('petani.index', compact('petani'));
     }
+
 
     public function create()
     {

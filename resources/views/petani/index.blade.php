@@ -66,17 +66,24 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-plus"></i></i>
-                                    </a>
-                                    <a href="{{ route('petani.edit', $p->id_petani) }}" class="btn btn-warning btn-sm">
+                                    {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
+                                    @if ($p->kepemilikan_count == 0)
+                                        <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
+                                            class="btn btn-success btn-sm me-1" title="Tambah Kepemilikan">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    @endif
+
+                                    <a href="{{ route('petani.edit', $p->id_petani) }}" class="btn btn-warning btn-sm"
+                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
+
                                     <form action="{{ route('petani.destroy', $p->id_petani) }}" method="POST"
                                         class="d-inline delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger btn-sm btn-delete">
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

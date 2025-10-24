@@ -444,6 +444,14 @@ input.form-control {
     padding-right: 2.5rem !important; /* kasih ruang untuk ikon mata */
 }
 
+.table td .btn {
+    margin: 0 0.5px !important; /* jarak kanan-kiri kecil dan seragam */
+}
+.table td form {
+    display: inline-block;
+    margin: 0;
+}
+
 /* HUMBERGER BAR */
 .custom {
   font-size: 20px; /* ubah sesuai kebutuhan */
