@@ -23,9 +23,9 @@ class PetaniController extends Controller
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('nama', 'like', "%{$keyword}%")
-                ->orWhere('NIK', 'like', "%{$keyword}%")
-                ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
-                ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
+                    ->orWhere('NIK', 'like', "%{$keyword}%")
+                    ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
+                    ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
             });
         }
 
@@ -49,14 +49,20 @@ class PetaniController extends Controller
             'alamat' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif',
             'pdf_scan_ktp' => 'nullable|file|mimes:pdf|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        $pdfName = null;
+        $ktpName = null;
+        $kkName = null;
 
-        // Upload PDF ke storage/app/public/ktp_pdf
         if ($request->hasFile('pdf_scan_ktp')) {
-            $pdfName = time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName();
-            $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $pdfName, 'public'); // ✅ simpan di disk 'public'
+            $ktpName = time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName();
+            $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $ktpName, 'public');
+        }
+
+        if ($request->hasFile('pdf_scan_kk')) {
+            $kkName = time() . '_' . $request->file('pdf_scan_kk')->getClientOriginalName();
+            $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
         }
 
         Petani::create([
@@ -66,7 +72,8 @@ class PetaniController extends Controller
             'nama' => $request->nama,
             'alamat' => $request->alamat,
             'status' => $request->status,
-            'pdf_scan_ktp' => $pdfName,
+            'pdf_scan_ktp' => $ktpName,
+            'pdf_scan_kk' => $kkName,
         ]);
 
         return redirect()->route('petani.index')->with('success', 'Data petani berhasil ditambahkan.');
@@ -87,6 +94,7 @@ class PetaniController extends Controller
             'alamat' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif',
             'pdf_scan_ktp' => 'nullable|file|mimes:pdf|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         $pdfName = $petani->pdf_scan_ktp;
@@ -101,6 +109,18 @@ class PetaniController extends Controller
             $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $pdfName, 'public');
         }
 
+        $pdfName = $petani->pdf_scan_kk;
+
+        // Jika user upload file baru, hapus yang lama
+        if ($request->hasFile('pdf_scan_kk')) {
+            if ($pdfName && Storage::disk('public')->exists('ktp_pdf/' . $pdfName)) {
+                Storage::disk('public')->delete('ktp_pdf/' . $pdfName);
+            }
+
+            $pdfName = time() . '_' . $request->file('pdf_scan_kk')->getClientOriginalName();
+            $request->file(key: 'pdf_scan_kk')->storeAs('ktp_pdf', $pdfName, 'public');
+        }
+
         $petani->update([
             'nomor_anggota_plasma' => $request->nomor_anggota_plasma,
             'nomor_anggota_koperasi' => $request->nomor_anggota_koperasi,
@@ -109,6 +129,7 @@ class PetaniController extends Controller
             'alamat' => $request->alamat,
             'status' => $request->status,
             'pdf_scan_ktp' => $pdfName,
+            'pdf_scan_kk' => $pdfName,
         ]);
 
         return redirect()->route('petani.index')->with('success', 'Data petani berhasil diperbarui.');
@@ -121,6 +142,10 @@ class PetaniController extends Controller
             Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_ktp);
         }
 
+        if ($petani->pdf_scan_kk && Storage::disk('public')->exists('ktp_pdf/' . $petani->pdf_scan_kk)) {
+            Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_kk);
+        }
+
         $petani->delete();
 
         return redirect()->route('petani.index')->with('success', 'Data petani berhasil dihapus.');
@@ -129,7 +154,7 @@ class PetaniController extends Controller
     public function tambahKepemilikan($id_petani)
     {
         $petani = Petani::with('desa.kecamatan')->findOrFail($id_petani);
-        $desa = Desa::with('kecamatan')->get();
+        $desa = Desa::with(relations: 'kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
 
         return view('petani.createkepemilikan', compact('petani', 'desa', 'tahun_tanam'));
@@ -148,10 +173,14 @@ class PetaniController extends Controller
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
+            'lahan.*.nama_SHM' => 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
+            'lahan.*.nama_sporadik' => 'nullable|string|max:100',
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
+            'lahan.*.pdf_scan_SHM' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         DB::beginTransaction();
@@ -171,14 +200,32 @@ class PetaniController extends Controller
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
 
+                $shmName = null;
+                $petaName = null;
+
+                if ($request->hasFile('pdf_scan_shm')) {
+                    $shmName = time() . '_' . $request->file('pdf_scan_shm')->getClientOriginalName();
+                    $request->file('pdf_scan_shm')->storeAs('ktp_pdf', $shmName, 'public');
+                }
+
+                if ($request->hasFile('pdf_scan_peta')) {
+                    $petaName = time() . '_' . $request->file('pdf_scan_peta')->getClientOriginalName();
+                    $request->file('pdf_scan_peta')->storeAs('ktp_pdf', $petaName, 'public');
+                }
+
+
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
+                    'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
+                    'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
+                    'pdf_scan_SHM' => $shmName,
+                    'pdf_scan_peta' => $petaName
                 ]);
             }
 
@@ -187,7 +234,7 @@ class PetaniController extends Controller
             return redirect()->route('petani.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', value: 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

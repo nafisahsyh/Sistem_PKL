@@ -37,7 +37,8 @@
                             <th>NIK</th>
                             <th>Nama</th>
                             <th>Status</th>
-                            <th>PDF DOC</th>
+                            <th>KTP</th>
+                            <th>KK</th>
                             <th style="width: 180px;">Aksi</th>
                         </tr>
                     </thead>
@@ -58,6 +59,16 @@
                                 <td class="text-center">
                                     @if ($p->pdf_scan_ktp)
                                         <a href="{{ asset('storage/ktp_pdf/' . $p->pdf_scan_ktp) }}" target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-file-pdf"></i> Lihat
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Tidak ada</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if ($p->pdf_scan_kk)
+                                        <a href="{{ asset('storage/ktp_pdf/' . $p->pdf_scan_kk) }}" target="_blank"
                                             class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-file-pdf"></i> Lihat
                                         </a>

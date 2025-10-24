@@ -22,6 +22,7 @@ class Petani extends Model
         'alamat',
         'status',
         'pdf_scan_ktp',
+        'pdf_scan_kk',
     ];
 
     public function desa()

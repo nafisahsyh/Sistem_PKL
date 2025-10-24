@@ -72,6 +72,16 @@
                         <span class="text-muted">Tidak ada dokumen</span>
                     @endif
                 </div>
+                <div class="mb-3">
+                    @if ($petani->pdf_scan_kk)
+                        <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}" target="_blank"
+                            class="btn btn-sm btn-info text-white">
+                            Lihat Dokumen PDF
+                        </a>
+                    @else
+                        <span class="text-muted">Tidak ada dokumen</span>
+                    @endif
+                </div>
             </div>
 
             {{-- DATA LAHAN & DETAIL KEPEMILIKAN --}}
@@ -102,8 +112,8 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Peta</label>
-                                <input type="number" step="0.01" name="lahan[0][luas_peta]"
-                                    class="form-control text-kecil" min="0">
+                                <input type="number" step="0.01" name="lahan[0][luas_peta]" class="form-control text-kecil"
+                                    min="0">
                             </div>
                         </div>
 
@@ -137,19 +147,50 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Surat</label>
-                                <input type="number" step="0" name="lahan[0][luas_surat]"
-                                    class="form-control text-kecil" min="0">
+                                <input type="number" step="0" name="lahan[0][luas_surat]" class="form-control text-kecil"
+                                    min="0">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Jumlah PBB (Rp)</label>
-                                <input type="number" step="0" name="lahan[0][jumlah_pbb]"
-                                    class="form-control text-kecil" min="0">
+                                <input type="number" step="0" name="lahan[0][jumlah_pbb]" class="form-control text-kecil"
+                                    min="0">
                             </div>
                         </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
             </div>
+
+            {{-- inputan SHM dan peta --}}
+            <div class="card p-4 mb-4 shadow-sm rounded-3">
+                <h5 class="text-brown mb-3">File SHM dan Peta</h5>
+
+                <!-- Tambahan upload file SHM dan Peta -->
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="pdf_scan_SHM" class="form-label">File SHM (PDF)</label>
+                        <input type="file" name="pdf_scan_SHM"
+                            class="form-control text-kecil @error('pdf_scan_SHM') is-invalid @enderror"
+                            accept="application/pdf">
+                        @error('pdf_scan_SHM')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="pdf_scan_peta" class="form-label">File Peta (PDF)</label>
+                        <input type="file" name="pdf_scan_peta"
+                            class="form-control text-kecil @error('pdf_scan_peta') is-invalid @enderror"
+                            accept="application/pdf">
+                        @error('pdf_scan_peta')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
+                    </div>
+                </div>
+            </div>
+
 
             {{-- STATUS KEPEMILIKAN --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
@@ -164,8 +205,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Tanggal Mulai</label>
-                        <input type="date" name="tanggal_mulai" class="form-control text-kecil"
-                            value="{{ date('Y-m-d') }}">
+                        <input type="date" name="tanggal_mulai" class="form-control text-kecil" value="{{ date('Y-m-d') }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Tanggal Selesai</label>
@@ -203,7 +243,7 @@
             btnHapus.type = 'button';
             btnHapus.className = 'btn btn-sm btn-danger';
             btnHapus.innerHTML = '<i class="fa fa-trash-can"></i>';
-            btnHapus.onclick = function() {
+            btnHapus.onclick = function () {
                 hapusLahan(this);
             };
             header.appendChild(btnHapus);
@@ -231,7 +271,7 @@
     {{-- Tambahkan script Choices.js untuk dropdown --}}
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('select.form-select').forEach(select => {
                 new Choices(select, {
                     searchEnabled: false,

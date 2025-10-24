@@ -68,7 +68,7 @@
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->alamat ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Dokumen</th>
+                            <th class="text-normal text-start ps-3">Scan KTP</th>
                             <td class="text-normal-sm text-start ps-3">
                                 @if (!empty($kepemilikan->petani->pdf_scan_ktp))
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
@@ -76,10 +76,25 @@
                                         <i class="fas fa-file-pdf"></i> Lihat
                                     </a>
                                 @else
-                                    -
+                                    <span class="text-muted">Tidak ada file</span>
                                 @endif
                             </td>
                         </tr>
+
+                        <tr>
+                            <th class="text-normal text-start ps-3">Scan KK</th>
+                            <td class="text-normal-sm text-start ps-3">
+                                @if (!empty($kepemilikan->petani->pdf_scan_kk))
+                                    <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
+                                        target="_blank" class="btn btn-info btn-sm text-dark">
+                                        <i class="fas fa-file-pdf"></i> Lihat
+                                    </a>
+                                @else
+                                    <span class="text-muted">Tidak ada file</span>
+                                @endif
+                            </td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -154,6 +169,33 @@
                                         <th class="text-normal text-start ps-3">Jumlah PBB</th>
                                         <td class="text-normal-sm text-start ps-3">Rp
                                             {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">File SHM</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            @if (!empty($detail->pdf_scan_shm))
+                                                <a href="{{ asset('storage/ktp_pdf/' . $detail->pdf_scan_shm) }}"
+                                                    target="_blank" class="btn btn-info btn-sm text-dark">
+                                                    <i class="fas fa-file-pdf"></i> Lihat
+                                                </a>
+                                            @else
+                                                <span class="text-muted">Tidak ada file</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Peta Lahan</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            @if (!empty($detail->pdf_scan_peta))
+                                                <a href="{{ asset('storage/ktp_pdf/' . $detail->pdf_scan_peta) }}"
+                                                    target="_blank" class="btn btn-info btn-sm text-dark">
+                                                    <i class="fas fa-file-pdf"></i> Lihat
+                                                </a>
+                                            @else
+                                                <span class="text-muted">Tidak ada file</span>
+                                            @endif
                                         </td>
                                     </tr>
                                     <tr>

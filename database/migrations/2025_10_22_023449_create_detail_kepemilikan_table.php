@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('luas_surat', 10, 2)->nullable();
             $table->string('nomor_pbb', 100)->nullable();
             $table->decimal('jumlah_pbb', 10, 2)->nullable();
+            $table->string('pdf_scan_shm', 255)->nullable();
+            $table->string('pdf_scan_peta', 255)->nullable();
 
             $table->timestamps();
 

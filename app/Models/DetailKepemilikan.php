@@ -19,6 +19,8 @@ class DetailKepemilikan extends Model
         'luas_surat',
         'nomor_pbb',
         'jumlah_pbb',
+        'pdf_scan_SHM',
+        'pdf_scan_peta',
     ];
 
     public function kepemilikan()

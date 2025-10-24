@@ -44,7 +44,7 @@ class KepemilikanController extends Controller
     public function create()
     {
         $petani = Petani::with('desa.kecamatan')->get();
-        $desa = Desa::with('kecamatan')->get();
+        $desa = Desa::with(relations: 'kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
 
         return view('kepemilikan.create', compact('petani', 'desa', 'tahun_tanam'));

@@ -98,6 +98,24 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="pdf_scan_kk" class="form-label">File Scan KK (PDF)</label>
+                        <input type="file" name="pdf_scan_kk" id="pdf_scan_kk"
+                            class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
+                            accept="application/pdf">
+
+                        @if ($petani->pdf_scan_kk)
+                            <small class="text-muted">
+                                File saat ini:
+                                <a href="{{ asset('storage/' . $petani->pdf_scan_kk) }}" target="_blank">Lihat PDF</a>
+                            </small>
+                        @endif
+
+                        @error('pdf_scan_ktp')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="text-start mt-3">

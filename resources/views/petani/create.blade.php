@@ -90,6 +90,17 @@
                         @enderror
                         <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="pdf_scan_ktp" class="form-label">Scan KK (PDF)</label>
+                        <input type="file" name="pdf_scan_kk"
+                            class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
+                            accept="application/pdf">
+                        @error('pdf_scan_kk')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
+                    </div>
                 </div>
 
                 <div class="text-start mt-3">
