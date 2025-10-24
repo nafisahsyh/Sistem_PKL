@@ -130,9 +130,17 @@
                                         <td class="text-normal-sm text-start ps-3">{{ $detail->nomor_SHM ?? '-' }}</td>
                                     </tr>
                                     <tr>
+                                        <th class="text-normal text-start ps-3">Nama Sesuai SHM</th>
+                                        <td class="text-normal-sm text-start ps-3">{{ $detail->nama_SHM ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
                                         <th class="text-normal text-start ps-3">Nomor Sporadik</th>
                                         <td class="text-normal-sm text-start ps-3">{{ $detail->nomor_sporadik ?? '-' }}
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Nama Sesuai Sporadik</th>
+                                        <td class="text-normal-sm text-start ps-3">{{ $detail->nama_sporadik ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-normal text-start ps-3">Nomor PBB</th>

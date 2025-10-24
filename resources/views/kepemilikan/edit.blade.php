@@ -129,9 +129,27 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai SHM</label>
+                                <input type="text" name="lahan[{{ $index }}][nama_SHM]" 
+                                    class="form-control text-kecil" value="{{ $detail->nama_SHM }}">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor Sporadik</label>
                                 <input type="text" name="lahan[{{ $index }}][nomor_sporadik]" 
                                     class="form-control text-kecil" value="{{ $detail->nomor_sporadik }}">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor Sporadik</label>
+                                <input type="text" name="lahan[{{ $index }}][nomor_sporadik]" 
+                                    class="form-control text-kecil" value="{{ $detail->nomor_sporadik }}">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai Sporadik</label>
+                                <input type="text" name="lahan[{{ $index }}][nama_sporadik]" 
+                                    class="form-control text-kecil" value="{{ $detail->nama_sporadik }}">
                             </div>
 
                             <div class="col-md-4 mb-3">

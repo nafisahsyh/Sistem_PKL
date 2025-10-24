@@ -113,15 +113,23 @@
                                 <input type="text" name="lahan[0][nomor_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai SHM</label>
+                                <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor Sporadik</label>
                                 <input type="text" name="lahan[0][nomor_sporadik]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai Sporadik</label>
+                                <input type="text" name="lahan[0][nama_sporadik]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor PBB</label>
                                 <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil">
                             </div>
                         </div>
-
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Surat</label>

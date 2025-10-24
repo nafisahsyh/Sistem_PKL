@@ -66,7 +66,9 @@ class KepemilikanController extends Controller
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
+            'lahan.*.nama_SHM'=> 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
+            'lahan.*.nama_sporadik'=> 'nullable|string|max:100',
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
@@ -93,7 +95,9 @@ class KepemilikanController extends Controller
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
+                    'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
+                    'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
@@ -149,7 +153,9 @@ class KepemilikanController extends Controller
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
+            'lahan.*.nama_SHM'=> 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
+            'lahan.*.nama_sporadik'=> 'nullable|string|max:100',
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
@@ -184,7 +190,9 @@ class KepemilikanController extends Controller
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
+                    'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
+                    'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
@@ -220,7 +228,7 @@ class KepemilikanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil dihapus.');
+            return redirect()->route(route: 'kepemilikan.index')->with('success', 'Data kepemilikan berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
