@@ -27,6 +27,9 @@ return new class extends Migration
             $table->decimal('jumlah_pbb', 10, 2)->nullable();
             $table->string('pdf_scan_shm', 255)->nullable();
             $table->string('pdf_scan_peta', 255)->nullable();
+            $table->enum('status_kepemilikan', ['aktif', 'nonaktif'])->default('aktif');
+            $table->date('tanggal_mulai')->nullable();
+            $table->date('tanggal_selesai')->nullable();
 
             $table->timestamps();
 

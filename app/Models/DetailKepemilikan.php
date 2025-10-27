@@ -21,6 +21,9 @@ class DetailKepemilikan extends Model
         'jumlah_pbb',
         'pdf_scan_shm',
         'pdf_scan_peta',
+        'status_kepemilkan',
+        'tanggal_mulai',
+        'tanggal_selesai',
     ];
 
     public function kepemilikan()

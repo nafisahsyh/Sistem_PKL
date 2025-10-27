@@ -10,9 +10,6 @@ class Kepemilikan extends Model
     protected $primaryKey = 'id_kepemilikan';
     protected $fillable = [
         'id_petani',
-        'status_kepemilikan',
-        'tanggal_mulai',
-        'tanggal_selesai',
     ];
 
     protected $with = ['detailKepemilikan.lahan', 'petani']; // auto load

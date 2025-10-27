@@ -16,9 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_petani'); // siapa pemiliknya
 
             // Status & waktu kepemilikan
-            $table->enum('status_kepemilikan', ['aktif', 'nonaktif'])->default('aktif');
-            $table->date('tanggal_mulai')->nullable();
-            $table->date('tanggal_selesai')->nullable();
 
             $table->timestamps();
 

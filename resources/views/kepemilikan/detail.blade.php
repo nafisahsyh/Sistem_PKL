@@ -188,7 +188,7 @@
                                         <th class="text-normal text-start ps-3">Peta Lahan</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             @if (!empty($detail->pdf_scan_peta))
-                                                <a href="{{ asset('storage/peta_pdf/' . $detail->pdf_scan_peta) }}" target="_blank" class="btn btn-info btn-sm text-dark">
+                                                <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}" target="_blank" class="btn btn-info btn-sm text-dark">
                                                     <i class="fas fa-file-pdf"></i> Lihat
                                                 </a>
                                             @else

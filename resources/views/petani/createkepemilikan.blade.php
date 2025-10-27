@@ -164,6 +164,25 @@
                         </div>
 
                         <div class="row mt-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kepemilikan</label>
+                                <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil">
+                                    <option value="aktif" {{ isset($lahanData['status_kepemilikan']) && $lahanData['status_kepemilikan'] == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="nonaktif" {{ isset($lahanData['status_kepemilikan']) && $lahanData['status_kepemilikan'] == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="date" name="lahan[0][tanggal_mulai]" class="form-control text-kecil"
+                                    value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="date" name="lahan[0][tanggal_selesai]" class="form-control text-kecil">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">PDF SHM</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
@@ -177,31 +196,11 @@
                         </div>
                     </div>
                 </div>
+
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
             </div>
 
             {{-- STATUS KEPEMILIKAN --}}
-            <div class="card p-4 mb-4 shadow-sm rounded-3">
-                <h5 class="text-brown mb-3">Status Kepemilikan</h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status_kepemilikan" class="form-select text-kecil">
-                            <option value="aktif">Aktif</option>
-                            <option value="nonaktif">Nonaktif</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tanggal Mulai</label>
-                        <input type="date" name="tanggal_mulai" class="form-control text-kecil" value="{{ date('Y-m-d') }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tanggal Selesai</label>
-                        <input type="date" name="tanggal_selesai" class="form-control text-kecil">
-                    </div>
-                </div>
-            </div>
-
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-success me-2">Simpan</button>
                 <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
@@ -209,75 +208,78 @@
         </form>
     </div>
 
-    {{-- SCRIPT TAMBAH LAHAN --}}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         let lahanIndex = 1;
+
+        const desaOptions = `@foreach($desa as $d)
+            <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})</option>
+        @endforeach`;
+
+        const tahunTanamOptions = `@foreach($tahun_tanam as $t)
+            <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
+        @endforeach`;
 
         function tambahLahan() {
             const container = document.getElementById('lahan-container');
             const template = container.firstElementChild.cloneNode(true);
 
+            // Reset input & file
+            template.querySelectorAll('input').forEach(el => el.value = '');
+            template.querySelectorAll('input[type="file"]').forEach(el => el.value = '');
+
+            // Reset select
+            const selectDesa = template.querySelector('select[name$="[id_desa]"]');
+            selectDesa.innerHTML = `<option value="" disabled selected hidden>Pilih Desa</option>` + desaOptions;
+
+            const selectTahun = template.querySelector('select[name$="[id_tahun_tanam]"]');
+            selectTahun.innerHTML = `<option value="" disabled selected hidden>Pilih Tahun Tanam</option>` + tahunTanamOptions;
+
+            // Update index
             template.querySelectorAll('input, select').forEach(el => {
                 const name = el.getAttribute('name');
-                if (name) {
-                    // ganti hanya angka di dalam tanda kurung []
-                    el.setAttribute('name', name.replace(/\[\d+\]/, `[${lahanIndex}]`));
-                }
-                if (el.type === 'file') {
-                    el.value = '';
-                } else if (el.tagName === 'SELECT') {
-                    el.selectedIndex = 0;
-                } else {
-                    el.value = '';
-                }
+                if (name) el.setAttribute('name', name.replace(/\[\d+\]/, `[${lahanIndex}]`));
             });
 
+            // Update heading
             template.querySelector('h6.text-brown').innerText = 'Lahan ' + (lahanIndex + 1);
 
+            // Tombol hapus
             const header = document.createElement('div');
             header.classList.add('d-flex', 'justify-content-end', 'mb-3');
             const btnHapus = document.createElement('button');
             btnHapus.type = 'button';
             btnHapus.className = 'btn btn-sm btn-danger';
             btnHapus.innerHTML = '<i class="fa fa-trash-can"></i>';
-            btnHapus.onclick = function () {
-                hapusLahan(this);
-            };
+            btnHapus.onclick = function () { hapusLahan(this); };
             header.appendChild(btnHapus);
             template.insertBefore(header, template.firstChild);
 
             container.appendChild(template);
+
+            // Inisialisasi Choices.js baru untuk select baru
+            new Choices(selectDesa, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
+            new Choices(selectTahun, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
+
             lahanIndex++;
         }
 
         function hapusLahan(btn) {
             const container = document.getElementById('lahan-container');
             btn.closest('.lahan-item').remove();
-
             [...container.children].forEach((el, i) => {
                 el.querySelector('h6.text-brown').innerText = 'Lahan ' + (i + 1);
                 el.querySelectorAll('input, select').forEach(input => {
                     const name = input.getAttribute('name');
-                    if (name) {
-                        input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
-                    }
+                    if (name) input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
                 });
             });
-
             lahanIndex = container.children.length;
         }
-    </script>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('select.form-select').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: false,
-                    shouldSort: false,
-                    itemSelectText: '',
-                });
+                new Choices(select, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
             });
         });
     </script>

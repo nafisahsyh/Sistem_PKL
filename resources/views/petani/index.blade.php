@@ -102,7 +102,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
                                     <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data petani</p>
                                 </td>

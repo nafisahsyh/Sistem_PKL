@@ -164,9 +164,6 @@ class PetaniController extends Controller
     {
         $request->validate([
             'id_petani' => 'required|exists:petani,id_petani',
-            'status_kepemilikan' => 'required|in:aktif,nonaktif',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
 
             'lahan' => 'required|array|min:1',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
@@ -182,6 +179,9 @@ class PetaniController extends Controller
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
+            'lahan.*.tanggal_mulai' => 'nullable|date',
+            'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
 
         DB::beginTransaction();
@@ -190,9 +190,6 @@ class PetaniController extends Controller
             // Simpan data utama kepemilikan
             $kepemilikan = Kepemilikan::create([
                 'id_petani' => $request->id_petani,
-                'status_kepemilikan' => $request->status_kepemilikan,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
             ]);
 
             // Simpan per lahan
@@ -208,16 +205,18 @@ class PetaniController extends Controller
                 $shmName = null;
                 $petaName = null;
 
-                if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
-                    $file = $request->file("lahan.$index.pdf_scan_shm");
-                    $path = $file->store('shm_pdf', 'public');
-                    $shmName = basename($path); // hanya ambil nama file
+                // File SHM
+                if (isset($lahanData['pdf_scan_shm']) && $lahanData['pdf_scan_shm']->isValid()) {
+                    $shmPath = $lahanData['pdf_scan_shm']->store('shm_pdf', 'public');
+                } else {
+                    $shmPath = $detail->pdf_scan_shm ?? null;
                 }
 
-                if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
-                    $file = $request->file("lahan.$index.pdf_scan_peta");
-                    $path = $file->store('peta_pdf', 'public');
-                    $petaName = basename($path); // hanya ambil nama file
+                // File Peta
+                if (isset($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
+                    $petaPath = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
+                } else {
+                    $petaPath = $detail->pdf_scan_peta ?? null;
                 }
                 // Simpan detail kepemilikan
                 DetailKepemilikan::create([
@@ -233,6 +232,9 @@ class PetaniController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
+                    'status_kepemilikan' => $lahanData->status_kepemilikan,
+                    'tanggal_mulai' => $lahanData->tanggal_mulai,
+                    'tanggal_selesai' => $lahanData->tanggal_selesai,
                 ]);
             }
 

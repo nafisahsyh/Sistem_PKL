@@ -39,12 +39,12 @@ class KepemilikanController extends Controller
                         ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
                         ->orWhere('nomor_anggota_koperasi', 'like', "%{$search}%");
                 })
-                ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
-                    $q2->where('desa', 'like', "%{$search}%");
-                })
-                ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
-                    $q2->where('tahun', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
+                        $q2->where('desa', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
+                        $q2->where('tahun', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -57,7 +57,7 @@ class KepemilikanController extends Controller
 
             $kepemilikan->getCollection()->transform(function ($item) use ($search) {
                 $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($search) {
-                    $desa  = strtolower($detail->lahan->desa->desa ?? '');
+                    $desa = strtolower($detail->lahan->desa->desa ?? '');
                     $tahun = strtolower($detail->lahan->tahunTanam->tahun ?? '');
                     return str_contains($desa, $search) || str_contains($tahun, $search);
                 })->values();
@@ -93,7 +93,7 @@ class KepemilikanController extends Controller
     }
 
 
-        public function editPerLahan($id_kepemilikan, $id_lahan)
+    public function editPerLahan($id_kepemilikan, $id_lahan)
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
@@ -114,10 +114,10 @@ class KepemilikanController extends Controller
         return view('kepemilikan.edit_per_lahan', compact('kepemilikan', 'selectedDetail', 'petani', 'desa', 'tahun_tanam'));
     }
 
-        public function destroyPerLahan($id_kepemilikan, $id_lahan)
+    public function destroyPerLahan($id_kepemilikan, $id_lahan)
     {
         // Cek apakah kepemilikan dan lahan cocok
-        $detail = \App\Models\DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
+        $detail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
             ->where('id_lahan', $id_lahan)
             ->first();
 
@@ -218,7 +218,7 @@ class KepemilikanController extends Controller
             'petani',
             'detailKepemilikan' => function ($q) use ($id) {
                 $q->where('id_kepemilikan', $id)
-                ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
+                    ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
             }
         ])->findOrFail($id);
 
@@ -236,9 +236,6 @@ class KepemilikanController extends Controller
     {
         $request->validate([
             'id_petani' => 'required|exists:petani,id_petani',
-            'status_kepemilikan' => 'required|in:aktif,nonaktif',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
 
             'lahan' => 'required|array|min:1',
             'lahan.*.id_detail_kepemilikan' => 'nullable|exists:detail_kepemilikan,id_detail_kepemilikan',
@@ -248,6 +245,9 @@ class KepemilikanController extends Controller
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
+            'lahan.*.tanggal_mulai' => 'nullable|date',
+            'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
 
         DB::beginTransaction();
@@ -256,9 +256,6 @@ class KepemilikanController extends Controller
             $kepemilikan = Kepemilikan::findOrFail($id);
             $kepemilikan->update([
                 'id_petani' => $request->id_petani,
-                'status_kepemilikan' => $request->status_kepemilikan,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
             ]);
 
             foreach ($request->lahan as $index => $lahanData) {
@@ -281,13 +278,14 @@ class KepemilikanController extends Controller
                 $lahan->save();
 
                 // Handle file SHM
+                // File SHM
                 if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
                     $shmPath = $request->file("lahan.$index.pdf_scan_shm")->store('shm_pdf', 'public');
                 } else {
                     $shmPath = $detail->pdf_scan_shm ?? null;
                 }
 
-                // Handle file Peta
+                // File Peta
                 if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
                     $petaPath = $request->file("lahan.$index.pdf_scan_peta")->store('peta_pdf', 'public');
                 } else {
@@ -307,6 +305,9 @@ class KepemilikanController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmPath,
                     'pdf_scan_peta' => $petaPath,
+                    'status_kepemilikan' => $lahanData->status_kepemilikan,
+                    'tanggal_mulai' => $lahanData->tanggal_mulai,
+                    'tanggal_selesai' => $lahanData->tanggal_selesai,
                 ]);
                 $detail->save();
             }
@@ -356,7 +357,7 @@ class KepemilikanController extends Controller
             'petani',
             'detailKepemilikan' => function ($q) use ($id_kepemilikan) {
                 $q->where('id_kepemilikan', $id_kepemilikan)
-                ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
+                    ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
             }
         ])->findOrFail($id_kepemilikan);
 
