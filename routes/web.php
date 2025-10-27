@@ -62,6 +62,16 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('petani.createkepemilikan');
     Route::post('/petani/storeKepemilikan', [PetaniController::class, 'storeKepemilikan'])
         ->name('petani.storeKepemilikan');
+    Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'showPerLahan'])
+        ->name('kepemilikan.showPerLahan');
+        //Per lahan
+    Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/edit', [KepemilikanController::class, 'editPerLahan'])
+        ->name('kepemilikan.editPerLahan');
+    Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/pdf', [KepemilikanController::class, 'pdfPerLahan'])
+        ->name('kepemilikan.pdfPerLahan');
+    Route::delete('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'destroyPerLahan'])
+    ->name('kepemilikan.destroyPerLahan');
+
 });
 
 // hanya super admin

@@ -23,20 +23,114 @@ class KepemilikanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Kepemilikan::with(['petani.desa.kecamatan', 'detailKepemilikan.lahan.desa.kecamatan']);
+        $query = Kepemilikan::with([
+            'petani.desa.kecamatan',
+            'detailKepemilikan.lahan.desa.kecamatan',
+            'detailKepemilikan.lahan.tahunTanam'
+        ]);
 
+        // 🔍 Fitur pencarian
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->whereHas('petani', function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
-                    ->orWhere('nomor_anggota_koperasi', 'like', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('petani', function ($q2) use ($search) {
+                    $q2->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
+                        ->orWhere('nomor_anggota_koperasi', 'like', "%{$search}%");
+                })
+                ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
+                    $q2->where('desa', 'like', "%{$search}%");
+                })
+                ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
+                    $q2->where('tahun', 'like', "%{$search}%");
+                });
             });
         }
 
-        $kepemilikan = $query->orderBy('id_kepemilikan', 'desc')->paginate(10);
+        // Gunakan paginate agar tetap bisa navigasi halaman
+        $kepemilikan = $query->paginate(10);
+
+        // 🎯 Filter hasil detail di setiap kepemilikan supaya hanya tampil yang cocok
+        if (!empty($request->search)) {
+            $search = strtolower($request->search);
+
+            $kepemilikan->getCollection()->transform(function ($item) use ($search) {
+                $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($search) {
+                    $desa  = strtolower($detail->lahan->desa->desa ?? '');
+                    $tahun = strtolower($detail->lahan->tahunTanam->tahun ?? '');
+                    return str_contains($desa, $search) || str_contains($tahun, $search);
+                })->values();
+                return $item;
+            });
+
+            // 🚫 Jika semua detail kosong setelah difilter, jangan tampilkan petani itu sama sekali
+            $kepemilikan->setCollection(
+                $kepemilikan->getCollection()->filter(function ($item) {
+                    return $item->detailKepemilikan->isNotEmpty();
+                })->values()
+            );
+        }
+
         return view('kepemilikan.index', compact('kepemilikan'));
     }
+
+    public function showPerLahan($id_kepemilikan, $id_lahan)
+    {
+        $kepemilikan = Kepemilikan::with(['petani', 'detailKepemilikan.lahan.desa.kecamatan', 'detailKepemilikan.lahan.tahunTanam'])
+            ->findOrFail($id_kepemilikan);
+
+        $selectedDetail = $kepemilikan->detailKepemilikan->firstWhere('id_lahan', $id_lahan);
+
+        if (!$selectedDetail) {
+            abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
+        }
+
+        return view('kepemilikan.detail_per_lahan', [
+            'kepemilikan' => $kepemilikan,
+            'detail' => $selectedDetail, // ✅ biar Blade tetap pakai $detail
+        ]);
+    }
+
+
+        public function editPerLahan($id_kepemilikan, $id_lahan)
+    {
+        $kepemilikan = Kepemilikan::with([
+            'petani',
+            'detailKepemilikan.lahan.desa.kecamatan',
+            'detailKepemilikan.lahan.tahunTanam'
+        ])->findOrFail($id_kepemilikan);
+
+        $selectedDetail = $kepemilikan->detailKepemilikan->firstWhere('id_lahan', $id_lahan);
+
+        if (!$selectedDetail) {
+            abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
+        }
+
+        $petani = Petani::with('desa.kecamatan')->get();
+        $desa = Desa::with('kecamatan')->get();
+        $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
+
+        return view('kepemilikan.edit_per_lahan', compact('kepemilikan', 'selectedDetail', 'petani', 'desa', 'tahun_tanam'));
+    }
+
+        public function destroyPerLahan($id_kepemilikan, $id_lahan)
+    {
+        // Cek apakah kepemilikan dan lahan cocok
+        $detail = \App\Models\DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
+            ->where('id_lahan', $id_lahan)
+            ->first();
+
+        if (!$detail) {
+            return redirect()->back()->with('error', 'Data lahan tidak ditemukan untuk kepemilikan ini.');
+        }
+
+        // Hapus detail kepemilikan (hanya lahan itu)
+        $detail->delete();
+
+        return redirect()->back()->with('success', 'Data lahan berhasil dihapus dari kepemilikan.');
+    }
+
 
     /**
      * Form tambah kepemilikan baru.
@@ -122,19 +216,15 @@ class KepemilikanController extends Controller
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
-            'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahun_tanam'
+            'detailKepemilikan' => function ($q) use ($id) {
+                $q->where('id_kepemilikan', $id)
+                ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
+            }
         ])->findOrFail($id);
 
         $petani = Petani::with('desa.kecamatan')->get();
         $desa = Desa::with('kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
-
-        $lahan = $kepemilikan->detailKepemilikan->map(function ($detail) {
-            return $detail->lahan;
-        });
-
-        $kepemilikan->setRelation('lahan', $lahan);
 
         return view('kepemilikan.edit', compact('kepemilikan', 'petani', 'desa', 'tahun_tanam'));
     }
@@ -264,12 +354,15 @@ class KepemilikanController extends Controller
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
-            'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahunTanam'
+            'detailKepemilikan' => function ($q) use ($id_kepemilikan) {
+                $q->where('id_kepemilikan', $id_kepemilikan)
+                ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
+            }
         ])->findOrFail($id_kepemilikan);
 
         return view('kepemilikan.detail', compact('kepemilikan'));
     }
+
 
     public function cetakPDF($id)
     {
