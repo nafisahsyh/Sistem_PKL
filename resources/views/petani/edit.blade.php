@@ -112,7 +112,7 @@
                             </small>
                         @endif
 
-                        @error('pdf_scan_ktp')
+                        @error('pdf_scan_kk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

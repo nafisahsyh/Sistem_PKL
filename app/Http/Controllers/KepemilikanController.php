@@ -30,7 +30,7 @@ class KepemilikanController extends Controller
             $query->whereHas('petani', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                     ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
-                    ->orWhere('nomor_anggota_koperasi','like', "%{$search}%");
+                    ->orWhere('nomor_anggota_koperasi', 'like', "%{$search}%");
             });
         }
 
@@ -66,10 +66,10 @@ class KepemilikanController extends Controller
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
-            'lahan.*.nama_SHM'=> 'nullable|string|max:100',
+            'lahan.*.nama_SHM' => 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
-            'lahan.*.nama_sporadik'=> 'nullable|string|max:100',
-            'lahan.*.nomor_kavling'=> 'nullable|string|max:100',
+            'lahan.*.nama_sporadik' => 'nullable|string|max:100',
+            'lahan.*.nomor_kavling' => 'nullable|string|max:100',
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
@@ -151,24 +151,19 @@ class KepemilikanController extends Controller
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
 
             'lahan' => 'required|array|min:1',
+            'lahan.*.id_detail_kepemilikan' => 'nullable|exists:detail_kepemilikan,id_detail_kepemilikan',
+            'lahan.*.id_lahan' => 'nullable|exists:lahan,id_lahan',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
-            'lahan.*.nomor_SHM' => 'nullable|string|max:100',
-            'lahan.*.nama_SHM'=> 'nullable|string|max:100',
-            'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
-            'lahan.*.nama_sporadik'=> 'nullable|string|max:100',
-            'lahan.*.nomor_ksvling' => 'nullable|string|max:100',
-            'lahan.*.luas_surat' => 'nullable|numeric|min:0',
-            'lahan.*.nomor_pbb' => 'nullable|string|max:100',
-            'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
+            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         DB::beginTransaction();
 
         try {
             $kepemilikan = Kepemilikan::findOrFail($id);
-
             $kepemilikan->update([
                 'id_petani' => $request->id_petani,
                 'status_kepemilikan' => $request->status_kepemilikan,
@@ -176,21 +171,41 @@ class KepemilikanController extends Controller
                 'tanggal_selesai' => $request->tanggal_selesai,
             ]);
 
-            $detailLama = DetailKepemilikan::where('id_kepemilikan', $id)->get();
-            foreach ($detailLama as $detail) {
-                $detail->lahan()->delete();
-                $detail->delete();
-            }
+            foreach ($request->lahan as $index => $lahanData) {
+                // cari detail kepemilikan lama
+                $detail = DetailKepemilikan::find($lahanData['id_detail_kepemilikan'] ?? null);
 
-            foreach ($request->lahan as $lahanData) {
-                $lahan = Lahan::create([
-                    'id_desa' => $lahanData['id_desa'],
-                    'id_tahun_tanam' => $lahanData['id_tahun_tanam'],
-                    'luas_peta' => $lahanData['luas_peta'],
-                ]);
+                if ($detail) {
+                    $lahan = Lahan::find($lahanData['id_lahan']);
+                } else {
+                    // jika data baru
+                    $lahan = new Lahan();
+                    $detail = new DetailKepemilikan();
+                    $detail->id_kepemilikan = $kepemilikan->id_kepemilikan;
+                }
 
-                DetailKepemilikan::create([
-                    'id_kepemilikan' => $kepemilikan->id_kepemilikan,
+                // update data lahan
+                $lahan->id_desa = $lahanData['id_desa'];
+                $lahan->id_tahun_tanam = $lahanData['id_tahun_tanam'];
+                $lahan->luas_peta = $lahanData['luas_peta'];
+                $lahan->save();
+
+                // Handle file SHM
+                if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                    $shmPath = $request->file("lahan.$index.pdf_scan_shm")->store('shm_pdf', 'public');
+                } else {
+                    $shmPath = $detail->pdf_scan_shm ?? null;
+                }
+
+                // Handle file Peta
+                if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                    $petaPath = $request->file("lahan.$index.pdf_scan_peta")->store('peta_pdf', 'public');
+                } else {
+                    $petaPath = $detail->pdf_scan_peta ?? null;
+                }
+
+                // Simpan detail
+                $detail->fill([
                     'id_lahan' => $lahan->id_lahan,
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
                     'nama_SHM' => $lahanData['nama_SHM'] ?? null,
@@ -200,7 +215,10 @@ class KepemilikanController extends Controller
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
+                    'pdf_scan_shm' => $shmPath,
+                    'pdf_scan_peta' => $petaPath,
                 ]);
+                $detail->save();
             }
 
             DB::commit();

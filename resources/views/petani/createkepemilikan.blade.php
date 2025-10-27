@@ -1,7 +1,7 @@
 @extends('theme.default')
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
-{{-- Tambahkan stylesheet Choices.js --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -12,7 +12,7 @@
             <h4 class="text-brown mb-0">Tambah Data Kepemilikan</h4>
         </div>
 
-        {{-- ALERT PESAN --}}
+        {{-- ALERT --}}
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -29,7 +29,7 @@
             </div>
         @endif
 
-        <form action="{{ route('kepemilikan.store') }}" method="POST">
+        <form action="{{ route('petani.storeKepemilikan') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="id_petani" value="{{ $petani->id_petani }}">
 
@@ -63,41 +63,44 @@
                     </div>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Dokumen KTP</label><br>
                     @if ($petani->pdf_scan_ktp)
                         <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}" target="_blank"
-                            class="btn btn-sm btn-info text-white">
-                            Lihat Dokumen PDF
+                            class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-pdf"></i> Dokumen
                         </a>
                     @else
-                        <span class="text-muted">Tidak ada dokumen</span>
+                        <span class="text-muted">Tidak ada</span>
                     @endif
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Dokumen Kartu Keluarga</label><br>
                     @if ($petani->pdf_scan_kk)
                         <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}" target="_blank"
-                            class="btn btn-sm btn-info text-white">
-                            Lihat Dokumen PDF
+                            class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-pdf"></i> Dokumen
                         </a>
                     @else
-                        <span class="text-muted">Tidak ada dokumen</span>
+                        <span class="text-muted">Tidak ada</span>
                     @endif
                 </div>
             </div>
 
-            {{-- DATA LAHAN & DETAIL KEPEMILIKAN --}}
+            {{-- DATA LAHAN --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
                 <div id="lahan-container">
                     <div class="border rounded p-3 mb-4 bg-light lahan-item">
                         <h6 class="text-brown mb-3">Lahan 1</h6>
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Desa</label>
                                 <select name="lahan[0][id_desa]" class="form-select text-kecil">
                                     <option value="" disabled selected hidden>Pilih Desa</option>
                                     @foreach ($desa as $d)
-                                        <option value="{{ $d->id_desa }}">{{ $d->desa }}
-                                            ({{ $d->kecamatan->kecamatan }})</option>
+                                        <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -111,31 +114,34 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Luas Lahan Berdasarkan Peta</label>
+                                <label class="form-label">Luas Lahan Berdasarkan Peta (m²)</label>
                                 <input type="number" step="0.01" name="lahan[0][luas_peta]" class="form-control text-kecil"
                                     min="0">
                             </div>
                         </div>
 
-                        <div class="row mt-3">
+                        <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor SHM</label>
                                 <input type="text" name="lahan[0][nomor_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Nama Sesuai SHM</label>
+                                <label class="form-label">Nama SHM</label>
                                 <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor Kavling</label>
                                 <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil">
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor Sporadik</label>
                                 <input type="text" name="lahan[0][nomor_sporadik]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Nama Sesuai Sporadik</label>
+                                <label class="form-label">Nama Sporadik</label>
                                 <input type="text" name="lahan[0][nama_sporadik]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
@@ -146,51 +152,33 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Luas Lahan Berdasarkan Surat</label>
-                                <input type="number" step="0" name="lahan[0][luas_surat]" class="form-control text-kecil"
-                                    min="0">
+                                <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
+                                <input type="number" step="0.01" name="lahan[0][luas_surat]"
+                                    class="form-control text-kecil">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Jumlah PBB (Rp)</label>
-                                <input type="number" step="0" name="lahan[0][jumlah_pbb]" class="form-control text-kecil"
-                                    min="0">
+                                <input type="number" step="0.01" name="lahan[0][jumlah_pbb]"
+                                    class="form-control text-kecil">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PDF SHM</label>
+                                <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
+                                    accept="application/pdf">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PDF Peta</label>
+                                <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control"
+                                    accept="application/pdf">
                             </div>
                         </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
             </div>
-
-            {{-- inputan SHM dan peta --}}
-            <div class="card p-4 mb-4 shadow-sm rounded-3">
-                <h5 class="text-brown mb-3">File SHM dan Peta</h5>
-
-                <!-- Tambahan upload file SHM dan Peta -->
-                <div class="row mt-3">
-                    <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_SHM" class="form-label">File SHM (PDF)</label>
-                        <input type="file" name="pdf_scan_SHM"
-                            class="form-control text-kecil @error('pdf_scan_SHM') is-invalid @enderror"
-                            accept="application/pdf">
-                        @error('pdf_scan_SHM')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_peta" class="form-label">File Peta (PDF)</label>
-                        <input type="file" name="pdf_scan_peta"
-                            class="form-control text-kecil @error('pdf_scan_peta') is-invalid @enderror"
-                            accept="application/pdf">
-                        @error('pdf_scan_peta')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
-                    </div>
-                </div>
-            </div>
-
 
             {{-- STATUS KEPEMILIKAN --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
@@ -221,7 +209,7 @@
         </form>
     </div>
 
-    {{-- Script untuk tambah/hapus lahan --}}
+    {{-- SCRIPT TAMBAH LAHAN --}}
     <script>
         let lahanIndex = 1;
 
@@ -230,9 +218,18 @@
             const template = container.firstElementChild.cloneNode(true);
 
             template.querySelectorAll('input, select').forEach(el => {
-                el.name = el.name.replace(/\d+/, lahanIndex);
-                el.value = '';
-                if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                const name = el.getAttribute('name');
+                if (name) {
+                    // ganti hanya angka di dalam tanda kurung []
+                    el.setAttribute('name', name.replace(/\[\d+\]/, `[${lahanIndex}]`));
+                }
+                if (el.type === 'file') {
+                    el.value = '';
+                } else if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
             });
 
             template.querySelector('h6.text-brown').innerText = 'Lahan ' + (lahanIndex + 1);
@@ -260,7 +257,10 @@
             [...container.children].forEach((el, i) => {
                 el.querySelector('h6.text-brown').innerText = 'Lahan ' + (i + 1);
                 el.querySelectorAll('input, select').forEach(input => {
-                    input.name = input.name.replace(/\d+/, i);
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
+                    }
                 });
             });
 
@@ -268,7 +268,7 @@
         }
     </script>
 
-    {{-- Tambahkan script Choices.js untuk dropdown --}}
+
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -277,10 +277,6 @@
                     searchEnabled: false,
                     shouldSort: false,
                     itemSelectText: '',
-                    allowHTML: true,
-                    position: 'auto',
-                    placeholder: true,
-                    placeholderValue: 'Pilih Status',
                 });
             });
         });

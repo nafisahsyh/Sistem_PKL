@@ -60,8 +60,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('kepemilikan.pdf');
     Route::get('petani/{id_petani}/createkepemilikan', [PetaniController::class, 'tambahKepemilikan'])
         ->name('petani.createkepemilikan');
-    Route::post('petani/simpan-kepemilikan', [PetaniController::class, 'storeKepemilikan'])
-        ->name('petani.store_kepemilikan');
+    Route::post('/petani/storeKepemilikan', [PetaniController::class, 'storeKepemilikan'])
+        ->name('petani.storeKepemilikan');
 });
 
 // hanya super admin

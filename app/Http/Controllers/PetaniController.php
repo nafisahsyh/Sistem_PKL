@@ -105,7 +105,7 @@ class PetaniController extends Controller
                 Storage::disk('public')->delete('ktp_pdf/' . $pdfName);
             }
 
-            $pdfName = time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName();
+            $pdfName = time() . '_' . $request->file(key: 'pdf_scan_ktp')->getClientOriginalName();
             $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $pdfName, 'public');
         }
 
@@ -176,16 +176,18 @@ class PetaniController extends Controller
             'lahan.*.nama_SHM' => 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
             'lahan.*.nama_sporadik' => 'nullable|string|max:100',
+            'lahan.*.nomor_kavling' => 'nullable|string|max:100',
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
-            'lahan.*.pdf_scan_SHM' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         DB::beginTransaction();
 
         try {
+            // Simpan data utama kepemilikan
             $kepemilikan = Kepemilikan::create([
                 'id_petani' => $request->id_petani,
                 'status_kepemilikan' => $request->status_kepemilikan,
@@ -193,27 +195,31 @@ class PetaniController extends Controller
                 'tanggal_selesai' => $request->tanggal_selesai,
             ]);
 
-            foreach ($request->lahan as $lahanData) {
+            // Simpan per lahan
+            foreach ($request->lahan as $index => $lahanData) {
+                // Simpan ke tabel lahan
                 $lahan = Lahan::create([
                     'id_desa' => $lahanData['id_desa'],
                     'id_tahun_tanam' => $lahanData['id_tahun_tanam'],
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
 
+                // Simpan file SHM & Peta (jika ada)
                 $shmName = null;
                 $petaName = null;
 
-                if ($request->hasFile('pdf_scan_shm')) {
-                    $shmName = time() . '_' . $request->file('pdf_scan_shm')->getClientOriginalName();
-                    $request->file('pdf_scan_shm')->storeAs('ktp_pdf', $shmName, 'public');
+                if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                    $file = $request->file("lahan.$index.pdf_scan_shm");
+                    $path = $file->store('shm_pdf', 'public');
+                    $shmName = basename($path); // hanya ambil nama file
                 }
 
-                if ($request->hasFile('pdf_scan_peta')) {
-                    $petaName = time() . '_' . $request->file('pdf_scan_peta')->getClientOriginalName();
-                    $request->file('pdf_scan_peta')->storeAs('ktp_pdf', $petaName, 'public');
+                if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                    $file = $request->file("lahan.$index.pdf_scan_peta");
+                    $path = $file->store('peta_pdf', 'public');
+                    $petaName = basename($path); // hanya ambil nama file
                 }
-
-
+                // Simpan detail kepemilikan
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
@@ -221,20 +227,20 @@ class PetaniController extends Controller
                     'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
                     'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
+                    'nomor_kavling' => $lahanData['nomor_kavling'] ?? null,
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
-                    'pdf_scan_SHM' => $shmName,
-                    'pdf_scan_peta' => $petaName
+                    'pdf_scan_shm' => $shmName,
+                    'pdf_scan_peta' => $petaName,
                 ]);
             }
 
             DB::commit();
-
-            return redirect()->route('petani.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
+            return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', value: 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
