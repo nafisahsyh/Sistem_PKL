@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Lahan extends Model
 {
@@ -36,13 +37,29 @@ class Lahan extends Model
         return $this->hasMany(Kepemilikan::class, 'id_lahan', 'id_lahan');
     }
 
-    public function tahun_tanam()
-    {
-        return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam', 'id_tahun_tanam');
-    }
-
     public function detailKepemilikan()
     {
         return $this->hasMany(DetailKepemilikan::class, 'id_lahan', 'id_lahan');
+    }
+
+    // Event untuk menghapus file SHM dan Peta saat data Lahan dihapus
+    protected static function booted()
+    {
+        static::deleting(function ($lahan) {
+            foreach ($lahan->detailKepemilikan as $detail) {
+                // Hapus file SHM
+                if ($detail->pdf_scan_shm && Storage::disk('public')->exists('shm_pdf/' . $detail->pdf_scan_shm)) {
+                    Storage::disk('public')->delete('shm_pdf/' . $detail->pdf_scan_shm);
+                }
+
+                // Hapus file Peta
+                if ($detail->pdf_scan_peta && Storage::disk('public')->exists('peta_pdf/' . $detail->pdf_scan_peta)) {
+                    Storage::disk('public')->delete('peta_pdf/' . $detail->pdf_scan_peta);
+                }
+
+                // Hapus detail kepemilikan
+                $detail->delete();
+            }
+        });
     }
 }

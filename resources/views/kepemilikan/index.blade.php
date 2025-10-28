@@ -8,8 +8,17 @@
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
-                {{-- 🔍 Search bar --}}
-                <div class="d-flex justify-content-end mb-3">
+
+                {{-- 🔍 Filter & Search --}}
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    {{-- Tombol Filter di kiri --}}
+                    <button
+                        class="btn {{ request()->filled('desa') || request()->filled('tahun') ? 'btn-success text-white' : 'btn-outline-success' }}"
+                        data-bs-toggle="modal" data-bs-target="#filterModal" title="Filter Data">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+
+                    {{-- Search bar di kanan --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end">
                         <input type="text" name="search" class="form-control form-control-search me-2"
@@ -41,17 +50,18 @@
                         @forelse ($kepemilikan as $index => $k)
                             @php
                                 $isSearching = request()->filled('search');
+                                $isFiltered = request()->filled('desa') || request()->filled('tahun');
 
                                 $detailList = $k->detailKepemilikan->map(
                                     fn($d) => [
                                         'desa' => $d->lahan->desa->desa ?? '-',
                                         'tahun' => $d->lahan->tahunTanam->tahun ?? '-',
                                         'id_lahan' => $d->id_lahan,
-                                        'status_kepemilikan' => $d->status_kepemilikan, // <- Tambahkan ini
+                                        'status_kepemilikan' => $d->status_kepemilikan,
                                     ],
                                 );
 
-                                if (!$isSearching) {
+                                if (!$isSearching && !$isFiltered) {
                                     $detailList = $detailList
                                         ->unique(fn($item) => $item['desa'] . $item['tahun'])
                                         ->values();
@@ -66,8 +76,8 @@
 
                             @foreach ($detailList as $i => $detail)
                                 <tr>
-                                    {{-- Kolom utama --}}
-                                    @if (!$isSearching && $i == 0)
+                                    {{-- Mode normal (tanpa filter/search) --}}
+                                    @if (!$isSearching && !$isFiltered && $i == 0)
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             {{ $rowNumber }}
                                         </td>
@@ -83,8 +93,9 @@
                                                 {{ ucfirst($k->petani->status) }}
                                             </span>
                                         </td>
-                                    @elseif ($isSearching)
-                                        {{-- Saat search, tampil semua kolom --}}
+
+                                        {{-- Mode search / filter --}}
+                                    @elseif ($isSearching || $isFiltered)
                                         <td class="text-center align-middle">{{ $rowNumber }}</td>
                                         <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
                                         <td>{{ $k->petani->nama ?? '-' }}</td>
@@ -96,12 +107,11 @@
                                         </td>
                                     @endif
 
-                                    {{-- Desa & Tahun --}}
                                     <td>{{ $detail['desa'] }}</td>
                                     <td class="text-center">{{ $detail['tahun'] }}</td>
 
-                                    {{-- Aksi --}}
-                                    @if (!$isSearching && $i == 0)
+                                    {{-- Tombol Aksi --}}
+                                    @if (!$isSearching && !$isFiltered && $i == 0)
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}"
                                                 class="btn btn-info btn-sm" title="Detail">
@@ -121,7 +131,7 @@
                                                 </button>
                                             </form>
                                         </td>
-                                    @elseif ($isSearching)
+                                    @elseif ($isSearching || $isFiltered)
                                         <td class="text-center align-middle">
                                             <a href="{{ route('kepemilikan.showPerLahan', ['id_kepemilikan' => $k->id_kepemilikan, 'id_lahan' => $detail['id_lahan']]) }}"
                                                 class="btn btn-info btn-sm" title="Detail">
@@ -164,6 +174,74 @@
         </div>
     </div>
 
+    {{-- Modal Filter --}}
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header bg-success text-white rounded-top-4">
+                    <h5 class="modal-title" id="filterModalLabel">
+                        <i class="fas fa-filter me-2"></i> Filter Data Kepemilikan
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form action="{{ route('kepemilikan.index') }}" method="GET">
+                    <div class="modal-body px-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Filter Desa</label>
+                            <select name="desa" id="filter_desa" class="form-select">
+                                <option value="">Semua Desa</option>
+                                @foreach ($daftarDesa as $desa)
+                                    <option value="{{ $desa->desa }}"
+                                        {{ request('desa') == $desa->desa ? 'selected' : '' }}>
+                                        {{ $desa->desa }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Filter Tahun Tanam</label>
+                            <select name="tahun" id="filter_tahun_tanam" class="form-select">
+                                <option value="">Semua Tahun</option>
+                                @foreach ($daftarTahun as $tahun)
+                                    <option value="{{ $tahun->tahun }}"
+                                        {{ request('tahun') == $tahun->tahun ? 'selected' : '' }}>
+                                        {{ $tahun->tahun }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <a href="{{ route('kepemilikan.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt me-1"></i> Reset
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i> Terapkan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Choices.js --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const desaSelect = document.getElementById('filter_desa');
+            const tahunSelect = document.getElementById('filter_tahun_tanam');
+            if (desaSelect) new Choices(desaSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari desa..."
+            });
+            if (tahunSelect) new Choices(tahunSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari tahun..."
+            });
+        });
+    </script>
     {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -188,7 +266,6 @@
         });
     </script>
 
-    {{-- Alert Sukses --}}
     @if (session('success'))
         <script>
             Swal.fire({

@@ -35,4 +35,16 @@ class DetailKepemilikan extends Model
     {
         return $this->belongsTo(Lahan::class, 'id_lahan', 'id_lahan');
     }
+    // Event untuk menghapus file ketika detail dihapus
+    protected static function booted()
+    {
+        static::deleting(function ($detail) {
+            if ($detail->pdf_scan_shm && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                Storage::disk('public')->delete($detail->pdf_scan_shm);
+            }
+            if ($detail->pdf_scan_peta && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                Storage::disk('public')->delete($detail->pdf_scan_peta);
+            }
+        });
+    }
 }
