@@ -31,7 +31,7 @@
                             <th>No</th>
                             <th>Nomor Plasma</th>
                             <th>Nama Petani</th>
-                            <th>Status</th>
+                            <th>Status Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
                             <th>Aksi</th>
@@ -79,8 +79,8 @@
                                         </td>
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             <span
-                                                class="badge {{ $k->status_kepemilikan === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ ucfirst($k->status_kepemilikan) }}
+                                                class="badge {{ $k->petani->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                                {{ ucfirst($k->petani->status) }}
                                             </span>
                                         </td>
                                     @elseif ($isSearching)

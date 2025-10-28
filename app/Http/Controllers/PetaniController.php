@@ -206,17 +206,15 @@ class PetaniController extends Controller
                 $petaName = null;
 
                 // File SHM
+                $shmName = null;
                 if (isset($lahanData['pdf_scan_shm']) && $lahanData['pdf_scan_shm']->isValid()) {
-                    $shmPath = $lahanData['pdf_scan_shm']->store('shm_pdf', 'public');
-                } else {
-                    $shmPath = $detail->pdf_scan_shm ?? null;
+                    $shmName = $lahanData['pdf_scan_shm']->store('shm_pdf', 'public');
                 }
 
                 // File Peta
+                $petaName = null;
                 if (isset($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
-                    $petaPath = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
-                } else {
-                    $petaPath = $detail->pdf_scan_peta ?? null;
+                    $petaName = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
                 }
                 // Simpan detail kepemilikan
                 DetailKepemilikan::create([
@@ -232,9 +230,9 @@ class PetaniController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
-                    'status_kepemilikan' => $lahanData->status_kepemilikan,
-                    'tanggal_mulai' => $lahanData->tanggal_mulai,
-                    'tanggal_selesai' => $lahanData->tanggal_selesai,
+                    'status_kepemilikan' => $lahanData['status_kepemilikan'],
+                    'tanggal_mulai' => $lahanData['tanggal_mulai'],
+                    'tanggal_selesai' => $lahanData['tanggal_selesai'],
                 ]);
             }
 

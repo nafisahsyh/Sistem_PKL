@@ -55,11 +55,11 @@
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Status Kepemilikan</th>
+                            <th class="text-normal text-start ps-3">Status Petani</th>
                             <td class="text-normal-sm text-start ps-3">
                                 <span
-                                    class="badge {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ ucfirst($kepemilikan->status_kepemilikan) }}
+                                    class="badge {{ $kepemilikan->petani->status == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ ucfirst($kepemilikan->petani->status) }}
                                 </span>
                             </td>
                         </tr>
@@ -172,6 +172,26 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th class="text-normal text-start ps-3">Status Lahan</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            <span class="badge {{ $detail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                                {{ ucfirst($detail->status_kepemilikan) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Tanggal Mulai</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            {{ $detail->tanggal_mulai ? \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') : '-' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Tanggal Selesai</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            {{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th class="text-normal text-start ps-3">File SHM</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             @if (!empty($detail->pdf_scan_shm))
@@ -194,17 +214,6 @@
                                             @else
                                                 <span class="text-muted">Tidak ada file</span>
                                             @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-normal text-start ps-3">Tanggal Mulai</th>
-                                        <td class="text-normal-sm text-start ps-3">
-                                            {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-normal text-start ps-3">Tanggal Selesai</th>
-                                        <td class="text-normal-sm text-start ps-3">
-                                            {{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
                                         </td>
                                     </tr>
                                 </tbody>

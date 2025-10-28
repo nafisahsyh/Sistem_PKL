@@ -305,9 +305,9 @@ class KepemilikanController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmPath,
                     'pdf_scan_peta' => $petaPath,
-                    'status_kepemilikan' => $lahanData->status_kepemilikan,
-                    'tanggal_mulai' => $lahanData->tanggal_mulai,
-                    'tanggal_selesai' => $lahanData->tanggal_selesai,
+                    'status_kepemilikan' => $lahanData['status_kepemilikan'],
+                    'tanggal_mulai' => $lahanData['tanggal_mulai'],
+                    'tanggal_selesai' => $lahanData['tanggal_selesai'],
                 ]);
                 $detail->save();
             }
