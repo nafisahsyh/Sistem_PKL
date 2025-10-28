@@ -52,6 +52,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
 
     // resource yang bisa diakses oleh keduanya
     Route::resource('kecamatan', KecamatanController::class);
+    Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('desa', DesaController::class);
     Route::resource('petani', PetaniController::class);
     Route::resource('kepemilikan', KepemilikanController::class);
