@@ -90,23 +90,23 @@
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
                 <div id="lahan-container">
+                    {{-- Lahan 1 --}}
                     <div class="border rounded p-3 mb-4 bg-light lahan-item">
                         <h6 class="text-brown mb-3">Lahan 1</h6>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Desa</label>
-                                <select name="lahan[0][id_desa]" class="form-select text-kecil">
+                                <select name="lahan[0][id_desa]" class="form-select text-kecil select-desa">
                                     <option value="" disabled selected hidden>Pilih Desa</option>
                                     @foreach ($desa as $d)
-                                        <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})
-                                        </option>
+                                        <option value="{{ $d->id_desa }}">{{ $d->desa }}
+                                            ({{ $d->kecamatan->kecamatan }})</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Tahun Tanam</label>
-                                <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil">
+                                <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil select-tahun">
                                     <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
                                     @foreach ($tahun_tanam as $t)
                                         <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
@@ -115,11 +115,10 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Peta (m²)</label>
-                                <input type="number" step="0.01" name="lahan[0][luas_peta]" class="form-control text-kecil"
-                                    min="0">
+                                <input type="number" step="0.01" name="lahan[0][luas_peta]"
+                                    class="form-control text-kecil" min="0">
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor SHM</label>
@@ -134,7 +133,6 @@
                                 <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil">
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor Sporadik</label>
@@ -149,7 +147,6 @@
                                 <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil">
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
@@ -162,13 +159,12 @@
                                     class="form-control text-kecil">
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kepemilikan</label>
                                 <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil">
-                                    <option value="aktif" {{ isset($lahanData['status_kepemilikan']) && $lahanData['status_kepemilikan'] == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="nonaktif" {{ isset($lahanData['status_kepemilikan']) && $lahanData['status_kepemilikan'] == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                    <option value="aktif" selected>Aktif</option>
+                                    <option value="nonaktif">Nonaktif</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -181,7 +177,6 @@
                                 <input type="date" name="lahan[0][tanggal_selesai]" class="form-control text-kecil">
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">PDF SHM</label>
@@ -210,76 +205,150 @@
 
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        let lahanIndex = 1;
-
-        const desaOptions = `@foreach($desa as $d)
-            <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})</option>
-        @endforeach`;
-
-        const tahunTanamOptions = `@foreach($tahun_tanam as $t)
-            <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
-        @endforeach`;
-
-        function tambahLahan() {
-            const container = document.getElementById('lahan-container');
-            const template = container.firstElementChild.cloneNode(true);
-
-            // Reset input & file
-            template.querySelectorAll('input').forEach(el => el.value = '');
-            template.querySelectorAll('input[type="file"]').forEach(el => el.value = '');
-
-            // Reset select
-            const selectDesa = template.querySelector('select[name$="[id_desa]"]');
-            selectDesa.innerHTML = `<option value="" disabled selected hidden>Pilih Desa</option>` + desaOptions;
-
-            const selectTahun = template.querySelector('select[name$="[id_tahun_tanam]"]');
-            selectTahun.innerHTML = `<option value="" disabled selected hidden>Pilih Tahun Tanam</option>` + tahunTanamOptions;
-
-            // Update index
-            template.querySelectorAll('input, select').forEach(el => {
-                const name = el.getAttribute('name');
-                if (name) el.setAttribute('name', name.replace(/\[\d+\]/, `[${lahanIndex}]`));
-            });
-
-            // Update heading
-            template.querySelector('h6.text-brown').innerText = 'Lahan ' + (lahanIndex + 1);
-
-            // Tombol hapus
-            const header = document.createElement('div');
-            header.classList.add('d-flex', 'justify-content-end', 'mb-3');
-            const btnHapus = document.createElement('button');
-            btnHapus.type = 'button';
-            btnHapus.className = 'btn btn-sm btn-danger';
-            btnHapus.innerHTML = '<i class="fa fa-trash-can"></i>';
-            btnHapus.onclick = function () { hapusLahan(this); };
-            header.appendChild(btnHapus);
-            template.insertBefore(header, template.firstChild);
-
-            container.appendChild(template);
-
-            // Inisialisasi Choices.js baru untuk select baru
-            new Choices(selectDesa, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
-            new Choices(selectTahun, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
-
-            lahanIndex++;
-        }
-
-        function hapusLahan(btn) {
-            const container = document.getElementById('lahan-container');
-            btn.closest('.lahan-item').remove();
-            [...container.children].forEach((el, i) => {
-                el.querySelector('h6.text-brown').innerText = 'Lahan ' + (i + 1);
-                el.querySelectorAll('input, select').forEach(input => {
-                    const name = input.getAttribute('name');
-                    if (name) input.setAttribute('name', name.replace(/\[\d+\]/, `[${i}]`));
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi Choices untuk select yang sudah ada
+            document.querySelectorAll('.select-desa, .select-tahun').forEach(select => {
+                new Choices(select, {
+                    searchEnabled: false,
+                    shouldSort: false,
+                    itemSelectText: ''
                 });
             });
-            lahanIndex = container.children.length;
-        }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('select.form-select').forEach(select => {
-                new Choices(select, { searchEnabled: false, shouldSort: false, itemSelectText: '' });
+            // Tambah lahan dinamis
+            let lahanIndex = 1; // karena Lahan 1 sudah ada
+            const container = document.getElementById('lahan-container');
+
+            window.tambahLahan = function() {
+                const lahanDiv = document.createElement('div');
+                lahanDiv.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
+                lahanDiv.innerHTML = `
+        <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+        <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Desa</label>
+                <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil select-desa">
+                    <option value="" disabled selected hidden>Pilih Desa</option>
+                    @foreach ($desa as $d)
+                        <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Tahun Tanam</label>
+                <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil select-tahun">
+                    <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
+                    @foreach ($tahun_tanam as $t)
+                        <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Luas Lahan Berdasarkan Peta (m²)</label>
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" min="0">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nomor SHM</label>
+                <input type="text" name="lahan[${lahanIndex}][nomor_SHM]" class="form-control text-kecil">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nama SHM</label>
+                <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nomor Kavling</label>
+                <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nomor Sporadik</label>
+                <input type="text" name="lahan[${lahanIndex}][nomor_sporadik]" class="form-control text-kecil">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nama Sporadik</label>
+                <input type="text" name="lahan[${lahanIndex}][nama_sporadik]" class="form-control text-kecil">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nomor PBB</label>
+                <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Jumlah PBB (Rp)</label>
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status Kepemilikan</label>
+                <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil">
+                    <option value="aktif" selected>Aktif</option>
+                    <option value="nonaktif">Nonaktif</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil" value="{{ date('Y-m-d') }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">PDF SHM</label>
+                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" class="form-control" accept="application/pdf">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">PDF Peta</label>
+                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" class="form-control" accept="application/pdf">
+            </div>
+        </div>
+    `;
+                container.appendChild(lahanDiv);
+
+                // Inisialisasi Choices untuk select baru
+                new Choices(lahanDiv.querySelector('.select-desa'), {
+                    searchEnabled: false,
+                    shouldSort: false,
+                    itemSelectText: ''
+                });
+                new Choices(lahanDiv.querySelector('.select-tahun'), {
+                    searchEnabled: false,
+                    shouldSort: false,
+                    itemSelectText: ''
+                });
+
+                lahanIndex++;
+            };
+
+
+            // Hapus lahan
+            container.addEventListener('click', e => {
+                if (e.target.closest('.btn-hapus-lahan')) {
+                    e.target.closest('.lahan-item').remove();
+                    [...container.children].forEach((el, i) => {
+                        el.querySelector('h6').innerText = 'Lahan ' + (i + 1);
+                        el.querySelectorAll('input, select').forEach(input => {
+                            input.name = input.name.replace(/\d+/, i);
+                        });
+                    });
+                    lahanIndex = container.children.length;
+                }
             });
         });
     </script>

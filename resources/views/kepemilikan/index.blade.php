@@ -47,10 +47,10 @@
                                         'desa' => $d->lahan->desa->desa ?? '-',
                                         'tahun' => $d->lahan->tahunTanam->tahun ?? '-',
                                         'id_lahan' => $d->id_lahan,
+                                        'status_kepemilikan' => $d->status_kepemilikan, // <- Tambahkan ini
                                     ],
                                 );
 
-                                // Kalau tidak sedang search → hapus duplikat desa/tahun
                                 if (!$isSearching) {
                                     $detailList = $detailList
                                         ->unique(fn($item) => $item['desa'] . $item['tahun'])
@@ -66,7 +66,7 @@
 
                             @foreach ($detailList as $i => $detail)
                                 <tr>
-                                    {{-- Kolom utama (gabung baris kalau tidak search) --}}
+                                    {{-- Kolom utama --}}
                                     @if (!$isSearching && $i == 0)
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             {{ $rowNumber }}
@@ -84,14 +84,14 @@
                                             </span>
                                         </td>
                                     @elseif ($isSearching)
-                                        {{-- Saat search, tampil semua kolom per baris --}}
+                                        {{-- Saat search, tampil semua kolom --}}
                                         <td class="text-center align-middle">{{ $rowNumber }}</td>
                                         <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
                                         <td>{{ $k->petani->nama ?? '-' }}</td>
                                         <td class="text-center">
                                             <span
-                                                class="badge {{ $k->status_kepemilikan === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ ucfirst($k->status_kepemilikan) }}
+                                                class="badge {{ $detail['status_kepemilikan'] === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                                {{ ucfirst($detail['status_kepemilikan']) }}
                                             </span>
                                         </td>
                                     @endif
@@ -149,9 +149,7 @@
                             <tr>
                                 <td colspan="7" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
-                                    <p class="text-muted mb-0" style="font-size: 0.9rem;">
-                                        Belum ada data kepemilikan
-                                    </p>
+                                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data kepemilikan</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -166,7 +164,7 @@
         </div>
     </div>
 
-    {{-- 🧹 SweetAlert Konfirmasi Hapus --}}
+    {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -190,7 +188,7 @@
         });
     </script>
 
-    {{-- ✅ Alert Sukses --}}
+    {{-- Alert Sukses --}}
     @if (session('success'))
         <script>
             Swal.fire({

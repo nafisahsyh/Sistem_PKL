@@ -17,11 +17,11 @@
             {{-- Tombol aksi --}}
             <div class="ms-auto d-flex gap-2">
                 <a href="{{ route('kepemilikan.pdfPerLahan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => $detail->id_lahan]) }}"
-                   class="btn btn-danger shadow-sm" target="_blank">
+                    class="btn btn-danger shadow-sm" target="_blank">
                     <i class="fa fa-file-pdf"></i> Cetak PDF
                 </a>
                 <a href="{{ route('kepemilikan.editPerLahan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => $detail->id_lahan]) }}"
-                   class="btn btn-warning">
+                    class="btn btn-warning">
                     <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
@@ -45,20 +45,24 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor Anggota Koperasi</th>
-                            <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor Anggota Plasma</th>
-                            <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Status Kepemilikan</th>
                             <td class="text-normal-sm text-start ps-3">
-                                <span class="badge {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ ucfirst($kepemilikan->status_kepemilikan) }}
+                                <span
+                                    class="badge {{ $detail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ ucfirst($detail->status_kepemilikan) }}
                                 </span>
                             </td>
                         </tr>
+
                         <tr>
                             <th class="text-normal text-start ps-3">Alamat</th>
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->alamat ?? '-' }}</td>
@@ -82,7 +86,8 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Kecamatan</th>
-                            <td class="text-normal-sm text-start ps-3">{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Tahun Tanam</th>
@@ -90,7 +95,8 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Peta</th>
-                            <td class="text-normal-sm text-start ps-3">{{ number_format($detail->lahan->luas_peta ?? 0, 2, ',', '.') }} m²</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ number_format($detail->lahan->luas_peta ?? 0, 2, ',', '.') }} m²</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor Kavling</th>
@@ -98,7 +104,8 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Surat</th>
-                            <td class="text-normal-sm text-start ps-3">{{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} m²</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} m²</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor SHM</th>
@@ -122,7 +129,8 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Jumlah PBB</th>
-                            <td class="text-normal-sm text-start ps-3">Rp {{ number_format($detail->jumlah_pbb ?? 0, 2, ',', '.') }}</td>
+                            <td class="text-normal-sm text-start ps-3">Rp
+                                {{ number_format($detail->jumlah_pbb ?? 0, 2, ',', '.') }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">File SHM</th>
@@ -152,7 +160,8 @@
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Tanggal Mulai</th>
-                            <td class="text-normal-sm text-start ps-3">{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Tanggal Selesai</th>
