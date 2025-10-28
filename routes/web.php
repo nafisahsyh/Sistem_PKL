@@ -53,7 +53,6 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     // resource yang bisa diakses oleh keduanya
     Route::resource('kecamatan', KecamatanController::class);
     Route::resource('desa', DesaController::class);
-    Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('petani', PetaniController::class);
     Route::resource('kepemilikan', KepemilikanController::class);
     Route::get('/kepemilikan/{id}/pdf', [KepemilikanController::class, 'cetakPDF'])
@@ -64,13 +63,15 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('petani.storeKepemilikan');
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'showPerLahan'])
         ->name('kepemilikan.showPerLahan');
-        //Per lahan
+    //Per lahan
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/edit', [KepemilikanController::class, 'editPerLahan'])
         ->name('kepemilikan.editPerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/pdf', [KepemilikanController::class, 'pdfPerLahan'])
         ->name('kepemilikan.pdfPerLahan');
     Route::delete('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'destroyPerLahan'])
-    ->name('kepemilikan.destroyPerLahan');
+        ->name('kepemilikan.destroyPerLahan');
+    Route::get('/kepemilikan/{id_kepemilikan}/detail/{id_detail_kepemilikan}/cetak', [KepemilikanController::class, 'cetakPDFPerLahan'])
+        ->name('kepemilikan.cetakPerLahan');
 
 });
 

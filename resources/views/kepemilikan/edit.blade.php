@@ -410,11 +410,11 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">File Scan SHM (PDF)</label>
-                    <input type="file" name="lahan[${lahanIndex}][file_scan_shm]" accept="application/pdf" class="form-control text-kecil">
+                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" accept="application/pdf" class="form-control text-kecil">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">File Scan Peta (PDF)</label>
-                    <input type="file" name="lahan[${lahanIndex}][file_scan_peta]" accept="application/pdf" class="form-control text-kecil">
+                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" accept="application/pdf" class="form-control text-kecil">
                 </div>
             </div>
         `;

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Data Kepemilikan</title>
+    <title>Cetak Data Lahan Plasma</title>
 
     <style>
         body {
@@ -14,15 +14,12 @@
             margin: 25px;
         }
 
-        h2,
-        h3,
-        h4 {
+        h2, h3, h4 {
             text-align: center;
             margin: 0;
             padding: 0;
         }
 
-        /* === KOP SURAT === */
         .header {
             text-align: center;
             margin-bottom: 5px;
@@ -52,15 +49,13 @@
             margin-bottom: 10px;
         }
 
-        /* TABEL UMUM */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
 
-        th,
-        td {
+        th, td {
             border: 1px solid #000;
             padding: 6px 8px;
             text-align: left;
@@ -71,34 +66,10 @@
             font-weight: bold;
         }
 
-        .no-border th,
-        .no-border td {
+        .no-border th, .no-border td {
             border: none;
         }
 
-        /* CARD LAHAN */
-        .card {
-            border: 1px solid #000;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        .card-header {
-            font-weight: bold;
-            text-align: left;
-            border-bottom: 1px solid #000;
-            padding: 5px 8px;
-            background: none;
-            color: #000;
-        }
-
-        thead {
-            display: table-header-group; /* kunci utama: agar header muncul ulang di halaman baru */
-        }
-
-        /* BAGIAN JUDUL */
         .section-title {
             font-weight: bold;
             font-size: 13px;
@@ -107,7 +78,6 @@
             text-transform: uppercase;
         }
 
-        /* TANDA TANGAN */
         .signature {
             width: 100%;
             margin-top: 40px;
@@ -122,7 +92,7 @@
 
 <body>
 
-    <!-- === KOP SURAT TANPA BORDER === -->
+    <!-- KOP SURAT -->
     <div class="header">
         <table>
             <tr>
@@ -179,78 +149,66 @@
         </tr>
     </table>
 
-    {{-- Data Kepemilikan & Lahan --}}
-    <div class="section-title">Data Kepemilikan & Lahan</div>
-
-    @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
-        <table class="card">
-            <thead>
-                <tr>
-                    <th colspan="2" class="card-header">Lahan {{ $index + 1 }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th width="35%">Desa</th>
-                    <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Kecamatan</th>
-                    <td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Tahun Tanam</th>
-                    <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Luas Lahan Berdasarkan Peta</th>
-                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
-                </tr>
-                <tr>
-                    <th>Luas Lahan Berdasarkan Surat</th>
-                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} m²</td>
-                </tr>
-                <tr>
-                    <th>Nomor SHM</th>
-                    <td>{{ $detail->nomor_SHM ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Nama Berdasarkan SHM</th>
-                    <td>{{ $detail->nama_SHM ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Nomor Sporadik</th>
-                    <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Nama Berdasarkan Sporadik</th>
-                    <td>{{ $detail->nama_sporadik ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Nomor PBB</th>
-                    <td>{{ $detail->nomor_pbb ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Jumlah PBB</th>
-                    <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
-                </tr>
-                <tr>
-                    <th>Status Kepemilikan</th>
-                    <td>{{ $detail->status_kepemilikan ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Tanggal Mulai</th>
-                    <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
-                </tr>
-                <tr>
-                    <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
-                </tr>
-            </tbody>
-        </table>
-    @empty
-        <p>Belum ada detail lahan untuk kepemilikan ini.</p>
-    @endforelse
+    {{-- Data Lahan --}}
+    <div class="section-title">Data Lahan</div>
+    <table>
+        <tr>
+            <th width="35%">Desa</th>
+            <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Kecamatan</th>
+            <td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Tahun Tanam</th>
+            <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Luas Lahan Berdasarkan Peta</th>
+            <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
+        </tr>
+        <tr>
+            <th>Luas Lahan Berdasarkan Surat</th>
+            <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} m²</td>
+        </tr>
+        <tr>
+            <th>Nomor SHM</th>
+            <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nama Berdasarkan SHM</th>
+            <td>{{ $detail->nama_SHM ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Sporadik</th>
+            <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nama Berdasarkan Sporadik</th>
+            <td>{{ $detail->nama_sporadik ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor PBB</th>
+            <td>{{ $detail->nomor_pbb ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Jumlah PBB</th>
+            <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <th>Status Kepemilikan</th>
+            <td>{{ $detail->status_kepemilikan ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Tanggal Mulai</th>
+            <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+        </tr>
+        <tr>
+            <th>Tanggal Selesai</th>
+            <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+        </tr>
+    </table>
 
     <div class="signature">
         <p>Mengetahui,</p>

@@ -24,9 +24,11 @@
         @endif
 
         {{-- ==== FORM EDIT PER LAHAN ==== --}}
-        <form action="{{ route('kepemilikan.update', $kepemilikan->id_kepemilikan) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('kepemilikan.update', $kepemilikan->id_kepemilikan) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="id_petani" value="{{ $kepemilikan->id_petani }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
@@ -35,7 +37,7 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nomor Anggota Plasma</label>
-                        <input type="text" class="form-control text-kecil" 
+                        <input type="text" class="form-control text-kecil"
                             value="{{ $kepemilikan->petani->nomor_anggota_plasma }}" readonly>
                     </div>
 
@@ -47,16 +49,16 @@
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label">NIK</label>
-                        <input type="text" class="form-control text-kecil" 
-                            value="{{ $kepemilikan->petani->NIK }}" readonly>
+                        <input type="text" class="form-control text-kecil" value="{{ $kepemilikan->petani->NIK }}"
+                            readonly>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama</label>
-                        <input type="text" class="form-control text-kecil" 
-                            value="{{ $kepemilikan->petani->nama }}" readonly>
+                        <input type="text" class="form-control text-kecil" value="{{ $kepemilikan->petani->nama }}"
+                            readonly>
                     </div>
                     <div class="col-md-8 mb-3">
                         <label class="form-label">Alamat</label>
@@ -94,7 +96,8 @@
                 <h5 class="text-brown mb-3">Data Lahan</h5>
 
                 <div class="border rounded p-3 mb-4 bg-light lahan-item">
-                    <input type="hidden" name="lahan[0][id_detail_kepemilikan]" value="{{ $selectedDetail->id_detail_kepemilikan }}">
+                    <input type="hidden" name="lahan[0][id_detail_kepemilikan]"
+                        value="{{ $selectedDetail->id_detail_kepemilikan }}">
                     <input type="hidden" name="lahan[0][id_lahan]" value="{{ $selectedDetail->lahan->id_lahan }}">
 
                     <div class="row">
@@ -103,7 +106,7 @@
                             <select name="lahan[0][id_desa]" class="form-select text-kecil">
                                 <option value="" disabled hidden>Pilih Desa</option>
                                 @foreach ($desa as $d)
-                                    <option value="{{ $d->id_desa }}" 
+                                    <option value="{{ $d->id_desa }}"
                                         {{ $selectedDetail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
                                         {{ $d->desa }} ({{ $d->kecamatan->kecamatan }})
                                     </option>
@@ -116,7 +119,7 @@
                             <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil">
                                 <option value="" disabled hidden>Pilih Tahun Tanam</option>
                                 @foreach ($tahun_tanam as $t)
-                                    <option value="{{ $t->id_tahun_tanam }}" 
+                                    <option value="{{ $t->id_tahun_tanam }}"
                                         {{ $selectedDetail->lahan->id_tahun_tanam == $t->id_tahun_tanam ? 'selected' : '' }}>
                                         {{ $t->tahun }}
                                     </option>
@@ -170,13 +173,37 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
-                            <input type="number" step="0.01" name="lahan[0][luas_surat]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->luas_surat }}">
+                            <input type="number" step="0.01" name="lahan[0][luas_surat]"
+                                class="form-control text-kecil" value="{{ $selectedDetail->luas_surat }}">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Jumlah PBB (Rp)</label>
-                            <input type="number" step="0.01" name="lahan[0][jumlah_pbb]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->jumlah_pbb }}">
+                            <input type="number" step="0.01" name="lahan[0][jumlah_pbb]"
+                                class="form-control text-kecil" value="{{ $selectedDetail->jumlah_pbb }}">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status Kepemilikan</label>
+                            <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil">
+                                <option value="aktif"
+                                    {{ $selectedDetail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="nonaktif"
+                                    {{ $selectedDetail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tanggal Mulai</label>
+                            <input type="date" name="lahan[0][tanggal_mulai]" class="form-control text-kecil"
+                                value="{{ $selectedDetail->tanggal_mulai ? date('Y-m-d', strtotime($selectedDetail->tanggal_mulai)) : '' }}">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tanggal Selesai</label>
+                            <input type="date" name="lahan[0][tanggal_selesai]" class="form-control text-kecil"
+                                value="{{ $selectedDetail->tanggal_selesai ? date('Y-m-d', strtotime($selectedDetail->tanggal_selesai)) : '' }}">
                         </div>
                     </div>
 
@@ -184,50 +211,29 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">File Scan SHM (PDF)</label>
-                            <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control text-kecil" accept="application/pdf">
+                            <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control text-kecil"
+                                accept="application/pdf">
                             @if ($selectedDetail->pdf_scan_shm)
                                 <small class="text-muted">
                                     File saat ini:
-                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_shm) }}" target="_blank">Lihat PDF</a>
+                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_shm) }}"
+                                        target="_blank">Lihat PDF</a>
                                 </small>
                             @endif
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">File Scan Peta (PDF)</label>
-                            <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control text-kecil" accept="application/pdf">
+                            <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control text-kecil"
+                                accept="application/pdf">
                             @if ($selectedDetail->pdf_scan_peta)
                                 <small class="text-muted">
                                     File saat ini:
-                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_peta) }}" target="_blank">Lihat PDF</a>
+                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_peta) }}"
+                                        target="_blank">Lihat PDF</a>
                                 </small>
                             @endif
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- ===================== STATUS KEPEMILIKAN ===================== --}}
-            <div class="card p-4 mb-4 shadow-sm rounded-3">
-                <h5 class="text-brown mb-3">Status Kepemilikan</h5>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status_kepemilikan" class="form-select text-kecil">
-                            <option value="aktif" {{ $kepemilikan->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="nonaktif" {{ $kepemilikan->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tanggal Mulai</label>
-                        <input type="date" name="tanggal_mulai" class="form-control text-kecil"
-                            value="{{ $kepemilikan->tanggal_mulai }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tanggal Selesai</label>
-                        <input type="date" name="tanggal_selesai" class="form-control text-kecil"
-                            value="{{ $kepemilikan->tanggal_selesai }}">
                     </div>
                 </div>
             </div>

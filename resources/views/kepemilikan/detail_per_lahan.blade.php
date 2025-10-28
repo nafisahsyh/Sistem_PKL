@@ -16,8 +16,8 @@
 
             {{-- Tombol aksi --}}
             <div class="ms-auto d-flex gap-2">
-                <a href="{{ route('kepemilikan.pdfPerLahan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => $detail->id_lahan]) }}"
-                    class="btn btn-danger shadow-sm" target="_blank">
+                <a href="{{ route('kepemilikan.cetakPerLahan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_detail_kepemilikan' => $detail->id_detail_kepemilikan]) }}"
+                    class="btn btn-danger btn-sm">
                     <i class="fa fa-file-pdf"></i> Cetak PDF
                 </a>
                 <a href="{{ route('kepemilikan.editPerLahan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => $detail->id_lahan]) }}"
