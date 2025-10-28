@@ -18,6 +18,12 @@
                         <i class="fas fa-filter"></i> Filter
                     </button>
 
+                    {{-- button print pdf --}}
+                    <a href="{{ route('kepemilikan.cetakSemuaPDF', request()->only(['desa', 'tahun', 'search'])) }}"
+                        class="btn btn-primary">
+                        Cetak PDF
+                    </a>
+
                     {{-- Search bar di kanan --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end">

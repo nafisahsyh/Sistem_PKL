@@ -73,6 +73,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('kepemilikan.destroyPerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/detail/{id_detail_kepemilikan}/cetak', [KepemilikanController::class, 'cetakPDFPerLahan'])
         ->name('kepemilikan.cetakPerLahan');
+    Route::get('/kepemilikan/cetakSemuaPDF', [KepemilikanController::class, 'cetakSemuaPDF'])
+        ->name('kepemilikan.cetakSemuaPDF');
 
 });
 
