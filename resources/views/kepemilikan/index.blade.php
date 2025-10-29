@@ -4,7 +4,17 @@
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
     <div class="container-fluid px-4 mt-5">
-        <h3 class="mt-4 text-brown">Data Kepemilikan</h3>
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h3 class="text-brown mb-0">Data Kepemilikan</h3>
+            <a href="{{ route('kepemilikan.cetakSemuaPDF', [
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                target="_blank" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
+        </div>
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
@@ -17,11 +27,6 @@
                         data-bs-toggle="modal" data-bs-target="#filterModal" title="Filter Data">
                         <i class="fas fa-filter"></i> Filter
                     </button>
-
-                    {{-- button print pdf --}}
-                    <a href="{{ route('kepemilikan.cetakSemuaPDF', request()->query()) }}" class="btn btn-danger">
-                        Cetak PDF
-                    </a>
 
                     {{-- Search bar di kanan --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET"
@@ -51,9 +56,12 @@
 
                 {{-- Tambahan baru --}}
                 @php
+                    // Pastikan variabel mode selalu ada supaya gak error
+                    $mode = $mode ?? 'normal';
                     $isNormalMode = $mode === 'normal';
                     $isPerLahanMode = $mode === 'perLahan';
                 @endphp
+
 
                 {{-- 🧾 Tabel Data --}}
                 <table class="table table-bordered table-striped align-middle table-custom">

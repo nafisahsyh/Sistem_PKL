@@ -50,9 +50,7 @@
 <body>
 
     <h2>DATA KEPEMILIKAN LAHAN PETANI</h2>
-    <h4>
-        Desa: {{ $request->desa ?? 'Semua Desa' }} — Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }}
-    </h4>
+    <h4>Desa: {{ $request->desa ?? 'Semua Desa' }} — Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }}</h4>
 
     <div class="info">
         <p><strong>Desa:</strong> {{ $request->desa ?? 'Semua Desa' }}</p>
@@ -77,27 +75,47 @@
         </thead>
         <tbody>
             @php $no = 1; @endphp
+
+            {{-- Pastikan $kepemilikan berisi koleksi yang sudah difilter di controller --}}
             @foreach ($kepemilikan as $k)
-                @php $rowspan = $k->detailKepemilikan->count(); @endphp
-                @foreach ($k->detailKepemilikan as $index => $detail)
+                {{-- Gunakan values() -> agar index konsisten --}}
+                @php
+                    $details = $k->detailKepemilikan->values();
+                    $count = $details->count();
+                    // kalau kosong, lewati (controller seharusnya sudah buang yg kosong, tapi safe-check)
+                    if ($count === 0) continue;
+                @endphp
+
+                @foreach ($details as $index => $detail)
                     @php
-                        $lahan = $detail->lahan;
-                        $desa = $lahan->desa->desa ?? '-';
-                        $tahun = $lahan->tahunTanam->tahun ?? '-';
+                        // guard-null untuk lahan & relasi
+                        $lahan = $detail->lahan ?? null;
+                        $desaNama = $lahan && $lahan->desa ? ($lahan->desa->desa ?? '-') : '-';
+                        $tahunNama = $lahan && $lahan->tahunTanam ? ($lahan->tahunTanam->tahun ?? '-') : '-';
+
+                        // numeric safe: cast ke float agar number_format tidak error ketika null/''.
+                        $luasPeta = $lahan && is_numeric($lahan->luas_peta) ? (float) $lahan->luas_peta : 0;
+                        $luasSurat = is_numeric($detail->luas_surat) ? (float) $detail->luas_surat : 0;
+
+                        $noKavling = $detail->nomor_kavling ?? '-';
+                        $noSHM = $detail->nomor_SHM ?? '-';
                     @endphp
+
                     <tr>
                         @if ($index === 0)
-                            <td rowspan="{{ $rowspan }}">{{ $no++ }}</td>
-                            <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
-                            <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
-                            <td rowspan="{{ $rowspan }}" class="text-left">{{ $k->petani->nama ?? '-' }}</td>
+                            {{-- Rowspan berdasarkan jumlah detail yang sebenarnya --}}
+                            <td rowspan="{{ $count }}">{{ $no++ }}</td>
+                            <td rowspan="{{ $count }}">{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
+                            <td rowspan="{{ $count }}">{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
+                            <td rowspan="{{ $count }}" class="text-left">{{ $k->petani->nama ?? '-' }}</td>
                         @endif
-                        <td>{{ $desa }}</td>
-                        <td>{{ $tahun }}</td>
-                        <td>{{ $detail->nomor_kavling ?? '-' }}</td>
-                        <td>{{ number_format($lahan->luas_peta ?? 0, 2, ',', '.') }}</td>
-                        <td>{{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }}</td>
-                        <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+
+                        <td>{{ $desaNama }}</td>
+                        <td>{{ $tahunNama }}</td>
+                        <td>{{ $noKavling }}</td>
+                        <td>{{ number_format($luasPeta, 2, ',', '.') }}</td>
+                        <td>{{ number_format($luasSurat, 2, ',', '.') }}</td>
+                        <td>{{ $noSHM }}</td>
                     </tr>
                 @endforeach
             @endforeach
