@@ -7,7 +7,7 @@
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">
             {{-- Tombol Kembali --}}
-            <a href="{{ route('kepemilikan.show', $kepemilikan->id_kepemilikan) }}" class="btn btn-success p-2">
+            <a href="{{ route('kepemilikan.index', $kepemilikan->id_kepemilikan) }}" class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 

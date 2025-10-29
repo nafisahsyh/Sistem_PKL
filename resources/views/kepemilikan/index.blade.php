@@ -26,17 +26,34 @@
                     {{-- Search bar di kanan --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end">
+
+                        {{-- Biar filter tetap terkirim waktu pencarian --}}
+                        @if (request()->filled('desa'))
+                            <input type="hidden" name="desa" value="{{ request('desa') }}">
+                        @endif
+                        @if (request()->filled('tahun'))
+                            <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                        @endif
+
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari nama petani, nomor plasma, atau desa..." value="{{ request('search') }}"
                             style="width: 300px;">
+
                         <button class="btn btn-success" type="submit" title="Cari">
                             <i class="fas fa-search"></i>
                         </button>
+
                         <a href="{{ route('kepemilikan.index') }}" class="btn btn-primary ms-2" title="Reset">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>
                 </div>
+
+                {{-- Tambahan baru --}}
+                @php
+                    $isNormalMode = $mode === 'normal';
+                    $isPerLahanMode = $mode === 'perLahan';
+                @endphp
 
                 {{-- 🧾 Tabel Data --}}
                 <table class="table table-bordered table-striped align-middle table-custom">
@@ -54,9 +71,6 @@
                     <tbody>
                         @forelse ($kepemilikan as $index => $k)
                             @php
-                                $isSearching = request()->filled('search');
-                                $isFiltered = request()->filled('desa') || request()->filled('tahun');
-
                                 $detailList = $k->detailKepemilikan->map(
                                     fn($d) => [
                                         'desa' => $d->lahan->desa->desa ?? '-',
@@ -66,7 +80,7 @@
                                     ],
                                 );
 
-                                if (!$isSearching && !$isFiltered) {
+                                if ($isNormalMode) {
                                     $detailList = $detailList
                                         ->unique(fn($item) => $item['desa'] . $item['tahun'])
                                         ->values();
@@ -81,8 +95,8 @@
 
                             @foreach ($detailList as $i => $detail)
                                 <tr>
-                                    {{-- Mode normal (tanpa filter/search) --}}
-                                    @if (!$isSearching && !$isFiltered && $i == 0)
+                                    {{-- Mode normal --}}
+                                    @if ($isNormalMode && $i == 0)
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             {{ $rowNumber }}
                                         </td>
@@ -99,8 +113,8 @@
                                             </span>
                                         </td>
 
-                                        {{-- Mode search / filter --}}
-                                    @elseif ($isSearching || $isFiltered)
+                                        {{-- Mode per lahan --}}
+                                    @elseif ($isPerLahanMode)
                                         <td class="text-center align-middle">{{ $rowNumber }}</td>
                                         <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
                                         <td>{{ $k->petani->nama ?? '-' }}</td>
@@ -116,7 +130,7 @@
                                     <td class="text-center">{{ $detail['tahun'] }}</td>
 
                                     {{-- Tombol Aksi --}}
-                                    @if (!$isSearching && !$isFiltered && $i == 0)
+                                    @if ($isNormalMode && $i == 0)
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
                                             <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}"
                                                 class="btn btn-info btn-sm" title="Detail">
@@ -136,7 +150,7 @@
                                                 </button>
                                             </form>
                                         </td>
-                                    @elseif ($isSearching || $isFiltered)
+                                    @elseif ($isPerLahanMode)
                                         <td class="text-center align-middle">
                                             <a href="{{ route('kepemilikan.showPerLahan', ['id_kepemilikan' => $k->id_kepemilikan, 'id_lahan' => $detail['id_lahan']]) }}"
                                                 class="btn btn-info btn-sm" title="Detail">
@@ -247,6 +261,7 @@
             });
         });
     </script>
+
     {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

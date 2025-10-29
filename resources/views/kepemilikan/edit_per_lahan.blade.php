@@ -4,7 +4,16 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h4 class="mt-4 text-brown">Edit Data Kepemilikan (Per Lahan)</h4>
+        {{-- button back --}}
+        <div class="d-flex align-items-center mb-3">
+            {{-- Tombol Back --}}
+            <a href="{{ route('kepemilikan.index', $kepemilikan->id_kepemilikan) }}" class="btn btn-success p-2 me-3">
+                <i class="fas fa-chevron-left fa-lg"></i>
+            </a>
+
+            {{-- Judul Halaman --}}
+            <h4 class="text-brown mb-0">Edit Data Kepemilikan (Per Lahan)</h4>
+        </div>
 
         {{-- ALERT PESAN --}}
         @if (session('success'))

@@ -51,8 +51,7 @@
 
     <h2>DATA KEPEMILIKAN LAHAN PETANI</h2>
     <h4>
-        Desa: {{ $request->desa ?? 'Semua Desa' }} 
-        — Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }}
+        Desa: {{ $request->desa ?? 'Semua Desa' }} — Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }}
     </h4>
 
     <div class="info">
@@ -65,37 +64,40 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>No. Anggota Koperasi</th>
                 <th>No. Anggota Plasma</th>
-                <th>No. Kavling</th>
+                <th>No. Anggota Koperasi</th>
                 <th class="text-left">Nama Petani</th>
-                <th>No. Surat SHM</th>
-                <th>Luas Sesuai Peta (m²)</th>
-                <th>Luas Sesuai Surat (m²)</th>
                 <th>Desa</th>
                 <th>Tahun Tanam</th>
+                <th>No. Kavling</th>
+                <th>Luas Sesuai Peta (m²)</th>
+                <th>Luas Sesuai Surat (m²)</th>
+                <th>No. Surat SHM</th>
             </tr>
         </thead>
         <tbody>
             @php $no = 1; @endphp
             @foreach ($kepemilikan as $k)
-                @foreach ($k->detailKepemilikan as $detail)
+                @php $rowspan = $k->detailKepemilikan->count(); @endphp
+                @foreach ($k->detailKepemilikan as $index => $detail)
                     @php
-                        $lahan = $detail->lahan; // Data lahan terkait
+                        $lahan = $detail->lahan;
                         $desa = $lahan->desa->desa ?? '-';
                         $tahun = $lahan->tahunTanam->tahun ?? '-';
                     @endphp
                     <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
-                        <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
-                        <td>{{ $detail->nomor_kavling ?? '-' }}</td>
-                        <td class="text-left">{{ $k->petani->nama ?? '-' }}</td>
-                        <td>{{ $detail->nomor_SHM ?? '-' }}</td>
-                        <td>{{ number_format($lahan->luas_peta ?? 0, 2, ',', '.') }}</td>
-                        <td>{{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }}</td>
+                        @if ($index === 0)
+                            <td rowspan="{{ $rowspan }}">{{ $no++ }}</td>
+                            <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
+                            <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
+                            <td rowspan="{{ $rowspan }}" class="text-left">{{ $k->petani->nama ?? '-' }}</td>
+                        @endif
                         <td>{{ $desa }}</td>
                         <td>{{ $tahun }}</td>
+                        <td>{{ $detail->nomor_kavling ?? '-' }}</td>
+                        <td>{{ number_format($lahan->luas_peta ?? 0, 2, ',', '.') }}</td>
+                        <td>{{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }}</td>
+                        <td>{{ $detail->nomor_SHM ?? '-' }}</td>
                     </tr>
                 @endforeach
             @endforeach
