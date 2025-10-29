@@ -7,7 +7,12 @@
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">
             {{-- Tombol Kembali --}}
-            <a href="{{ route('kepemilikan.index', $kepemilikan->id_kepemilikan) }}" class="btn btn-success p-2">
+            <a href="{{ route('kepemilikan.index', [
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                class="btn btn-success p-2" title="Kembali ke Data Kepemilikan">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 
@@ -67,6 +72,34 @@
                             <th class="text-normal text-start ps-3">Alamat</th>
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->alamat ?? '-' }}</td>
                         </tr>
+                        <tr>
+                            <th class="text-normal text-start ps-3">Scan KTP</th>
+                            <td class="text-normal-sm text-start ps-3">
+                                @if (!empty($kepemilikan->petani->pdf_scan_ktp))
+                                    <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
+                                        target="_blank" class="btn btn-info btn-sm text-dark">
+                                        <i class="fas fa-file-pdf"></i> Lihat
+                                    </a>
+                                @else
+                                    <span class="text-muted">Tidak ada file</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-normal text-start ps-3">Scan KK</th>
+                            <td class="text-normal-sm text-start ps-3">
+                                @if (!empty($kepemilikan->petani->pdf_scan_kk))
+                                    <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
+                                        target="_blank" class="btn btn-info btn-sm text-dark">
+                                        <i class="fas fa-file-pdf"></i> Lihat
+                                    </a>
+                                @else
+                                    <span class="text-muted">Tidak ada file</span>
+                                @endif
+                            </td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -149,7 +182,7 @@
                             <th class="text-normal text-start ps-3">Peta Lahan</th>
                             <td class="text-normal-sm text-start ps-3">
                                 @if (!empty($detail->pdf_scan_peta))
-                                    <a href="{{ asset('storage/peta_pdf/' . $detail->pdf_scan_peta) }}" target="_blank"
+                                    <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}" target="_blank"
                                         class="btn btn-info btn-sm text-dark">
                                         <i class="fas fa-file-pdf"></i> Lihat
                                     </a>

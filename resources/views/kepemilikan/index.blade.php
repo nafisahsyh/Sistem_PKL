@@ -68,7 +68,8 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>Nomor Plasma</th>
+                            <th>Nomor Anggota Plasma</th>
+                            <th>Nomor Anggota Koperasi</th>
                             <th>Nama Petani</th>
                             <th>Status Petani</th>
                             <th>Desa</th>
@@ -112,6 +113,9 @@
                                             {{ $k->petani->nomor_anggota_plasma ?? '-' }}
                                         </td>
                                         <td class="align-middle" rowspan="{{ $detailList->count() }}">
+                                            {{ $k->petani->nomor_anggota_koperasi ?? '-' }}
+                                        </td>
+                                        <td class="align-middle" rowspan="{{ $detailList->count() }}">
                                             {{ $k->petani->nama ?? '-' }}
                                         </td>
                                         <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
@@ -125,6 +129,7 @@
                                     @elseif ($isPerLahanMode)
                                         <td class="text-center align-middle">{{ $rowNumber }}</td>
                                         <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
+                                        <td>{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
                                         <td>{{ $k->petani->nama ?? '-' }}</td>
                                         <td class="text-center">
                                             <span
@@ -160,11 +165,23 @@
                                         </td>
                                     @elseif ($isPerLahanMode)
                                         <td class="text-center align-middle">
-                                            <a href="{{ route('kepemilikan.showPerLahan', ['id_kepemilikan' => $k->id_kepemilikan, 'id_lahan' => $detail['id_lahan']]) }}"
+                                            <a href="{{ route('kepemilikan.showPerLahan', [
+                                                'id_kepemilikan' => $k->id_kepemilikan,
+                                                'id_lahan' => $detail['id_lahan'],
+                                                'search' => request('search'),
+                                                'desa' => request('desa'),
+                                                'tahun' => request('tahun'),
+                                            ]) }}"
                                                 class="btn btn-info btn-sm" title="Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('kepemilikan.editPerLahan', ['id_kepemilikan' => $k->id_kepemilikan, 'id_lahan' => $detail['id_lahan']]) }}"
+                                            <a href="{{ route('kepemilikan.editPerLahan', [
+                                             'id_kepemilikan' => $k->id_kepemilikan,
+                                                'id_lahan' => $detail['id_lahan'],
+                                                'search' => request('search'),
+                                                'desa' => request('desa'),
+                                                'tahun' => request('tahun'),
+                                            ]) }}"
                                                 class="btn btn-warning btn-sm" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
@@ -184,7 +201,7 @@
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
                                     <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data kepemilikan</p>
                                 </td>

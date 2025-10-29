@@ -39,12 +39,12 @@ class KepemilikanController extends Controller
                         ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
                         ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
                 })
-                ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
-                    $q2->whereRaw('LOWER(desa) like ?', ["%{$search}%"]);
-                })
-                ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
-                    $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
-                });
+                    ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(desa) like ?', ["%{$search}%"]);
+                    })
+                    ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
+                    });
             });
         }
 
@@ -113,11 +113,25 @@ class KepemilikanController extends Controller
         $daftarDesa = Desa::orderBy('desa')->get();
         $daftarTahun = Tahun_Tanam::orderBy('tahun', 'desc')->get();
 
-        // 🟢 Selalu mode normal (merge)
-        $mode = 'normal';
+        // 🟢 Tentukan mode tampilan otomatis
+        if ($request->filled('desa') || $request->filled('tahun')) {
+            $mode = 'perLahan'; // kalau filter aktif
+        } elseif (!empty($search)) {
+            $isSearchPetani = Kepemilikan::whereHas('petani', function ($q) use ($search) {
+                $q->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
+            })->exists();
+
+            // kalau search nama petani → tetap normal, kalau bukan → per lahan
+            $mode = $isSearchPetani ? 'normal' : 'perLahan';
+        } else {
+            $mode = 'normal'; // default
+        }
 
         return view('kepemilikan.index', compact('kepemilikan', 'daftarDesa', 'daftarTahun', 'mode'));
     }
+
 
 
     public function showPerLahan($id_kepemilikan, $id_lahan)
@@ -415,7 +429,7 @@ class KepemilikanController extends Controller
         $kepemilikan = Kepemilikan::with([
             'petani',
             'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahun_tanam'
+            'detailKepemilikan.lahan.tahunTanam'
         ])->findOrFail($id);
 
         $pdf = Pdf::loadView('kepemilikan.pdf', compact('kepemilikan'))
@@ -481,7 +495,7 @@ class KepemilikanController extends Controller
         $finalPath = storage_path('app/public/kepemilikan_gabungan.pdf');
         $pdfMerger->Output($finalPath, 'F');
 
-        return response()->download($finalPath, 'Data Kepemilikan Lahan' . $kepemilikan->petani->nama . '.pdf');
+        return response()->download($finalPath, 'Data Kepemilikan Lahan ' . $kepemilikan->petani->nama . '.pdf');
     }
 
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
@@ -574,12 +588,12 @@ class KepemilikanController extends Controller
                         ->orWhere('nomor_anggota_plasma', 'like', "%{$search}%")
                         ->orWhere('nomor_anggota_koperasi', 'like', "%{$search}%");
                 })
-                ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
-                    $q2->where('desa', 'like', "%{$search}%");
-                })
-                ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
-                    $q2->where('tahun', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
+                        $q2->where('desa', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
+                        $q2->where('tahun', 'like', "%{$search}%");
+                    });
             });
         });
 
@@ -639,7 +653,11 @@ class KepemilikanController extends Controller
             'request' => $request
         ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('Data_Kepemilikan.pdf');
-    }
+        $namaDesa = $request->filled('desa') ? str_replace(' ', '_', $request->desa) : 'SemuaDesa';
+        $namaTahun = $request->filled('tahun') ? $request->tahun : 'SemuaTahun';
 
+        $namaFile = "Data_Kepemilikan_{$namaDesa}_{$namaTahun}.pdf";
+
+        return $pdf->download($namaFile);
+    }
 }

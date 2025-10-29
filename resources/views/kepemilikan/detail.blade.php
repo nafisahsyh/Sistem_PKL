@@ -175,7 +175,7 @@
                                         <th class="text-normal text-start ps-3">Status Lahan</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             <span class="badge {{ $detail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ ucfirst($detail->status_kepemilikan) }}
+                                                 {{ ucfirst(strtolower($detail->status_kepemilikan)) }}
                                             </span>
                                         </td>
                                     </tr>

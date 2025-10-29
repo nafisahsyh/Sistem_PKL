@@ -7,12 +7,17 @@
         {{-- button back --}}
         <div class="d-flex align-items-center mb-3">
             {{-- Tombol Back --}}
-            <a href="{{ route('kepemilikan.index', $kepemilikan->id_kepemilikan) }}" class="btn btn-success p-2 me-3">
+            <a href="{{ route('kepemilikan.index', [
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                class="btn btn-success p-2" title="Kembali ke Data Kepemilikan">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 
             {{-- Judul Halaman --}}
-            <h4 class="text-brown mb-0">Edit Data Kepemilikan (Per Lahan)</h4>
+            <h4 class="text-brown mb-0 ms-3">Edit Data Kepemilikan</h4>
         </div>
 
         {{-- ALERT PESAN --}}
