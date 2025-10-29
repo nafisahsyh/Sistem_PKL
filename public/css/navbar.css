@@ -191,11 +191,18 @@
 }
 
 /* === Styling tabel kustom === */
+.table-custom {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1.5px solid #014C2D;
+}
+
 .table-custom thead tr th {
     background-color: #014C2D;
     color: #fff;
     font-weight: normal !important;
     font-size: 0.9rem;
+    border: 1px solid #cce1d7; /* 🌿 batas kolom terlihat */
 }
 
 .table-custom tbody tr:nth-child(odd) {
@@ -209,6 +216,12 @@
 .table-custom tbody tr:hover {
     background-color: #b6d3c2;
 }
+
+.table-custom td {
+    border: 1px solid #6b8f7e;
+    padding: 6px 8px;
+}
+
 
 .text-brown {
     color: #000000;
