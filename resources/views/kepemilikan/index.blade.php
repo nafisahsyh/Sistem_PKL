@@ -19,8 +19,7 @@
                     </button>
 
                     {{-- button print pdf --}}
-                    <a href="{{ route('kepemilikan.cetakSemuaPDF', request()->only(['desa', 'tahun', 'search'])) }}"
-                        class="btn btn-primary">
+                    <a href="{{ route('kepemilikan.cetakSemuaPDF', request()->query()) }}" class="btn btn-danger">
                         Cetak PDF
                     </a>
 

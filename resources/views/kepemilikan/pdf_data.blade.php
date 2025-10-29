@@ -81,7 +81,7 @@
             @foreach ($kepemilikan as $k)
                 @foreach ($k->detailKepemilikan as $detail)
                     @php
-                        $lahan = $detail->lahan;
+                        $lahan = $detail->lahan; // Data lahan terkait
                         $desa = $lahan->desa->desa ?? '-';
                         $tahun = $lahan->tahunTanam->tahun ?? '-';
                     @endphp
@@ -89,10 +89,10 @@
                         <td>{{ $no++ }}</td>
                         <td>{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
                         <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
-                        <td>{{ $lahan->nomor_kavling ?? '-' }}</td>
+                        <td>{{ $detail->nomor_kavling ?? '-' }}</td>
                         <td class="text-left">{{ $k->petani->nama ?? '-' }}</td>
-                        <td>{{ $detail->nomor_surat_shm ?? '-' }}</td>
-                        <td>{{ number_format($detail->luas_peta ?? 0, 2, ',', '.') }}</td>
+                        <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+                        <td>{{ number_format($lahan->luas_peta ?? 0, 2, ',', '.') }}</td>
                         <td>{{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }}</td>
                         <td>{{ $desa }}</td>
                         <td>{{ $tahun }}</td>

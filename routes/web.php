@@ -55,6 +55,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::resource('tahun_tanam', TahunTanamController::class);
     Route::resource('desa', DesaController::class);
     Route::resource('petani', PetaniController::class);
+    Route::get('/kepemilikan/cetakSemuaPDF', [KepemilikanController::class, 'cetakSemuaPDF'])
+        ->name('kepemilikan.cetakSemuaPDF');
     Route::resource('kepemilikan', KepemilikanController::class);
     Route::get('/kepemilikan/{id}/pdf', [KepemilikanController::class, 'cetakPDF'])
         ->name('kepemilikan.pdf');
@@ -73,9 +75,6 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('kepemilikan.destroyPerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/detail/{id_detail_kepemilikan}/cetak', [KepemilikanController::class, 'cetakPDFPerLahan'])
         ->name('kepemilikan.cetakPerLahan');
-    Route::get('/kepemilikan/cetakSemuaPDF', [KepemilikanController::class, 'cetakSemuaPDF'])
-        ->name('kepemilikan.cetakSemuaPDF');
-
 });
 
 // hanya super admin
