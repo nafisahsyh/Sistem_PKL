@@ -36,6 +36,17 @@ class Petani extends Model
         return $this->hasMany(Kepemilikan::class, 'id_petani', 'id_petani');
     }
 
+    public function riwayatSebagaiSebelum()
+    {
+        return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sebelum');
+    }
+
+    public function riwayatSebagaiSesudah()
+    {
+        return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sesudah');
+    }
+
+
     // Event untuk menghapus file PDF otomatis
     protected static function booted()
     {

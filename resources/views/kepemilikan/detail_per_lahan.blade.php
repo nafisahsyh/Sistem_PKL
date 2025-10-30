@@ -17,7 +17,7 @@
             </a>
 
             {{-- Judul --}}
-            <h3 class="text-brown mb-0">Detail Kepemilikan Per Lahan</h3>
+            <h4 class="text-brown mb-0">Detail Kepemilikan Per Lahan</h4>
 
             {{-- Tombol aksi --}}
             <div class="ms-auto d-flex gap-2">
@@ -32,7 +32,6 @@
             </div>
         </div>
 
-        {{-- Data Petani --}}
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-success text-white">
                 <strong>Data Petani</strong>
@@ -106,9 +105,14 @@
         </div>
 
         {{-- Data Lahan --}}
+        {{-- Data Lahan --}}
         <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-success text-white">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                 <strong>Data Lahan</strong>
+                <a href="{{ route('kepemilikan.riwayatLahan', ['id_lahan' => $detail->id_lahan]) }}"
+                    class="btn btn-info btn-sm text-dark">
+                    <i class="fas fa-history"></i> Riwayat
+                </a>
             </div>
             <div class="card-body p-0">
                 <table class="table table-sm table-bordered mb-0">

@@ -12,7 +12,7 @@
             </a>
 
             {{-- Judul --}}
-            <h3 class="text-brown mb-0">Detail Kepemilikan</h3>
+            <h4 class="text-brown mb-0">Detail Kepemilikan</h4>
 
             {{-- Tombol aksi di kanan --}}
             <div class="ms-auto d-flex gap-2">
@@ -108,8 +108,14 @@
             <div class="card-body p-0">
                 @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
                     <div class="card mb-3 shadow-sm">
-                        <div class="card-header bg-light text-success">
+                        <div class="card-header bg-light text-success d-flex justify-content-between align-items-center">
                             <strong>Lahan {{ $index + 1 }}</strong>
+
+                            {{-- Tombol Riwayat per Lahan --}}
+                            <a href="{{ route('kepemilikan.riwayatLahan', ['id_lahan' => $detail->id_lahan]) }}"
+                                class="btn btn-info btn-sm text-dark">
+                                <i class="fas fa-history"></i> Riwayat
+                            </a>
                         </div>
                         <div class="card-body p-0">
                             <table class="table table-sm table-bordered mb-0">

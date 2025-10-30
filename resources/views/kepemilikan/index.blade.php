@@ -176,7 +176,7 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('kepemilikan.editPerLahan', [
-                                             'id_kepemilikan' => $k->id_kepemilikan,
+                                                'id_kepemilikan' => $k->id_kepemilikan,
                                                 'id_lahan' => $detail['id_lahan'],
                                                 'search' => request('search'),
                                                 'desa' => request('desa'),

@@ -69,6 +69,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     //Per lahan
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/edit', [KepemilikanController::class, 'editPerLahan'])
         ->name('kepemilikan.editPerLahan');
+    Route::put('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/update', [KepemilikanController::class, 'updatePerLahan'])
+    ->name('kepemilikan.updatePerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/pdf', [KepemilikanController::class, 'pdfPerLahan'])
         ->name('kepemilikan.pdfPerLahan');
     Route::delete('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'destroyPerLahan'])
@@ -81,6 +83,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('pbb.generate');
     Route::post('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/ganti', [KepemilikanController::class, 'updateKepemilikan'])
     ->name('kepemilikan.updateKepemilikan');
+    Route::get('/kepemilikan/riwayat-lahan/{id_lahan}', [KepemilikanController::class, 'riwayatLahan'])
+    ->name('kepemilikan.riwayatLahan');
 });
 
 // hanya super admin

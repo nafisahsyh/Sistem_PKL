@@ -162,7 +162,7 @@
                         <div class="row mt-3">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kepemilikan</label>
-                                <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil">
+                                <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil select-status">
                                     <option value="aktif" selected>Aktif</option>
                                     <option value="nonaktif">Nonaktif</option>
                                 </select>
@@ -207,7 +207,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inisialisasi Choices untuk select yang sudah ada
-            document.querySelectorAll('.select-desa, .select-tahun').forEach(select => {
+            document.querySelectorAll('.select-desa, .select-tahun, .select-status').forEach(select => {
                 new Choices(select, {
                     searchEnabled: false,
                     shouldSort: false,

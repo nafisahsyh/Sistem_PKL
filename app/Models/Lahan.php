@@ -41,6 +41,12 @@ class Lahan extends Model
     {
         return $this->hasMany(DetailKepemilikan::class, 'id_lahan', 'id_lahan');
     }
+    
+    public function riwayatKepemilikan()
+    {
+        return $this->hasMany(RiwayatKepemilikan::class, 'id_lahan');
+    }
+
 
     // Event untuk menghapus file SHM dan Peta saat data Lahan dihapus
     protected static function booted()

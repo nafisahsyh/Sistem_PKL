@@ -22,9 +22,9 @@ class PetaniController extends Controller
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('nama', 'like', "%{$keyword}%")
-                  ->orWhere('NIK', 'like', "%{$keyword}%")
-                  ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
-                  ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
+                ->orWhere('NIK', 'like', "%{$keyword}%")
+                ->orWhere('nomor_anggota_plasma', 'like', "%{$keyword}%")
+                ->orWhere('nomor_anggota_koperasi', 'like', "%{$keyword}%");
             });
         }
 

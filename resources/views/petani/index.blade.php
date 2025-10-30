@@ -39,7 +39,7 @@
                             <th>Status</th>
                             <th>KTP</th>
                             <th>KK</th>
-                            <th style="width: 180px;">Aksi</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +76,8 @@
                                         <span class="text-muted">Tidak ada</span>
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center"
+                                    style="width: {{ $p->kepemilikan_count == 0 ? '180px' : '150px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
                                     @if ($p->kepemilikan_count == 0)
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
@@ -99,6 +100,7 @@
                                         </button>
                                     </form>
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
