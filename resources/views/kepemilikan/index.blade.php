@@ -74,7 +74,7 @@
                             <th>Status Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
-                            <th>Aksi</th>
+                            <th style="width: 180px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

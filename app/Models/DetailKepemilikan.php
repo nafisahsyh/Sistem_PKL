@@ -35,6 +35,12 @@ class DetailKepemilikan extends Model
     {
         return $this->belongsTo(Lahan::class, 'id_lahan', 'id_lahan');
     }
+
+    public function pbb()
+    {
+        return $this->hasMany(Pbb::class, 'id_detail_kepemilikan');
+    }
+
     // Event untuk menghapus file ketika detail dihapus
     protected static function booted()
     {

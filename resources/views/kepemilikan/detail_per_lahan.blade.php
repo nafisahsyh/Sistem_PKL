@@ -166,6 +166,48 @@
                                 {{ number_format($detail->jumlah_pbb ?? 0, 2, ',', '.') }}</td>
                         </tr>
                         <tr>
+                            <th class="text-normal text-start ps-3">Riwayat Pembayaran PBB</th>
+                            <td class="text-normal-sm text-start ps-3">
+                                @php
+                                    $pbbList = $detail->pbb->sortByDesc('tahun');
+                                @endphp
+
+                                @if ($pbbList->isNotEmpty())
+                                    @foreach ($pbbList as $p)
+                                        <div class="mb-1">
+                                            <strong>{{ $p->tahun }}</strong> :
+                                            Rp {{ number_format($p->jumlah, 2, ',', '.') }}
+                                            <span class="badge {{ $p->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
+                                                {{ ucfirst($p->status) }}
+                                            </span>
+
+                                            @if ($p->status == 'belum')
+                                                <form action="{{ route('pbb.lunas', $p->id_pbb) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-sm btn-success ms-2">
+                                                        <i class="fas fa-check"></i> Tandai Lunas
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">Belum ada data PBB tahunan.</span>
+                                @endif
+
+                                {{-- Tombol Generate Tahun Baru --}}
+                                <form action="{{ route('pbb.generate', $detail->id_detail_kepemilikan) }}" method="POST"
+                                    class="mt-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-sync"></i> Akumulasi
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
                             <th class="text-normal text-start ps-3">File SHM</th>
                             <td class="text-normal-sm text-start ps-3">
                                 @if (!empty($detail->pdf_scan_shm))

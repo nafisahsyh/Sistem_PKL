@@ -75,6 +75,12 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('kepemilikan.destroyPerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/detail/{id_detail_kepemilikan}/cetak', [KepemilikanController::class, 'cetakPDFPerLahan'])
         ->name('kepemilikan.cetakPerLahan');
+    Route::patch('/pbb/lunas/{id}', [KepemilikanController::class, 'tandaiLunasPbb'])
+        ->name('pbb.lunas');
+    Route::post('/pbb/generate/{id_detail_kepemilikan}', [KepemilikanController::class, 'generatePbbTahunBaru'])
+        ->name('pbb.generate');
+    Route::post('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/ganti', [KepemilikanController::class, 'updateKepemilikan'])
+    ->name('kepemilikan.updateKepemilikan');
 });
 
 // hanya super admin

@@ -8,6 +8,9 @@ use App\Models\Petani;
 use App\Models\Lahan;
 use App\Models\Desa;
 use App\Models\Tahun_Tanam;
+use App\Models\Pbb;
+use App\Models\RiwayatKepemilikan;
+use Carbon\Carbon;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use setasign\Fpdi\Fpdi;
@@ -284,8 +287,9 @@ class KepemilikanController extends Controller
         $petani = Petani::with('desa.kecamatan')->get();
         $desa = Desa::with('kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
+        $lahan = $kepemilikan->details->pluck('lahan');
 
-        return view('kepemilikan.edit', compact('kepemilikan', 'petani', 'desa', 'tahun_tanam'));
+        return view('kepemilikan.edit', compact('kepemilikan', 'petani', 'desa', 'tahun_tanam', 'lahan'));
     }
 
     /**
@@ -660,4 +664,193 @@ class KepemilikanController extends Controller
 
         return $pdf->download($namaFile);
     }
+
+    /* data PBB per lahan */
+    // 🟢 Menandai PBB tahun tertentu sebagai lunas
+    public function tandaiLunasPbb($id)
+    {
+        $pbb = Pbb::findOrFail($id);
+        $pbb->update(['status' => 'lunas']);
+
+        return redirect()->back()->with('success', 'PBB tahun ' . $pbb->tahun . ' telah ditandai lunas.');
+    }
+
+
+    // 🟡 Membuat akumulasi otomatis untuk tahun berikutnya
+    public function generatePbbTahunBaru($id_detail_kepemilikan)
+    {
+        $tahunSekarang = Carbon::now()->year;
+        $bulanSekarang = Carbon::now()->month;
+
+        // ✅ Pastikan hanya bisa dijalankan di bulan Oktober
+        if ($bulanSekarang != 10) {
+            return back()->with('error', 'Akumulasi PBB hanya dapat dilakukan pada bulan Oktober.');
+        }
+
+        $detail = DetailKepemilikan::with('pbb')->findOrFail($id_detail_kepemilikan);
+        $jumlahPBB = $detail->jumlah_pbb ?? 0;
+
+        $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+        $tahunDepan = $tahunSekarang + 1;
+
+        // 🔁 Kalau tahun ini belum lunas → tambahkan ke akumulasi
+        if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
+            $jumlahPBB += $pbbTahunIni->jumlah;
+        }
+
+        // 🔍 Cek apakah tahun depan sudah ada data
+        $pbbTahunDepan = $detail->pbb->where('tahun', $tahunDepan)->first();
+
+        if ($pbbTahunDepan) {
+            // 🟡 Kalau sudah ada → update ulang jumlah sesuai data terbaru
+            $pbbTahunDepan->update([
+                'jumlah' => $jumlahPBB,
+                'status' => 'belum', // pastikan tetap belum sampai dibayar
+            ]);
+            $message = 'Data PBB tahun ' . $tahunDepan . ' telah diperbarui sesuai jumlah terbaru.';
+        } else {
+            // 🟢 Kalau belum ada → buat baru
+            Pbb::create([
+                'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
+                'tahun' => $tahunDepan,
+                'jumlah' => $jumlahPBB,
+                'status' => 'belum',
+            ]);
+            $message = 'PBB tahun ' . $tahunDepan . ' berhasil dibuat!';
+        }
+
+        return back()->with('success', $message);
+    }
+
+    public function gantiKepemilikan(Request $request, $id_lahan)
+    {
+        $request->validate([
+            'nomor_anggota_plasma' => 'required|string',
+            'nomor_anggota_koperasi' => 'required|string',
+            'NIK' => 'required|string|max:16',
+            'nama' => 'required|string',
+            'alamat' => 'required|string',
+            'status' => 'required|in:aktif,tidak_aktif',
+            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+        ]);
+
+        // Simpan file PDF (jika ada)
+        $ktpFile = $request->file('pdf_scan_ktp')?->store('ktp_pdf', 'public');
+        $kkFile = $request->file('pdf_scan_kk')?->store('kk_pdf', 'public');
+
+        // Buat petani baru
+        $petaniBaru = Petani::create([
+            'nomor_anggota_plasma' => $request->nomor_anggota_plasma,
+            'nomor_anggota_koperasi' => $request->nomor_anggota_koperasi,
+            'NIK' => $request->NIK,
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'status' => $request->status,
+            'pdf_scan_ktp' => $ktpFile ? basename($ktpFile) : null,
+            'pdf_scan_kk' => $kkFile ? basename($kkFile) : null,
+        ]);
+
+        // Ambil data lahan lama
+        $lahan = DetailKepemilikan::findOrFail($id_lahan);
+        $id_petani_lama = $lahan->id_petani;
+
+        // Catat riwayat kepemilikan
+        RiwayatKepemilikan::create([
+            'id_lahan' => $id_lahan,
+            'id_petani_sebelum' => $id_petani_lama,
+            'id_petani_sesudah' => $petaniBaru->id_petani,
+            'tanggal_ganti' => now(),
+            'keterangan' => 'Ganti kepemilikan dari ' . $lahan->petani->nama . ' ke ' . $petaniBaru->nama,
+        ]);
+
+        // Update lahan ke petani baru
+        $lahan->update(['id_petani' => $petaniBaru->id_petani]);
+
+        return redirect()->back()->with('success', 'Kepemilikan berhasil diganti dan petani baru ditambahkan.');
+    }
+
+    public function updateKepemilikan(Request $request, $id_kepemilikan, $id_lahan)
+    {
+        $kepemilikan = Kepemilikan::with('petani', 'detailKepemilikan.lahan')
+            ->findOrFail($id_kepemilikan);
+        $detail = $kepemilikan->detailKepemilikan->firstWhere('id_lahan', $id_lahan);
+
+        if (!$detail) {
+            abort(404, 'Lahan tidak ditemukan.');
+        }
+
+        // 🔸 Validasi input
+        $validated = $request->validate([
+            'mode' => 'required|in:lama,baru',
+            'id_petani_lama' => 'required|exists:petani,id_petani',
+            'id_petani_baru' => 'nullable|exists:petani,id_petani',
+            'nama' => 'nullable|string|max:255',
+            'NIK' => 'nullable|string|max:16',
+            'nomor_anggota_plasma' => 'nullable|string|max:100',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100',
+            'alamat' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:50',
+            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        // 🔹 Simpan id petani sebelum diganti
+        $id_petani_sebelum = $detail->id_petani;
+
+        // 🔹 Tentukan id_petani sesudah
+        if ($validated['mode'] === 'lama') {
+            // Pilih dari daftar petani yang sudah ada
+            $id_petani_sesudah = $validated['id_petani_baru'];
+        } else {
+            // Buat petani baru
+            $petaniBaru = new Petani();
+            $petaniBaru->fill([
+                'nomor_anggota_plasma' => $validated['nomor_anggota_plasma'],
+                'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
+                'NIK' => $validated['NIK'],
+                'nama' => $validated['nama'],
+                'alamat' => $validated['alamat'],
+                'status' => $validated['status'] ?? 'aktif',
+            ]);
+
+            if ($request->hasFile('pdf_scan_ktp')) {
+                $fileKtp = $request->file('pdf_scan_ktp');
+                $petaniBaru->pdf_scan_ktp = $fileKtp->storeAs(
+                    'ktp_pdf',
+                    time() . '_' . $fileKtp->getClientOriginalName(),
+                    'public'
+                );
+            }
+
+            if ($request->hasFile('pdf_scan_kk')) {
+                $fileKk = $request->file('pdf_scan_kk');
+                $petaniBaru->pdf_scan_kk = $fileKk->storeAs(
+                    'kk_pdf',
+                    time() . '_' . $fileKk->getClientOriginalName(),
+                    'public'
+                );
+            }
+
+            $petaniBaru->save();
+            $id_petani_sesudah = $petaniBaru->id_petani;
+        }
+
+        // 🔹 Update detail kepemilikan (pindahkan lahan ke petani baru)
+        $detail->update(['id_petani' => $id_petani_sesudah]);
+
+        // 🔹 Simpan riwayat kepemilikan
+        RiwayatKepemilikan::create([
+            'id_lahan' => $id_lahan,
+            'id_petani_sebelum' => $id_petani_sebelum,
+            'id_petani_sesudah' => $id_petani_sesudah,
+            'tanggal_ganti' => now(),
+            'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan',
+        ]);
+
+        return redirect()->route('kepemilikan.editPerLahan', [$id_kepemilikan, $id_lahan])
+            ->with('success', 'Kepemilikan berhasil diperbarui.');
+    }
+
 }

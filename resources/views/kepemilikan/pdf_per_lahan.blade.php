@@ -14,7 +14,9 @@
             margin: 25px;
         }
 
-        h2, h3, h4 {
+        h2,
+        h3,
+        h4 {
             text-align: center;
             margin: 0;
             padding: 0;
@@ -55,7 +57,8 @@
             margin-bottom: 15px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #000;
             padding: 6px 8px;
             text-align: left;
@@ -66,7 +69,8 @@
             font-weight: bold;
         }
 
-        .no-border th, .no-border td {
+        .no-border th,
+        .no-border td {
             border: none;
         }
 
@@ -197,6 +201,23 @@
             <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
         </tr>
         <tr>
+            <th>Status PBB</th>
+            <td>
+                @php
+                    $tahunSekarang = now()->year;
+                    $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+                @endphp
+
+                @if ($pbbTahunIni)
+                    <span class="badge {{ $pbbTahunIni->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
+                        {{ ucfirst($pbbTahunIni->status) }}
+                    </span>
+                @else
+                    <span class="text-muted">Belum ada data tahun {{ $tahunSekarang }}</span>
+                @endif
+            </td>
+        </tr>
+        <tr>
             <th>Status Kepemilikan</th>
             <td>{{ $detail->status_kepemilikan ?? '-' }}</td>
         </tr>
@@ -206,7 +227,8 @@
         </tr>
         <tr>
             <th>Tanggal Selesai</th>
-            <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+            <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+            </td>
         </tr>
     </table>
 

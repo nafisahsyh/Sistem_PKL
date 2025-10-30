@@ -95,7 +95,8 @@
         }
 
         thead {
-            display: table-header-group; /* kunci utama: agar header muncul ulang di halaman baru */
+            display: table-header-group;
+            /* kunci utama: agar header muncul ulang di halaman baru */
         }
 
         /* BAGIAN JUDUL */
@@ -235,6 +236,23 @@
                     <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
                 </tr>
                 <tr>
+                    <th>Status PBB</th>
+                    <td>
+                        @php
+                            $tahunSekarang = now()->year;
+                            $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+                        @endphp
+
+                        @if ($pbbTahunIni)
+                            <span class="badge {{ $pbbTahunIni->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
+                                {{ ucfirst($pbbTahunIni->status) }}
+                            </span>
+                        @else
+                            <span class="text-muted">Belum ada data tahun {{ $tahunSekarang }}</span>
+                        @endif
+                    </td>
+                </tr>
+                <tr>
                     <th>Status Kepemilikan</th>
                     <td>{{ $detail->status_kepemilikan ?? '-' }}</td>
                 </tr>
@@ -244,7 +262,8 @@
                 </tr>
                 <tr>
                     <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                    </td>
                 </tr>
             </tbody>
         </table>
