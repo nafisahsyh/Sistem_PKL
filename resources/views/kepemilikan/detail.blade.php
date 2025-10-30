@@ -209,15 +209,6 @@
                                             @else
                                                 <span class="text-muted">Belum ada data PBB tahunan.</span>
                                             @endif
-
-                                            {{-- Tombol Generate Tahun Baru --}}
-                                            <form action="{{ route('pbb.generate', $detail->id_detail_kepemilikan) }}"
-                                                method="POST" class="mt-2">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-sync"></i> Akumulasi
-                                                </button>
-                                            </form>
                                         </td>
                                     </tr>
                                     <tr>

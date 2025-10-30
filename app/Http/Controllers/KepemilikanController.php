@@ -148,6 +148,40 @@ class KepemilikanController extends Controller
             abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
         }
 
+        // 🧩 Tambahan: Auto generate PBB tahun depan (hanya bulan Oktober)
+        $bulanSekarang = Carbon::now()->month;
+        $tahunSekarang = Carbon::now()->year;
+        $tahunDepan = $tahunSekarang + 1;
+
+        if ($bulanSekarang == 10) {
+            $jumlahPBB = $selectedDetail->jumlah_pbb ?? 0;
+            $pbbTahunIni = $selectedDetail->pbb->where('tahun', $tahunSekarang)->first();
+
+            // Kalau tahun ini belum lunas, tambahkan ke akumulasi
+            if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
+                $jumlahPBB += $pbbTahunIni->jumlah;
+            }
+
+            // Cek apakah tahun depan sudah ada
+            $pbbTahunDepan = $selectedDetail->pbb->where('tahun', $tahunDepan)->first();
+
+            if ($pbbTahunDepan) {
+                // Kalau sudah ada, update ulang jumlahnya
+                $pbbTahunDepan->update([
+                    'jumlah' => $jumlahPBB,
+                    'status' => 'belum',
+                ]);
+            } else {
+                // Kalau belum ada, buat baru
+                Pbb::create([
+                    'id_detail_kepemilikan' => $selectedDetail->id_detail_kepemilikan,
+                    'tahun' => $tahunDepan,
+                    'jumlah' => $jumlahPBB,
+                    'status' => 'belum',
+                ]);
+            }
+        }
+
         return view('kepemilikan.detail_per_lahan', [
             'kepemilikan' => $kepemilikan,
             'detail' => $selectedDetail,
@@ -219,22 +253,22 @@ class KepemilikanController extends Controller
     }
 
 
-        public function destroyPerLahan($id_kepemilikan, $id_lahan)
-        {
-            // Cek apakah kepemilikan dan lahan cocok
-            $detail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
-                ->where('id_lahan', $id_lahan)
-                ->first();
+    public function destroyPerLahan($id_kepemilikan, $id_lahan)
+    {
+        // Cek apakah kepemilikan dan lahan cocok
+        $detail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
+            ->where('id_lahan', $id_lahan)
+            ->first();
 
-            if (!$detail) {
-                return redirect()->back()->with('error', 'Data lahan tidak ditemukan untuk kepemilikan ini.');
-            }
-
-            // Hapus detail kepemilikan (hanya lahan itu)
-            $detail->delete();
-
-            return redirect()->back()->with('success', 'Data lahan berhasil dihapus dari kepemilikan.');
+        if (!$detail) {
+            return redirect()->back()->with('error', 'Data lahan tidak ditemukan untuk kepemilikan ini.');
         }
+
+        // Hapus detail kepemilikan (hanya lahan itu)
+        $detail->delete();
+
+        return redirect()->back()->with('success', 'Data lahan berhasil dihapus dari kepemilikan.');
+    }
 
 
     /**
@@ -467,6 +501,42 @@ class KepemilikanController extends Controller
                     ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
             }
         ])->findOrFail($id_kepemilikan);
+
+        // 🧩 Tambahan: Auto generate PBB tahun depan hanya di bulan Oktober
+        $bulanSekarang = Carbon::now()->month;
+        $tahunSekarang = Carbon::now()->year;
+        $tahunDepan = $tahunSekarang + 1;
+
+        if ($bulanSekarang == 10) {
+            foreach ($kepemilikan->detailKepemilikan as $detail) {
+                $jumlahPBB = $detail->jumlah_pbb ?? 0;
+                $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+
+                // Jika tahun ini belum lunas, tambahkan ke akumulasi
+                if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
+                    $jumlahPBB += $pbbTahunIni->jumlah;
+                }
+
+                // Cek apakah tahun depan sudah ada datanya
+                $pbbTahunDepan = $detail->pbb->where('tahun', $tahunDepan)->first();
+
+                if ($pbbTahunDepan) {
+                    // Kalau sudah ada, perbarui jumlahnya
+                    $pbbTahunDepan->update([
+                        'jumlah' => $jumlahPBB,
+                        'status' => 'belum',
+                    ]);
+                } else {
+                    // Kalau belum ada, buat baru
+                    Pbb::create([
+                        'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
+                        'tahun' => $tahunDepan,
+                        'jumlah' => $jumlahPBB,
+                        'status' => 'belum',
+                    ]);
+                }
+            }
+        }
 
         return view('kepemilikan.detail', compact('kepemilikan'));
     }
@@ -780,8 +850,21 @@ class KepemilikanController extends Controller
         ]);
 
         // Simpan file PDF (jika ada)
-        $ktpFile = $request->file('pdf_scan_ktp')?->store('ktp_pdf', 'public');
-        $kkFile = $request->file('pdf_scan_kk')?->store('kk_pdf', 'public');
+        // Simpan file PDF (jika ada)
+        $ktpName = $request->hasFile('pdf_scan_ktp')
+            ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
+            : null;
+
+        $kkName = $request->hasFile('pdf_scan_kk')
+            ? time() . '_' . $request->file('pdf_scan_kk')->getClientOriginalName()
+            : null;
+
+        if ($ktpName) {
+            $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $ktpName, 'public');
+        }
+        if ($kkName) {
+            $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
+        }
 
         // Buat petani baru
         $petaniBaru = Petani::create([
@@ -791,8 +874,8 @@ class KepemilikanController extends Controller
             'nama' => $request->nama,
             'alamat' => $request->alamat,
             'status' => $request->status,
-            'pdf_scan_ktp' => $ktpFile ? basename($ktpFile) : null,
-            'pdf_scan_kk' => $kkFile ? basename($kkFile) : null,
+            'pdf_scan_ktp' => $ktpName,
+            'pdf_scan_kk' => $kkName,
         ]);
 
         // Ambil data lahan lama
@@ -865,10 +948,18 @@ class KepemilikanController extends Controller
             $id_petani_sesudah = $petaniBaru->id_petani;
         }
 
-        //Update kepemilikan utamanya juga
-        $kepemilikan->update(['id_petani' => $id_petani_sesudah]);
+        // 🔸 Cari atau buat kepemilikan milik petani baru
+        $kepemilikanBaru = Kepemilikan::firstOrCreate(
+            ['id_petani' => $id_petani_sesudah],
+            ['tanggal_kepemilikan' => now(), 'status' => 'aktif']
+        );
 
-        // Simpan ke riwayat kepemilikan
+        //  Langsung pindahkan lahan ke petani baru
+        $detail->update([
+            'id_kepemilikan' => $kepemilikanBaru->id_kepemilikan,
+        ]);
+
+        // Simpan riwayat perpindahan
         RiwayatKepemilikan::create([
             'id_lahan' => $id_lahan,
             'id_petani_sebelum' => $id_petani_sebelum,
@@ -877,22 +968,22 @@ class KepemilikanController extends Controller
             'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
         ]);
 
-        return redirect()->route('kepemilikan.editPerLahan', [$id_kepemilikan, $id_lahan])
-            ->with('success', 'Kepemilikan lahan berhasil diperbarui.');
+        return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
+            ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
     }
 
     public function riwayatLahan($id_lahan)
     {
-        $riwayat = \App\Models\RiwayatKepemilikan::with([
+        $riwayat = RiwayatKepemilikan::with([
             'petaniSebelum',
             'petaniSesudah',
             'lahan.desa.kecamatan'
         ])
-        ->where('id_lahan', $id_lahan)
-        ->orderByDesc('tanggal_ganti')
-        ->get();
+            ->where('id_lahan', $id_lahan)
+            ->orderByDesc('tanggal_ganti')
+            ->get();
 
-        $lahan = \App\Models\Lahan::with('desa.kecamatan')->findOrFail($id_lahan);
+        $lahan = Lahan::with('desa.kecamatan')->findOrFail($id_lahan);
 
         return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan'));
     }
