@@ -561,3 +561,9 @@ input.form-control {
 #gantiPemilikModal #selectPetaniLama {
     font-size: 0.9rem;
 }
+
+.custom-textarea {
+    min-height: 36px !important;  /* tinggi minimal */
+    max-height: 36px !important;  /* opsional, kalau mau ada limit */
+    resize: vertical; /* tetap bisa diubah ke bawah, kalau mau matikan pakai 'none' */
+}

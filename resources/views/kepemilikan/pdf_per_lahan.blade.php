@@ -136,11 +136,15 @@
             <td>: {{ $kepemilikan->petani->NIK ?? '-' }}</td>
         </tr>
         <tr>
-            <th>Nomor Anggota Koperasi</th>
+            <th>Telepon</th>
+            <td>: {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Koperasi</th>
             <td>: {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
         </tr>
         <tr>
-            <th>Nomor Anggota Plasma</th>
+            <th>Nomor Plasma</th>
             <td>: {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
         </tr>
         <tr>
@@ -232,39 +236,39 @@
         </tr>
     </table>
     {{-- Tambahan: Data Riwayat Kepemilikan --}}
-        @php
-            $riwayatList = $detail->lahan->riwayatKepemilikan ?? collect();
-        @endphp
+    @php
+        $riwayatList = $detail->lahan->riwayatKepemilikan ?? collect();
+    @endphp
 
-        @if ($riwayatList->isNotEmpty())
-            <div class="section-title">Riwayat Kepemilikan Lahan {{ $index + 1 }}</div>
-            <table>
-                <thead>
+    @if ($riwayatList->isNotEmpty())
+        <div class="section-title">Riwayat Kepemilikan Lahan {{ $index + 1 }}</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Petani Awal</th>
+                    <th>Nama Petani Sekarang</th>
+                    <th>Tanggal Ganti</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($riwayatList as $rIndex => $riwayat)
                     <tr>
-                        <th>No</th>
-                        <th>Nama Pemilik Sebelumnya</th>
-                        <th>Nama Pemilik Sesudah</th>
-                        <th>Tanggal Ganti</th>
-                        <th>Keterangan</th>
+                        <td>{{ $rIndex + 1 }}</td>
+                        <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
+                        <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') }}</td>
+                        <td>{{ $riwayat->keterangan ?? '-' }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($riwayatList as $rIndex => $riwayat)
-                        <tr>
-                            <td>{{ $rIndex + 1 }}</td>
-                            <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
-                            <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') }}</td>
-                            <td>{{ $riwayat->keterangan ?? '-' }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @else
-            <p style="font-style: italic; margin-top: -10px; margin-bottom: 15px;">
-                Tidak ada riwayat kepemilikan untuk lahan ini.
-            </p>
-        @endif
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <p style="font-style: italic; margin-top: -10px; margin-bottom: 15px;">
+            Tidak ada riwayat kepemilikan untuk lahan ini.
+        </p>
+    @endif
 
     <div class="signature">
         <p>Mengetahui,</p>

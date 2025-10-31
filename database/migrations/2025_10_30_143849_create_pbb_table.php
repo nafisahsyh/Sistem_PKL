@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('pbb', function (Blueprint $table) {
-            $table->id('id_pbb');
+            $table->bigIncrements('id_pbb');
             $table->unsignedBigInteger('id_detail_kepemilikan');
             $table->year('tahun');
             $table->decimal('jumlah', 12, 2);

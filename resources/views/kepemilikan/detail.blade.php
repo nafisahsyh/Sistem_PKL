@@ -36,7 +36,7 @@
                 <table class="table table-bordered mb-0 ">
                     <tbody>
                         <tr>
-                            <th class="text-normal text-start ps-3" width="30%">Nama</th>
+                            <th class="text-normal text-start ps-3" width="30%">Nama Lengkap</th>
                             <td class="text-normal-sm text-start ps-3" text-start ps-3>
                                 {{ $kepemilikan->petani->nama ?? '-' }}</td>
                         </tr>
@@ -45,12 +45,17 @@
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->NIK ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Nomor Anggota Koperasi</th>
+                            <th class="text-normal text-start ps-3">Telepon</th>
+                            <td class="text-normal-sm text-start ps-3" text-start ps-3>
+                                {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-normal text-start ps-3">Nomor Koperasi</th>
                             <td class="text-normal-sm text-start ps-3">
                                 {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Nomor Anggota Plasma</th>
+                            <th class="text-normal text-start ps-3">Nomor Plasma</th>
                             <td class="text-normal-sm text-start ps-3">
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
                         </tr>

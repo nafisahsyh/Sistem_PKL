@@ -13,7 +13,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="nomor_anggota_plasma" class="form-label">Nomor Anggota Plasma</label>
+                        <label for="nomor_anggota_plasma" class="form-label">Nomor Plasma</label>
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             id="nomor_anggota_plasma" name="nomor_anggota_plasma"
@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="nomor_anggota_koperasi" class="form-label">Nomor Anggota Koperasi</label>
+                        <label for="nomor_anggota_koperasi" class="form-label">Nomor Koperasi</label>
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
                             id="nomor_anggota_koperasi" name="nomor_anggota_koperasi"
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama Petani</label>
+                        <label for="nama" class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
                             id="nama" name="nama" value="{{ old('nama', $petani->nama) }}" required>
                         @error('nama')
@@ -66,6 +66,16 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="no_telepon" class="form-label">Nomor Telepon</label>
+                        <input type="text" class="form-control text-kecil @error('no_telepon') is-invalid @enderror"
+                            id="no_telepon" name="no_telepon" value="{{ old('no_telepon', $petani->no_telepon) }}"
+                            placeholder="0812xxxx atau +62812xxxx">
+                        @error('no_telepon')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status"
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
@@ -80,7 +90,9 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_ktp" class="form-label">File Scan KTP (PDF)</label>
                         <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp"
@@ -98,7 +110,6 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_kk" class="form-label">File Scan KK (PDF)</label>
                         <input type="file" name="pdf_scan_kk" id="pdf_scan_kk"

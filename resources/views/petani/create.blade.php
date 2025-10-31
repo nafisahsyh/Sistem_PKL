@@ -12,7 +12,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="nomor_anggota_plasma" class="form-label">Nomor Anggota Plasma</label>
+                        <label for="nomor_anggota_plasma" class="form-label">Nomor Plasma</label>
                         <input type="text" name="nomor_anggota_plasma"
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             value="{{ old('nomor_anggota_plasma') }}" placeholder="Masukkan nomor anggota plasma" required>
@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="nomor_anggota_koperasi" class="form-label">Nomor Anggota Koperasi</label>
+                        <label for="nomor_anggota_koperasi" class="form-label">Nomor Koperasi</label>
                         <input type="text" name="nomor_anggota_koperasi"
                             class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
                             value="{{ old('nomor_anggota_koperasi') }}" placeholder="Masukkan nomor anggota koperasi"
@@ -37,8 +37,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="NIK" class="form-label">NIK</label>
                         <input type="text" name="NIK"
-                            class="form-control text-kecil @error('NIK') is-invalid @enderror"
-                            value="{{ old('NIK') }}" placeholder="Masukkan NIK 16 digit" maxlength="16" required>
+                            class="form-control text-kecil @error('NIK') is-invalid @enderror" value="{{ old('NIK') }}"
+                            placeholder="Masukkan NIK 16 digit" maxlength="16" required>
                         @error('NIK')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -47,8 +47,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="nama" class="form-label">Nama Lengkap</label>
                         <input type="text" name="nama"
-                            class="form-control text-kecil @error('nama') is-invalid @enderror"
-                            value="{{ old('nama') }}" placeholder="Masukkan nama lengkap" required>
+                            class="form-control text-kecil @error('nama') is-invalid @enderror" value="{{ old('nama') }}"
+                            placeholder="Masukkan nama lengkap" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -65,6 +65,17 @@
                 </div>
 
                 <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label for="no_telepon" class="form-label">Nomor Telepon</label>
+                        <input type="text" class="form-control text-kecil @error('no_telepon') is-invalid @enderror"
+                            id="no_telepon" name="no_telepon" value="{{ old('no_telepon') }}"
+                            placeholder="0812xxxx atau +62812xxxx">
+                        @error('no_telepon')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="col-md-6 mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status"

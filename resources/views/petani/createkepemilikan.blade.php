@@ -37,24 +37,29 @@
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <h5 class="text-brown mb-3">Data Petani</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Plasma</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Plasma</label>
                         <input type="text" class="form-control text-kecil" value="{{ $petani->nomor_anggota_plasma }}"
                             readonly>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Koperasi</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Koperasi</label>
                         <input type="text" class="form-control text-kecil" value="{{ $petani->nomor_anggota_koperasi }}"
                             readonly>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label class="form-label">NIK</label>
                         <input type="text" class="form-control text-kecil" value="{{ $petani->NIK }}" readonly>
                     </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Telepon</label>
+                        <input type="text" class="form-control text-kecil" value="{{ $petani->no_telepon }}" readonly>
+                    </div>
+
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Nama</label>
+                        <label class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control text-kecil" value="{{ $petani->nama }}" readonly>
                     </div>
                     <div class="col-md-8 mb-3">
@@ -100,7 +105,8 @@
                                     <option value="" disabled selected hidden>Pilih Desa</option>
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}">{{ $d->desa }}
-                                            ({{ $d->kecamatan->kecamatan }})</option>
+                                            ({{ $d->kecamatan->kecamatan }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

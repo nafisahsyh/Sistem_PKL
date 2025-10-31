@@ -50,28 +50,34 @@
                 <h5 class="text-brown mb-3">Data Petani</h5>
 
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Plasma</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Plasma</label>
                         <input type="text" class="form-control text-kecil"
                             value="{{ $kepemilikan->petani->nomor_anggota_plasma }}" readonly>
                     </div>
 
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Koperasi</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Koperasi</label>
                         <input type="text" class="form-control text-kecil"
                             value="{{ $kepemilikan->petani->nomor_anggota_koperasi }}" readonly>
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label class="form-label">NIK</label>
                         <input type="text" class="form-control text-kecil" value="{{ $kepemilikan->petani->NIK }}"
                             readonly>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Telepon</label>
+                        <input type="text" class="form-control text-kecil"
+                            value="{{ $kepemilikan->petani->no_telepon }}" readonly>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Nama</label>
+                        <label class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control text-kecil" value="{{ $kepemilikan->petani->nama }}"
                             readonly>
                     </div>
@@ -151,8 +157,8 @@
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Luas Lahan Berdasarkan Peta</label>
-                            <input type="number" step="0.01" name="lahan[0][luas_peta]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->lahan->luas_peta }}">
+                            <input type="number" step="0.01" name="lahan[0][luas_peta]"
+                                class="form-control text-kecil" value="{{ $selectedDetail->lahan->luas_peta }}">
                         </div>
                     </div>
 
@@ -277,6 +283,7 @@
                     'id_lahan' => $selectedDetail->lahan->id_lahan,
                 ]) }}"
                 method="POST" enctype="multipart/form-data">
+
                 @csrf
 
                 <input type="hidden" name="lahan" value="{{ $selectedDetail->lahan->id_lahan }}">
@@ -316,7 +323,7 @@
                         <div id="petaniBaru" style="display: none;">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label>Nama</label>
+                                    <label>Nama Lengkap</label>
                                     <input type="text" name="nama" class="form-control">
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -324,16 +331,20 @@
                                     <input type="text" name="NIK" class="form-control">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label>Nomor Anggota Plasma</label>
+                                    <label>Telepon</label>
+                                    <input type="text" name="no_telepon" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Nomor Plasma</label>
                                     <input type="text" name="nomor_anggota_plasma" class="form-control">
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label>Nomor Anggota Koperasi</label>
+                                <div class="col-md-6 mb-3">
+                                    <label>Nomor Koperasi</label>
                                     <input type="text" name="nomor_anggota_koperasi" class="form-control">
                                 </div>
-                                <div class="col-md-8 mb-3">
+                                <div class="col-md-12 mb-3">
                                     <label>Alamat</label>
-                                    <textarea name="alamat" class="form-control"></textarea>
+                                    <textarea name="alamat" class="form-control form-control-sm custom-textarea"></textarea>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Scan KTP (PDF)</label>
@@ -348,10 +359,18 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label>Keterangan</label>
-                            <textarea name="keterangan" class="form-control"></textarea>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Ganti</label>
+                                <input type="date" name="tanggal_ganti" class="form-control"
+                                    value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Keterangan</label>
+                                <textarea name="keterangan" class="form-control form-control-sm custom-textarea"></textarea>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="modal-footer d-flex justify-content-between">
