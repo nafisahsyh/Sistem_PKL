@@ -1,0 +1,61 @@
+[33mb61fe0a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m)[m error
+[33m0881d37[m pbb done
+[33m6c92b9d[m revisi fitur riwayat kepemilikan dan pbb
+[33mff3fa78[m Perbaikan edit per lahan, perbaikan ganti kepemilikan, tambah riwayat lahan, perbaikan tampilan, perbaikan error dll
+[33m540c610[m masih error pada function ganti pemilik
+[33ma1fcb58[m memperbaiki fitur pdf dan search serta filter (done)
+[33m68fc910[m Tampilan tabel agar lebih rapi
+[33m88d7d1d[m Perbaikan search, cetak pdf search
+[33m02fe249[m search bar dan filter
+[33mc48fbd4[m pdf data kepemilikan keseluruhan
+[33m15f47c9[m filter data semua error dan cetak pdf
+[33mb761de4[m Tambahkan fitur filter per tahun/desa dan search di filter
+[33mb56c87f[m tambah route tahun tanam
+[33m43be8e6[m cetak pdf per lahan dan menambahkan data shm dan peta
+[33m1b16d94[m Perbaikan untuk create kepemilikan, menampilkan status kepemilikan baik di index maupun detail per lahan
+[33m4d9e463[m menambahkan data status lahan, start date, and end date
+[33m622241e[m beberapa fitur masih error
+[33m46fc1fb[m Pisah detail dan edit per Lahan, merge tabel kepemilikan
+[33m7f22eff[m menambahkan peta dan shm scan
+[33mf904255[m undone fitur revisi
+[33md0db28d[m Memperbaiki dropdown, menambah atribut nomor kavling, menambahkan lihat pdf di edit kepemilikan
+[33m19e0bdf[m new field nama sesuai SHM dan sporadik
+[33m39510de[m Perbaikan createkepemilikan
+[33mde5e53c[m perbaikan file pdf dan halaman detail kepemilikan
+[33m29edb16[m Perbaiki tampilan pdf
+[33m7613bb7[m Perbaiki tampilan pdf dan index kepemilikan
+[33me229f2d[m perbaikan fitur tambah kepemilikan, logo pdf, tampilan dll
+[33m52b6ab6[m memperbaiki tampilan detail kepemilikan
+[33m9505dae[m Perbaikan tampilan Kepemilikan
+[33mbcecf9e[m fitur cetak pdf
+[33m79e3172[m edit kepemilikan
+[33m7ed282d[m fitur kepemilikan undone pt.2
+[33md8fa05d[m fitur kepemilikan CRUD (undone)
+[33ma5542a7[m Tambah tabel petani, CRUD
+[33mb907898[m memperbesar burger bar
+[33mae73e4e[m perbaikan search bar
+[33m4c225cf[m perbaikan beberapa fitur
+[33me3f5e7e[m ubah kata sandi
+[33m4bb9994[m Perbaikan tampilan semua halaman
+[33m071dcce[m fitur reset password donegit add .
+[33m2a10e4f[m perbaikan route, authcontroller, sidebar, dan dashboard sesuai role
+[33mf90ea3f[m Create, edit, index User
+[33mce9bef0[m middleware kill me
+[33m6ae7fd3[m menambahkan tabel users, model dan controller, route, login.blade
+[33mfec7e92[m membuat blade reset password
+[33m5d873d8[m membuat tampilan login
+[33m2c9da23[m perubahan icon pemasukan pengeluaran
+[33m5deb8c6[m perbaikan tampilan index desa
+[33m796c813[m Perbaikan/perapian tampilan create-edit untuk tabel input, ukuran text dll
+[33m173bc56[m Menambahkan search bar pada fitur desa untuk mencari desa atau kecamatan
+[33md3bc3aa[m Menambahkan alert untuk mencegah duplikasi inputan pada saat create maupun edit
+[33m7573af2[m mengarahkan detail ke halaman sebenarnya
+[33m44a236f[m penambahan count di dashboard, pagination di fitur desa
+[33m2090f11[m fitur desa CRUD, relasi desa-kecamatan
+[33m3e7b0e7[m membuat fitur tahun CRUD
+[33m063bc03[m Fitur kecamatan CRUD, tambah css, perbaikan alert
+[33m744c54c[m perbaikan header, perubahan favicon, merapikan css
+[33md6d4b1a[m perbaikan dashboard
+[33mc5f162b[m Penambahan logo, perbaikan sidebar
+[33m416b776[m making dashboard
+[33m7fa4cab[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m first commit
