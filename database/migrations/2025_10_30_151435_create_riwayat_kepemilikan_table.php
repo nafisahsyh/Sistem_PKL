@@ -11,13 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('riwayat_kepemilikan', function (Blueprint $table) {
-            $table->id('id_riwayat');
+            $table->bigIncrements('id_riwayat');
 
             $table->unsignedBigInteger('id_lahan');
             $table->unsignedBigInteger('id_petani_sebelum');
             $table->unsignedBigInteger('id_petani_sesudah')->nullable();
 
-            $table->date('tanggal_ganti')->default(DB::raw('CURRENT_DATE'));
+            $table->date('tanggal_ganti');
             $table->string('keterangan')->nullable();
             $table->timestamps();
 

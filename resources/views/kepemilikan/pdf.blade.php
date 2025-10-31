@@ -155,7 +155,7 @@
     <div class="section-title">Data Petani</div>
     <table class="no-border">
         <tr>
-            <th width="30%">Nama</th>
+            <th width="30%">Nama Lengkap</th>
             <td>: {{ $kepemilikan->petani->nama ?? '-' }}</td>
         </tr>
         <tr>
@@ -163,11 +163,15 @@
             <td>: {{ $kepemilikan->petani->NIK ?? '-' }}</td>
         </tr>
         <tr>
-            <th>Nomor Anggota Koperasi</th>
+            <th>Telepon</th>
+            <td>: {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Koperasi</th>
             <td>: {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
         </tr>
         <tr>
-            <th>Nomor Anggota Plasma</th>
+            <th>Nomor Plasma</th>
             <td>: {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
         </tr>
         <tr>
@@ -279,8 +283,8 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama Pemilik Sebelumnya</th>
-                        <th>Nama Pemilik Sesudah</th>
+                        <th>Nama Petani Awal</th>
+                        <th>Nama Petani Sekarang</th>
                         <th>Tanggal Ganti</th>
                         <th>Keterangan</th>
                     </tr>

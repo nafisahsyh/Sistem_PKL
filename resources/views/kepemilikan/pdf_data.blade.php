@@ -62,9 +62,9 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>No. Anggota Plasma</th>
-                <th>No. Anggota Koperasi</th>
-                <th class="text-left">Nama Petani</th>
+                <th>Nomor Plasma</th>
+                <th>Nomor Koperasi</th>
+                <th class="text-left">Nama Lengkap</th>
                 <th>Desa</th>
                 <th>Tahun Tanam</th>
                 <th>No. Kavling</th>

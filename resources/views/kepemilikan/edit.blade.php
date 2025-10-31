@@ -34,11 +34,11 @@
                 <h5 class="text-brown mb-3">Data Petani</h5>
 
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Plasma</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Plasma</label>
                         <select id="id_petani" name="id_petani" class="form-select text-kecil"
                             onchange="tampilDataPetani()">
-                            <option value="" disabled hidden>Pilih Nomor Anggota Plasma</option>
+                            <option value="" disabled hidden>Pilih Nomor Plasma</option>
                             @foreach ($petani as $p)
                                 <option value="{{ $p->id_petani }}" data-nama="{{ $p->nama }}"
                                     data-nik="{{ $p->NIK }}" data-anggota="{{ $p->nomor_anggota_koperasi }}"
@@ -50,16 +50,22 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Koperasi</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nomor Koperasi</label>
                         <input type="text" id="anggota" class="form-control text-kecil"
                             value="{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '' }}" readonly>
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label class="form-label">NIK</label>
                         <input type="text" id="nik" class="form-control text-kecil"
                             value="{{ $kepemilikan->petani->NIK ?? '' }}" readonly>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Telepon</label>
+                        <input type="text" id="no_telepon" class="form-control text-kecil"
+                            value="{{ $kepemilikan->petani->no_telepon ?? '' }}" readonly>
                     </div>
                 </div>
 

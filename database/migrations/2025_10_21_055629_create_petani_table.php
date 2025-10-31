@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['aktif', 'tidak_aktif'])->default('aktif');
             $table->string('pdf_scan_ktp', 255)->nullable();
             $table->string('pdf_scan_kk', 255)->nullable();
+            $table->string('no_telepon', 20)->nullable();
             $table->timestamps();
         });
     }

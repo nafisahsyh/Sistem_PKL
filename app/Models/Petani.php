@@ -21,6 +21,7 @@ class Petani extends Model
         'NIK',
         'nama',
         'alamat',
+        'no_telepon',
         'status',
         'pdf_scan_ktp',
         'pdf_scan_kk',

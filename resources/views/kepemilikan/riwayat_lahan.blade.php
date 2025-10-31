@@ -49,8 +49,8 @@
                         <tr>
                             <th class="text-normal text-center" width="5%">No</th>
                             <th class="text-normal text-center">Tanggal Ganti</th>
-                            <th class="text-normal text-start ps-3">Petani Sebelumnya</th>
-                            <th class="text-normal text-start ps-3">Petani Sesudahnya</th>
+                            <th class="text-normal text-start ps-3">Petani Awal</th>
+                            <th class="text-normal text-start ps-3">Petani Sekarang</th>
                             <th class="text-normal text-start ps-3">Keterangan</th>
                         </tr>
                     </thead>

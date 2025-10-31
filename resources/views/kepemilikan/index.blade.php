@@ -68,8 +68,8 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>Nomor Anggota Plasma</th>
-                            <th>Nomor Anggota Koperasi</th>
+                            <th>Nomor Plasma</th>
+                            <th>Nomor Koperasi</th>
                             <th>Nama Petani</th>
                             <th>Status Petani</th>
                             <th>Desa</th>

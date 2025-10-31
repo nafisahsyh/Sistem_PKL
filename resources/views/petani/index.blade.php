@@ -32,8 +32,8 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>No Anggota Plasma</th>
-                            <th>No Anggota Koperasi</th>
+                            <th>Nomor Plasma</th>
+                            <th>Nomor Koperasi</th>
                             <th>NIK</th>
                             <th>Nama</th>
                             <th>Status</th>

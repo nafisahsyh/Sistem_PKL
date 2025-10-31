@@ -30,10 +30,10 @@
                 <h5 class="text-brown mb-3">Data Petani</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Plasma</label>
+                        <label class="form-label">Nomor Plasma</label>
                         <select id="id_petani" name="id_petani" class="form-select text-kecil"
                             onchange="tampilDataPetani()">
-                            <option value="">-- Pilih Nomor Plasma --</option>
+                            <option value="">Pilih Nomor Plasma</option>
                             @foreach ($petani as $p)
                                 <option value="{{ $p->id_petani }}" data-nama="{{ $p->nama }}"
                                     data-nik="{{ $p->NIK }}" data-anggota="{{ $p->nomor_anggota_koperasi }}"
@@ -45,7 +45,7 @@
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Nomor Anggota Koperasi</label>
+                        <label class="form-label">Nomor Koperasi</label>
                         <input type="text" id="anggota" class="form-control text-kecil" readonly>
                     </div>
                     <div class="col-md-4 mb-3">
@@ -80,7 +80,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Desa</label>
                                 <select name="lahan[0][id_desa]" class="form-select text-kecil">
-                                    <option value="">-- Pilih Desa --</option>
+                                    <option value="">Pilih Desa</option>
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}">{{ $d->desa }}
                                             ({{ $d->kecamatan->kecamatan }})
