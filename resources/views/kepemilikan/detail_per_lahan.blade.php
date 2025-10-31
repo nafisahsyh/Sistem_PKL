@@ -191,7 +191,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="btn btn-sm btn-success ms-2">
-                                                        <i class="fas fa-check"></i> Tandai Lunas
+                                                        <i class="fas fa-check"></i> Lunas
                                                     </button>
                                                 </form>
                                             @endif

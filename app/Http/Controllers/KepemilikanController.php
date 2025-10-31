@@ -498,45 +498,9 @@ class KepemilikanController extends Controller
             'petani',
             'detailKepemilikan' => function ($q) use ($id_kepemilikan) {
                 $q->where('id_kepemilikan', $id_kepemilikan)
-                    ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
+                    ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'pbb']);
             }
         ])->findOrFail($id_kepemilikan);
-
-        // 🧩 Tambahan: Auto generate PBB tahun depan hanya di bulan Oktober
-        $bulanSekarang = Carbon::now()->month;
-        $tahunSekarang = Carbon::now()->year;
-        $tahunDepan = $tahunSekarang + 1;
-
-        if ($bulanSekarang == 10) {
-            foreach ($kepemilikan->detailKepemilikan as $detail) {
-                $jumlahPBB = $detail->jumlah_pbb ?? 0;
-                $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
-
-                // Jika tahun ini belum lunas, tambahkan ke akumulasi
-                if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
-                    $jumlahPBB += $pbbTahunIni->jumlah;
-                }
-
-                // Cek apakah tahun depan sudah ada datanya
-                $pbbTahunDepan = $detail->pbb->where('tahun', $tahunDepan)->first();
-
-                if ($pbbTahunDepan) {
-                    // Kalau sudah ada, perbarui jumlahnya
-                    $pbbTahunDepan->update([
-                        'jumlah' => $jumlahPBB,
-                        'status' => 'belum',
-                    ]);
-                } else {
-                    // Kalau belum ada, buat baru
-                    Pbb::create([
-                        'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
-                        'tahun' => $tahunDepan,
-                        'jumlah' => $jumlahPBB,
-                        'status' => 'belum',
-                    ]);
-                }
-            }
-        }
 
         return view('kepemilikan.detail', compact('kepemilikan'));
     }
@@ -781,14 +745,18 @@ class KepemilikanController extends Controller
 
     /* data PBB per lahan */
     //Menandai PBB tahun tertentu sebagai lunas
-    public function tandaiLunasPbb($id)
+    public function tandaiLunasPbb($id_pbb)
     {
-        $pbb = Pbb::findOrFail($id);
+        $pbb = Pbb::findOrFail($id_pbb);
         $pbb->update(['status' => 'lunas']);
 
-        return redirect()->back()->with('success', 'PBB tahun ' . $pbb->tahun . ' telah ditandai lunas.');
-    }
+        // Reload relasi dan data terbaru
+        $pbb->refresh();
+        $pbb->detailKepemilikan->load('pbb');
 
+        return redirect()->route('kepemilikan.show', $pbb->detailKepemilikan->id_kepemilikan)
+            ->with('success', 'PBB tahun ' . $pbb->tahun . ' telah ditandai lunas.');
+    }
 
     //Membuat akumulasi otomatis untuk tahun berikutnya
     public function generatePbbTahunBaru($id_detail_kepemilikan)
