@@ -505,7 +505,6 @@ class KepemilikanController extends Controller
         return view('kepemilikan.detail', compact('kepemilikan'));
     }
 
-
     public function cetakPDF($id)
     {
         $kepemilikan = Kepemilikan::with([
@@ -743,7 +742,7 @@ class KepemilikanController extends Controller
         return $pdf->download($namaFile);
     }
 
-    /* data PBB per lahan */
+    // data PBB per lahan //
     //Menandai PBB tahun tertentu sebagai lunas
     public function tandaiLunasPbb($id_pbb)
     {
@@ -817,7 +816,6 @@ class KepemilikanController extends Controller
             'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
         ]);
 
-        // Simpan file PDF (jika ada)
         // Simpan file PDF (jika ada)
         $ktpName = $request->hasFile('pdf_scan_ktp')
             ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
