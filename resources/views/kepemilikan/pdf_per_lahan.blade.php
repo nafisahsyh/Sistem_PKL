@@ -241,7 +241,7 @@
     @endphp
 
     @if ($riwayatList->isNotEmpty())
-        <div class="section-title">Riwayat Kepemilikan Lahan {{ $index + 1 }}</div>
+        <div class="section-title">Riwayat Kepemilikan Lahan</div>
         <table>
             <thead>
                 <tr>
@@ -265,8 +265,8 @@
             </tbody>
         </table>
     @else
-        <p style="font-style: italic; margin-top: -10px; margin-bottom: 15px;">
-            Tidak ada riwayat kepemilikan untuk lahan ini.
+        <p style="font-style: italic; margin-top: 10px;">
+            Tidak ada riwayat kepemilikan lahan
         </p>
     @endif
 

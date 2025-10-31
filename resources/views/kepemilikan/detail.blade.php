@@ -186,19 +186,14 @@
                                         <th class="text-normal text-start ps-3">Riwayat Pembayaran PBB</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             @php
-                                                $pbbList = \App\Models\Pbb::where(
-                                                    'id_detail_kepemilikan',
-                                                    $detail->id_detail_kepemilikan,
-                                                )
-                                                    ->orderByDesc('tahun')
-                                                    ->get();
+                                                $pbbList = $detail->pbb->sortByDesc('tahun');
                                             @endphp
 
                                             @if ($pbbList->isNotEmpty())
                                                 @foreach ($pbbList as $p)
                                                     <div class="mb-1">
-                                                        <strong>{{ $p->tahun }}</strong> : Rp
-                                                        {{ number_format($p->jumlah, 2, ',', '.') }}
+                                                        <strong>{{ $p->tahun }}</strong> :
+                                                        Rp {{ number_format($p->jumlah, 2, ',', '.') }}
                                                         <span
                                                             class="badge {{ $p->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
                                                             {{ ucfirst($p->status) }}

@@ -99,6 +99,15 @@
             /* kunci utama: agar header muncul ulang di halaman baru */
         }
 
+        .riwayat-table thead {
+            display: table-header-group;
+            /* Header akan diulang di halaman berikutnya */
+        }
+
+        .riwayat-table tbody {
+            display: table-row-group;
+        }
+
         /* BAGIAN JUDUL */
         .section-title {
             font-weight: bold;
@@ -279,7 +288,7 @@
 
         @if ($riwayatList->isNotEmpty())
             <div class="section-title">Riwayat Kepemilikan Lahan {{ $index + 1 }}</div>
-            <table>
+            <table class="card riwayat-table">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -302,8 +311,8 @@
                 </tbody>
             </table>
         @else
-            <p style="font-style: italic; margin-top: -10px; margin-bottom: 15px;">
-                Tidak ada riwayat kepemilikan untuk lahan ini.
+            <p style="font-style: italic; margin-top: 10px;">
+                Tidak ada riwayat kepemilikan lahan
             </p>
         @endif
     @empty

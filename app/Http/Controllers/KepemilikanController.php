@@ -135,8 +135,6 @@ class KepemilikanController extends Controller
         return view('kepemilikan.index', compact('kepemilikan', 'daftarDesa', 'daftarTahun', 'mode'));
     }
 
-
-
     public function showPerLahan($id_kepemilikan, $id_lahan)
     {
         $kepemilikan = Kepemilikan::with(['petani', 'detailKepemilikan.lahan.desa.kecamatan', 'detailKepemilikan.lahan.tahunTanam'])
@@ -146,40 +144,6 @@ class KepemilikanController extends Controller
 
         if (!$selectedDetail) {
             abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
-        }
-
-        // 🧩 Tambahan: Auto generate PBB tahun depan (hanya bulan Oktober)
-        $bulanSekarang = Carbon::now()->month;
-        $tahunSekarang = Carbon::now()->year;
-        $tahunDepan = $tahunSekarang + 1;
-
-        if ($bulanSekarang == 10) {
-            $jumlahPBB = $selectedDetail->jumlah_pbb ?? 0;
-            $pbbTahunIni = $selectedDetail->pbb->where('tahun', $tahunSekarang)->first();
-
-            // Kalau tahun ini belum lunas, tambahkan ke akumulasi
-            if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
-                $jumlahPBB += $pbbTahunIni->jumlah;
-            }
-
-            // Cek apakah tahun depan sudah ada
-            $pbbTahunDepan = $selectedDetail->pbb->where('tahun', $tahunDepan)->first();
-
-            if ($pbbTahunDepan) {
-                // Kalau sudah ada, update ulang jumlahnya
-                $pbbTahunDepan->update([
-                    'jumlah' => $jumlahPBB,
-                    'status' => 'belum',
-                ]);
-            } else {
-                // Kalau belum ada, buat baru
-                Pbb::create([
-                    'id_detail_kepemilikan' => $selectedDetail->id_detail_kepemilikan,
-                    'tahun' => $tahunDepan,
-                    'jumlah' => $jumlahPBB,
-                    'status' => 'belum',
-                ]);
-            }
         }
 
         return view('kepemilikan.detail_per_lahan', [
@@ -817,8 +781,6 @@ class KepemilikanController extends Controller
             'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
         ]);
 
-<<<<<<< HEAD
-=======
         // Format nomor telepon
         $no_telepon = $request->no_telepon;
         if ($no_telepon) {
@@ -826,8 +788,6 @@ class KepemilikanController extends Controller
                 $no_telepon = '+62' . substr($no_telepon, 1);
             }
         }
-
->>>>>>> ad321bea1af9ccecaac0c0df668c5f7b9241105c
         // Simpan file PDF (jika ada)
         $ktpName = $request->hasFile('pdf_scan_ktp')
             ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
@@ -883,9 +843,9 @@ class KepemilikanController extends Controller
             'petaniSesudah',
             'lahan.desa.kecamatan'
         ])
-        ->where('id_lahan', $id_lahan)
-        ->orderByDesc('tanggal_ganti')
-        ->get();
+            ->where('id_lahan', $id_lahan)
+            ->orderByDesc('tanggal_ganti')
+            ->get();
 
         $lahan = Lahan::with('desa.kecamatan')->findOrFail($id_lahan);
 
@@ -940,13 +900,33 @@ class KepemilikanController extends Controller
                 'no_telepon' => $no_telepon,
             ]);
 
-            if ($request->hasFile('pdf_scan_ktp')) {
-                $petaniBaru->pdf_scan_ktp = $request->file('pdf_scan_ktp')->store('ktp_pdf', 'public');
+            $ktpName = $request->hasFile('pdf_scan_ktp')
+                ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
+                : null;
+
+            $kkName = $request->hasFile('pdf_scan_kk')
+                ? time() . '_' . $request->file('pdf_scan_kk')->getClientOriginalName()
+                : null;
+
+            if ($ktpName) {
+                $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $ktpName, 'public');
             }
-            if ($request->hasFile('pdf_scan_kk')) {
-                $petaniBaru->pdf_scan_kk = $request->file('pdf_scan_kk')->store('kk_pdf', 'public');
+            if ($kkName) {
+                $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
             }
-            $petaniBaru->save();
+
+            // Buat petani baru dengan assign nama file PDF
+            $petaniBaru = Petani::create([
+                'nomor_anggota_plasma' => $validated['nomor_anggota_plasma'],
+                'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
+                'NIK' => $validated['NIK'],
+                'nama' => $validated['nama'],
+                'alamat' => $validated['alamat'],
+                'status' => $validated['status'] ?? 'aktif',
+                'no_telepon' => $no_telepon,
+                'pdf_scan_ktp' => $ktpName,
+                'pdf_scan_kk' => $kkName,
+            ]);
 
             $id_petani_sesudah = $petaniBaru->id_petani;
         }
