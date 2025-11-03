@@ -959,16 +959,6 @@ class KepemilikanController extends Controller
                 $no_telepon = '+62' . substr($no_telepon, 1);
             }
 
-            $petaniBaru = Petani::create([
-                'nomor_anggota_plasma' => $validated['nomor_anggota_plasma'],
-                'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
-                'NIK' => $validated['NIK'],
-                'nama' => $validated['nama'],
-                'alamat' => $validated['alamat'],
-                'status' => $validated['status'] ?? 'aktif',
-                'no_telepon' => $no_telepon,
-            ]);
-
             $ktpName = $request->hasFile('pdf_scan_ktp')
                 ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
                 : null;

@@ -511,14 +511,17 @@ input.form-control {
 /* ---------- Modal Petani Baru & Footer ---------- */
 
 /* Container Petani Baru */
-#gantiPemilikModal #petaniBaru {
+#gantiPemilikModal #petaniBaru,
+#modalGantiKepemilikan #petaniBaru {
     display: block; /* nanti JS bisa toggle */
 }
 
 /* Label semua input/textarea di Petani Baru */
 #gantiPemilikModal #petaniBaru label,
-#gantiPemilikModal .mb-3 label {
-    font-size: 0.9rem; /* ukuran label */
+#gantiPemilikModal .mb-3 label,
+#modalGantiKepemilikan #petaniBaru label,
+#modalGantiKepemilikan .mb-3 label {
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
@@ -528,65 +531,82 @@ input.form-control {
 #gantiPemilikModal #petaniBaru textarea.form-control,
 #gantiPemilikModal .mb-3 input.form-control,
 #gantiPemilikModal .mb-3 select.form-select,
-#gantiPemilikModal .mb-3 textarea.form-control {
-    font-size: 0.9rem; /* ukuran teks input/select/textarea */
+#gantiPemilikModal .mb-3 textarea.form-control,
+#modalGantiKepemilikan #petaniBaru input.form-control,
+#modalGantiKepemilikan #petaniBaru select.form-select,
+#modalGantiKepemilikan #petaniBaru textarea.form-control,
+#modalGantiKepemilikan .mb-3 input.form-control,
+#modalGantiKepemilikan .mb-3 select.form-select,
+#modalGantiKepemilikan .mb-3 textarea.form-control {
+    font-size: 0.9rem;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
 }
 
-/* Placeholder teks di input/textarea */
+/* Placeholder teks */
 #gantiPemilikModal #petaniBaru input::placeholder,
-#gantiPemilikModal #petaniBaru textarea::placeholder {
+#gantiPemilikModal #petaniBaru textarea::placeholder,
+#modalGantiKepemilikan #petaniBaru input::placeholder,
+#modalGantiKepemilikan #petaniBaru textarea::placeholder {
     font-size: 0.9rem;
     color: #888;
 }
 
 /* Textarea alamat dan keterangan */
 #gantiPemilikModal #petaniBaru textarea.form-control,
-#gantiPemilikModal textarea.form-control {
+#gantiPemilikModal textarea.form-control,
+#modalGantiKepemilikan #petaniBaru textarea.form-control,
+#modalGantiKepemilikan textarea.form-control {
     min-height: 90px;
     resize: vertical;
     font-size: 1rem;
 }
 
 /* Tombol Simpan Perubahan */
-#gantiPemilikModal .modal-footer .btn-success {
-    font-size: 0.8rem; /* ukuran teks tombol */
+#gantiPemilikModal .modal-footer .btn-success,
+#modalGantiKepemilikan .modal-footer .btn-success {
+    font-size: 0.8rem;
     font-weight: 500;
     padding: 0.6rem 1.2rem;
     border-radius: 0.5rem;
 }
 
-/* Optional: agar dropdown Petani Lama/Baru proporsional */
-#gantiPemilikModal #selectPetaniLama {
+/* Dropdown Petani Lama */
+#gantiPemilikModal #selectPetaniLama,
+#modalGantiKepemilikan #selectPetaniLama {
     font-size: 0.9rem;
 }
 
+/* Textarea kecil */
 .custom-textarea {
-    min-height: 36px !important;  /* tinggi minimal */
-    max-height: 36px !important;  /* opsional, kalau mau ada limit */
-    resize: vertical; /* tetap bisa diubah ke bawah, kalau mau matikan pakai 'none' */
+    min-height: 36px !important;
+    max-height: 36px !important;
+    resize: vertical;
 }
 
-    /* Styling text-muted khusus di dalam modal detail petani */
-    .modal-body .text-muted {
-        color: #101010 !important; /* Warna default Bootstrap (bisa diganti kalau mau lebih soft) */
-        font-weight: 500 !important; /* Tidak terlalu tebal, tapi masih kelihatan tegas */
-    }
+/* Styling text-muted di dalam modal */
+#gantiPemilikModal .modal-body .text-muted,
+#modalGantiKepemilikan .modal-body .text-muted {
+    color: #101010 !important;
+    font-weight: 500 !important;
+}
 
-    /* Supaya tulisan isi tabel (td) tetap normal */
-    .modal-body td {
-        font-weight: 400;
-        color: #212529;
-    }
+/* Supaya tulisan isi tabel (td) tetap normal */
+#gantiPemilikModal .modal-body td,
+#modalGantiKepemilikan .modal-body td {
+    font-weight: 400;
+    color: #212529;
+}
 
-    /* Tambahan agar tampilan rapi dan seimbang */
-    .modal-body h6 {
-        font-weight: 600;
-        color: #00A85A;
-    }
+/* Judul bagian kecil dan garis pembatas */
+#gantiPemilikModal .modal-body h6,
+#modalGantiKepemilikan .modal-body h6 {
+    font-weight: 600;
+    color: #00A85A;
+}
 
-    .modal-body hr {
-        border-color: #dcdcdc;
-        opacity: 0.7;
-    }
+#gantiPemilikModal .modal-body hr,
+#modalGantiKepemilikan .modal-body hr {
+    border-color: #dcdcdc;
+    opacity: 0.7;
+}

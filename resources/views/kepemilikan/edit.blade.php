@@ -1,6 +1,7 @@
 @extends('theme.default')
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -119,12 +120,19 @@
                             <input type="hidden" name="lahan[{{ $index }}][id_lahan]"
                                 value="{{ $detail->lahan->id_lahan }}">
 
+                            {{-- Tombol hapus & ganti kepemilikan --}}
                             <div class="d-flex justify-content-end mb-2">
                                 @if (count($kepemilikan->detailKepemilikan) > 1)
-                                    <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                                    <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan me-2">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 @endif
+                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
+                                    data-bs-target="#modalGantiKepemilikan"
+                                    data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
+                                    onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
+                                    <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
+                                </button>
                             </div>
 
                             <h6 class="text-brown mb-3">Lahan {{ $index + 1 }}</h6>
@@ -220,14 +228,15 @@
                                 </div>
                             </div>
 
-                            {{-- Tambahan Status & Tanggal --}}
+                            {{-- Status & Tanggal --}}
                             <div class="row mt-3">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
                                     <select name="lahan[{{ $index }}][status_kepemilikan]"
                                         class="form-select text-kecil">
                                         <option value="aktif"
-                                            {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
+                                        </option>
                                         <option value="nonaktif"
                                             {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
                                         </option>
@@ -256,7 +265,8 @@
                                     @if ($detail->pdf_scan_shm)
                                         <small class="text-muted">File saat ini:
                                             <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
-                                                target="_blank">Lihat PDF</a>
+                                                target="_blank">Lihat
+                                                PDF</a>
                                         </small>
                                     @endif
                                 </div>
@@ -267,7 +277,8 @@
                                     @if ($detail->pdf_scan_peta)
                                         <small class="text-muted">File saat ini:
                                             <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
-                                                target="_blank">Lihat PDF</a>
+                                                target="_blank">Lihat
+                                                PDF</a>
                                         </small>
                                     @endif
                                 </div>
@@ -277,61 +288,165 @@
                 </div>
 
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
-            </div>
 
-            <div class="text-start mt-3">
-                <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
+                {{-- Tombol Perbarui / Batal --}}
+                <div class="text-start mt-3">
+                    <button type="submit" class="btn btn-success me-2">Perbarui</button>
+                    <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
+                </div>
             </div>
         </form>
-    </div>
 
-    {{-- ========== SCRIPT ========== --}}
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        <!-- ======= MODAL GANTI KEPEMILIKAN ======= -->
+        <div class="modal fade" id="modalGantiKepemilikan" tabindex="-1" aria-labelledby="gantiPemilikLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <form id="formGantiKepemilikan"
+                    action="{{ route('kepemilikan.updateKepemilikan', [
+                        'id_kepemilikan' => $kepemilikan->id_kepemilikan,
+                        'id_lahan' => 0, // akan diganti via JS
+                    ]) }}"
+                    method="POST" enctype="multipart/form-data">
+                    @csrf
 
-            // === Inisialisasi dropdown (tanpa duplicate dari clone) ===
-            function initChoices(context = document) {
-                context.querySelectorAll('select.form-select').forEach(select => {
-                    if (!select.dataset.choicesInitialized) {
-                        new Choices(select, {
-                            searchEnabled: false,
-                            shouldSort: false,
-                            itemSelectText: '',
-                            allowHTML: true,
-                            position: 'auto'
-                        });
-                        select.dataset.choicesInitialized = true;
-                    }
-                });
-            }
-            initChoices();
+                    <input type="hidden" name="id_lahan" id="id_lahan_modal">
+                    <input type="hidden" name="id_petani_lama" value="{{ $kepemilikan->id_petani }}">
 
-            // === Fungsi tampil data petani ===
-            window.tampilDataPetani = function() {
-                const select = document.getElementById('id_petani');
-                const opt = select.options[select.selectedIndex];
-                document.getElementById('anggota').value = opt?.dataset.anggota || '';
-                document.getElementById('nik').value = opt?.dataset.nik || '';
-                document.getElementById('nama').value = opt?.dataset.nama || '';
-                document.getElementById('alamat').value = opt?.dataset.alamat || '';
-            };
+                    <div class="modal-content rounded-4">
+                        <div class="modal-header bg-success text-white rounded-top-4">
+                            <h5 class="modal-title" id="gantiPemilikLabel">Ganti Kepemilikan Lahan</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
 
-            // === Tambah / Hapus Lahan ===
-            let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
-            const container = document.getElementById('lahan-container');
+                        <div class="modal-body px-4 py-3">
+                            {{-- MODE PILIHAN --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mode</label>
+                                <select name="mode" class="form-select choices-select" id="modeSelect" required>
+                                    <option value="" disabled selected hidden>Pilih Mode</option>
+                                    <option value="lama">Gunakan Petani Lama</option>
+                                    <option value="baru">Tambah Petani Baru</option>
+                                </select>
+                            </div>
 
-            window.tambahLahan = function() {
-                const lahanBaru = document.createElement('div');
-                lahanBaru.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
-                lahanBaru.innerHTML = `
-        <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
-                <i class="fa-solid fa-trash-can"></i>
-            </button>
+                            {{-- MODE: PETANI LAMA --}}
+                            <div id="petaniLama" class="mb-3">
+                                <label class="form-label">Pilih Petani Baru (dari Data Lama)</label>
+                                <select id="selectPetaniLama" name="id_petani_baru" class="form-select">
+                                    <option value="" selected disabled>Pilih Petani</option>
+                                    @foreach ($petani as $p)
+                                        @if ($p->id_petani != $kepemilikan->id_petani)
+                                            <option value="{{ $p->id_petani }}">{{ $p->nomor_anggota_plasma }}
+                                                ({{ $p->nama }})</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+
+                            </div>
+
+                            {{-- MODE: PETANI BARU --}}
+                            <div id="petaniBaru" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label>Nama Lengkap</label>
+                                        <input type="text" name="nama" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label>NIK</label>
+                                        <input type="text" name="NIK" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label>Telepon</label>
+                                        <input type="text" name="no_telepon" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Nomor Plasma</label>
+                                        <input type="text" name="nomor_anggota_plasma" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Nomor Koperasi</label>
+                                        <input type="text" name="nomor_anggota_koperasi" class="form-control">
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label>Alamat</label>
+                                        <textarea name="alamat" class="form-control form-control-sm custom-textarea"></textarea>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Scan KTP (PDF)</label>
+                                        <input type="file" name="pdf_scan_ktp" class="form-control"
+                                            accept="application/pdf">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Scan KK (PDF)</label>
+                                        <input type="file" name="pdf_scan_kk" class="form-control"
+                                            accept="application/pdf">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TANGGAL DAN KETERANGAN --}}
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tanggal Ganti</label>
+                                    <input type="date" name="tanggal_ganti" class="form-control"
+                                        value="{{ date('Y-m-d') }}" required>
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Keterangan</label>
+                                    <textarea name="keterangan" class="form-control form-control-sm custom-textarea"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
+
+
+        {{-- ================== SCRIPT ================== --}}
+        <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                // ================== INIT CHOICES UNTUK SEMUA SELECT ==================
+                function initChoices(context = document) {
+                    context.querySelectorAll('select.form-select').forEach(select => {
+                        if (!select.dataset.choicesInitialized) {
+                            new Choices(select, {
+                                searchEnabled: false,
+                                shouldSort: false,
+                                itemSelectText: '',
+                                allowHTML: true,
+                                position: 'auto'
+                            });
+                            select.dataset.choicesInitialized = true;
+                        }
+                    });
+                }
+                initChoices();
+
+
+                // ================== TAMBAH / HAPUS LAHAN ==================
+                let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
+                const container = document.getElementById('lahan-container');
+
+                window.tambahLahan = function() {
+                    const lahanBaru = document.createElement('div');
+                    lahanBaru.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
+                    lahanBaru.innerHTML = `
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+            <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
 
             <div class="row">
                 <div class="col-md-3 mb-3">
@@ -354,11 +469,10 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Kode</label>
-                    <input type="text" name="lahan[${lahanIndex}][kode_lahan]"
-                    class="form-control text-kecil" min="0">
-            </div>
+                    <input type="text" name="lahan[${lahanIndex}][kode_lahan]" class="form-control text-kecil">
+                </div>
                 <div class="col-md-3 mb-3">
-                    <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                    <label class="form-label">Luas Lapangan (M²)</label>
                     <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
                 </div>
             </div>
@@ -369,7 +483,7 @@
                     <input type="text" name="lahan[${lahanIndex}][nomor_SHM]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Nama Sesuai SHM</label>
+                    <label class="form-label">Nama SHM</label>
                     <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
@@ -384,30 +498,19 @@
                     <input type="text" name="lahan[${lahanIndex}][nomor_sporadik]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Nama Sesuai Sporadik</label>
+                    <label class="form-label">Nama Sporadik</label>
                     <input type="text" name="lahan[${lahanIndex}][nama_sporadik]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Luas Sesuai Surat (M²)</label>
+                    <label class="form-label">Luas Surat (M²)</label>
                     <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Nomor PBB</label>
-                    <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Jumlah PBB (Rp)</label>
-                    <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                 </div>
             </div>
 
             <div class="row mt-3">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Status Kepemilikan</label>
-                    <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil" required>
+                    <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil">
                         <option value="" disabled hidden>Pilih Status</option>
                         <option value="aktif" selected>Aktif</option>
                         <option value="nonaktif">Nonaktif</option>
@@ -415,9 +518,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Tanggal Mulai</label>
-                    <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" 
-                        class="form-control text-kecil" 
-                        value="${new Date().toISOString().split('T')[0]}">
+                    <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil" value="${new Date().toISOString().split('T')[0]}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Tanggal Selesai</label>
@@ -437,41 +538,102 @@
             </div>
         `;
 
-                container.appendChild(lahanBaru);
-                lahanIndex++;
-                initChoices(lahanBaru);
+                    container.appendChild(lahanBaru);
+                    lahanIndex++;
+                    initChoices(lahanBaru);
+                    updateHapusTombol();
+                };
 
-                // === Tampilkan semua tombol hapus setelah ada lebih dari 1 lahan ===
-                if (container.children.length > 1) {
-                    container.querySelectorAll('.btn-hapus-lahan').forEach(btn => {
-                        btn.style.display = 'inline-block';
-                    });
-                }
-            };
-
-            // === Hapus lahan ===
-            container.addEventListener('click', e => {
-                if (e.target.closest('.btn-hapus-lahan')) {
-                    e.target.closest('.lahan-item').remove();
-
-                    // urutkan ulang nomor dan nama input
-                    [...container.children].forEach((el, i) => {
-                        el.querySelector('h6').innerText = 'Lahan ' + (i + 1);
-                        el.querySelectorAll('input, select').forEach(input => {
-                            input.name = input.name.replace(/\d+/, i);
-                        });
-                    });
-                    lahanIndex = container.children.length;
-
-                    // === Sembunyikan tombol hapus kalau sisa 1 lahan ===
-                    if (lahanIndex <= 1) {
-                        container.querySelectorAll('.btn-hapus-lahan').forEach(btn => {
-                            btn.style.display = 'none';
-                        });
+                // Hapus Lahan
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-hapus-lahan')) {
+                        const item = e.target.closest('.lahan-item');
+                        item.remove();
+                        updateIndices();
+                        updateHapusTombol();
                     }
-                }
-            });
+                });
 
-        });
-    </script>
-@endsection
+                function updateIndices() {
+                    container.querySelectorAll('.lahan-item').forEach((item, index) => {
+                        item.querySelectorAll('input, select').forEach(input => {
+                            input.name = input.name.replace(/lahan\[\d+\]/, `lahan[${index}]`);
+                        });
+                        item.querySelector('h6').textContent = `Lahan ${index + 1}`;
+                    });
+                    lahanIndex = container.querySelectorAll('.lahan-item').length;
+                }
+
+                function updateHapusTombol() {
+                    const items = container.querySelectorAll('.lahan-item');
+                    items.forEach(item => {
+                        const btn = item.querySelector('.btn-hapus-lahan');
+                        btn.style.display = (items.length <= 1) ? 'none' : 'inline-block';
+                    });
+                }
+
+                // ================== MODAL GANTI KEPEMILIKAN ==================
+                window.setLahanId = function(id) {
+                    const inputLahan = document.getElementById('id_lahan_modal');
+                    const form = document.getElementById('formGantiKepemilikan');
+
+                    inputLahan.value = id;
+
+                    const baseAction =
+                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}";
+                    form.action = baseAction.replace(':id', id);
+
+                    form.method = 'POST';
+                    const methodField = form.querySelector('input[name="_method"]');
+                    if (methodField) methodField.remove();
+                };
+
+                // ================== TOGGLE PETANI LAMA / BARU ==================
+                const modeSelect = document.getElementById('modeSelect');
+                const petaniLama = document.getElementById('petaniLama');
+                const petaniBaru = document.getElementById('petaniBaru');
+
+                function toggleMode(value) {
+                    petaniLama.style.display = (value === 'lama') ? 'block' : 'none';
+                    petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
+                }
+
+                // Default
+                modeSelect.value = 'lama';
+                toggleMode('lama');
+
+                modeSelect.addEventListener('change', function() {
+                    toggleMode(this.value);
+                });
+
+                const gantiPemilikModal = document.getElementById('gantiPemilikModal');
+
+                gantiPemilikModal.addEventListener('shown.bs.modal', function() {
+                    const selectPetaniLama = document.getElementById('selectPetaniLama');
+                    const selectPetaniBaru = document.getElementById('selectPetaniBaru');
+
+                    [selectPetaniLama, selectPetaniBaru].forEach(sel => {
+                        if (!sel) return;
+
+                        // Hapus instance lama
+                        if (sel.choices) sel.choices.destroy();
+
+                        // Buat instance baru
+                        sel.choices = new Choices(sel, {
+                            searchEnabled: sel.id ===
+                            'selectPetaniLama', // search cuma untuk petani lama
+                            placeholder: true,
+                            placeholderValue: sel.id === 'selectPetaniLama' ? 'Pilih Petani' :
+                                '',
+                            searchPlaceholderValue: 'Cari petani...',
+                            shouldSort: false,
+                            itemSelectText: '',
+                            allowHTML: true,
+                            position: 'auto'
+                        });
+                    });
+                });
+            });
+        </script>
+
+    @endsection
