@@ -47,6 +47,9 @@ class KepemilikanController extends Controller
                     })
                     ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
                         $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
+                    })
+                    ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"]);
                     });
             });
         }
@@ -88,7 +91,11 @@ class KepemilikanController extends Controller
                     $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($search) {
                         $desa = strtolower($detail->lahan->desa->desa ?? '');
                         $tahun = strtolower($detail->lahan->tahunTanam->tahun ?? '');
-                        return str_contains($desa, $search) || str_contains($tahun, $search);
+                        $kodeLahan = strtolower($detail->kode_lahan ?? '');
+                        
+                        return str_contains($desa, $search) 
+                        || str_contains($tahun, $search)
+                        || str_contains($kodeLahan, $search);
                     })->values();
                     return $item;
                 });
@@ -137,13 +144,33 @@ class KepemilikanController extends Controller
 
     public function showPerLahan($id_kepemilikan, $id_lahan)
     {
-        $kepemilikan = Kepemilikan::with(['petani', 'detailKepemilikan.lahan.desa.kecamatan', 'detailKepemilikan.lahan.tahunTanam'])
+        $kepemilikan = Kepemilikan::with([
+            'petani',
+            'detailKepemilikan.lahan.desa.kecamatan',
+            'detailKepemilikan.lahan.tahunTanam',
+            'detailKepemilikan.pbb',
+        ])
             ->findOrFail($id_kepemilikan);
 
         $selectedDetail = $kepemilikan->detailKepemilikan->firstWhere('id_lahan', $id_lahan);
 
         if (!$selectedDetail) {
             abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
+        }
+        $tahunSekarang = Carbon::now()->year;
+
+        $pbbTahunIni = $selectedDetail->pbb->where('tahun', $tahunSekarang)->first();
+
+        if (!$pbbTahunIni) {
+            // Buat data baru hanya kalau belum ada
+            Pbb::create([
+                'id_detail_kepemilikan' => $selectedDetail->id_detail_kepemilikan,
+                'tahun' => $tahunSekarang,
+                'jumlah' => $detail->jumlah_pbb ?? 0,
+                'status' => 'belum',
+            ]);
+            // Refresh relasi biar data terbaru muncul di Blade
+            $selectedDetail->load('pbb');
         }
 
         return view('kepemilikan.detail_per_lahan', [
@@ -199,6 +226,7 @@ class KepemilikanController extends Controller
         ]);
 
         $detail->update([
+            'kode_lahan' => $data['kode_lahan'],
             'nomor_SHM' => $data['nomor_SHM'],
             'nama_SHM' => $data['nama_SHM'],
             'nomor_kavling' => $data['nomor_kavling'],
@@ -261,6 +289,7 @@ class KepemilikanController extends Controller
             'lahan' => 'required',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
+            'lahan.*.kode_lahan' => 'nullable|string|max:15',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
             'lahan.*.nama_SHM' => 'nullable|string|max:100',
@@ -292,6 +321,7 @@ class KepemilikanController extends Controller
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
+                    'kode_lahan' => $lahanData['kode_lahan'] ?? null,
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
                     'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
@@ -348,6 +378,7 @@ class KepemilikanController extends Controller
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
+            'lahan.*.kode_lahan'=> 'nullable|string|max:15',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
@@ -400,6 +431,7 @@ class KepemilikanController extends Controller
                 // Simpan detail
                 $detail->fill([
                     'id_lahan' => $lahan->id_lahan,
+                    'kode_lahan' =>$lahanData['kode_lahan'],
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
                     'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
@@ -465,6 +497,27 @@ class KepemilikanController extends Controller
                     ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'pbb']);
             }
         ])->findOrFail($id_kepemilikan);
+
+        $tahunSekarang = Carbon::now()->year;
+
+        // Loop semua detail_kepemilikan
+        foreach ($kepemilikan->detailKepemilikan as $detail) {
+            // Cek apakah sudah ada data PBB untuk tahun ini
+            $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+
+            if (!$pbbTahunIni) {
+                // Buat data baru hanya kalau belum ada
+                Pbb::create([
+                    'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
+                    'tahun' => $tahunSekarang,
+                    'jumlah' => $detail->jumlah_pbb ?? 0, // Simpan jumlah saat ini
+                    'status' => 'belum',
+                ]);
+            }
+        }
+
+        // Refresh relasi supaya data terbaru muncul di Blade
+        $kepemilikan->load('detailKepemilikan.pbb');
 
         return view('kepemilikan.detail', compact('kepemilikan'));
     }
@@ -638,6 +691,9 @@ class KepemilikanController extends Controller
                     })
                     ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
                         $q2->where('tahun', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"]);
                     });
             });
         });
@@ -724,48 +780,49 @@ class KepemilikanController extends Controller
     //Membuat akumulasi otomatis untuk tahun berikutnya
     public function generatePbbTahunBaru($id_detail_kepemilikan)
     {
+
         $tahunSekarang = Carbon::now()->year;
         $bulanSekarang = Carbon::now()->month;
 
-        //Pastikan hanya bisa dijalankan di bulan Oktober
         if ($bulanSekarang != 10) {
             return back()->with('error', 'Akumulasi PBB hanya dapat dilakukan pada bulan Oktober.');
         }
 
         $detail = DetailKepemilikan::with('pbb')->findOrFail($id_detail_kepemilikan);
-        $jumlahPBB = $detail->jumlah_pbb ?? 0;
+        $jumlahPBBBaru = $detail->jumlah_pbb ?? 0;
 
-        $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
         $tahunDepan = $tahunSekarang + 1;
 
-        //Kalau tahun ini belum lunas → tambahkan ke akumulasi
+        // Cek PBB tahun ini
+        $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+
+        // Jika tahun ini belum lunas, tambahkan ke akumulasi
         if ($pbbTahunIni && $pbbTahunIni->status == 'belum') {
-            $jumlahPBB += $pbbTahunIni->jumlah;
+            $jumlahPBBBaru += $pbbTahunIni->jumlah;
         }
 
-        //Cek apakah tahun depan sudah ada data
+        // Cek data tahun depan
         $pbbTahunDepan = $detail->pbb->where('tahun', $tahunDepan)->first();
 
         if ($pbbTahunDepan) {
-            //Kalau sudah ada → update ulang jumlah sesuai data terbaru
+            // update hanya kalau memang berbeda
             $pbbTahunDepan->update([
-                'jumlah' => $jumlahPBB,
-                'status' => 'belum', // pastikan tetap belum sampai dibayar
+                'jumlah' => $jumlahPBBBaru,
+                'status' => 'belum',
             ]);
-            $message = 'Data PBB tahun ' . $tahunDepan . ' telah diperbarui sesuai jumlah terbaru.';
         } else {
-            //Kalau belum ada → buat baru
+            // buat baru
             Pbb::create([
                 'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
                 'tahun' => $tahunDepan,
-                'jumlah' => $jumlahPBB,
+                'jumlah' => $jumlahPBBBaru,
                 'status' => 'belum',
             ]);
-            $message = 'PBB tahun ' . $tahunDepan . ' berhasil dibuat!';
         }
 
-        return back()->with('success', $message);
+        return back()->with('success', 'PBB tahun ' . $tahunDepan . ' berhasil dibuat atau diperbarui.');
     }
+
 
     public function gantiKepemilikan(Request $request, $id_lahan)
     {

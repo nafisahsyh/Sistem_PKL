@@ -217,6 +217,10 @@
                     <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
                 </tr>
                 <tr>
+                    <th>Kode</th>
+                    <td>{{ $detail->kode_lahan ?? '-' }}</td>
+                </tr>
+                <tr>
                     <th>Luas Lahan Berdasarkan Peta</th>
                     <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
                 </tr>

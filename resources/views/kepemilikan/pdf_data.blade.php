@@ -67,6 +67,7 @@
                 <th class="text-left">Nama Lengkap</th>
                 <th>Desa</th>
                 <th>Tahun Tanam</th>
+                <th>Kode</th>
                 <th>No. Kavling</th>
                 <th>Luas Sesuai Peta (m²)</th>
                 <th>Luas Sesuai Surat (m²)</th>
@@ -99,6 +100,7 @@
 
                         $noKavling = $detail->nomor_kavling ?? '-';
                         $noSHM = $detail->nomor_SHM ?? '-';
+                        $kodeLahan = $detail->kode_lahan ?? '_';
                     @endphp
 
                     <tr>
@@ -112,6 +114,7 @@
 
                         <td>{{ $desaNama }}</td>
                         <td>{{ $tahunNama }}</td>
+                        <td>{{ $kodeLahan }}</td>
                         <td>{{ $noKavling }}</td>
                         <td>{{ number_format($luasPeta, 2, ',', '.') }}</td>
                         <td>{{ number_format($luasSurat, 2, ',', '.') }}</td>

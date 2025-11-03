@@ -25,8 +25,7 @@
                         <label for="nomor_anggota_koperasi" class="form-label">Nomor Koperasi</label>
                         <input type="text" name="nomor_anggota_koperasi"
                             class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
-                            value="{{ old('nomor_anggota_koperasi') }}" placeholder="Masukkan nomor anggota koperasi"
-                            required>
+                            value="{{ old('nomor_anggota_koperasi') }}" placeholder="Masukkan nomor anggota koperasi">
                         @error('nomor_anggota_koperasi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -38,7 +37,7 @@
                         <label for="NIK" class="form-label">NIK</label>
                         <input type="text" name="NIK"
                             class="form-control text-kecil @error('NIK') is-invalid @enderror" value="{{ old('NIK') }}"
-                            placeholder="Masukkan NIK 16 digit" maxlength="16" required>
+                            placeholder="Masukkan NIK 16 digit" maxlength="16">
                         @error('NIK')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

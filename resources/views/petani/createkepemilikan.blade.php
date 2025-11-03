@@ -120,6 +120,11 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
+                                <label class="form-label">Kode Lahan</label>
+                                <input type="text" name="lahan[0][kode_lahan]"
+                                    class="form-control text-kecil" min="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Luas Lahan Berdasarkan Peta (m²)</label>
                                 <input type="number" step="0.01" name="lahan[0][luas_peta]"
                                     class="form-control text-kecil" min="0">
@@ -253,6 +258,11 @@
                         <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
                     @endforeach
                 </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Kode Lahan</label>
+                <input type="text" name="lahan[${lahanIndex}][kode_lahan]"
+                    class="form-control text-kecil" min="0">
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Luas Lahan Berdasarkan Peta (m²)</label>

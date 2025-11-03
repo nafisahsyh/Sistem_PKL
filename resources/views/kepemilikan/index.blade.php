@@ -74,6 +74,7 @@
                             <th>Status Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
+                            <th>Kode</th>
                             <th style="width: 180px;">Aksi</th>
                         </tr>
                     </thead>
@@ -86,6 +87,7 @@
                                         'tahun' => $d->lahan->tahunTanam->tahun ?? '-',
                                         'id_lahan' => $d->id_lahan,
                                         'status_kepemilikan' => $d->status_kepemilikan,
+                                        'kode_lahan' => $d->kode_lahan ??'-',
                                     ],
                                 );
 
@@ -141,6 +143,7 @@
 
                                     <td>{{ $detail['desa'] }}</td>
                                     <td class="text-center">{{ $detail['tahun'] }}</td>
+                                    <td class="text-center">{{ $detail['kode_lahan'] }}</td>
 
                                     {{-- Tombol Aksi --}}
                                     @if ($isNormalMode && $i == 0)

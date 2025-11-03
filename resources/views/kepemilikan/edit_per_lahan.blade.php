@@ -156,6 +156,12 @@
                         </div>
 
                         <div class="col-md-4 mb-3">
+                            <label class="form-label">Kode</label>
+                            <input type="text" name="lahan[0][kode_lahan]"
+                                class="form-control text-kecil" value="{{ $selectedDetail->kode_lahan }}">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Luas Lahan Berdasarkan Peta</label>
                             <input type="number" step="0.01" name="lahan[0][luas_peta]"
                                 class="form-control text-kecil" value="{{ $selectedDetail->lahan->luas_peta }}">

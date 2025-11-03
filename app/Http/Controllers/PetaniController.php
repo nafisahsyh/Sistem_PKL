@@ -41,8 +41,8 @@ class PetaniController extends Controller
     {
         $request->validate([
             'nomor_anggota_plasma' => 'required|string|max:100|unique:petani',
-            'nomor_anggota_koperasi' => 'required|string|max:100|unique:petani',
-            'NIK' => 'required|string|size:16|unique:petani',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani',
+            'NIK' => 'nullable|string|size:16|unique:petani',
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif',
@@ -98,8 +98,8 @@ class PetaniController extends Controller
     {
         $request->validate([
             'nomor_anggota_plasma' => 'required|string|max:100|unique:petani,nomor_anggota_plasma,' . $petani->id_petani . ',id_petani',
-            'nomor_anggota_koperasi' => 'required|string|max:100|unique:petani,nomor_anggota_koperasi,' . $petani->id_petani . ',id_petani',
-            'NIK' => 'required|string|size:16|unique:petani,NIK,' . $petani->id_petani . ',id_petani',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani,nomor_anggota_koperasi,' . $petani->id_petani . ',id_petani',
+            'NIK' => 'nullable|string|size:16|unique:petani,NIK,' . $petani->id_petani . ',id_petani',
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif',
@@ -173,6 +173,7 @@ class PetaniController extends Controller
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
+            'lahan.*.kode_lahan' => 'nullable|string|max:15',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
             'lahan.*.nama_SHM' => 'nullable|string|max:100',
             'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
@@ -212,6 +213,7 @@ class PetaniController extends Controller
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
+                    'kode_lahan' => $lahanData['kode_lahan'],
                     'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
                     'nama_SHM' => $lahanData['nama_SHM'] ?? null,
                     'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,

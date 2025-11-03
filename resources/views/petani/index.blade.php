@@ -47,10 +47,10 @@
                             <tr>
                                 <td class="text-center">
                                     {{ ($petani->currentPage() - 1) * $petani->perPage() + $loop->iteration }}</td>
-                                <td>{{ $p->nomor_anggota_plasma }}</td>
-                                <td>{{ $p->nomor_anggota_koperasi }}</td>
-                                <td>{{ $p->NIK }}</td>
-                                <td>{{ $p->nama }}</td>
+                                <td>{{ $p->nomor_anggota_plasma ?? '—' }}</td>
+                                <td>{{ $p->nomor_anggota_koperasi ?? '—' }}</td>
+                                <td>{{ $p->NIK ?? '—' }}</td>
+                                <td>{{ $p->nama ?? '—' }}</td>
                                 <td class="text-center">
                                     <span class="badge {{ $p->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
                                         {{ ucfirst($p->status) }}

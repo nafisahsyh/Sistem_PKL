@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_lahan');       // FK ke lahan
 
             // Data legalitas & pajak tiap lahan
+            $table->string('kode_lahan',15)->nullable();
             $table->string('nomor_SHM', 100)->nullable();
             $table->string('nama_SHM',100)->nullable();
             $table->string('nomor_sporadik', 100)->nullable();

@@ -11,6 +11,7 @@ class DetailKepemilikan extends Model
     protected $fillable = [
         'id_kepemilikan',
         'id_lahan',
+        'kode_lahan',
         'nomor_SHM',
         'nama_SHM',
         'nomor_sporadik',
