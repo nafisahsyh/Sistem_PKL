@@ -120,10 +120,13 @@
                                 value="{{ $detail->lahan->id_lahan }}">
 
                             <div class="d-flex justify-content-end mb-2">
-                                <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                                @if (count($kepemilikan->detailKepemilikan) > 1)
+                                    <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                @endif
                             </div>
+
                             <h6 class="text-brown mb-3">Lahan {{ $index + 1 }}</h6>
 
                             {{-- Informasi dasar lahan --}}
@@ -318,13 +321,12 @@
                 const lahanBaru = document.createElement('div');
                 lahanBaru.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
                 lahanBaru.innerHTML = `
-            <div class="d-flex justify-content-end mb-2">
-                <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
-
-            <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
+        <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+        <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
@@ -427,7 +429,14 @@
 
                 container.appendChild(lahanBaru);
                 lahanIndex++;
-                initChoices(lahanBaru); // aktifkan dropdown baru
+                initChoices(lahanBaru);
+
+                // === Tampilkan semua tombol hapus setelah ada lebih dari 1 lahan ===
+                if (container.children.length > 1) {
+                    container.querySelectorAll('.btn-hapus-lahan').forEach(btn => {
+                        btn.style.display = 'inline-block';
+                    });
+                }
             };
 
             // === Hapus lahan ===
@@ -435,6 +444,7 @@
                 if (e.target.closest('.btn-hapus-lahan')) {
                     e.target.closest('.lahan-item').remove();
 
+                    // urutkan ulang nomor dan nama input
                     [...container.children].forEach((el, i) => {
                         el.querySelector('h6').innerText = 'Lahan ' + (i + 1);
                         el.querySelectorAll('input, select').forEach(input => {
@@ -442,8 +452,16 @@
                         });
                     });
                     lahanIndex = container.children.length;
+
+                    // === Sembunyikan tombol hapus kalau sisa 1 lahan ===
+                    if (lahanIndex <= 1) {
+                        container.querySelectorAll('.btn-hapus-lahan').forEach(btn => {
+                            btn.style.display = 'none';
+                        });
+                    }
                 }
             });
+
         });
     </script>
 @endsection

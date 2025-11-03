@@ -58,7 +58,7 @@
 
                     {{-- Tombol toggle mata --}}
                     <span id="toggle-password" class="password-toggle">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye-slash"></i>
                     </span>
 
                     @error('password')
@@ -85,8 +85,12 @@
                 togglePassword.addEventListener('click', function() {
                     const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                     password.setAttribute('type', type);
-                    this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' :
-                    '<i class="fas fa-eye-slash"></i>';
+
+                    // ubah ikon sesuai kondisi
+                    this.innerHTML = type === 'password' ?
+                        '<i class="fas fa-eye-slash"></i>' // mata tertutup = password disembunyikan
+                        :
+                        '<i class="fas fa-eye"></i>'; // mata terbuka = password terlihat
                 });
             </script>
         </div>

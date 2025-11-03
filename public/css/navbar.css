@@ -567,3 +567,26 @@ input.form-control {
     max-height: 36px !important;  /* opsional, kalau mau ada limit */
     resize: vertical; /* tetap bisa diubah ke bawah, kalau mau matikan pakai 'none' */
 }
+
+    /* Styling text-muted khusus di dalam modal detail petani */
+    .modal-body .text-muted {
+        color: #101010 !important; /* Warna default Bootstrap (bisa diganti kalau mau lebih soft) */
+        font-weight: 500 !important; /* Tidak terlalu tebal, tapi masih kelihatan tegas */
+    }
+
+    /* Supaya tulisan isi tabel (td) tetap normal */
+    .modal-body td {
+        font-weight: 400;
+        color: #212529;
+    }
+
+    /* Tambahan agar tampilan rapi dan seimbang */
+    .modal-body h6 {
+        font-weight: 600;
+        color: #00A85A;
+    }
+
+    .modal-body hr {
+        border-color: #dcdcdc;
+        opacity: 0.7;
+    }
