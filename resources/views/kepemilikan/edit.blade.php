@@ -131,19 +131,19 @@
 
                             {{-- Informasi dasar lahan --}}
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Desa</label>
                                     <select name="lahan[{{ $index }}][id_desa]" class="form-select text-kecil">
                                         <option value="" disabled hidden>Pilih Desa</option>
                                         @foreach ($desa as $d)
                                             <option value="{{ $d->id_desa }}"
                                                 {{ $detail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
-                                                {{ $d->desa }} ({{ $d->kecamatan->kecamatan }})
+                                                {{ $d->desa }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Tahun Tanam</label>
                                     <select name="lahan[{{ $index }}][id_tahun_tanam]"
                                         class="form-select text-kecil">
@@ -156,13 +156,13 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Kode Lahan</label>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Kode</label>
                                     <input type="text" step="0.01" name="lahan[{{ $index }}][kode_lahan]"
                                         class="form-control text-kecil" value="{{ $detail->kode_lahan }}">
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Luas Lahan Berdasarkan Peta</label>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
                                         class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
                                 </div>
@@ -200,18 +200,18 @@
                                         class="form-control text-kecil" value="{{ $detail->nama_sporadik }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Nomor PBB</label>
-                                    <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
-                                        class="form-control text-kecil" value="{{ $detail->nomor_pbb }}">
+                                    <label class="form-label">Luas Sesuai Surat (M²)</label>
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
+                                        class="form-control text-kecil" value="{{ $detail->luas_surat }}">
                                 </div>
                             </div>
 
                             {{-- Luas & PBB --}}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
-                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
-                                        class="form-control text-kecil" value="{{ $detail->luas_surat }}">
+                                    <label class="form-label">Nomor PBB</label>
+                                    <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
+                                        class="form-control text-kecil" value="{{ $detail->nomor_pbb }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Jumlah PBB (Rp)</label>
@@ -334,16 +334,16 @@
         <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
 
             <div class="row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Desa</label>
                     <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil">
                         <option value="" disabled selected hidden>Pilih Desa</option>
                         @foreach ($desa as $d)
-                            <option value="{{ $d->id_desa }}">{{ $d->desa }} ({{ $d->kecamatan->kecamatan }})</option>
+                            <option value="{{ $d->id_desa }}">{{ $d->desa }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Tahun Tanam</label>
                     <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil">
                         <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
@@ -352,8 +352,13 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Luas Lahan Berdasarkan Peta</label>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Kode</label>
+                    <input type="text" name="lahan[${lahanIndex}][kode_lahan]"
+                    class="form-control text-kecil" min="0">
+            </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                     <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
                 </div>
             </div>
@@ -383,15 +388,15 @@
                     <input type="text" name="lahan[${lahanIndex}][nama_sporadik]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Nomor PBB</label>
-                    <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
+                    <label class="form-label">Luas Sesuai Surat (M²)</label>
+                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
-                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
+                    <label class="form-label">Nomor PBB</label>
+                    <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Jumlah PBB (Rp)</label>

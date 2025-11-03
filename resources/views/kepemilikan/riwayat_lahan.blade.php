@@ -58,8 +58,8 @@
                             <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                                 <tr>
                                     <th style="width: 5%">No</th>
-                                    <th>Petani Sebelumnya</th>
-                                    <th>Petani Sesudahnya</th>
+                                    <th>Petani Awal</th>
+                                    <th>Petani Sekarang</th>
                                     <th>Tanggal Ganti</th>
                                     <th>Keterangan</th>
                                     <th style="width: 10%">Aksi</th>
@@ -94,7 +94,15 @@
     </div>
 @endsection
 
-@foreach ($riwayat as $item)
+@php
+    $firstRiwayatId = $riwayat->first()->id_riwayat ?? null; // yang paling baru (petani sekarang)
+@endphp
+
+@foreach ($riwayat as $index => $item)
+    @php
+        $isFirst = $item->id_riwayat === $firstRiwayatId;
+    @endphp
+
     <div class="modal fade" id="detailPetaniModal{{ $item->id_riwayat }}" tabindex="-1"
         aria-labelledby="detailPetaniLabel{{ $item->id_riwayat }}" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -109,8 +117,15 @@
 
                 <div class="modal-body px-4 py-3">
                     <div class="row">
+                        {{-- Petani Sebelumnya / Awal --}}
                         <div class="col-md-6 mb-4">
-                            <h6 class="fw-semibold text-success mb-3 border-bottom pb-1">Petani Sebelumnya</h6>
+                            <h6 class="fw-semibold text-success mb-3 border-bottom pb-1">
+                                @if ($loop->last)
+                                    Petani Awal
+                                @else
+                                    Petani Sebelumnya
+                                @endif
+                            </h6>
                             <table class="table table-borderless table-sm mb-0">
                                 <tr>
                                     <th class="text-muted" width="40%">Nama</th>
@@ -131,8 +146,15 @@
                             </table>
                         </div>
 
+                        {{-- Petani Sesudah / Sekarang --}}
                         <div class="col-md-6 mb-4">
-                            <h6 class="fw-semibold text-success mb-3 border-bottom pb-1">Petani Sesudah</h6>
+                            <h6 class="fw-semibold text-success mb-3 border-bottom pb-1">
+                                @if ($isFirst)
+                                    Petani Sekarang
+                                @else
+                                    Petani Sesudah
+                                @endif
+                            </h6>
                             <table class="table table-borderless table-sm mb-0">
                                 <tr>
                                     <th class="text-muted" width="40%">Nama</th>

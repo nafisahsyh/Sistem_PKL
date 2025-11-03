@@ -194,12 +194,20 @@ class KepemilikanController extends Controller
             abort(404, 'Lahan tidak ditemukan untuk kepemilikan ini.');
         }
 
-        $petani = Petani::with('desa.kecamatan')->get();
+        // Petani yang sedang memiliki lahan ini
+        $id_petani_saat_ini = $kepemilikan->id_petani;
+
+        // Ambil semua petani selain pemilik saat ini
+        $petani = Petani::with('desa.kecamatan')
+            ->where('id_petani', '!=', $id_petani_saat_ini)
+            ->get();
+
         $desa = Desa::with('kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
 
         return view('kepemilikan.edit_per_lahan', compact('kepemilikan', 'selectedDetail', 'petani', 'desa', 'tahun_tanam'));
     }
+
 
     public function updatePerLahan(Request $request, $id_kepemilikan, $id_lahan)
     {
@@ -901,13 +909,17 @@ class KepemilikanController extends Controller
             'lahan.desa.kecamatan'
         ])
             ->where('id_lahan', $id_lahan)
-            ->orderByDesc('tanggal_ganti')
+            ->orderByDesc('id_riwayat')
             ->get();
 
         $lahan = Lahan::with('desa.kecamatan')->findOrFail($id_lahan);
 
-        return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan'));
+        // Ambil petani terakhir (yang benar-benar sekarang)
+        $petaniSekarang = $riwayat->sortBy('tanggal_ganti')->last()?->petaniSesudah;
+
+        return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan', 'petaniSekarang'));
     }
+
 
     public function updateKepemilikan(Request $request, $id_kepemilikan, $id_lahan)
     {

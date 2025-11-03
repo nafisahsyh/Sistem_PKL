@@ -136,18 +136,18 @@
                                 {{ $detail->kode_lahan ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Peta</th>
+                            <th class="text-normal text-start ps-3">Luas Sesuai Lapangan</th>
                             <td class="text-normal-sm text-start ps-3">
-                                {{ number_format($detail->lahan->luas_peta ?? 0, 2, ',', '.') }} m²</td>
+                                {{ number_format($detail->lahan->luas_peta ?? 0, 2, ',', '.') }} M²</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor Kavling</th>
                             <td class="text-normal-sm text-start ps-3">{{ $detail->nomor_kavling ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Luas Lahan Berdasarkan Surat</th>
+                            <th class="text-normal text-start ps-3">Luas Sesuai Surat</th>
                             <td class="text-normal-sm text-start ps-3">
-                                {{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} m²</td>
+                                {{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} M²</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor SHM</th>

@@ -69,8 +69,8 @@
                 <th>Tahun Tanam</th>
                 <th>Kode</th>
                 <th>No. Kavling</th>
-                <th>Luas Sesuai Peta (m²)</th>
-                <th>Luas Sesuai Surat (m²)</th>
+                <th>Luas Sesuai Lapangan (M²)</th>
+                <th>Luas Sesuai Surat (M²)</th>
                 <th>No. Surat SHM</th>
             </tr>
         </thead>

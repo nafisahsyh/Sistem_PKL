@@ -129,20 +129,20 @@
                     <input type="hidden" name="lahan[0][id_lahan]" value="{{ $selectedDetail->lahan->id_lahan }}">
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Desa</label>
                             <select name="lahan[0][id_desa]" class="form-select text-kecil choices-select">
                                 <option value="" disabled hidden>Pilih Desa</option>
                                 @foreach ($desa as $d)
                                     <option value="{{ $d->id_desa }}"
                                         {{ $selectedDetail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
-                                        {{ $d->desa }} ({{ $d->kecamatan->kecamatan }})
+                                        {{ $d->desa }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Tahun Tanam</label>
                             <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil choices-select">
                                 <option value="" disabled hidden>Pilih Tahun Tanam</option>
@@ -155,14 +155,14 @@
                             </select>
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Kode</label>
-                            <input type="text" name="lahan[0][kode_lahan]"
-                                class="form-control text-kecil" value="{{ $selectedDetail->kode_lahan }}">
+                            <input type="text" name="lahan[0][kode_lahan]" class="form-control text-kecil"
+                                value="{{ $selectedDetail->kode_lahan }}">
                         </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Luas Lahan Berdasarkan Peta</label>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                             <input type="number" step="0.01" name="lahan[0][luas_peta]"
                                 class="form-control text-kecil" value="{{ $selectedDetail->lahan->luas_peta }}">
                         </div>
@@ -198,17 +198,17 @@
                                 value="{{ $selectedDetail->nama_sporadik }}">
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Nomor PBB</label>
-                            <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nomor_pbb }}">
+                            <label class="form-label">Luas Sesuai Surat (M²)</label>
+                            <input type="number" step="0.01" name="lahan[0][luas_surat]"
+                                class="form-control text-kecil" value="{{ $selectedDetail->luas_surat }}">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Luas Lahan Berdasarkan Surat (m²)</label>
-                            <input type="number" step="0.01" name="lahan[0][luas_surat]"
-                                class="form-control text-kecil" value="{{ $selectedDetail->luas_surat }}">
+                            <label class="form-label">Nomor PBB</label>
+                            <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil"
+                                value="{{ $selectedDetail->nomor_pbb }}">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Jumlah PBB (Rp)</label>
@@ -307,6 +307,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Mode</label>
                             <select name="mode" class="form-select choices-select" id="modeSelect">
+                                <option value="" disabled hidden selected>Pilih Mode</option>
                                 <option value="lama">Gunakan Petani Lama</option>
                                 <option value="baru">Tambah Petani Baru</option>
                             </select>
@@ -316,13 +317,16 @@
                         <div id="petaniLama" class="mb-3">
                             <label class="form-label">Pilih Petani Baru (dari Data Lama)</label>
                             <select id="selectPetaniLama" name="id_petani_baru" class="form-select choices-select">
-                                <option value="" disabled hidden selected>Pilih Petani</option>
                                 @foreach ($petani as $p)
-                                    <option value="{{ $p->id_petani }}">{{ $p->nama }}
-                                        ({{ $p->desa->nama_desa ?? '-' }})
-                                    </option>
+                                    {{-- Sembunyikan petani yang saat ini pemilik lahan --}}
+                                    @if ($p->id_petani != $kepemilikan->id_petani)
+                                        <option value="{{ $p->id_petani }}">
+                                            {{ $p->nomor_anggota_plasma }} ({{ $p->nama }})
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
+
                         </div>
 
                         <!-- Petani Baru -->
@@ -399,6 +403,8 @@
                     new Choices(select, {
                         searchEnabled: select.id ===
                             'selectPetaniLama', // search cuma aktif untuk petani lama
+                        placeholder: true,
+                        placeholderValue: 'Pilih Petani',
                         searchPlaceholderValue: 'Cari petani...',
                         shouldSort: false,
                         itemSelectText: '',

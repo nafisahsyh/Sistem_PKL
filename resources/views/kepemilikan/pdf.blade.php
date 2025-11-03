@@ -221,12 +221,12 @@
                     <td>{{ $detail->kode_lahan ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <th>Luas Lahan Berdasarkan Peta</th>
-                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} m²</td>
+                    <th>Luas Sesuai Lapangan</th>
+                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} M²</td>
                 </tr>
                 <tr>
-                    <th>Luas Lahan Berdasarkan Surat</th>
-                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} m²</td>
+                    <th>Luas Sesuai Surat</th>
+                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} M²</td>
                 </tr>
                 <tr>
                     <th>Nomor SHM</th>
