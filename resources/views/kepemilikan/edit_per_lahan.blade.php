@@ -123,155 +123,168 @@
                         <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
                     </button>
                 </div>
-                <div class="border rounded p-3 mb-4 bg-light lahan-item">
-                    <input type="hidden" name="lahan[0][id_detail_kepemilikan]"
-                        value="{{ $selectedDetail->id_detail_kepemilikan }}">
-                    <input type="hidden" name="lahan[0][id_lahan]" value="{{ $selectedDetail->lahan->id_lahan }}">
 
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Desa</label>
-                            <select name="lahan[0][id_desa]" class="form-select text-kecil choices-select">
-                                <option value="" disabled hidden>Pilih Desa</option>
-                                @foreach ($desa as $d)
-                                    <option value="{{ $d->id_desa }}"
-                                        {{ $selectedDetail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
-                                        {{ $d->desa }}
+                {{-- Filter hanya lahan yang sesuai --}}
+                @foreach ($groupDetails as $index => $detail)
+                    <div class="card-header bg-success text-white">
+                        <strong>Data Lahan {{ $index + 1 }}</strong>
+                    </div>
+                    <div class="border rounded p-3 mb-4 bg-light lahan-item">
+                        <input type="hidden" name="lahan[{{ $index }}][id_detail_kepemilikan]"
+                            value="{{ $detail->id_detail_kepemilikan }}">
+                        <input type="hidden" name="lahan[{{ $index }}][id_lahan]"
+                            value="{{ $detail->lahan->id_lahan }}">
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Desa</label>
+                                <select name="lahan[{{ $index }}][id_desa]"
+                                    class="form-select text-kecil choices-select">
+                                    <option value="" disabled hidden>Pilih Desa</option>
+                                    @foreach ($desa as $d)
+                                        <option value="{{ $d->id_desa }}"
+                                            {{ $detail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
+                                            {{ $d->desa }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Tahun Tanam</label>
+                                <select name="lahan[{{ $index }}][id_tahun_tanam]"
+                                    class="form-select text-kecil choices-select">
+                                    <option value="" disabled hidden>Pilih Tahun Tanam</option>
+                                    @foreach ($tahun_tanam as $t)
+                                        <option value="{{ $t->id_tahun_tanam }}"
+                                            {{ $detail->lahan->id_tahun_tanam == $t->id_tahun_tanam ? 'selected' : '' }}>
+                                            {{ $t->tahun }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Kode</label>
+                                <input type="text" name="lahan[{{ $index }}][kode_lahan]"
+                                    class="form-control text-kecil" value="{{ $detail->kode_lahan }}">
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
+                                    class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor SHM</label>
+                                <input type="text" name="lahan[{{ $index }}][nomor_SHM]"
+                                    class="form-control text-kecil" value="{{ $detail->nomor_SHM }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai SHM</label>
+                                <input type="text" name="lahan[{{ $index }}][nama_SHM]"
+                                    class="form-control text-kecil" value="{{ $detail->nama_SHM }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor Kavling</label>
+                                <input type="text" name="lahan[{{ $index }}][nomor_kavling]"
+                                    class="form-control text-kecil" value="{{ $detail->nomor_kavling }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor Sporadik</label>
+                                <input type="text" name="lahan[{{ $index }}][nomor_sporadik]"
+                                    class="form-control text-kecil" value="{{ $detail->nomor_sporadik }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sesuai Sporadik</label>
+                                <input type="text" name="lahan[{{ $index }}][nama_sporadik]"
+                                    class="form-control text-kecil" value="{{ $detail->nama_sporadik }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Luas Sesuai Surat (M²)</label>
+                                <input type="number" step="0.01" name="lahan[{{ $index }}][luas_surat]"
+                                    class="form-control text-kecil" value="{{ $detail->luas_surat }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nomor PBB</label>
+                                <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
+                                    class="form-control text-kecil" value="{{ $detail->nomor_pbb }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jumlah PBB (Rp)</label>
+                                <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
+                                    class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kepemilikan</label>
+                                <select name="lahan[{{ $index }}][status_kepemilikan]"
+                                    class="form-select text-kecil choices-select">
+                                    <option value="aktif" {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>
+                                        Aktif</option>
+                                    <option value="nonaktif"
+                                        {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
                                     </option>
-                                @endforeach
-                            </select>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="date" name="lahan[{{ $index }}][tanggal_mulai]"
+                                    class="form-control text-kecil"
+                                    value="{{ $detail->tanggal_mulai ? date('Y-m-d', strtotime($detail->tanggal_mulai)) : '' }}">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="date" name="lahan[{{ $index }}][tanggal_selesai]"
+                                    class="form-control text-kecil"
+                                    value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
+                            </div>
                         </div>
 
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Tahun Tanam</label>
-                            <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil choices-select">
-                                <option value="" disabled hidden>Pilih Tahun Tanam</option>
-                                @foreach ($tahun_tanam as $t)
-                                    <option value="{{ $t->id_tahun_tanam }}"
-                                        {{ $selectedDetail->lahan->id_tahun_tanam == $t->id_tahun_tanam ? 'selected' : '' }}>
-                                        {{ $t->tahun }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        {{-- FILE UPLOAD --}}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">File Scan SHM (PDF)</label>
+                                <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
+                                    class="form-control text-kecil" accept="application/pdf">
+                                @if ($detail->pdf_scan_shm)
+                                    <small class="text-muted">
+                                        File saat ini:
+                                        <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}" target="_blank">Lihat
+                                            PDF</a>
+                                    </small>
+                                @endif
+                            </div>
 
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Kode</label>
-                            <input type="text" name="lahan[0][kode_lahan]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->kode_lahan }}">
-                        </div>
-
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                            <input type="number" step="0.01" name="lahan[0][luas_peta]"
-                                class="form-control text-kecil" value="{{ $selectedDetail->lahan->luas_peta }}">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">File Scan Peta (PDF)</label>
+                                <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
+                                    class="form-control text-kecil" accept="application/pdf">
+                                @if ($detail->pdf_scan_peta)
+                                    <small class="text-muted">
+                                        File saat ini:
+                                        <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}" target="_blank">Lihat
+                                            PDF</a>
+                                    </small>
+                                @endif
+                            </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nomor SHM</label>
-                            <input type="text" name="lahan[0][nomor_SHM]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nomor_SHM }}">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nama Sesuai SHM</label>
-                            <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nama_SHM }}">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nomor Kavling</label>
-                            <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nomor_kavling }}">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nomor Sporadik</label>
-                            <input type="text" name="lahan[0][nomor_sporadik]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nomor_sporadik }}">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nama Sesuai Sporadik</label>
-                            <input type="text" name="lahan[0][nama_sporadik]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nama_sporadik }}">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Luas Sesuai Surat (M²)</label>
-                            <input type="number" step="0.01" name="lahan[0][luas_surat]"
-                                class="form-control text-kecil" value="{{ $selectedDetail->luas_surat }}">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nomor PBB</label>
-                            <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->nomor_pbb }}">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Jumlah PBB (Rp)</label>
-                            <input type="number" step="0.01" name="lahan[0][jumlah_pbb]"
-                                class="form-control text-kecil" value="{{ $selectedDetail->jumlah_pbb }}">
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Status Kepemilikan</label>
-                            <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil choices-select">
-                                <option value="aktif"
-                                    {{ $selectedDetail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
-                                </option>
-                                <option value="nonaktif"
-                                    {{ $selectedDetail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Tanggal Mulai</label>
-                            <input type="date" name="lahan[0][tanggal_mulai]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->tanggal_mulai ? date('Y-m-d', strtotime($selectedDetail->tanggal_mulai)) : '' }}">
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Tanggal Selesai</label>
-                            <input type="date" name="lahan[0][tanggal_selesai]" class="form-control text-kecil"
-                                value="{{ $selectedDetail->tanggal_selesai ? date('Y-m-d', strtotime($selectedDetail->tanggal_selesai)) : '' }}">
-                        </div>
-                    </div>
-
-                    {{-- FILE UPLOAD --}}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">File Scan SHM (PDF)</label>
-                            <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control text-kecil"
-                                accept="application/pdf">
-                            @if ($selectedDetail->pdf_scan_shm)
-                                <small class="text-muted">
-                                    File saat ini:
-                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_shm) }}"
-                                        target="_blank">Lihat PDF</a>
-                                </small>
-                            @endif
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">File Scan Peta (PDF)</label>
-                            <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control text-kecil"
-                                accept="application/pdf">
-                            @if ($selectedDetail->pdf_scan_peta)
-                                <small class="text-muted">
-                                    File saat ini:
-                                    <a href="{{ asset('storage/' . $selectedDetail->pdf_scan_peta) }}"
-                                        target="_blank">Lihat PDF</a>
-                                </small>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
+
 
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-success me-2">Perbarui</button>

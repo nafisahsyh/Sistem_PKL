@@ -81,21 +81,12 @@
                     <tbody>
                         @forelse ($kepemilikan as $index => $k)
                             @php
-                                $detailList = $k->detailKepemilikan->map(
-                                    fn($d) => [
-                                        'desa' => $d->lahan->desa->desa ?? '-',
-                                        'tahun' => $d->lahan->tahunTanam->tahun ?? '-',
-                                        'id_lahan' => $d->id_lahan,
-                                        'status_kepemilikan' => $d->status_kepemilikan,
-                                        'kode_lahan' => $d->kode_lahan ??'-',
-                                    ],
+                                // Group detail berdasarkan desa dan tahun tanam
+                                $grouped = $k->detailKepemilikan->groupBy(
+                                    fn($d) => ($d->lahan->desa->desa ?? '-') .
+                                        '-' .
+                                        ($d->lahan->tahunTanam->tahun ?? '-'),
                                 );
-
-                                if ($isNormalMode) {
-                                    $detailList = $detailList
-                                        ->unique(fn($item) => $item['desa'] . $item['tahun'])
-                                        ->values();
-                                }
 
                                 $rowNumber =
                                     $loop->iteration +
@@ -104,103 +95,114 @@
                                         : 0);
                             @endphp
 
-                            @foreach ($detailList as $i => $detail)
-                                <tr>
-                                    {{-- Mode normal --}}
-                                    @if ($isNormalMode && $i == 0)
-                                        <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
-                                            {{ $rowNumber }}
-                                        </td>
-                                        <td class="align-middle" rowspan="{{ $detailList->count() }}">
-                                            {{ $k->petani->nomor_anggota_plasma ?? '-' }}
-                                        </td>
-                                        <td class="align-middle" rowspan="{{ $detailList->count() }}">
-                                            {{ $k->petani->nomor_anggota_koperasi ?? '-' }}
-                                        </td>
-                                        <td class="align-middle" rowspan="{{ $detailList->count() }}">
-                                            {{ $k->petani->nama ?? '-' }}
-                                        </td>
-                                        <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
-                                            <span
-                                                class="badge {{ $k->petani->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ ucfirst($k->petani->status) }}
-                                            </span>
-                                        </td>
+                            @php $firstRow = true; @endphp
+                            @foreach ($grouped as $group)
+                                @foreach ($group as $i => $detail)
+                                    <tr>
+                                        {{-- tampilkan kolom petani hanya di baris pertama --}}
+                                        @if ($firstRow)
+                                            <td class="text-center align-middle"
+                                                rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                {{ $rowNumber }}
+                                            </td>
+                                            <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                {{ $k->petani->nomor_anggota_plasma ?? '-' }}
+                                            </td>
+                                            <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                {{ $k->petani->nomor_anggota_koperasi ?? '-' }}
+                                            </td>
+                                            <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                {{ $k->petani->nama ?? '-' }}
+                                            </td>
+                                            <td class="text-center align-middle"
+                                                rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                <span
+                                                    class="badge {{ $k->petani->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                                    {{ ucfirst($k->petani->status) }}
+                                                </span>
+                                            </td>
+                                        @endif
 
-                                        {{-- Mode per lahan --}}
-                                    @elseif ($isPerLahanMode)
-                                        <td class="text-center align-middle">{{ $rowNumber }}</td>
-                                        <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
-                                        <td>{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
-                                        <td>{{ $k->petani->nama ?? '-' }}</td>
-                                        <td class="text-center">
-                                            <span
-                                                class="badge {{ $detail['status_kepemilikan'] === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ ucfirst($detail['status_kepemilikan']) }}
-                                            </span>
-                                        </td>
-                                    @endif
+                                        {{-- kolom desa & tahun (gabung kalau sama) --}}
+                                        @if ($i === 0)
+                                            <td class="align-middle text-center" rowspan="{{ count($group) }}">
+                                                {{ $detail->lahan->desa->desa ?? '-' }}
+                                            </td>
+                                            <td class="align-middle text-center" rowspan="{{ count($group) }}">
+                                                {{ $detail->lahan->tahunTanam->tahun ?? '-' }}
+                                            </td>
+                                        @endif
 
-                                    <td>{{ $detail['desa'] }}</td>
-                                    <td class="text-center">{{ $detail['tahun'] }}</td>
-                                    <td class="text-center">{{ $detail['kode_lahan'] }}</td>
+                                        {{-- kolom kode lahan, tampil tiap baris --}}
+                                        <td class="text-center">{{ $detail->kode_lahan ?? '-' }}</td>
 
-                                    {{-- Tombol Aksi --}}
-                                    @if ($isNormalMode && $i == 0)
-                                        <td class="text-center align-middle" rowspan="{{ $detailList->count() }}">
-                                            <a href="{{ route('kepemilikan.show', $k->id_kepemilikan) }}"
-                                                class="btn btn-info btn-sm" title="Detail">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('kepemilikan.edit', $k->id_kepemilikan) }}"
-                                                class="btn btn-warning btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
-                                                method="POST" class="d-inline delete-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-danger btn-sm btn-delete"
-                                                    title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    @elseif ($isPerLahanMode)
-                                        <td class="text-center align-middle">
-                                            <a href="{{ route('kepemilikan.showPerLahan', [
-                                                'id_kepemilikan' => $k->id_kepemilikan,
-                                                'id_lahan' => $detail['id_lahan'],
-                                                'search' => request('search'),
-                                                'desa' => request('desa'),
-                                                'tahun' => request('tahun'),
-                                            ]) }}"
-                                                class="btn btn-info btn-sm" title="Detail">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('kepemilikan.editPerLahan', [
-                                                'id_kepemilikan' => $k->id_kepemilikan,
-                                                'id_lahan' => $detail['id_lahan'],
-                                                'search' => request('search'),
-                                                'desa' => request('desa'),
-                                                'tahun' => request('tahun'),
-                                            ]) }}"
-                                                class="btn btn-warning btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form
-                                                action="{{ route('kepemilikan.destroyPerLahan', ['id_kepemilikan' => $k->id_kepemilikan, 'id_lahan' => $detail['id_lahan']]) }}"
-                                                method="POST" class="d-inline delete-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-danger btn-sm btn-delete"
-                                                    title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    @endif
-                                </tr>
+                                        {{-- tombol aksi tampil sekali di baris pertama petani --}}
+                                        @if ($firstRow)
+                                            <td class="text-center align-middle"
+                                                rowspan="{{ $k->detailKepemilikan->count() }}">
+                                                @if (request()->filled('desa') || request()->filled('tahun'))
+                                                    {{-- Kalau ada filter aktif → pakai route per lahan --}}
+                                                    @if (isset($detail) && $detail->lahan)
+                                                        <a href="{{ route('kepemilikan.showPerLahan', [
+                                                            'id_kepemilikan' => $k->id_kepemilikan,
+                                                            'id_lahan' => $detail->lahan->id_lahan,
+                                                            'search' => $search,
+                                                            'desa' => $desa,
+                                                            'tahun' => $tahun,
+                                                        ]) }}"
+                                                            class="btn btn-info btn-sm">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+
+                                                        <a href="{{ route('kepemilikan.editPerLahan', [
+                                                            'id_kepemilikan' => $k->id_kepemilikan,
+                                                            'id_lahan' => $detail->lahan->id_lahan,
+                                                            'search' => $search,
+                                                            'desa' => $desa,
+                                                            'tahun' => $tahun,
+                                                        ]) }}"
+                                                            class="btn btn-warning btn-sm" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+
+                                                        <form
+                                                            action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
+                                                            method="POST" class="d-inline"
+                                                            onsubmit="return confirm('Apakah kamu yakin ingin menghapus data kepemilikan ini?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                title="Hapus">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                @else
+                                                    {{-- Kalau tidak ada filter → pakai route normal --}}
+                                                    <a href="{{ route('kepemilikan.show', ['kepemilikan' => $k->id_kepemilikan]) }}"
+                                                        class="btn btn-info btn-sm" title="Detail">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    <a href="{{ route('kepemilikan.edit', ['kepemilikan' => $k->id_kepemilikan]) }}"
+                                                        class="btn btn-warning btn-sm" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+
+                                                    <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
+                                                        method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Apakah kamu yakin ingin menghapus data kepemilikan ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </td>
+                                            @php $firstRow = false; @endphp
+                                        @endif
+                                @endforeach
                             @endforeach
                         @empty
                             <tr>
