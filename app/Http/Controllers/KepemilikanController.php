@@ -99,7 +99,7 @@ class KepemilikanController extends Controller
             });
 
         }
-        
+
         // Filter ulang data berdasarkan dropdown (desa & tahun)
         $kepemilikan->getCollection()->transform(function ($item) use ($request) {
             $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request) {
@@ -825,7 +825,11 @@ class KepemilikanController extends Controller
         });
 
         //Ambil hasil akhir
-        $kepemilikan = $query->get();
+        $kepemilikan = $query
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->orderBy('petani.nomor_anggota_plasma', 'asc')
+            ->select('kepemilikan.*')
+            ->get();
 
         if ($kepemilikan->isEmpty()) {
             return back()->with('error', 'Tidak ada data yang cocok dengan filter atau pencarian.');
