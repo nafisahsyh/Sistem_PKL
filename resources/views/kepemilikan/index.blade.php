@@ -166,12 +166,14 @@
                                                         </a>
 
                                                         <form
-                                                            action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
-                                                            method="POST" class="d-inline"
-                                                            onsubmit="return confirm('Apakah kamu yakin ingin menghapus data kepemilikan ini?')">
+                                                            action="{{ route('kepemilikan.destroyPerLahan', [
+                                                                'id_kepemilikan' => $k->id_kepemilikan,
+                                                                'id_lahan' => $detail->lahan->id_lahan,
+                                                            ]) }}"
+                                                            method="POST" class="d-inline delete-form">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                            <button type="button" class="btn btn-danger btn-sm btn-delete"
                                                                 title="Hapus">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
@@ -179,22 +181,32 @@
                                                     @endif
                                                 @else
                                                     {{-- Kalau tidak ada filter → pakai route normal --}}
-                                                    <a href="{{ route('kepemilikan.show', ['kepemilikan' => $k->id_kepemilikan]) }}"
+                                                    <a href="{{ route('kepemilikan.show', [
+                                                        'kepemilikan' => $k->id_kepemilikan,
+                                                        'search' => $search,
+                                                        'desa' => $desa,
+                                                        'tahun' => $tahun,
+                                                    ]) }}"
                                                         class="btn btn-info btn-sm" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
 
-                                                    <a href="{{ route('kepemilikan.edit', ['kepemilikan' => $k->id_kepemilikan]) }}"
+                                                    <a href="{{ route('kepemilikan.edit', [
+                                                        'kepemilikan' => $k->id_kepemilikan,
+                                                        'search' => $search,
+                                                        'desa' => $desa,
+                                                        'tahun' => $tahun,
+                                                    ]) }}"
                                                         class="btn btn-warning btn-sm" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
 
                                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
-                                                        method="POST" class="d-inline"
-                                                        onsubmit="return confirm('Apakah kamu yakin ingin menghapus data kepemilikan ini?')">
+                                                        method="POST" class="d-inline delete-form">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                        <button type="button" class="btn btn-danger btn-sm btn-delete"
+                                                            title="Hapus">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>

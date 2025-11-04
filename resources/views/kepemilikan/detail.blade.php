@@ -7,7 +7,12 @@
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">
             {{-- Tombol Kembali sebagai icon saja --}}
-            <a href="{{ route('kepemilikan.index') }}" class="btn btn-success p-2">
+            <a href="{{ route('kepemilikan.index', [
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 

@@ -5,7 +5,21 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h4 class="mt-4 text-brown">Edit Data Kepemilikan</h4>
+        {{-- button back --}}
+        <div class="d-flex align-items-center mb-3">
+            {{-- Tombol Back --}}
+            <a href="{{ route('kepemilikan.index', [
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                class="btn btn-success p-2" title="Kembali ke Data Kepemilikan">
+                <i class="fas fa-chevron-left fa-lg"></i>
+            </a>
+
+            {{-- Judul Halaman --}}
+            <h4 class="text-brown mb-0 ms-3">Edit Data Kepemilikan</h4>
+        </div>
 
         {{-- ALERT PESAN --}}
         @if (session('success'))
@@ -120,6 +134,8 @@
                             <input type="hidden" name="lahan[{{ $index }}][id_lahan]"
                                 value="{{ $detail->lahan->id_lahan }}">
 
+                            <input type="hidden" name="lahan[{{ $index }}][hapus]" value="0">
+
                             {{-- Tombol hapus & ganti kepemilikan --}}
                             <div class="d-flex justify-content-end mb-2">
                                 @if (count($kepemilikan->detailKepemilikan) > 1)
@@ -141,7 +157,8 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Desa</label>
-                                    <select name="lahan[{{ $index }}][id_desa]" class="form-select text-kecil choices-select">
+                                    <select name="lahan[{{ $index }}][id_desa]"
+                                        class="form-select text-kecil choices-select">
                                         <option value="" disabled hidden>Pilih Desa</option>
                                         @foreach ($desa as $d)
                                             <option value="{{ $d->id_desa }}"
@@ -543,11 +560,21 @@
                 };
 
                 container.addEventListener('click', function(e) {
-                    if (e.target.closest('.btn-hapus-lahan')) {
-                        e.target.closest('.lahan-item').remove();
-                        updateIndices();
-                        updateHapusTombol();
-                    }
+                    const btn = e.target.closest('.btn-hapus-lahan');
+                    if (!btn) return;
+
+                    const item = btn.closest('.lahan-item');
+
+                    // Tandai hidden input 'hapus' jadi 1
+                    const hapusInput = item.querySelector('input[name*="[hapus]"]');
+                    if (hapusInput) hapusInput.value = 1;
+
+                    // Sembunyikan dari user
+                    item.style.display = 'none';
+
+                    // Update index & tombol hapus seperti biasa
+                    updateIndices();
+                    updateHapusTombol();
                 });
 
                 function updateIndices() {

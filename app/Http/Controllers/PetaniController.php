@@ -237,13 +237,4 @@ class PetaniController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
-
-    public function kepemilikanAktif()
-    {
-        return $this->hasMany(Kepemilikan::class, 'id_petani')
-                    ->whereHas('detailKepemilikan', function($q) {
-                        $q->where('status_kepemilikan', 'aktif');
-                    });
-    }
-
 }

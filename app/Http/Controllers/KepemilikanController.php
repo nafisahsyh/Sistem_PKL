@@ -85,17 +85,21 @@ class KepemilikanController extends Controller
                     $tahun = strtolower($detail->lahan->tahunTanam->tahun ?? '');
                     $kodeLahan = strtolower($detail->kode_lahan ?? '');
                     $namaPetani = strtolower($detail->kepemilikan->petani->nama ?? '');
+                    $nomorPlasma = strtolower($detail->kepemilikan->petani->nomor_anggota_plasma ?? '');
+                    $nomorKoperasi = strtolower($detail->kepemilikan->petani->nomor_anggota_koperasi ?? '');
 
                     return str_contains($desa, $search)
                         || str_contains($tahun, $search)
                         || str_contains($kodeLahan, $search)
-                        || str_contains($namaPetani, $search);
+                        || str_contains($namaPetani, $search)
+                        || str_contains($nomorPlasma, $search)
+                        || str_contains($nomorKoperasi, $search);
                 })->values();
                 return $item;
             });
 
         }
-
+        
         // Filter ulang data berdasarkan dropdown (desa & tahun)
         $kepemilikan->getCollection()->transform(function ($item) use ($request) {
             $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request) {
@@ -496,6 +500,14 @@ class KepemilikanController extends Controller
             ]);
 
             foreach ($request->lahan as $index => $lahanData) {
+                // jika lahan ditandai dihapus
+                if (isset($lahanData['hapus']) && $lahanData['hapus'] == 1) {
+                    if (!empty($lahanData['id_detail_kepemilikan'])) {
+                        DetailKepemilikan::destroy($lahanData['id_detail_kepemilikan']);
+                    }
+                    continue; // lewati update lainnya
+                }
+
                 // cari detail kepemilikan lama
                 $detail = DetailKepemilikan::find($lahanData['id_detail_kepemilikan'] ?? null);
 
@@ -930,8 +942,8 @@ class KepemilikanController extends Controller
                 'status' => 'belum',
             ]);
         }
-        
-         $detail->load('pbb');
+
+        $detail->load('pbb');
 
         return back()->with('success', 'PBB tahun ' . $tahunDepan . ' berhasil dibuat atau diperbarui.');
     }

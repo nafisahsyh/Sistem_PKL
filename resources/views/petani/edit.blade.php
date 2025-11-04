@@ -17,7 +17,8 @@
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             id="nomor_anggota_plasma" name="nomor_anggota_plasma"
-                            value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}" required>
+                            value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}" 
+                            placeholder="Masukkan nomor plasma" required>
                         @error('nomor_anggota_plasma')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -28,7 +29,8 @@
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
                             id="nomor_anggota_koperasi" name="nomor_anggota_koperasi"
-                            value="{{ old('nomor_anggota_koperasi', $petani->nomor_anggota_koperasi) }}">
+                            value="{{ old('nomor_anggota_koperasi', $petani->nomor_anggota_koperasi) }}"
+                            placeholder="Masukkan nomor koperasi">
                         @error('nomor_anggota_koperasi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -39,7 +41,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="NIK" class="form-label">NIK</label>
                         <input type="text" class="form-control text-kecil @error('NIK') is-invalid @enderror"
-                            id="NIK" name="NIK" value="{{ old('NIK', $petani->NIK) }}" maxlength="16">
+                            id="NIK" name="NIK" value="{{ old('NIK', $petani->NIK) }}" maxlength="16"
+                            placeholder="Masukkan NIK">
                         @error('NIK')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -48,7 +51,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="nama" class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
-                            id="nama" name="nama" value="{{ old('nama', $petani->nama) }}" required>
+                            id="nama" name="nama" value="{{ old('nama', $petani->nama) }}" 
+                            placeholder="Masukan nama lengkap" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
