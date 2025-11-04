@@ -68,4 +68,12 @@ class Petani extends Model
             }
         });
     }
+
+    public function kepemilikanAktif()
+    {
+        return $this->hasMany(Kepemilikan::class, 'id_petani', 'id_petani')
+                    ->whereHas('detailKepemilikan', function($q) {
+                        $q->where('status_kepemilikan', 'aktif');
+                    });
+    }
 }

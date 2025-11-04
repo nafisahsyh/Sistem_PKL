@@ -28,7 +28,7 @@
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_koperasi') is-invalid @enderror"
                             id="nomor_anggota_koperasi" name="nomor_anggota_koperasi"
-                            value="{{ old('nomor_anggota_koperasi', $petani->nomor_anggota_koperasi) }}" required>
+                            value="{{ old('nomor_anggota_koperasi', $petani->nomor_anggota_koperasi) }}">
                         @error('nomor_anggota_koperasi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -39,7 +39,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="NIK" class="form-label">NIK</label>
                         <input type="text" class="form-control text-kecil @error('NIK') is-invalid @enderror"
-                            id="NIK" name="NIK" value="{{ old('NIK', $petani->NIK) }}" maxlength="16" required>
+                            id="NIK" name="NIK" value="{{ old('NIK', $petani->NIK) }}" maxlength="16">
                         @error('NIK')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

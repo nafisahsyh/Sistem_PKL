@@ -30,11 +30,15 @@ class KepemilikanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Kepemilikan::with([
-            'petani.desa.kecamatan',
-            'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahunTanam'
-        ]);
+        $query = Kepemilikan::select('kepemilikan.*')
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->with([
+                'petani.desa.kecamatan',
+                'detailKepemilikan.lahan.desa.kecamatan',
+                'detailKepemilikan.lahan.tahunTanam'
+            ])
+            ->orderBy('petani.nomor_anggota_plasma', 'asc');
+
 
         $search = strtolower($request->search ?? '');
 

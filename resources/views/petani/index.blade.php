@@ -48,12 +48,21 @@
                                 <td class="text-center">
                                     {{ ($petani->currentPage() - 1) * $petani->perPage() + $loop->iteration }}</td>
                                 <td>{{ $p->nomor_anggota_plasma ?? '—' }}</td>
-                                <td>{{ $p->nomor_anggota_koperasi ?? '—' }}</td>
-                                <td>{{ $p->NIK ?? '—' }}</td>
+                                <td class="text-center">{{ $p->nomor_anggota_koperasi ?: '—' }}</td>
+                                <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td>{{ $p->nama ?? '—' }}</td>
                                 <td class="text-center">
-                                    <span class="badge {{ $p->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                        {{ ucfirst($p->status) }}
+                                    @php
+                                        if ($p->status === 'aktif') {
+                                            $label = 'Aktif';
+                                            $badgeClass = 'bg-success';
+                                        } else {
+                                            $label = 'Tidak Aktif';
+                                            $badgeClass = 'bg-danger';
+                                        }
+                                    @endphp
+                                    <span class="badge {{ $badgeClass }}">
+                                        {{ $label }}
                                     </span>
                                 </td>
                                 <td class="text-center">
@@ -79,13 +88,12 @@
                                 <td class="text-center"
                                     style="width: {{ $p->kepemilikan_count == 0 ? '180px' : '150px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
-                                    @if ($p->kepemilikan_count == 0)
+                                    @if ($p->kepemilikanAktif()->count() == 0)
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
                                             class="btn btn-success btn-sm me-1" title="Tambah Kepemilikan">
                                             <i class="fas fa-plus"></i>
                                         </a>
                                     @endif
-
                                     <a href="{{ route('petani.edit', $p->id_petani) }}" class="btn btn-warning btn-sm"
                                         title="Edit">
                                         <i class="fas fa-edit"></i>

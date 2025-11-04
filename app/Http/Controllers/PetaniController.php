@@ -28,7 +28,7 @@ class PetaniController extends Controller
             });
         }
 
-        $petani = $query->orderBy('nama')->paginate(10);
+        $petani = $query->orderBy('id_petani', 'desc')->paginate(10);
         return view('petani.index', compact('petani'));
     }
 
@@ -237,4 +237,13 @@ class PetaniController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
+
+    public function kepemilikanAktif()
+    {
+        return $this->hasMany(Kepemilikan::class, 'id_petani')
+                    ->whereHas('detailKepemilikan', function($q) {
+                        $q->where('status_kepemilikan', 'aktif');
+                    });
+    }
+
 }

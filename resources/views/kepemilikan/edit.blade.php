@@ -37,7 +37,7 @@
                 <div class="row">
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Nomor Plasma</label>
-                        <select id="id_petani" name="id_petani" class="form-select text-kecil"
+                        <select id="id_petani" name="id_petani" class="form-select text-kecil choices-select"
                             onchange="tampilDataPetani()">
                             <option value="" disabled hidden>Pilih Nomor Plasma</option>
                             @foreach ($petani as $p)
@@ -141,7 +141,7 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Desa</label>
-                                    <select name="lahan[{{ $index }}][id_desa]" class="form-select text-kecil">
+                                    <select name="lahan[{{ $index }}][id_desa]" class="form-select text-kecil choices-select">
                                         <option value="" disabled hidden>Pilih Desa</option>
                                         @foreach ($desa as $d)
                                             <option value="{{ $d->id_desa }}"
@@ -154,7 +154,7 @@
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Tahun Tanam</label>
                                     <select name="lahan[{{ $index }}][id_tahun_tanam]"
-                                        class="form-select text-kecil">
+                                        class="form-select text-kecil choices-select">
                                         <option value="" disabled hidden>Pilih Tahun Tanam</option>
                                         @foreach ($tahun_tanam as $t)
                                             <option value="{{ $t->id_tahun_tanam }}"
@@ -233,7 +233,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
                                     <select name="lahan[{{ $index }}][status_kepemilikan]"
-                                        class="form-select text-kecil">
+                                        class="form-select text-kecil choices-select">
                                         <option value="aktif"
                                             {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
                                         </option>
@@ -333,12 +333,12 @@
                             {{-- MODE: PETANI LAMA --}}
                             <div id="petaniLama" class="mb-3">
                                 <label class="form-label">Pilih Petani Baru (dari Data Lama)</label>
-                                <select id="selectPetaniLama" name="id_petani_baru" class="form-select">
-                                    <option value="" selected disabled>Pilih Petani</option>
+                                <select id="selectPetaniLama" name="id_petani_baru" class="form-select choices-select">
                                     @foreach ($petani as $p)
                                         @if ($p->id_petani != $kepemilikan->id_petani)
                                             <option value="{{ $p->id_petani }}">{{ $p->nomor_anggota_plasma }}
-                                                ({{ $p->nama }})</option>
+                                                ({{ $p->nama }})
+                                            </option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -410,17 +410,16 @@
         </div>
 
 
-        {{-- ================== SCRIPT ================== --}}
         <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
                 // ================== INIT CHOICES UNTUK SEMUA SELECT ==================
-                function initChoices(context = document) {
-                    context.querySelectorAll('select.form-select').forEach(select => {
+                function initChoices(context = document, searchEnabled = false) {
+                    context.querySelectorAll('select.form-select select.choices-select').forEach(select => {
                         if (!select.dataset.choicesInitialized) {
                             new Choices(select, {
-                                searchEnabled: false,
+                                searchEnabled: searchEnabled,
                                 shouldSort: false,
                                 itemSelectText: '',
                                 allowHTML: true,
@@ -430,8 +429,7 @@
                         }
                     });
                 }
-                initChoices();
-
+                initChoices(); // init semua select utama
 
                 // ================== TAMBAH / HAPUS LAHAN ==================
                 let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
@@ -540,15 +538,13 @@
 
                     container.appendChild(lahanBaru);
                     lahanIndex++;
-                    initChoices(lahanBaru);
+                    initChoices(lahanBaru); // init select Choices di lahan baru
                     updateHapusTombol();
                 };
 
-                // Hapus Lahan
                 container.addEventListener('click', function(e) {
                     if (e.target.closest('.btn-hapus-lahan')) {
-                        const item = e.target.closest('.lahan-item');
-                        item.remove();
+                        e.target.closest('.lahan-item').remove();
                         updateIndices();
                         updateHapusTombol();
                     }
@@ -576,16 +572,10 @@
                 window.setLahanId = function(id) {
                     const inputLahan = document.getElementById('id_lahan_modal');
                     const form = document.getElementById('formGantiKepemilikan');
-
                     inputLahan.value = id;
-
-                    const baseAction =
-                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}";
-                    form.action = baseAction.replace(':id', id);
-
-                    form.method = 'POST';
-                    const methodField = form.querySelector('input[name="_method"]');
-                    if (methodField) methodField.remove();
+                    form.action =
+                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}"
+                        .replace(':id', id);
                 };
 
                 // ================== TOGGLE PETANI LAMA / BARU ==================
@@ -598,41 +588,37 @@
                     petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
                 }
 
-                // Default
+                // Default dan event listener
                 modeSelect.value = 'lama';
                 toggleMode('lama');
-
                 modeSelect.addEventListener('change', function() {
                     toggleMode(this.value);
                 });
 
-                const gantiPemilikModal = document.getElementById('gantiPemilikModal');
-
-                gantiPemilikModal.addEventListener('shown.bs.modal', function() {
-                    const selectPetaniLama = document.getElementById('selectPetaniLama');
-                    const selectPetaniBaru = document.getElementById('selectPetaniBaru');
-
-                    [selectPetaniLama, selectPetaniBaru].forEach(sel => {
-                        if (!sel) return;
-
-                        // Hapus instance lama
-                        if (sel.choices) sel.choices.destroy();
-
-                        // Buat instance baru
-                        sel.choices = new Choices(sel, {
-                            searchEnabled: sel.id ===
-                            'selectPetaniLama', // search cuma untuk petani lama
-                            placeholder: true,
-                            placeholderValue: sel.id === 'selectPetaniLama' ? 'Pilih Petani' :
-                                '',
-                            searchPlaceholderValue: 'Cari petani...',
-                            shouldSort: false,
-                            itemSelectText: '',
-                            allowHTML: true,
-                            position: 'auto'
+                // ================== INIT CHOICES UNTUK SELECT MODAL ==================
+                // Pastikan ini di luar semua DOMContentLoaded lain
+                const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
+                if (modalGantiKepemilikan) {
+                    modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
+                        const allSelects = document.querySelectorAll('select.form-select.choices-select');
+                        allSelects.forEach(select => {
+                            if (!select.classList.contains('choices-initialized')) {
+                                new Choices(select, {
+                                    searchEnabled: select.id ===
+                                        'selectPetaniLama', // search cuma aktif untuk petani lama
+                                    placeholder: true,
+                                    placeholderValue: 'Pilih Petani',
+                                    searchPlaceholderValue: 'Cari petani...',
+                                    shouldSort: false,
+                                    itemSelectText: '',
+                                    allowHTML: true
+                                });
+                                select.classList.add('choices-initialized');
+                            }
                         });
                     });
-                });
+                }
+
             });
         </script>
 
