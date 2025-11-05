@@ -346,7 +346,7 @@
                             {{-- MODE PILIHAN --}}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Mode</label>
-                                <select name="mode" class="form-select choices-select" id="modeSelect" required>
+                                <select name="mode" class="form-select choices-modal" id="modeSelect" required>
                                     <option value="" disabled selected hidden>Pilih Mode</option>
                                     <option value="lama">Gunakan Petani Lama</option>
                                     <option value="baru">Tambah Petani Baru</option>
@@ -356,7 +356,7 @@
                             {{-- MODE: PETANI LAMA --}}
                             <div id="petaniLama" class="mb-3">
                                 <label class="form-label">Pilih Petani Baru (dari Data Lama)</label>
-                                <select id="selectPetaniLama" name="id_petani_baru" class="form-select choices-select">
+                                <select id="selectPetaniLama" name="id_petani_baru" class="form-select choices-modal">
                                     @foreach ($petani as $p)
                                         @if ($p->id_petani != $kepemilikan->id_petani)
                                             <option value="{{ $p->id_petani }}">{{ $p->nomor_anggota_plasma }}
@@ -437,10 +437,10 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                // ================== INIT CHOICES UNTUK SEMUA SELECT ==================
+                // ===== Choices untuk LAHAN UTAMA =====
                 function initChoices(context = document, searchEnabled = false) {
-                    context.querySelectorAll('select.form-select select.choices-select').forEach(select => {
-                        if (!select.dataset.choicesInitialized) {
+                    context.querySelectorAll('select.form-select.choices-select').forEach(select => {
+                        if (!select.classList.contains('choices-main-initialized')) {
                             new Choices(select, {
                                 searchEnabled: searchEnabled,
                                 shouldSort: false,
@@ -448,11 +448,11 @@
                                 allowHTML: true,
                                 position: 'auto'
                             });
-                            select.dataset.choicesInitialized = true;
+                            select.classList.add('choices-main-initialized');
                         }
                     });
                 }
-                initChoices(); // init semua select utama
+                initChoices(document, false);
 
                 // ================== TAMBAH / HAPUS LAHAN ==================
                 let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
@@ -472,7 +472,7 @@
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Desa</label>
-                    <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil">
+                    <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil choices-select">
                         <option value="" disabled selected hidden>Pilih Desa</option>
                         @foreach ($desa as $d)
                             <option value="{{ $d->id_desa }}">{{ $d->desa }}</option>
@@ -481,7 +481,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Tahun Tanam</label>
-                    <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil">
+                    <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil choices-select">
                         <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
                         @foreach ($tahun_tanam as $t)
                             <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
@@ -531,7 +531,7 @@
             <div class="row mt-3">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Status Kepemilikan</label>
-                    <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil">
+                    <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil choices-select">
                         <option value="" disabled hidden>Pilih Status</option>
                         <option value="aktif" selected>Aktif</option>
                         <option value="nonaktif">Nonaktif</option>
@@ -627,30 +627,33 @@
                 modeSelect.addEventListener('change', function() {
                     toggleMode(this.value);
                 });
-
                 // ================== INIT CHOICES UNTUK SELECT MODAL ==================
-                // Pastikan ini di luar semua DOMContentLoaded lain
                 const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
                 if (modalGantiKepemilikan) {
                     modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
-                        const allSelects = document.querySelectorAll('select.form-select.choices-select');
-                        allSelects.forEach(select => {
-                            if (!select.classList.contains('choices-initialized')) {
-                                new Choices(select, {
-                                    searchEnabled: select.id ===
-                                        'selectPetaniLama', // search cuma aktif untuk petani lama
-                                    placeholder: true,
-                                    placeholderValue: 'Pilih Petani',
-                                    searchPlaceholderValue: 'Cari petani...',
-                                    shouldSort: false,
-                                    itemSelectText: '',
-                                    allowHTML: true
-                                });
-                                select.classList.add('choices-initialized');
+                        const modalSelects = modalGantiKepemilikan.querySelectorAll(
+                            'select.choices-modal'
+                        );
+                        modalSelects.forEach(select => {
+                            // destroy instance lama kalau ada
+                            if (select.choices) {
+                                select.choices.destroy();
                             }
+
+                            new Choices(select, {
+                                searchEnabled: select.id ===
+                                'selectPetaniLama', // cuma search untuk petani lama
+                                placeholder: true,
+                                placeholderValue: 'Pilih Petani',
+                                searchPlaceholderValue: 'Cari petani...',
+                                shouldSort: false,
+                                itemSelectText: '',
+                                allowHTML: true
+                            });
                         });
                     });
                 }
+
 
             });
         </script>
