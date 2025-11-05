@@ -86,7 +86,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center"
-                                    style="width: {{ $p->kepemilikan_count == 0 ? '180px' : '150px' }};">
+                                    style="width: {{ $p->kepemilikanAktif()->count() == 0 ? '180px' : '150px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
                                     @if ($p->kepemilikanAktif()->count() == 0)
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"

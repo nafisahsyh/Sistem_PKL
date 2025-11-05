@@ -1032,12 +1032,16 @@ class KepemilikanController extends Controller
             ->orderByDesc('id_riwayat')
             ->get();
 
-        $lahan = Lahan::with('desa.kecamatan')->findOrFail($id_lahan);
+        $lahan = Lahan::with(['detailKepemilikan.kepemilikan.petani', 'desa.kecamatan'])
+            ->findOrFail($id_lahan);
 
-        // Ambil petani terakhir (yang benar-benar sekarang)
+        // Ambil ID Kepemilikan aktif saat ini
+        $id_kepemilikan = $lahan->detailKepemilikan->last()->id_kepemilikan ?? null;
+
+        // Ambil petani terakhir (yang memegang lahan sekarang)
         $petaniSekarang = $riwayat->sortBy('tanggal_ganti')->last()?->petaniSesudah;
 
-        return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan', 'petaniSekarang'));
+        return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan', 'petaniSekarang', 'id_kepemilikan'));
     }
 
 
@@ -1132,6 +1136,32 @@ class KepemilikanController extends Controller
 
         return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
             ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
+    }
+
+    public function updateRiwayat(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal_ganti'     => 'required|date',
+            'keterangan'        => 'nullable|string',
+        ]);
+
+        $riwayat = RiwayatKepemilikan::findOrFail($id);
+
+        $riwayat->update([
+            'tanggal_ganti'     => $request->tanggal_ganti,
+            'keterangan'        => $request->keterangan,
+        ]);
+
+        return back()->with('success', 'Riwayat kepemilikan berhasil diperbarui.');
+    }
+
+
+    // HAPUS RIWAYAT
+    public function deleteRiwayat($id)
+    {
+        RiwayatKepemilikan::findOrFail($id)->delete();
+
+        return back()->with('success', 'Riwayat kepemilikan berhasil dihapus.');
     }
 
 }

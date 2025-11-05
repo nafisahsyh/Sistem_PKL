@@ -84,6 +84,11 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     ->name('kepemilikan.updateKepemilikan');
     Route::get('/kepemilikan/riwayat-lahan/{id_lahan}', [KepemilikanController::class, 'riwayatLahan'])
     ->name('kepemilikan.riwayatLahan');
+    Route::put('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'updateRiwayat'])
+    ->name('riwayat.update');
+    Route::delete('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'deleteRiwayat'])
+    ->name('riwayat.destroy');
+
 });
 
 // hanya super admin
