@@ -75,8 +75,14 @@ class KepemilikanController extends Controller
             });
         }
 
-        $kepemilikan = $query->paginate(10)->appends($request->all());
+        $kepemilikan = $query
+            ->whereHas('detailKepemilikan') // hanya ambil kepemilikan yang masih punya detail
+            ->paginate(10)
+            ->appends($request->all());
 
+        // batasi jumlah link di kiri & kanan
+        $kepemilikan->onEachSide(1); // 1 link di kiri & kanan
+        
         // Logika MERGE hasil search nama/nomor plasma
         if (!empty($search)) {
             $kepemilikan->getCollection()->transform(function ($item) use ($search) {
@@ -563,8 +569,12 @@ class KepemilikanController extends Controller
             }
 
             DB::commit();
+            // Ambil query parameter sebelumnya: page, search, desa, tahun
+            $queryParams = request()->only(['page', 'search', 'desa', 'tahun']);
 
-            return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil diperbarui.');
+            return redirect()->route('kepemilikan.index', $queryParams)
+                ->with('success', 'Data kepemilikan berhasil diperbarui.');
+
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -580,18 +590,17 @@ class KepemilikanController extends Controller
 
         try {
             $kepemilikan = Kepemilikan::findOrFail($id);
-            $detail = DetailKepemilikan::where('id_kepemilikan', $id)->get();
 
-            foreach ($detail as $d) {
-                $d->lahan()->delete();
-                $d->delete();
-            }
+            // Hapus detail kepemilikan, tapi jangan hapus lahan!
+            DetailKepemilikan::where('id_kepemilikan', $id)->delete();
 
+            // Hapus kepemilikan induk
             $kepemilikan->delete();
 
             DB::commit();
 
-            return redirect()->route(route: 'kepemilikan.index')->with('success', 'Data kepemilikan berhasil dihapus.');
+            return redirect()->route('kepemilikan.index')
+                ->with('success', 'Data kepemilikan berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

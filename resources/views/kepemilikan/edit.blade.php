@@ -306,6 +306,12 @@
 
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
 
+
+                {{-- === Tambahkan hidden input untuk page & filter === --}}
+                <input type="hidden" name="page" value="{{ request('page') }}">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <input type="hidden" name="desa" value="{{ request('desa') }}">
+                <input type="hidden" name="tahun" value="{{ request('tahun') }}">
                 {{-- Tombol Perbarui / Batal --}}
                 <div class="text-start mt-3">
                     <button type="submit" class="btn btn-success me-2">Perbarui</button>

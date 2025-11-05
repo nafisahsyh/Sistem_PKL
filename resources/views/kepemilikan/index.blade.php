@@ -190,17 +190,16 @@
                                                         class="btn btn-info btn-sm" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-
                                                     <a href="{{ route('kepemilikan.edit', [
                                                         'kepemilikan' => $k->id_kepemilikan,
-                                                        'search' => $search,
-                                                        'desa' => $desa,
-                                                        'tahun' => $tahun,
+                                                        'page' => request('page'),
+                                                        'search' => request('search'),
+                                                        'desa' => request('desa'),
+                                                        'tahun' => request('tahun'),
                                                     ]) }}"
                                                         class="btn btn-warning btn-sm" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-
                                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
                                                         method="POST" class="d-inline delete-form">
                                                         @csrf
