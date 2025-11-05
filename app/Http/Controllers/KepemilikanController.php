@@ -82,7 +82,7 @@ class KepemilikanController extends Controller
 
         // batasi jumlah link di kiri & kanan
         $kepemilikan->onEachSide(1); // 1 link di kiri & kanan
-        
+
         // Logika MERGE hasil search nama/nomor plasma
         if (!empty($search)) {
             $kepemilikan->getCollection()->transform(function ($item) use ($search) {
@@ -190,7 +190,7 @@ class KepemilikanController extends Controller
             })
             ->get();
 
-        // 🔧 Hapus duplikat jika ada (berdasarkan ID detail)
+        //Hapus duplikat jika ada (berdasarkan ID detail)
         $groupDetails = $groupDetails->unique('id_detail_kepemilikan')->values();
 
         // Pastikan data PBB tahun berjalan tersedia

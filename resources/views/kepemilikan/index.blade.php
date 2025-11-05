@@ -228,7 +228,7 @@
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-end mt-3">
-                    {{ $kepemilikan->links('pagination::bootstrap-5') }}
+                    {{ $kepemilikan->links('vendor.pagination.grouped') }}
                 </div>
             </div>
         </div>

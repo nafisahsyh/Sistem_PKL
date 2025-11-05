@@ -11,13 +11,15 @@
                 @csrf
                 @method('PUT')
 
+                <input type="hidden" name="page" value="{{ $page }}">
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nomor_anggota_plasma" class="form-label">Nomor Plasma</label>
                         <input type="text"
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             id="nomor_anggota_plasma" name="nomor_anggota_plasma"
-                            value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}" 
+                            value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}"
                             placeholder="Masukkan nomor plasma" required>
                         @error('nomor_anggota_plasma')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -51,7 +53,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="nama" class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
-                            id="nama" name="nama" value="{{ old('nama', $petani->nama) }}" 
+                            id="nama" name="nama" value="{{ old('nama', $petani->nama) }}"
                             placeholder="Masukan nama lengkap" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -135,7 +137,7 @@
 
                 <div class="text-start mt-3">
                     <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                    <a href="{{ route('petani.index') }}" class="btn btn-danger">Batal</a>
+                    <a href="{{ route('petani.index', ['page' => $page ?? 1]) }}" class="btn btn-danger">Batal</a>
                 </div>
             </form>
         </div>

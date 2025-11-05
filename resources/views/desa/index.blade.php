@@ -71,7 +71,7 @@
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-end mt-3">
-                    {{ $desa->links('pagination::bootstrap-5') }}
+                    {{ $desa->links('vendor.pagination.grouped') }}
                 </div>
             </div>
 

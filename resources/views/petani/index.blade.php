@@ -94,11 +94,10 @@
                                             <i class="fas fa-plus"></i>
                                         </a>
                                     @endif
-                                    <a href="{{ route('petani.edit', $p->id_petani) }}" class="btn btn-warning btn-sm"
-                                        title="Edit">
+                                    <a href="{{ route('petani.edit', ['petani' => $p->id_petani, 'page' => $petani->currentPage()]) }}"
+                                        class="btn btn-warning btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
                                     <form action="{{ route('petani.destroy', $p->id_petani) }}" method="POST"
                                         class="d-inline delete-form">
                                         @csrf
@@ -122,7 +121,7 @@
                 </table>
 
                 <div class="d-flex justify-content-end mt-3">
-                    {{ $petani->links('pagination::bootstrap-5') }}
+                    {{ $petani->links('vendor.pagination.grouped') }}
                 </div>
             </div>
         </div>

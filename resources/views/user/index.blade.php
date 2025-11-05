@@ -77,7 +77,7 @@
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-end mt-3">
-                    {{ $users->links('pagination::bootstrap-5') }}
+                    {{ $users->links('vendor.pagination.grouped') }}
                 </div>
             </div>
         </div>
