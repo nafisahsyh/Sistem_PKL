@@ -184,7 +184,7 @@ class PetaniController extends Controller
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
-            'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
+            'lahan.*.status_kepemilikan' => 'nullable|in:aktif,nonaktif',
             'lahan.*.tanggal_mulai' => 'nullable|date',
             'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
@@ -224,7 +224,7 @@ class PetaniController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
-                    'status_kepemilikan' => $lahanData['status_kepemilikan'],
+                    'status_kepemilikan' => $lahanData['status_kepemilikan'] ?? 'aktif',
                     'tanggal_mulai' => $lahanData['tanggal_mulai'],
                     'tanggal_selesai' => $lahanData['tanggal_selesai'],
                 ]);

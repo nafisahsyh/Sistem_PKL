@@ -79,11 +79,8 @@
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status"
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
-                            <option value="" disabled selected hidden>Pilih Status</option>
-                            <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="tidak_aktif" {{ old('status') == 'tidak_aktif' ? 'selected' : '' }}>
-                                Tidak Aktif
-                            </option>
+                            <option value="aktif" selected>Aktif</option>
+                            <option value="tidak_aktif">Tidak Aktif</option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
