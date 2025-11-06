@@ -31,6 +31,8 @@ class DashboardController extends Controller
 
         $jumlahPetani = Petani::count();
 
+        $jumlahLahan = Lahan::count();
+
         // Ambil data luas lapangan dan luas surat per desa dan tahun tanam
         $dataLahan = Lahan::select(
             'id_desa',
@@ -62,6 +64,7 @@ class DashboardController extends Controller
             'jumlahDesa',
             'jumlahPengguna',
             'jumlahPetani',
+            'jumlahLahan',
             'chartData'
         ));
     }

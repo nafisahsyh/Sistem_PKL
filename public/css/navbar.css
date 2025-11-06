@@ -146,19 +146,19 @@
 }
 
 .bg-red {
-    background-color: #C8102E !important;
+    background-color: #DB4125 !important;
 }
 
 .bg-yellow {
-    background-color: #C4A000 !important;
+    background-color: #DB9725 !important;
 }
 
 .bg-brown {
-    background-color: #A67C52 !important;
+    background-color: #864E44 !important;
 }
 
 .bg-blue {
-    background-color: #007BFF !important;
+    background-color: #4925DB !important;
 }
 
 /* HOVER */
@@ -609,4 +609,41 @@ input.form-control {
 #modalGantiKepemilikan .modal-body hr {
     border-color: #dcdcdc;
     opacity: 0.7;
+}
+
+.card-footer a {
+    text-decoration: none !important;
+}
+.card-footer a:hover {
+    text-decoration: none !important;
+}
+
+/* Input kotak kecil */
+.goto-input {
+    width: 38px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    text-align: center;
+    border-radius: 6px !important;
+    border: 1px solid #ced4da;
+    font-size: 0.85rem;
+}
+
+/* Hilangkan tombol spinner Chrome / Edge / Opera */
+.goto-input::-webkit-inner-spin-button,
+.goto-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Kecilkan tombol page number */
+.page-link-small {
+    font-size: 0.75rem !important;
+    padding: 3px 8px !important;
+}
+.goto-of-text {
+    margin-left: 10px;   /* tambah jarak ke kiri */
+    margin-right: 10px;  /* tambah jarak ke kanan */
+    font-size: 0.85rem;
+    font-weight: 500;
 }

@@ -124,9 +124,8 @@
                                     min="0">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                                <input type="number" step="0.01" name="lahan[0][luas_peta]"
-                                    class="form-control text-kecil" min="0">
+                                <label class="form-label">Nomor Kavling</label>
+                                <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil">
                             </div>
                         </div>
                         <div class="row">
@@ -139,8 +138,9 @@
                                 <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Nomor Kavling</label>
-                                <input type="text" name="lahan[0][nomor_kavling]" class="form-control text-kecil">
+                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                <input type="number" step="0.01" name="lahan[0][luas_peta]"
+                                    class="form-control text-kecil" min="0">
                             </div>
                         </div>
                         <div class="row">
@@ -264,8 +264,8 @@
                     class="form-control text-kecil" min="0">
             </div>
             <div class="col-md-3 mb-3">
-                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" min="0">
+                <label class="form-label">Nomor Kavling</label>
+                <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
             </div>
         </div>
         <div class="row">
@@ -278,8 +278,8 @@
                 <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
             </div>
             <div class="col-md-4 mb-3">
-                <label class="form-label">Nomor Kavling</label>
-                <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
+                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" min="0">
             </div>
         </div>
         <div class="row">

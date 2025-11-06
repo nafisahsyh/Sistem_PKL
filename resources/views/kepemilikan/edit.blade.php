@@ -188,9 +188,9 @@
                                         class="form-control text-kecil" value="{{ $detail->kode_lahan }}">
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
-                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
+                                    <label class="form-label">Nomor Kavling</label>
+                                    <input type="text" name="lahan[{{ $index }}][nomor_kavling]"
+                                        class="form-control text-kecil" value="{{ $detail->nomor_kavling }}">
                                 </div>
                             </div>
 
@@ -207,9 +207,9 @@
                                         class="form-control text-kecil" value="{{ $detail->nama_SHM }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Nomor Kavling</label>
-                                    <input type="text" name="lahan[{{ $index }}][nomor_kavling]"
-                                        class="form-control text-kecil" value="{{ $detail->nomor_kavling }}">
+                                    <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                    <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
+                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
                                 </div>
                             </div>
 
@@ -494,8 +494,8 @@
                     <input type="text" name="lahan[${lahanIndex}][kode_lahan]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label class="form-label">Luas Lapangan (M²)</label>
-                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
+                    <label class="form-label">Nomor Kavling</label>
+                    <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
                 </div>
             </div>
 
@@ -509,8 +509,8 @@
                     <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Nomor Kavling</label>
-                    <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
+                    <label class="form-label">Luas Lapangan (M²)</label>
+                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
                 </div>
             </div>
 
