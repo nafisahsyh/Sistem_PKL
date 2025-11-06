@@ -179,8 +179,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Tanggal Mulai</label>
-                                <input type="date" name="lahan[0][tanggal_mulai]" class="form-control text-kecil"
-                                    value="{{ date('Y-m-d') }}">
+                                <input type="date" name="lahan[0][tanggal_mulai]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Tanggal Selesai</label>
@@ -316,7 +315,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Tanggal Mulai</label>
-                <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil" value="{{ date('Y-m-d') }}">
+                <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil">
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Tanggal Selesai</label>
