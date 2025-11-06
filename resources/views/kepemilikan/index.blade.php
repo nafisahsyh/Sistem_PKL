@@ -146,6 +146,7 @@
                                                         <a href="{{ route('kepemilikan.showPerLahan', [
                                                             'id_kepemilikan' => $k->id_kepemilikan,
                                                             'id_lahan' => $detail->lahan->id_lahan,
+                                                            'page' => request('page'),
                                                             'search' => $search,
                                                             'desa' => $desa,
                                                             'tahun' => $tahun,
@@ -157,6 +158,7 @@
                                                         <a href="{{ route('kepemilikan.editPerLahan', [
                                                             'id_kepemilikan' => $k->id_kepemilikan,
                                                             'id_lahan' => $detail->lahan->id_lahan,
+                                                            'page' => request('page'),
                                                             'search' => $search,
                                                             'desa' => $desa,
                                                             'tahun' => $tahun,
@@ -183,6 +185,7 @@
                                                     {{-- Kalau tidak ada filter → pakai route normal --}}
                                                     <a href="{{ route('kepemilikan.show', [
                                                         'kepemilikan' => $k->id_kepemilikan,
+                                                        'page' => request('page'),
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,

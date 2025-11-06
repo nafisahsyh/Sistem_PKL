@@ -154,7 +154,7 @@ class KepemilikanController extends Controller
         ]);
     }
 
-    public function showPerLahan($id_kepemilikan, $id_lahan)
+    public function showPerLahan(Request $request, $id_kepemilikan, $id_lahan)
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
@@ -162,6 +162,11 @@ class KepemilikanController extends Controller
             'detailKepemilikan.lahan.tahunTanam',
             'detailKepemilikan.pbb',
         ])->findOrFail($id_kepemilikan);
+
+        $page = $request->page ?? 1;
+        $search = $request->search ?? null;
+        $filterDesa = $request->desa ?? null;
+        $filterTahun = $request->tahun ?? null;
 
         // Ambil detail kepemilikan yang sesuai dengan lahan yang diklik
         $selectedDetail = $kepemilikan->detailKepemilikan->firstWhere('id_lahan', $id_lahan);
@@ -225,6 +230,11 @@ class KepemilikanController extends Controller
             'groupDetails' => $groupDetails,
             'desaTarget' => $desaTarget,
             'tahunTarget' => $tahunTarget,
+            'page' => $request->page,
+            'search' => $request->search,
+            'filterDesa' => $request->desa,
+            'filterTahun' => $request->tahun,
+
         ]);
     }
 
@@ -456,7 +466,7 @@ class KepemilikanController extends Controller
     /**
      * Form edit kepemilikan.
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
@@ -465,6 +475,11 @@ class KepemilikanController extends Controller
                     ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam']);
             }
         ])->findOrFail($id);
+
+        $page = $request->page;
+        $search = $request->search;
+        $desa = $request->desa;
+        $tahun = $request->tahun;
 
         $petani = Petani::with('desa.kecamatan')->get();
         $desa = Desa::with('kecamatan')->get();
@@ -610,7 +625,7 @@ class KepemilikanController extends Controller
     /*
      * function untuk menampilkan detail
      */
-    public function show($id_kepemilikan)
+    public function show(Request $request, $id_kepemilikan)
     {
         $kepemilikan = Kepemilikan::with([
             'petani',
@@ -619,6 +634,11 @@ class KepemilikanController extends Controller
                     ->with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'pbb']);
             }
         ])->findOrFail($id_kepemilikan);
+
+        $page = $request->page;
+        $search = $request->search;
+        $desa = $request->desa;
+        $tahun = $request->tahun;
 
         $tahunSekarang = Carbon::now()->year;
 
@@ -720,24 +740,62 @@ class KepemilikanController extends Controller
 
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
     {
-        $detail = DetailKepemilikan::with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'kepemilikan.petani'])
-            ->where('id_kepemilikan', $id_kepemilikan)
-            ->where('id_detail_kepemilikan', $id_detail)
-            ->firstOrFail();
+        // Ambil detail yang diklik dulu
+        $selectedDetail = DetailKepemilikan::with([
+            'lahan.desa.kecamatan',
+            'lahan.tahunTanam',
+            'kepemilikan.petani',
+            'pbb'
+        ])->findOrFail($id_detail);
 
-        $kepemilikan = $detail->kepemilikan;
+        $kepemilikan = $selectedDetail->kepemilikan;
         $petani = $kepemilikan->petani;
 
-        // Generate PDF utama hanya untuk 1 detail
-        $pdf = Pdf::loadView('kepemilikan.pdf_per_lahan', compact('kepemilikan', 'detail'))
-            ->setPaper('a4', 'portrait');
+        // Tentukan desa & tahun dari lahan yang diklik
+        $desaTarget = $selectedDetail->lahan->desa->desa ?? null;
+        $tahunTarget = $selectedDetail->lahan->tahunTanam->tahun ?? null;
+
+        // Ambil semua detail kepemilikan di desa & tahun yang sama
+        $groupDetails = DetailKepemilikan::with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'pbb'])
+            ->where('id_kepemilikan', $id_kepemilikan)
+            ->whereHas('lahan', function ($q) use ($desaTarget, $tahunTarget) {
+                $q->whereHas('desa', function ($qq) use ($desaTarget) {
+                    $qq->where('desa', $desaTarget);
+                })->whereHas('tahunTanam', function ($qq) use ($tahunTarget) {
+                    $qq->where('tahun', $tahunTarget);
+                });
+            })->get();
+
+        // Pastikan semua detail punya PBB tahun berjalan
+        $tahunSekarang = Carbon::now()->year;
+        foreach ($groupDetails as $detail) {
+            $pbbTahunIni = $detail->pbb->firstWhere('tahun', $tahunSekarang);
+            if (!$pbbTahunIni) {
+                Pbb::create([
+                    'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
+                    'tahun' => $tahunSekarang,
+                    'jumlah' => $detail->jumlah_pbb ?? 0,
+                    'status' => 'belum',
+                ]);
+            }
+        }
+
+        // Refresh relasi pbb
+        $groupDetails->load('pbb');
+
+        // Generate PDF dengan semua detail
+        $pdf = Pdf::loadView('kepemilikan.pdf_per_lahan', [
+            'kepemilikan' => $kepemilikan,
+            'groupDetails' => $groupDetails,
+            'desaTarget' => $desaTarget,
+            'tahunTarget' => $tahunTarget,
+        ])->setPaper('a4', 'portrait');
 
         $pathMain = storage_path('app/public/kepemilikan_per_lahan.pdf');
         $pdf->save($pathMain);
 
+        // Lampiran PDF KTP/KK
         $lampiranFiles = [];
-
-        // KTP & KK Petani
         if ($petani->pdf_scan_ktp && file_exists(storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_ktp))) {
             $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_ktp);
         }
@@ -745,19 +803,19 @@ class KepemilikanController extends Controller
             $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_kk);
         }
 
-        // SHM & PETA hanya untuk lahan ini
-        if ($detail->pdf_scan_shm && file_exists(storage_path('app/public/' . $detail->pdf_scan_shm))) {
-            $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_shm);
+        // Lampiran PDF SHM & Peta untuk semua lahan
+        foreach ($groupDetails as $detail) {
+            if ($detail->pdf_scan_shm && file_exists(storage_path('app/public/' . $detail->pdf_scan_shm))) {
+                $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_shm);
+            }
+            if ($detail->pdf_scan_peta && file_exists(storage_path('app/public/' . $detail->pdf_scan_peta))) {
+                $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_peta);
+            }
         }
 
-        if ($detail->pdf_scan_peta && file_exists(storage_path('app/public/' . $detail->pdf_scan_peta))) {
-            $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_peta);
-        }
-
-        // Gabungkan PDF
+        // Merge PDF seperti sebelumnya
         $pdfMerger = new Fpdi();
         $pageCount = $pdfMerger->setSourceFile($pathMain);
-
         for ($i = 1; $i <= $pageCount; $i++) {
             $tpl = $pdfMerger->importPage($i);
             $size = $pdfMerger->getTemplateSize($tpl);
@@ -770,7 +828,6 @@ class KepemilikanController extends Controller
             for ($i = 1; $i <= $pageCount; $i++) {
                 $tpl = $pdfMerger->importPage($i);
                 $size = $pdfMerger->getTemplateSize($tpl);
-
                 $pdfMerger->AddPage($size['width'] > $size['height'] ? 'L' : 'P', [$size['width'], $size['height']]);
                 $pdfMerger->useTemplate($tpl);
             }
@@ -783,11 +840,8 @@ class KepemilikanController extends Controller
             $finalPath,
             'Kepemilikan '
             . ($petani->nama ?? 'Tanpa Nama')
-            . ' - '
-            . ($detail->lahan->desa->desa ?? 'Lahan')
-            . ' ('
-            . ($detail->lahan->tahunTanam->tahun ?? 'Tahun Tidak Diketahui')
-            . ').pdf'
+            . ' - ' . $desaTarget
+            . ' (' . $tahunTarget . ').pdf'
         );
     }
 
@@ -1150,15 +1204,15 @@ class KepemilikanController extends Controller
     public function updateRiwayat(Request $request, $id)
     {
         $request->validate([
-            'tanggal_ganti'     => 'required|date',
-            'keterangan'        => 'nullable|string',
+            'tanggal_ganti' => 'required|date',
+            'keterangan' => 'nullable|string',
         ]);
 
         $riwayat = RiwayatKepemilikan::findOrFail($id);
 
         $riwayat->update([
-            'tanggal_ganti'     => $request->tanggal_ganti,
-            'keterangan'        => $request->keterangan,
+            'tanggal_ganti' => $request->tanggal_ganti,
+            'keterangan' => $request->keterangan,
         ]);
 
         return back()->with('success', 'Riwayat kepemilikan berhasil diperbarui.');

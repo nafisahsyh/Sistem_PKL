@@ -9,7 +9,7 @@
         h2, h4 { text-align: center; margin: 0; padding: 0; }
         .info { margin-top: 20px; margin-bottom: 10px; font-size: 13px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #000; padding: 5px 7px; text-align: center; }
+        th, td { border: 1px solid #000; padding: 5px 7px; text-align: center; vertical-align: top; }
         th { background-color: #f0f0f0; font-weight: bold; }
         .text-left { text-align: left; }
         .page-break { page-break-after: always; }
@@ -27,11 +27,39 @@
 </div>
 
 @php
-    $chunks = $kepemilikan->chunk(10); // 10 petani per halaman
-    $noGlobal = 1; // nomor urut global antar halaman
+    // Logika pembagian halaman dinamis
+    $pages = [];
+    $temp = collect();
+    $limit = 10; // halaman pertama = 10 petani
+    $count = 0;
+
+    foreach ($kepemilikan as $k) {
+        $temp->push($k);
+        $count++;
+
+        // batas halaman pertama
+        if (count($pages) == 0 && $count == $limit) {
+            $pages[] = $temp;
+            $temp = collect();
+            $count = 0;
+            $limit = 13; // halaman berikutnya mulai 13 petani
+        } 
+        // batas halaman berikutnya
+        elseif (count($pages) > 0 && $count == $limit) {
+            $pages[] = $temp;
+            $temp = collect();
+            $count = 0;
+        }
+    }
+
+    if ($temp->isNotEmpty()) {
+        $pages[] = $temp;
+    }
+
+    $noGlobal = 1;
 @endphp
 
-@foreach ($chunks as $chunkIndex => $chunk)
+@foreach ($pages as $pageIndex => $page)
     <table>
         <thead>
             <tr>
@@ -49,7 +77,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($chunk as $k)
+            @foreach ($page as $k)
                 @php
                     $details = $k->detailKepemilikan->values();
                     $rowspan = $details->count();
@@ -69,7 +97,6 @@
 
                     <tr>
                         @if ($i === 0)
-                            {{-- Rowspan untuk kolom petani --}}
                             <td rowspan="{{ $rowspan }}">{{ $noGlobal++ }}</td>
                             <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_plasma ?? '-'}}</td>
                             <td rowspan="{{ $rowspan }}">{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
@@ -89,7 +116,6 @@
         </tbody>
     </table>
 
-    {{-- Page break kecuali halaman terakhir --}}
     @if (!$loop->last)
         <div class="page-break"></div>
     @endif

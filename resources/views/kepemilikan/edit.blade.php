@@ -9,6 +9,7 @@
         <div class="d-flex align-items-center mb-3">
             {{-- Tombol Back --}}
             <a href="{{ route('kepemilikan.index', [
+                'page' => request('page'),
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
@@ -642,7 +643,7 @@
 
                             new Choices(select, {
                                 searchEnabled: select.id ===
-                                'selectPetaniLama', // cuma search untuk petani lama
+                                    'selectPetaniLama', // cuma search untuk petani lama
                                 placeholder: true,
                                 placeholderValue: 'Pilih Petani',
                                 searchPlaceholderValue: 'Cari petani...',

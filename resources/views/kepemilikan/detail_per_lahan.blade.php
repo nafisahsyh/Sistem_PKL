@@ -8,6 +8,7 @@
         <div class="d-flex align-items-center mb-4 gap-2">
             {{-- Tombol Kembali --}}
             <a href="{{ route('kepemilikan.index', [
+                'page' => request('page'),
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
@@ -47,6 +48,11 @@
                         <tr>
                             <th class="text-normal text-start ps-3">NIK</th>
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->NIK ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-normal text-start ps-3">Telepon</th>
+                            <td class="text-normal-sm text-start ps-3" text-start ps-3>
+                                {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Nomor Anggota Koperasi</th>
@@ -245,7 +251,15 @@
                                     @endif
                                 </td>
                             </tr>
-
+                            <tr>
+                                <th class="text-normal text-start ps-3">Status Lahan</th>
+                                <td class="text-normal-sm text-start ps-3">
+                                    <span
+                                        class="badge {{ $detail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ ucfirst(strtolower($detail->status_kepemilikan)) }}
+                                    </span>
+                                </td>
+                            </tr>
                             <tr>
                                 <th class="text-normal text-start ps-3">Tanggal Mulai</th>
                                 <td class="text-normal-sm text-start ps-3">

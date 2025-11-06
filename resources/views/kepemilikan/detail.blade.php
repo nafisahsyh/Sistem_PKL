@@ -8,6 +8,7 @@
         <div class="d-flex align-items-center mb-4 gap-2">
             {{-- Tombol Kembali sebagai icon saja --}}
             <a href="{{ route('kepemilikan.index', [
+                'page' => request('page'),
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),

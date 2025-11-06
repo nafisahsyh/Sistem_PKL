@@ -91,6 +91,23 @@
         .signature p {
             margin-bottom: 60px;
         }
+
+        .card {
+            border: 1px solid #000;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .card-header {
+            font-weight: bold;
+            text-align: left;
+            border-bottom: 1px solid #000;
+            padding: 5px 8px;
+            background: none;
+            color: #000;
+        }
     </style>
 </head>
 
@@ -158,121 +175,135 @@
     </table>
 
     {{-- Data Lahan --}}
-    <div class="section-title">Data Lahan</div>
-    <table>
-        <tr>
-            <th width="35%">Desa</th>
-            <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Kecamatan</th>
-            <td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Tahun Tanam</th>
-            <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Kode</th>
-            <td>{{ $detail->kode_lahan ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Luas Sesuai Lapangan</th>
-            <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} M²</td>
-        </tr>
-        <tr>
-            <th>Luas Sesuai Surat</th>
-            <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} M²</td>
-        </tr>
-        <tr>
-            <th>Nomor SHM</th>
-            <td>{{ $detail->nomor_SHM ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Nama Berdasarkan SHM</th>
-            <td>{{ $detail->nama_SHM ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Nomor Sporadik</th>
-            <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Nama Berdasarkan Sporadik</th>
-            <td>{{ $detail->nama_sporadik ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Nomor PBB</th>
-            <td>{{ $detail->nomor_pbb ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Jumlah PBB</th>
-            <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Status PBB</th>
-            <td>
-                @php
-                    $tahunSekarang = now()->year;
-                    $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
-                @endphp
-
-                @if ($pbbTahunIni)
-                    <span class="badge {{ $pbbTahunIni->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
-                        {{ ucfirst($pbbTahunIni->status) }}
-                    </span>
-                @else
-                    <span class="text-muted">Belum ada data tahun {{ $tahunSekarang }}</span>
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <th>Status Kepemilikan</th>
-            <td>{{ $detail->status_kepemilikan ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Tanggal Mulai</th>
-            <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
-        </tr>
-        <tr>
-            <th>Tanggal Selesai</th>
-            <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
-            </td>
-        </tr>
-    </table>
-    {{-- Tambahan: Data Riwayat Kepemilikan --}}
-    @php
-        $riwayatList = $detail->lahan->riwayatKepemilikan ?? collect();
-    @endphp
-
-    @if ($riwayatList->isNotEmpty())
-        <div class="section-title">Riwayat Kepemilikan Lahan</div>
-        <table>
+    @foreach ($groupDetails as $detail)
+        <div class="section-title">Data Kepemilikan & Lahan</div>
+        <table class="card">
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Nama Petani Awal</th>
-                    <th>Nama Petani Sekarang</th>
-                    <th>Tanggal Ganti</th>
-                    <th>Keterangan</th>
+                    <th colspan="2" class="card-header">Lahan {{ $loop->iteration }}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($riwayatList as $rIndex => $riwayat)
-                    <tr>
-                        <td>{{ $rIndex + 1 }}</td>
-                        <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
-                        <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
-                        <td>{{ \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') }}</td>
-                        <td>{{ $riwayat->keterangan ?? '-' }}</td>
-                    </tr>
-                @endforeach
+                <tr>
+                    <th width="35%">Desa</th>
+                    <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Kecamatan</th>
+                    <td>{{ $detail->lahan->desa->kecamatan->kecamatan ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Tahun Tanam</th>
+                    <td>{{ $detail->lahan->tahunTanam->tahun ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Kode</th>
+                    <td>{{ $detail->kode_lahan ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Luas Sesuai Lapangan</th>
+                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} M²</td>
+                </tr>
+                <tr>
+                    <th>Luas Sesuai Surat</th>
+                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} M²</td>
+                </tr>
+                <tr>
+                    <th>Nomor SHM</th>
+                    <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nama Berdasarkan SHM</th>
+                    <td>{{ $detail->nama_SHM ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nomor Sporadik</th>
+                    <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nama Berdasarkan Sporadik</th>
+                    <td>{{ $detail->nama_sporadik ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nomor PBB</th>
+                    <td>{{ $detail->nomor_pbb ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Jumlah PBB</th>
+                    <td>Rp {{ number_format($detail->jumlah_pbb, 2, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <th>Status PBB</th>
+                    <td>
+                        @php
+                            $tahunSekarang = now()->year;
+                            $pbbTahunIni = $detail->pbb->where('tahun', $tahunSekarang)->first();
+                        @endphp
+                        @if ($pbbTahunIni)
+                            <span class="badge {{ $pbbTahunIni->status == 'lunas' ? 'bg-success' : 'bg-danger' }}">
+                                {{ ucfirst($pbbTahunIni->status) }}
+                            </span>
+                        @else
+                            <span class="text-muted">Belum ada data tahun {{ $tahunSekarang }}</span>
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status Kepemilikan</th>
+                    <td>{{ ucfirst($detail->status_kepemilikan ?? '-') }}</td>
+                </tr>
+                <tr>
+                    <th>Tanggal Mulai</th>
+                    <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+                </tr>
+                <tr>
+                    <th>Tanggal Selesai</th>
+                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                    </td>
+                </tr>
             </tbody>
         </table>
-    @else
-        <p style="font-style: italic; margin-top: 10px;">
-            Tidak ada riwayat kepemilikan lahan
-        </p>
-    @endif
+
+        {{-- Tambahan: Data Riwayat Kepemilikan --}}
+        @php
+            $riwayatList = $detail->lahan->riwayatKepemilikan ?? collect();
+        @endphp
+
+        @if ($riwayatList->isNotEmpty())
+            <div class="section-title">Riwayat Kepemilikan Lahan</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Petani Awal</th>
+                        <th>Nama Petani Sekarang</th>
+                        <th>Tanggal Ganti</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($riwayatList as $rIndex => $riwayat)
+                        <tr>
+                            <td>{{ $rIndex + 1 }}</td>
+                            <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
+                            <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') }}</td>
+                            <td>{{ $riwayat->keterangan ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p style="font-style: italic; margin-top: 10px;">
+                Tidak ada riwayat kepemilikan lahan
+            </p>
+        @endif
+
+        {{-- Page break tiap lahan --}}
+        @if (!$loop->last)
+            <div style="page-break-after: always;"></div>
+        @endif
+    @endforeach
 
     <div class="signature">
         <p>Mengetahui,</p>

@@ -8,6 +8,7 @@
         <div class="d-flex align-items-center mb-3">
             {{-- Tombol Back --}}
             <a href="{{ route('kepemilikan.index', [
+                'page' => request('page'),
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
