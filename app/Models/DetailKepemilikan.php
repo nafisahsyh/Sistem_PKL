@@ -45,13 +45,25 @@ class DetailKepemilikan extends Model
     // Event untuk menghapus file ketika detail dihapus
     protected static function booted()
     {
+        static::created(function ($detail) {
+            if ($detail->kepemilikan && $detail->kepemilikan->petani) {
+                $detail->kepemilikan->petani->updateStatusPetani();
+            }
+        });
+
         static::deleting(function ($detail) {
-            if ($detail->pdf_scan_shm && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
-                Storage::disk('public')->delete($detail->pdf_scan_shm);
-            }
-            if ($detail->pdf_scan_peta && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
-                Storage::disk('public')->delete($detail->pdf_scan_peta);
-            }
+            // Ambil id petani sebelum relasi hilang
+            $idPetani = optional($detail->kepemilikan)->id_petani;
+
+            // Setelah dihapus dari database, panggil update status
+            static::deleted(function () use ($idPetani) {
+                if ($idPetani) {
+                    $petani = \App\Models\Petani::find($idPetani);
+                    if ($petani) {
+                        $petani->updateStatusPetani();
+                    }
+                }
+            });
         });
     }
 }

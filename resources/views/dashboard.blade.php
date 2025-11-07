@@ -84,6 +84,40 @@
                     </div>
                 </div>
 
+                <!-- Card Petani Aktif -->
+                <div class="col mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body d-flex align-items-center gap-2">
+                            <i class="fas fa-user-check fa-2x"></i>
+                            <div>
+                                <h6 class="mb-0">Petani Aktif</h6>
+                                <h3 class="mb-0">{{ $jumlahPetaniAktif ?? 0 }}</h3>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <a class="small text-white stretched-link" href="/petani?status=aktif">Lihat Detail</a>
+                            <i class="fas fa-angle-right small text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Petani Tidak Aktif -->
+                <div class="col mb-3">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body d-flex align-items-center gap-2">
+                            <i class="fas fa-user-times fa-2x"></i>
+                            <div>
+                                <h6 class="mb-0">Petani Tidak Aktif</h6>
+                                <h3 class="mb-0">{{ $jumlahPetaniNonaktif ?? 0 }}</h3>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <a class="small text-white stretched-link" href="/petani?status=tidak_aktif">Lihat Detail</a>
+                            <i class="fas fa-angle-right small text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col mb-3">
                     <div class="card bg-brown text-white">
                         <div class="card-body d-flex align-items-center gap-2">

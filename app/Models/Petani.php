@@ -66,14 +66,38 @@ class Petani extends Model
             foreach ($petani->kepemilikan as $kepemilikan) {
                 $kepemilikan->delete();
             }
+
+        });
+
+        static::creating(function ($petani) {
+            $petani->status = 'aktif';
         });
     }
 
     public function kepemilikanAktif()
     {
         return $this->hasMany(Kepemilikan::class, 'id_petani', 'id_petani')
-                    ->whereHas('detailKepemilikan', function($q) {
-                        $q->where('status_kepemilikan', 'aktif');
-                    });
+            ->whereHas('detailKepemilikan', function ($q) {
+                $q->where('status_kepemilikan', 'aktif');
+            });
     }
+
+    public function updateStatusPetani()
+    {
+        // Hitung total lahan yang dimiliki petani ini
+        $jumlahLahan = \App\Models\DetailKepemilikan::whereHas('kepemilikan', function ($q) {
+            $q->where('id_petani', $this->id_petani);
+        })->count();
+
+        // Kalau nggak punya lahan lagi, ubah ke tidak_aktif
+        if ($jumlahLahan === 0 && $this->status !== 'tidak_aktif') {
+            $this->update(['status' => 'tidak_aktif']);
+        }
+
+        // Kalau punya lahan, ubah ke aktif
+        elseif ($jumlahLahan > 0 && $this->status !== 'aktif') {
+            $this->update(['status' => 'aktif']);
+        }
+    }
+
 }

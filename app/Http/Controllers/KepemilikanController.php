@@ -666,6 +666,13 @@ class KepemilikanController extends Controller
 
         $tahunSekarang = Carbon::now()->year;
 
+        $jumlahLahan = $kepemilikan->detailKepemilikan->count();
+        if ($jumlahLahan === 0 && $kepemilikan->petani->status !== 'tidak_aktif') {
+            $kepemilikan->petani->update(['status' => 'tidak_aktif']);
+        } elseif ($jumlahLahan > 0 && $kepemilikan->petani->status !== 'aktif') {
+            $kepemilikan->petani->update(['status' => 'aktif']);
+        }
+
         // Loop semua detail_kepemilikan
         foreach ($kepemilikan->detailKepemilikan as $detail) {
             // Cek apakah sudah ada data PBB untuk tahun ini
@@ -679,6 +686,13 @@ class KepemilikanController extends Controller
                     'jumlah' => $detail->jumlah_pbb ?? 0, // Simpan jumlah saat ini
                     'status' => 'belum',
                 ]);
+            } else {
+                // Update jumlah jika belum lunas dan nilainya berubah
+                if ($pbbTahunIni->status === 'belum' && $pbbTahunIni->jumlah != $detail->jumlah_pbb) {
+                    $pbbTahunIni->update([
+                        'jumlah' => $detail->jumlah_pbb ?? 0,
+                    ]);
+                }
             }
         }
 

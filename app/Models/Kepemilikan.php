@@ -23,4 +23,19 @@ class Kepemilikan extends Model
     {
         return $this->hasMany(DetailKepemilikan::class, 'id_kepemilikan', 'id_kepemilikan');
     }
+
+    protected static function booted()
+    {
+        static::created(function ($kepemilikan) {
+            if ($kepemilikan->petani) {
+                $kepemilikan->petani->updateStatusPetani();
+            }
+        });
+
+        static::deleted(function ($kepemilikan) {
+            if ($kepemilikan->petani) {
+                $kepemilikan->petani->updateStatusPetani();
+            }
+        });
+    }
 }

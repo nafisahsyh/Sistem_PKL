@@ -31,7 +31,13 @@ class DashboardController extends Controller
 
         $jumlahPetani = Petani::count();
 
-        $jumlahLahan = Lahan::count();
+        $jumlahLahan = Lahan::whereHas('detailKepemilikan.kepemilikan.petani', function ($q) {
+            $q->where('status', 'aktif');
+        })->count();
+
+        // --- JUMLAH PETANI AKTIF & NONAKTIF ---
+        $jumlahPetaniAktif = Petani::where('status', 'aktif')->count();
+        $jumlahPetaniNonaktif = Petani::where('status', 'tidak_aktif')->count();
 
         // Ambil data luas lapangan dan luas surat per desa dan tahun tanam
         $dataLahan = Lahan::select(
@@ -41,9 +47,13 @@ class DashboardController extends Controller
             DB::raw('SUM(luas_surat) as total_surat')
         )
             ->leftJoin('detail_kepemilikan', 'lahan.id_lahan', '=', 'detail_kepemilikan.id_lahan')
+            ->leftJoin('kepemilikan', 'detail_kepemilikan.id_kepemilikan', '=', 'kepemilikan.id_kepemilikan')
+            ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->where('petani.status', '=', 'aktif') //hanya petani aktif
             ->groupBy('lahan.id_desa', 'lahan.id_tahun_tanam')
             ->with(['desa:id_desa,desa', 'tahunTanam:id_tahun_tanam,tahun'])
             ->get();
+
 
         // Ubah ke format yang mudah untuk Chart.js
         $chartData = [];
@@ -65,7 +75,9 @@ class DashboardController extends Controller
             'jumlahPengguna',
             'jumlahPetani',
             'jumlahLahan',
-            'chartData'
+            'chartData',
+            'jumlahPetaniAktif',
+            'jumlahPetaniNonaktif',
         ));
     }
 }
