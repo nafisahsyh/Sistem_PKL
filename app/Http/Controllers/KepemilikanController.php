@@ -80,8 +80,15 @@ class KepemilikanController extends Controller
             ->paginate(10)
             ->appends($request->all());
 
+        // transform collection supaya detail lahan unik per kepemilikan
+        $kepemilikan->getCollection()->transform(function ($item) {
+            $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan');
+            return $item;
+        });
+
         // batasi jumlah link di kiri & kanan
-        $kepemilikan->onEachSide(1); // 1 link di kiri & kanan
+        $kepemilikan->onEachSide(1);
+
 
         // Logika MERGE hasil search nama/nomor plasma
         if (!empty($search)) {
@@ -368,20 +375,37 @@ class KepemilikanController extends Controller
 
     public function destroyPerLahan($id_kepemilikan, $id_lahan)
     {
-        // Cek apakah kepemilikan dan lahan cocok
-        $detail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
-            ->where('id_lahan', $id_lahan)
-            ->first();
+        DB::beginTransaction();
 
-        if (!$detail) {
-            return redirect()->back()->with('error', 'Data lahan tidak ditemukan untuk kepemilikan ini.');
+        try {
+            // Cek apakah kepemilikan dan lahan cocok
+            $detail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)
+                ->where('id_lahan', $id_lahan)
+                ->first();
+
+            if (!$detail) {
+                return redirect()->back()->with('error', 'Data lahan tidak ditemukan untuk kepemilikan ini.');
+            }
+
+            // Hapus detail kepemilikan (hanya lahan itu)
+            $detail->delete();
+
+            // Cek apakah masih ada detail lain untuk kepemilikan ini
+            $sisaDetail = DetailKepemilikan::where('id_kepemilikan', $id_kepemilikan)->count();
+            if ($sisaDetail == 0) {
+                // Jika tidak ada, hapus kepemilikan induk
+                Kepemilikan::find($id_kepemilikan)->delete();
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data lahan berhasil dihapus dari kepemilikan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        // Hapus detail kepemilikan (hanya lahan itu)
-        $detail->delete();
-
-        return redirect()->back()->with('success', 'Data lahan berhasil dihapus dari kepemilikan.');
     }
+
 
 
     /**
@@ -530,7 +554,7 @@ class KepemilikanController extends Controller
                 }
 
                 // cari detail kepemilikan lama
-                $detail = DetailKepemilikan::find($lahanData['id_detail_kepemilikan'] ?? null);
+                $detail = DetailKepemilikan::find($lahanData['id_detail_kepemilikan']);
 
                 if ($detail) {
                     $lahan = Lahan::find($lahanData['id_lahan']);
@@ -1184,9 +1208,16 @@ class KepemilikanController extends Controller
         );
 
         // Pindahkan lahan ke petani baru
+        // Pindahkan lahan ke petani baru
         $detail->update([
             'id_kepemilikan' => $kepemilikanBaru->id_kepemilikan,
         ]);
+
+        // Cek kepemilikan lama, hapus jika sudah tidak punya detail
+        $kepemilikan->refresh(); // reload relasi
+        if ($kepemilikan->detailKepemilikan()->count() === 0) {
+            $kepemilikan->delete();
+        }
 
         // Simpan riwayat perpindahan
         RiwayatKepemilikan::create([
@@ -1196,6 +1227,7 @@ class KepemilikanController extends Controller
             'tanggal_ganti' => $validated['tanggal_ganti'],
             'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
         ]);
+
 
         return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
             ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
