@@ -102,7 +102,6 @@
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Desa</label>
                                 <select name="lahan[0][id_desa]" class="form-select text-kecil select-desa">
-                                    <option value="" disabled selected hidden>Pilih Desa</option>
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}">{{ $d->desa }}
                                         </option>
@@ -112,7 +111,6 @@
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Tahun Tanam</label>
                                 <select name="lahan[0][id_tahun_tanam]" class="form-select text-kecil select-tahun">
-                                    <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
                                     @foreach ($tahun_tanam as $t)
                                         <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
                                     @endforeach
@@ -159,11 +157,18 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kelola</label>
+                                <select name="lahan[0][status_pengelolaan]" class="form-select text-kecil select-status">
+                                    <option value="KSM" selected>KSM</option>
+                                    <option value="Mandiri">Mandiri</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor PBB</label>
                                 <input type="text" name="lahan[0][nomor_pbb]" class="form-control text-kecil">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Jumlah PBB (Rp)</label>
                                 <input type="number" step="0.01" name="lahan[0][jumlah_pbb]"
                                     class="form-control text-kecil">
@@ -216,11 +221,31 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inisialisasi Choices untuk select yang sudah ada
-            document.querySelectorAll('.select-desa, .select-tahun, .select-status').forEach(select => {
+            document.querySelectorAll('.select-desa').forEach(select => {
+                new Choices(select, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Desa',
+                    searchPlaceholderValue: 'Cari Desa...'
+                });
+            });
+
+            document.querySelectorAll('.select-tahun').forEach(select => {
+                new Choices(select, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Tahun Tanam',
+                    searchPlaceholderValue: 'Cari Tahun...'
+                });
+            });
+            document.querySelectorAll('.select-status').forEach(select => {
                 new Choices(select, {
                     searchEnabled: false,
                     shouldSort: false,
-                    itemSelectText: ''
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Status',
                 });
             });
 
@@ -242,7 +267,6 @@
             <div class="col-md-3 mb-3">
                 <label class="form-label">Desa</label>
                 <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil select-desa">
-                    <option value="" disabled selected hidden>Pilih Desa</option>
                     @foreach ($desa as $d)
                         <option value="{{ $d->id_desa }}">{{ $d->desa }}</option>
                     @endforeach
@@ -251,7 +275,6 @@
             <div class="col-md-3 mb-3">
                 <label class="form-label">Tahun Tanam</label>
                 <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil select-tahun">
-                    <option value="" disabled selected hidden>Pilih Tahun Tanam</option>
                     @foreach ($tahun_tanam as $t)
                         <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
                     @endforeach
@@ -296,11 +319,18 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status Kelola</label>
+                <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
+                    <option value="KSM" selected>KSM</option>                    
+                    <option value="Mandiri">Mandiri</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
                 <label class="form-label">Nomor PBB</label>
                 <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <label class="form-label">Jumlah PBB (Rp)</label>
                 <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
             </div>
@@ -308,7 +338,7 @@
         <div class="row mt-3">
             <div class="col-md-4 mb-3">
                 <label class="form-label">Status Kepemilikan</label>
-                <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil">
+                <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil select-status">
                     <option value="aktif" selected>Aktif</option>
                     <option value="nonaktif">Nonaktif</option>
                 </select>
@@ -335,17 +365,33 @@
     `;
                 container.appendChild(lahanDiv);
 
-                // Inisialisasi Choices untuk select baru
-                new Choices(lahanDiv.querySelector('.select-desa'), {
+            document.querySelectorAll('.select-desa').forEach(select => {
+                new Choices(select, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Desa',
+                    searchPlaceholderValue: 'Cari Desa...'
+                });
+            });
+
+            document.querySelectorAll('.select-tahun').forEach(select => {
+                new Choices(select, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Tahun Tanam',
+                    searchPlaceholderValue: 'Cari Tahun...'
+                });
+            });
+            document.querySelectorAll('.select-status').forEach(select => {
+                new Choices(select, {
                     searchEnabled: false,
                     shouldSort: false,
-                    itemSelectText: ''
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Status',
                 });
-                new Choices(lahanDiv.querySelector('.select-tahun'), {
-                    searchEnabled: false,
-                    shouldSort: false,
-                    itemSelectText: ''
-                });
+            });
 
                 lahanIndex++;
             };

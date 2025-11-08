@@ -25,6 +25,8 @@ class DetailKepemilikan extends Model
         'status_kepemilikan',
         'tanggal_mulai',
         'tanggal_selesai',
+        'status_pengelolaan',
+
     ];
 
     public function kepemilikan()

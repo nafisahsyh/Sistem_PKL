@@ -69,12 +69,12 @@
                         <tr>
                             <th>No</th>
                             <th>Nomor Plasma</th>
-                            <th>Nomor Koperasi</th>
                             <th>Nama Petani</th>
                             <th>Status Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
                             <th>Kode</th>
+                            <th>Status Kelola</th>
                             <th style="width: 180px;">Aksi</th>
                         </tr>
                     </thead>
@@ -109,9 +109,6 @@
                                                 {{ $k->petani->nomor_anggota_plasma ?? '-' }}
                                             </td>
                                             <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
-                                                {{ $k->petani->nomor_anggota_koperasi ?? '-' }}
-                                            </td>
-                                            <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $k->petani->nama ?? '-' }}
                                             </td>
                                             <td class="text-center align-middle"
@@ -135,72 +132,89 @@
 
                                         {{-- kolom kode lahan, tampil tiap baris --}}
                                         <td class="text-center">{{ $detail->kode_lahan ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ $detail->status_pengelolaan ?? '-' }}
+                                        </td>
 
                                         {{-- tombol aksi tampil sekali di baris pertama petani --}}
                                         @if ($firstRow)
-                                            <td class="text-center align-middle"
-                                                rowspan="{{ $k->detailKepemilikan->count() }}">
-                                                @if (request()->filled('desa') || request()->filled('tahun'))
-                                                    {{-- Kalau ada filter aktif → pakai route per lahan --}}
-                                                    @if (isset($detail) && $detail->lahan)
-                                                        <a href="{{ route('kepemilikan.showPerLahan', [
+                                            @php
+                                                // Hitung jumlah lahan aktif di kepemilikan ini
+                                                $jumlahLahan = $k->detailKepemilikan->count();
+
+                                                // Tentukan apakah harus tampil per lahan
+                                                // Sekarang termasuk juga kalau ada "search"
+                                                $tampilPerLahan =
+                                                    request()->filled('desa') ||
+                                                    request()->filled('tahun') ||
+                                                    request()->filled('status_pengelolaan') ||
+                                                    request()->filled('search');
+                                            @endphp
+
+                                            <td class="text-center align-middle" rowspan="{{ $jumlahLahan }}">
+                                                @if ($tampilPerLahan && isset($detail) && $detail->lahan)
+                                                    {{-- Mode per lahan --}}
+                                                    <a href="{{ route('kepemilikan.showPerLahan', [
+                                                        'id_kepemilikan' => $k->id_kepemilikan,
+                                                        'id_lahan' => $detail->lahan->id_lahan,
+                                                        'page' => request('page'),
+                                                        'search' => $search,
+                                                        'desa' => $desa,
+                                                        'tahun' => $tahun,
+                                                        'status_pengelolaan' => $status_pengelolaan,
+                                                    ]) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    <a href="{{ route('kepemilikan.editPerLahan', [
+                                                        'id_kepemilikan' => $k->id_kepemilikan,
+                                                        'id_lahan' => $detail->lahan->id_lahan,
+                                                        'page' => request('page'),
+                                                        'search' => $search,
+                                                        'desa' => $desa,
+                                                        'tahun' => $tahun,
+                                                        'status_pengelolaan' => $status_pengelolaan,
+                                                    ]) }}"
+                                                        class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form
+                                                        action="{{ route('kepemilikan.destroyPerLahan', [
                                                             'id_kepemilikan' => $k->id_kepemilikan,
                                                             'id_lahan' => $detail->lahan->id_lahan,
-                                                            'page' => request('page'),
-                                                            'search' => $search,
-                                                            'desa' => $desa,
-                                                            'tahun' => $tahun,
                                                         ]) }}"
-                                                            class="btn btn-info btn-sm">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-
-                                                        <a href="{{ route('kepemilikan.editPerLahan', [
-                                                            'id_kepemilikan' => $k->id_kepemilikan,
-                                                            'id_lahan' => $detail->lahan->id_lahan,
-                                                            'page' => request('page'),
-                                                            'search' => $search,
-                                                            'desa' => $desa,
-                                                            'tahun' => $tahun,
-                                                        ]) }}"
-                                                            class="btn btn-warning btn-sm" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-
-                                                        <form
-                                                            action="{{ route('kepemilikan.destroyPerLahan', [
-                                                                'id_kepemilikan' => $k->id_kepemilikan,
-                                                                'id_lahan' => $detail->lahan->id_lahan,
-                                                            ]) }}"
-                                                            method="POST" class="d-inline delete-form">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button" class="btn btn-danger btn-sm btn-delete"
-                                                                title="Hapus">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
+                                                        method="POST" class="d-inline delete-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger btn-sm btn-delete"
+                                                            title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 @else
-                                                    {{-- Kalau tidak ada filter → pakai route normal --}}
+                                                    {{-- Mode normal --}}
                                                     <a href="{{ route('kepemilikan.show', [
                                                         'kepemilikan' => $k->id_kepemilikan,
                                                         'page' => request('page'),
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
+                                                        'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
-                                                        class="btn btn-info btn-sm" title="Detail">
+                                                        class="btn btn-info btn-sm">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+
                                                     <a href="{{ route('kepemilikan.edit', [
                                                         'kepemilikan' => $k->id_kepemilikan,
                                                         'page' => request('page'),
-                                                        'search' => request('search'),
-                                                        'desa' => request('desa'),
-                                                        'tahun' => request('tahun'),
+                                                        'search' => $search,
+                                                        'desa' => $desa,
+                                                        'tahun' => $tahun,
+                                                        'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
-                                                        class="btn btn-warning btn-sm" title="Edit">
+                                                        class="btn btn-warning btn-sm">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <form action="{{ route('kepemilikan.destroy', $k->id_kepemilikan) }}"
@@ -274,6 +288,19 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Status Pengelolaan</label>
+                            <select name="status_pengelolaan" id="filter_status"
+                                class="form-select text-kecil choices-select">
+                                <option value="">Semua Status</option>
+                                <option value="KSM" {{ request('status_pengelolaan') == 'KSM' ? 'selected' : '' }}>KSM
+                                </option>
+                                <option value="Mandiri"
+                                    {{ request('status_pengelolaan') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                            </select>
+
+                        </div>
+
                     </div>
                     <div class="modal-footer d-flex justify-content-between">
                         <a href="{{ route('kepemilikan.index') }}" class="btn btn-secondary">
@@ -295,6 +322,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const desaSelect = document.getElementById('filter_desa');
             const tahunSelect = document.getElementById('filter_tahun_tanam');
+            const statusSelect = document.getElementById('filter_status');
             if (desaSelect) new Choices(desaSelect, {
                 shouldSort: false,
                 searchPlaceholderValue: "Cari desa..."
@@ -302,6 +330,10 @@
             if (tahunSelect) new Choices(tahunSelect, {
                 shouldSort: false,
                 searchPlaceholderValue: "Cari tahun..."
+            });
+            if (statusSelect) new Choices(statusSelect, {
+                shouldSort: false,
+                searchEnabled: false
             });
         });
     </script>

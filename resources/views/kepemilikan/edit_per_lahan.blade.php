@@ -140,8 +140,8 @@
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Desa</label>
                                 <select name="lahan[{{ $index }}][id_desa]"
-                                    class="form-select text-kecil choices-select">
-                                    <option value="" disabled hidden>Pilih Desa</option>
+                                    class="form-select text-kecil choices-select choices-search"
+                                    data-placeholder="Pilih Desa" data-search-placeholder="Cari Desa...">
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}"
                                             {{ $detail->lahan->id_desa == $d->id_desa ? 'selected' : '' }}>
@@ -154,8 +154,8 @@
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Tahun Tanam</label>
                                 <select name="lahan[{{ $index }}][id_tahun_tanam]"
-                                    class="form-select text-kecil choices-select">
-                                    <option value="" disabled hidden>Pilih Tahun Tanam</option>
+                                    class="form-select text-kecil choices-select choices-search"
+                                    data-placeholder="Pilih Tahun Tanam" data-search-placeholder="Cari Tahun...">
                                     @foreach ($tahun_tanam as $t)
                                         <option value="{{ $t->id_tahun_tanam }}"
                                             {{ $detail->lahan->id_tahun_tanam == $t->id_tahun_tanam ? 'selected' : '' }}>
@@ -214,12 +214,26 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kelola</label>
+                                <!-- Status Kelola (tidak ada search) -->
+                                <select name="lahan[{{ $index }}][status_pengelolaan]"
+                                    class="form-select text-kecil choices-select" required>
+                                    <option value="KSM"
+                                        {{ $detail->status_pengelolaan == 'KSM' || is_null($detail->status_pengelolaan) ? 'selected' : '' }}>
+                                        KSM
+                                    </option>
+                                    <option value="Mandiri"
+                                        {{ $detail->status_pengelolaan == 'Mandiri' ? 'selected' : '' }}>Mandiri
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nomor PBB</label>
                                 <input type="text" name="lahan[{{ $index }}][nomor_pbb]"
                                     class="form-control text-kecil" value="{{ $detail->nomor_pbb }}">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Jumlah PBB (Rp)</label>
                                 <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
                                     class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
@@ -288,7 +302,7 @@
 
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
+                <a href="{{ route('kepemilikan.index', request()->query()) }}" class="btn btn-danger">Batal</a>
             </div>
         </form>
     </div>
@@ -413,16 +427,19 @@
             const allSelects = document.querySelectorAll('select.choices-select');
             allSelects.forEach(select => {
                 if (!select.classList.contains('choices-initialized')) {
+                    // Hanya aktifkan search jika ada class 'choices-search'
+                    const searchEnabled = select.classList.contains('choices-search');
+
                     new Choices(select, {
-                        searchEnabled: select.id ===
-                            'selectPetaniLama', // search cuma aktif untuk petani lama
-                        placeholder: true,
-                        placeholderValue: 'Pilih Petani',
-                        searchPlaceholderValue: 'Cari petani...',
+                        searchEnabled: searchEnabled,
                         shouldSort: false,
                         itemSelectText: '',
-                        allowHTML: true
+                        allowHTML: true,
+                        position: 'auto',
+                        placeholderValue: select.dataset.placeholder || '',
+                        searchPlaceholderValue: select.dataset.searchPlaceholder || ''
                     });
+
                     select.classList.add('choices-initialized');
                 }
             });

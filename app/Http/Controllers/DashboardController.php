@@ -20,27 +20,29 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Hitung jumlah data di tabel kecamatan
+        $filterDesa = $request->desa;
+        $filterTahun = $request->tahun;
+
         $jumlahKecamatan = Kecamatan::count();
-
         $jumlahDesa = Desa::count();
-
         $jumlahPengguna = User::count();
-
         $jumlahPetani = Petani::count();
 
         $jumlahLahan = Lahan::whereHas('detailKepemilikan.kepemilikan.petani', function ($q) {
             $q->where('status', 'aktif');
         })->count();
 
-        // --- JUMLAH PETANI AKTIF & NONAKTIF ---
         $jumlahPetaniAktif = Petani::where('status', 'aktif')->count();
         $jumlahPetaniNonaktif = Petani::where('status', 'tidak_aktif')->count();
 
-        // Ambil data luas lapangan dan luas surat per desa dan tahun tanam
-        $dataLahan = Lahan::select(
+        //Ambil daftar Desa & Tahun untuk dropdown modal
+        $desaList = Desa::orderBy('desa')->get();
+        $tahunList = DB::table('tahun_tanam')->orderBy('tahun', 'desc')->get();
+
+        //Query data lahan
+        $query = Lahan::select(
             'id_desa',
             'id_tahun_tanam',
             DB::raw('SUM(luas_peta) as total_lapangan'),
@@ -49,35 +51,80 @@ class DashboardController extends Controller
             ->leftJoin('detail_kepemilikan', 'lahan.id_lahan', '=', 'detail_kepemilikan.id_lahan')
             ->leftJoin('kepemilikan', 'detail_kepemilikan.id_kepemilikan', '=', 'kepemilikan.id_kepemilikan')
             ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
-            ->where('petani.status', '=', 'aktif') //hanya petani aktif
+            ->where('petani.status', '=', 'aktif');
+
+        //Terapkan filter jika ada
+        if ($filterDesa && $filterDesa != "all") {
+            $query->where('lahan.id_desa', $filterDesa);
+        }
+
+        if ($filterTahun && $filterTahun != "all") {
+            $query->where('lahan.id_tahun_tanam', $filterTahun);
+        }
+
+        $dataLahan = $query
             ->groupBy('lahan.id_desa', 'lahan.id_tahun_tanam')
             ->with(['desa:id_desa,desa', 'tahunTanam:id_tahun_tanam,tahun'])
             ->get();
 
-
-        // Ubah ke format yang mudah untuk Chart.js
+        // Format untuk chart
         $chartData = [];
         foreach ($dataLahan as $row) {
-            $desa = $row->desa->desa ?? '-';
-            $tahun = $row->tahunTanam->tahun ?? '-';
             $chartData[] = [
-                'desa' => $desa,
-                'tahun' => $tahun,
+                'desa' => $row->desa->desa ?? '-',
+                'tahun' => $row->tahunTanam->tahun ?? '-',
                 'lapangan' => round($row->total_lapangan, 2),
                 'surat' => round($row->total_surat, 2),
             ];
         }
 
-        // Kirim data ke view
+        // Tambahan baru: Data status pengelolaan
+        $statusData = [
+            'petani' => [
+                'Mandiri' => Petani::whereHas('kepemilikan.detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
+                                    ->distinct()->count('id_petani'),
+                'KSM' => Petani::whereHas('kepemilikan.detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
+                                ->distinct()->count('id_petani'),
+            ],
+
+            'lahan' => [
+                // JUMLAH LAHAN
+                'Mandiri' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
+                                ->distinct()->count('id_lahan'),
+                'KSM' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
+                            ->distinct()->count('id_lahan'),
+
+                // ✅ TOTAL LUAS SURAT → lewat tabel detail_kepemilikan
+                'Mandiri_surat' => DB::table('detail_kepemilikan')
+                                        ->where('status_pengelolaan','Mandiri')
+                                        ->sum('luas_surat'),
+                'KSM_surat' => DB::table('detail_kepemilikan')
+                                        ->where('status_pengelolaan','KSM')
+                                        ->sum('luas_surat'),
+
+                // ✅ TOTAL LUAS PETA / LAPANGAN → lewat tabel lahan
+                'Mandiri_peta' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
+                                        ->sum('luas_peta'),
+                'KSM_peta' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
+                                    ->sum('luas_peta'),
+            ],
+        ];
+
+
         return view('dashboard', compact(
             'jumlahKecamatan',
             'jumlahDesa',
             'jumlahPengguna',
             'jumlahPetani',
             'jumlahLahan',
-            'chartData',
             'jumlahPetaniAktif',
             'jumlahPetaniNonaktif',
+            'chartData',
+            'desaList',
+            'tahunList',
+            'filterDesa',
+            'filterTahun',
+            'statusData' //dikirim ke view
         ));
     }
 }

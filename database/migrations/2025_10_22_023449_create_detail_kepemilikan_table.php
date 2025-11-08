@@ -31,7 +31,7 @@ return new class extends Migration
             $table->enum('status_kepemilikan', ['aktif', 'nonaktif'])->default('aktif');
             $table->date('tanggal_mulai')->nullable();
             $table->date('tanggal_selesai')->nullable();
-
+            $table->enum('status_pengelolaan', ['Mandiri', 'KSM'])->default('KSM');
             $table->timestamps();
 
             // Relasi foreign key
