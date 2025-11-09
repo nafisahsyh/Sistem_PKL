@@ -12,6 +12,7 @@
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
+                'status_pengelolaan' => request('status_pengelolaan')
             ]) }}"
                 class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
@@ -123,7 +124,14 @@
                             <strong>Lahan {{ $index + 1 }}</strong>
 
                             {{-- Tombol Riwayat per Lahan --}}
-                            <a href="{{ route('kepemilikan.riwayatLahan', ['id_lahan' => $detail->id_lahan]) }}"
+                            <a href="{{ route('kepemilikan.riwayatLahan', [
+                                'id_lahan' => $detail->id_lahan,
+                                'page' => request('page'),
+                                'search' => request('search'),
+                                'desa' => request('desa'),
+                                'tahun' => request('tahun'),
+                                'status_pengelolaan' => request('status_pengelolaan'),
+                            ]) }}"
                                 class="btn btn-info btn-sm text-dark">
                                 <i class="fas fa-history"></i> Riwayat
                             </a>

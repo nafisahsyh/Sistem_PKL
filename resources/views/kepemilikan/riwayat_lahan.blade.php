@@ -13,7 +13,15 @@
 
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">
-            <a href="{{ route('kepemilikan.show', $id_kepemilikan) }}" class="btn btn-success p-2" title="Kembali">
+            <a href="{{ route('kepemilikan.show', [
+                'kepemilikan' => $id_kepemilikan,
+                'page' => request('page'),
+                'search' => request('search'),
+                'desa' => request('desa'),
+                'tahun' => request('tahun'),
+                'status_pengelolaan' => request('status_pengelolaan'),
+            ]) }}"
+                class="btn btn-success p-2" title="Kembali">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 

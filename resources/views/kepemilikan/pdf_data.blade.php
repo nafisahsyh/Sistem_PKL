@@ -74,6 +74,7 @@
                 <th>Luas Lapangan (M²)</th>
                 <th>Luas Surat (M²)</th>
                 <th>No. Surat SHM</th>
+                <th>Status Kelola</th>
             </tr>
         </thead>
         <tbody>
@@ -93,6 +94,7 @@
                         $noKavling = $detail->nomor_kavling ?? '-';
                         $noSHM = $detail->nomor_SHM ?? '-';
                         $kodeLahan = $detail->kode_lahan ?? '-';
+                        $statusKelola = $detail->status_pengelolaan ?? '-';
                     @endphp
 
                     <tr>
@@ -110,6 +112,7 @@
                         <td>{{ number_format($luasPeta,2,',','.') }}</td>
                         <td>{{ number_format($luasSurat,2,',','.') }}</td>
                         <td>{{ $noSHM }}</td>
+                        <td>{{ $statusKelola }}</td>
                     </tr>
                 @endforeach
             @endforeach

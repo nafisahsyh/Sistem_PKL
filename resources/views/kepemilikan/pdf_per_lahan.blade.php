@@ -185,6 +185,10 @@
             </thead>
             <tbody>
                 <tr>
+                    <th>Status Kelola</th>
+                    <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
+                </tr>
+                <tr>
                     <th width="35%">Desa</th>
                     <td>{{ $detail->lahan->desa->desa ?? '-' }}</td>
                 </tr>
