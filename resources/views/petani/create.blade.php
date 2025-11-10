@@ -81,6 +81,7 @@
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
                             <option value="aktif" selected>Aktif</option>
                             <option value="tidak_aktif">Tidak Aktif</option>
+                            <option value="berhenti">Berhenti</option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>

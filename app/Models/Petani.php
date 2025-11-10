@@ -42,6 +42,20 @@ class Petani extends Model
         return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sebelum');
     }
 
+    // app/Models/Petani.php
+
+    public function detailKepemilikan()
+    {
+        return $this->hasManyThrough(
+            DetailKepemilikan::class,
+            Kepemilikan::class,
+            'id_petani',
+            'id_kepemilikan',
+            'id_petani',
+            'id_kepemilikan'
+        );
+    }
+
     public function riwayatSebagaiSesudah()
     {
         return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sesudah');
@@ -51,27 +65,32 @@ class Petani extends Model
     // Event untuk menghapus file PDF otomatis
     protected static function booted()
     {
+
+        static::updated(function ($petani) {
+            if ($petani->isDirty('status') && $petani->status === 'berhenti') {
+                $petani->detailKepemilikan()->update(['status_kepemilikan' => 'nonaktif']);
+            }
+        });
+
         static::deleting(function ($petani) {
-            // Hapus file KTP
             if ($petani->pdf_scan_ktp && Storage::disk('public')->exists('ktp_pdf/' . $petani->pdf_scan_ktp)) {
                 Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_ktp);
             }
 
-            // Hapus file KK
             if ($petani->pdf_scan_kk && Storage::disk('public')->exists('ktp_pdf/' . $petani->pdf_scan_kk)) {
                 Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_kk);
             }
 
-            // Hapus semua kepemilikan terkait
             foreach ($petani->kepemilikan as $kepemilikan) {
                 $kepemilikan->delete();
             }
-
         });
 
+        // Default status saat create
         static::creating(function ($petani) {
             $petani->status = 'aktif';
         });
+
     }
 
     public function kepemilikanAktif()
@@ -84,18 +103,18 @@ class Petani extends Model
 
     public function updateStatusPetani()
     {
-        // Hitung total lahan yang dimiliki petani ini
-        $jumlahLahan = \App\Models\DetailKepemilikan::whereHas('kepemilikan', function ($q) {
-            $q->where('id_petani', $this->id_petani);
-        })->count();
-
-        // Kalau nggak punya lahan lagi, ubah ke tidak_aktif
-        if ($jumlahLahan === 0 && $this->status !== 'tidak_aktif') {
-            $this->update(['status' => 'tidak_aktif']);
+        // Jangan ubah status kalau petani berhenti
+        if (in_array($this->status, ['berhenti'])) {
+            return;
         }
 
-        // Kalau punya lahan, ubah ke aktif
-        elseif ($jumlahLahan > 0 && $this->status !== 'aktif') {
+        $jumlahLahanAktif = DetailKepemilikan::whereHas('kepemilikan', function ($q) {
+            $q->where('id_petani', $this->id_petani);
+        })->where('status_kepemilikan', 'aktif')->count();
+
+        if ($jumlahLahanAktif === 0 && $this->status !== 'tidak_aktif') {
+            $this->update(['status' => 'tidak_aktif']);
+        } elseif ($jumlahLahanAktif > 0 && $this->status !== 'aktif') {
             $this->update(['status' => 'aktif']);
         }
     }

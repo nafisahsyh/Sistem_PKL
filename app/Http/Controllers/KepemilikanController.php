@@ -28,76 +28,93 @@ class KepemilikanController extends Controller
     /**
      * Tampilkan semua data kepemilikan.
      */
-public function index(Request $request)
-{
-    $query = Kepemilikan::select('kepemilikan.*')
-        ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
-        ->with([
-            'petani.desa.kecamatan',
-            'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahunTanam'
-        ])
-        ->orderBy('petani.nomor_anggota_plasma', 'asc');
+    public function index(Request $request)
+    {
+        $query = Kepemilikan::select('kepemilikan.*')
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->with([
+                'petani.desa.kecamatan',
+                'detailKepemilikan.lahan.desa.kecamatan',
+                'detailKepemilikan.lahan.tahunTanam'
+            ])
+            ->orderBy('petani.nomor_anggota_plasma', 'asc');
 
-    $search = strtolower($request->search ?? '');
-
-    // ===================== PENCARIAN GABUNGAN =====================
-    if (!empty($search)) {
-        $query->where(function ($q) use ($search) {
-            $q->whereHas('petani', function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
-            })
-            ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(desa) like ?', ["%{$search}%"]);
-            })
-            ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
-            })
-            ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"]);
+        // ===================== FILTER STATUS PETANI =====================
+        if (!empty($request->status_petani) && strtolower($request->status_petani) === 'berhenti') {
+            // Petani berhenti → punya lahan tapi semua nonaktif
+            $query->whereHas('petani', function ($q) {
+                $q->where('status', 'berhenti');
+            })->whereHas('detailKepemilikan', function ($q) {
+                $q->where('status_kepemilikan', 'nonaktif');
             });
+        } else {
+            // Default → hanya petani aktif + lahan aktif
+            $query->whereHas('petani', function ($q) {
+                $q->where('status', 'aktif');
+            })->whereHas('detailKepemilikan', function ($q) {
+                $q->where('status_kepemilikan', 'aktif');
+            });
+        }
+
+        $search = strtolower($request->search ?? '');
+
+        // ===================== PENCARIAN GABUNGAN =====================
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('petani', function ($q2) use ($search) {
+                    $q2->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
+                })
+                    ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(desa) like ?', ["%{$search}%"]);
+                    })
+                    ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
+                    })
+                    ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
+                        $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"]);
+                    });
+            });
+        }
+
+        // ===================== FILTER STATUS PENGELOLAAN =====================
+        if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
+            $query->whereHas('detailKepemilikan', function ($q) use ($request) {
+                $q->whereRaw('LOWER(status_pengelolaan) = ?', [strtolower($request->status_pengelolaan)]);
+            });
+        }
+
+        // ===================== FILTER DESA =====================
+        if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
+            $query->whereHas('detailKepemilikan.lahan.desa', function ($q) use ($request) {
+                $q->where('desa', $request->desa);
+            });
+        }
+
+        // ===================== FILTER TAHUN TANAM =====================
+        if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
+            $query->whereHas('detailKepemilikan.lahan.tahunTanam', function ($q) use ($request) {
+                $q->where('tahun', $request->tahun);
+            });
+        }
+
+        // ===================== AMBIL DATA =====================
+        $kepemilikan = $query
+            ->whereHas('detailKepemilikan')
+            ->paginate(10)
+            ->appends($request->all());
+
+        // pastikan detail unik per kepemilikan
+        $kepemilikan->getCollection()->transform(function ($item) {
+            $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan')->values();
+            return $item;
         });
-    }
 
-    // ===================== FILTER STATUS PENGELOLAAN =====================
-    if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
-        $query->whereHas('detailKepemilikan', function ($q) use ($request) {
-            $q->whereRaw('LOWER(status_pengelolaan) = ?', [strtolower($request->status_pengelolaan)]);
-        });
-    }
+        // pagination
+        $kepemilikan->onEachSide(1);
 
-    // ===================== FILTER DESA =====================
-    if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
-        $query->whereHas('detailKepemilikan.lahan.desa', function ($q) use ($request) {
-            $q->where('desa', $request->desa);
-        });
-    }
-
-    // ===================== FILTER TAHUN TANAM =====================
-    if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
-        $query->whereHas('detailKepemilikan.lahan.tahunTanam', function ($q) use ($request) {
-            $q->where('tahun', $request->tahun);
-        });
-    }
-
-    // ===================== AMBIL DATA =====================
-    $kepemilikan = $query
-        ->whereHas('detailKepemilikan')
-        ->paginate(10)
-        ->appends($request->all());
-
-    // pastikan detail unik per kepemilikan
-    $kepemilikan->getCollection()->transform(function ($item) {
-        $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan')->values();
-        return $item;
-    });
-
-    // pagination
-    $kepemilikan->onEachSide(1);
-
-            // Logika MERGE hasil search nama/nomor plasma
+        // Logika MERGE hasil search nama/nomor plasma
         if (!empty($search)) {
             $kepemilikan->getCollection()->transform(function ($item) use ($search) {
                 $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($search) {
@@ -120,56 +137,56 @@ public function index(Request $request)
 
         }
 
-    // ===================== FILTER ULANG DI COLLECTION =====================
-    $kepemilikan->getCollection()->transform(function ($item) use ($request) {
-        $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request) {
-            $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' || ($detail->lahan->desa->desa ?? '') === $request->desa;
-            $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
-            $byStatus = empty($request->status_pengelolaan) || strtolower($request->status_pengelolaan) === 'semua' || strtolower($detail->status_pengelolaan) == strtolower($request->status_pengelolaan);
-            return $byDesa && $byTahun && $byStatus;
-        })->values();
-        return $item;
-    });
+        // ===================== FILTER ULANG DI COLLECTION =====================
+        $kepemilikan->getCollection()->transform(function ($item) use ($request) {
+            $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request) {
+                $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' || ($detail->lahan->desa->desa ?? '') === $request->desa;
+                $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
+                $byStatus = empty($request->status_pengelolaan) || strtolower($request->status_pengelolaan) === 'semua' || strtolower($detail->status_pengelolaan) == strtolower($request->status_pengelolaan);
+                return $byDesa && $byTahun && $byStatus;
+            })->values();
+            return $item;
+        });
 
-    // hapus data tanpa detail
-    $kepemilikan->setCollection(
-        $kepemilikan->getCollection()->filter(function ($item) {
-            return $item->detailKepemilikan->isNotEmpty();
-        })->values()
-    );
+        // hapus data tanpa detail
+        $kepemilikan->setCollection(
+            $kepemilikan->getCollection()->filter(function ($item) {
+                return $item->detailKepemilikan->isNotEmpty();
+            })->values()
+        );
 
-    // dropdown data
-    $daftarDesa = Desa::orderBy('desa')->get();
-    $daftarTahun = Tahun_Tanam::orderBy('tahun', 'desc')->get();
+        // dropdown data
+        $daftarDesa = Desa::orderBy('desa')->get();
+        $daftarTahun = Tahun_Tanam::orderBy('tahun', 'desc')->get();
 
-    // mode tampilan
-    if (
-        (!empty($request->desa) && strtolower($request->desa) !== 'semua') ||
-        (!empty($request->tahun) && strtolower($request->tahun) !== 'semua')
-    ) {
-        $mode = 'perLahan';
-    } elseif (!empty($search)) {
-        $isSearchPetani = Kepemilikan::whereHas('petani', function ($q) use ($search) {
-            $q->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
-                ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
-                ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
-        })->exists();
-        $mode = $isSearchPetani ? 'normal' : 'perLahan';
-    } else {
-        $mode = 'normal';
+        // mode tampilan
+        if (
+            (!empty($request->desa) && strtolower($request->desa) !== 'semua') ||
+            (!empty($request->tahun) && strtolower($request->tahun) !== 'semua')
+        ) {
+            $mode = 'perLahan';
+        } elseif (!empty($search)) {
+            $isSearchPetani = Kepemilikan::whereHas('petani', function ($q) use ($search) {
+                $q->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
+            })->exists();
+            $mode = $isSearchPetani ? 'normal' : 'perLahan';
+        } else {
+            $mode = 'normal';
+        }
+
+        return view('kepemilikan.index', [
+            'kepemilikan' => $kepemilikan,
+            'daftarDesa' => $daftarDesa,
+            'daftarTahun' => $daftarTahun,
+            'mode' => $mode,
+            'search' => $request->search,
+            'desa' => $request->desa,
+            'tahun' => $request->tahun,
+            'status_pengelolaan' => $request->status_pengelolaan,
+        ]);
     }
-
-    return view('kepemilikan.index', [
-        'kepemilikan' => $kepemilikan,
-        'daftarDesa' => $daftarDesa,
-        'daftarTahun' => $daftarTahun,
-        'mode' => $mode,
-        'search' => $request->search,
-        'desa' => $request->desa,
-        'tahun' => $request->tahun,
-        'status_pengelolaan' => $request->status_pengelolaan,
-    ]);
-}
 
     public function showPerLahan(Request $request, $id_kepemilikan, $id_lahan)
     {
@@ -289,9 +306,9 @@ public function index(Request $request)
         $desa = Desa::with('kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
         $statusPengelolaanOptions = [
-        'KSM', 
-        'Mandiri'
-    ];
+            'KSM',
+            'Mandiri'
+        ];
 
         return view('kepemilikan.edit_per_lahan', compact(
             'kepemilikan',
@@ -387,7 +404,7 @@ public function index(Request $request)
             ]);
         }
 
-    return redirect()->route('kepemilikan.index', $request->query())
+        return redirect()->route('kepemilikan.index', $request->query())
             ->with('success', 'Semua data lahan berhasil diperbarui.');
     }
 
@@ -423,8 +440,6 @@ public function index(Request $request)
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
-
 
     /**
      * Form tambah kepemilikan baru.
@@ -574,18 +589,18 @@ public function index(Request $request)
                 }
 
                 // cari detail kepemilikan lama
-            $detailId = $lahanData['id_detail_kepemilikan'] ?? null; // === TAMBAHAN ===
+                $detailId = $lahanData['id_detail_kepemilikan'] ?? null; // === TAMBAHAN ===
 
-            if ($detailId) {
-                // data lama → update
-                $detail = DetailKepemilikan::find($detailId);
-                $lahan = Lahan::find($lahanData['id_lahan']);
-            } else {
-                // data baru → buat baru === TAMBAHAN ===
-                $lahan = new Lahan();
-                $detail = new DetailKepemilikan();
-                $detail->id_kepemilikan = $kepemilikan->id_kepemilikan;
-            }
+                if ($detailId) {
+                    // data lama → update
+                    $detail = DetailKepemilikan::find($detailId);
+                    $lahan = Lahan::find($lahanData['id_lahan']);
+                } else {
+                    // data baru → buat baru === TAMBAHAN ===
+                    $lahan = new Lahan();
+                    $detail = new DetailKepemilikan();
+                    $detail->id_kepemilikan = $kepemilikan->id_kepemilikan;
+                }
 
                 // update data lahan
                 $lahan->id_desa = $lahanData['id_desa'];
@@ -690,10 +705,12 @@ public function index(Request $request)
         $tahunSekarang = Carbon::now()->year;
 
         $jumlahLahan = $kepemilikan->detailKepemilikan->count();
-        if ($jumlahLahan === 0 && $kepemilikan->petani->status !== 'tidak_aktif') {
-            $kepemilikan->petani->update(['status' => 'tidak_aktif']);
-        } elseif ($jumlahLahan > 0 && $kepemilikan->petani->status !== 'aktif') {
-            $kepemilikan->petani->update(['status' => 'aktif']);
+        if ($kepemilikan->petani->status !== 'berhenti') {
+            if ($jumlahLahan === 0 && $kepemilikan->petani->status !== 'tidak_aktif') {
+                $kepemilikan->petani->update(['status' => 'tidak_aktif']);
+            } elseif ($jumlahLahan > 0 && $kepemilikan->petani->status !== 'aktif') {
+                $kepemilikan->petani->update(['status' => 'aktif']);
+            }
         }
 
         // Loop semua detail_kepemilikan
@@ -718,7 +735,7 @@ public function index(Request $request)
                 }
             }
         }
-
+        $kepemilikan->petani->refresh();
         // Refresh relasi supaya data terbaru muncul di Blade
         $kepemilikan->load('detailKepemilikan.pbb');
 

@@ -56,9 +56,15 @@
                                         if ($p->status === 'aktif') {
                                             $label = 'Aktif';
                                             $badgeClass = 'bg-success';
-                                        } else {
+                                        } elseif ($p->status === 'tidak_aktif') {
                                             $label = 'Tidak Aktif';
+                                            $badgeClass = 'bg-secondary';
+                                        } elseif ($p->status === 'berhenti') {
+                                            $label = 'Berhenti';
                                             $badgeClass = 'bg-danger';
+                                        } else {
+                                            $label = ucfirst($p->status);
+                                            $badgeClass = 'bg-secondary';
                                         }
                                     @endphp
                                     <span class="badge {{ $badgeClass }}">
@@ -88,7 +94,7 @@
                                 <td class="text-center"
                                     style="width: {{ $p->kepemilikanAktif()->count() == 0 ? '180px' : '150px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
-                                    @if ($p->kepemilikanAktif()->count() == 0)
+                                    @if ($p->kepemilikanAktif()->count() == 0 && $p->status !== 'berhenti')
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
                                             class="btn btn-success btn-sm me-1" title="Tambah Kepemilikan">
                                             <i class="fas fa-plus"></i>

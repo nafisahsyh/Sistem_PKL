@@ -113,10 +113,16 @@
                                             </td>
                                             <td class="text-center align-middle"
                                                 rowspan="{{ $k->detailKepemilikan->count() }}">
-                                                <span
-                                                    class="badge {{ $k->petani->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                                    {{ ucfirst($k->petani->status) }}
-                                                </span>
+                                                @if ($k->petani->status === 'aktif')
+                                                    <span class="badge bg-success">Aktif</span>
+                                                @elseif($k->petani->status === 'berhenti')
+                                                    <span class="badge bg-danger">Berhenti</span>
+                                                @elseif($k->petani->status === 'tidak_aktif')
+                                                    <span class="badge bg-secondary">Tidak Aktif</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-secondary">{{ ucfirst($k->petani->status) }}</span>
+                                                @endif
                                             </td>
                                         @endif
 
@@ -286,6 +292,14 @@
                                         {{ $tahun->tahun }}
                                     </option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Riwayat Lahan</label>
+                            <select name="status_petani" id="filter_status_petani" class="form-select">
+                                <option value="">Aktif</option> <!-- default -->
+                                <option value="berhenti" {{ request('status_petani') == 'berhenti' ? 'selected' : '' }}>
+                                    Berhenti</option>
                             </select>
                         </div>
                         <div class="mb-3">

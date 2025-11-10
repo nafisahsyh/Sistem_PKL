@@ -91,6 +91,9 @@
                             <option value="tidak_aktif"
                                 {{ old('status', $petani->status) == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif
                             </option>
+                            <option value="berhenti"
+                                {{ old('status', $petani->status) == 'berhenti' ? 'selected' : '' }}>Berhenti
+                            </option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>

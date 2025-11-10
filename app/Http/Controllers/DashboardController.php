@@ -35,7 +35,7 @@ class DashboardController extends Controller
         })->count();
 
         $jumlahPetaniAktif = Petani::where('status', 'aktif')->count();
-        $jumlahPetaniNonaktif = Petani::where('status', 'tidak_aktif')->count();
+        $jumlahPetaniNonaktif = Petani::whereIn('status', ['tidak_aktif', 'berhenti'])->count();
 
         //Ambil daftar Desa & Tahun untuk dropdown modal
         $desaList = Desa::orderBy('desa')->get();

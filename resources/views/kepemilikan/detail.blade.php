@@ -12,7 +12,7 @@
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
-                'status_pengelolaan' => request('status_pengelolaan')
+                'status_pengelolaan' => request('status_pengelolaan'),
             ]) }}"
                 class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
@@ -70,7 +70,13 @@
                             <th class="text-normal text-start ps-3">Status Petani</th>
                             <td class="text-normal-sm text-start ps-3">
                                 <span
-                                    class="badge {{ $kepemilikan->petani->status == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                                    class="badge {{ $kepemilikan->petani->status == 'aktif'
+                                        ? 'bg-success'
+                                        : ($kepemilikan->petani->status == 'tidak_aktif'
+                                            ? 'bg-secondary'
+                                            : ($kepemilikan->petani->status == 'berhenti'
+                                                ? 'bg-danger'
+                                                : 'bg-secondary')) }}">
                                     {{ ucfirst($kepemilikan->petani->status) }}
                                 </span>
                             </td>

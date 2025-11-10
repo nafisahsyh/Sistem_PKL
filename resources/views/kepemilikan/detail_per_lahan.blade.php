@@ -64,12 +64,18 @@
                             <td class="text-normal-sm text-start ps-3">
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
                         </tr>
-                        <tr>
-                            <th class="text-normal text-start ps-3">Status Kepemilikan</th>
+                         <tr>
+                            <th class="text-normal text-start ps-3">Status Petani</th>
                             <td class="text-normal-sm text-start ps-3">
                                 <span
-                                    class="badge {{ $selectedDetail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ ucfirst($selectedDetail->status_kepemilikan) }}
+                                    class="badge {{ $kepemilikan->petani->status == 'aktif'
+                                        ? 'bg-success'
+                                        : ($kepemilikan->petani->status == 'tidak_aktif'
+                                            ? 'bg-secondary'
+                                            : ($kepemilikan->petani->status == 'berhenti'
+                                                ? 'bg-danger'
+                                                : 'bg-secondary')) }}">
+                                    {{ ucfirst($kepemilikan->petani->status) }}
                                 </span>
                             </td>
                         </tr>
