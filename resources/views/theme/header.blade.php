@@ -4,7 +4,7 @@
 
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-brown-custom">
     <!-- Navbar Brand dengan logo berlatarkan lengkung -->
-    <a class="navbar-brand ps-3 d-flex align-items-center" href="/dashboard">
+    <a class="navbar-brand ps-3 d-flex align-items-center" href="{{ auth()->user()->role == 'super_admin' ? route('dashboard.super') : route('dashboard.admin') }}">
         <div class="logo-container mr-2">
             <img src="{{ asset('/storage/img/logo.png') }}" alt="logo">
         </div>

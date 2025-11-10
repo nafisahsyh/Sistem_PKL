@@ -24,6 +24,8 @@ class DashboardController extends Controller
     {
         $filterDesa = $request->desa;
         $filterTahun = $request->tahun;
+        $filterDesaKelola = $request->input('desa_kelola');
+        $filterTahunKelola = $request->input('tahun_kelola');
 
         $jumlahKecamatan = Kecamatan::count();
         $jumlahDesa = Desa::count();
@@ -110,6 +112,57 @@ class DashboardController extends Controller
             ],
         ];
 
+        $pengelolaanQuery = Kepemilikan::select(
+            'desa.desa',
+            'tahun_tanam.tahun',
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as petani_ksm"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as petani_mandiri"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as lahan_ksm"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as lahan_mandiri"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_ksm"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_mandiri"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN lahan.luas_peta ELSE 0 END) as luas_peta_ksm"),
+            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN lahan.luas_peta ELSE 0 END) as luas_peta_mandiri")
+        )
+        ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
+        ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
+        ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
+        ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam');
+
+        // === Tambahkan FILTER sesuai pilihan di modal
+        if ($filterDesa && $filterDesa != 'all') {
+            $pengelolaanQuery->where('lahan.id_desa', $filterDesa);
+        }
+
+        if ($filterTahun && $filterTahun != 'all') {
+            $pengelolaanQuery->where('lahan.id_tahun_tanam', $filterTahun);
+        }
+        // === Tambahkan FILTER sesuai pilihan di modal (khusus grafik terakhir)
+        if ($filterDesaKelola && $filterDesaKelola != 'all') {
+            $pengelolaanQuery->where('lahan.id_desa', $filterDesaKelola);
+        }
+
+        if ($filterTahunKelola && $filterTahunKelola != 'all') {
+            $pengelolaanQuery->where('lahan.id_tahun_tanam', $filterTahunKelola);
+        }
+
+        $pengelolaanChart = $pengelolaanQuery
+            ->groupBy('desa.desa', 'tahun_tanam.tahun')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'desa' => $item->desa,
+                    'tahun' => $item->tahun,
+                    'petani_ksm' => (int)$item->petani_ksm,
+                    'petani_mandiri' => (int)$item->petani_mandiri,
+                    'lahan_ksm' => (int)$item->lahan_ksm,
+                    'lahan_mandiri' => (int)$item->lahan_mandiri,
+                    'luas_surat_ksm' => (float)$item->luas_surat_ksm,
+                    'luas_surat_mandiri' => (float)$item->luas_surat_mandiri,
+                    'luas_peta_ksm' => (float)$item->luas_peta_ksm,
+                    'luas_peta_mandiri' => (float)$item->luas_peta_mandiri,
+                ];
+            });
 
         return view('dashboard', compact(
             'jumlahKecamatan',
@@ -124,7 +177,10 @@ class DashboardController extends Controller
             'tahunList',
             'filterDesa',
             'filterTahun',
-            'statusData' //dikirim ke view
+            'statusData',
+            'filterDesaKelola',
+            'filterTahunKelola',
+            'pengelolaanChart' //dikirim ke view
         ));
     }
 }
