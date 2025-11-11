@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('petani', function (Blueprint $table) {
             $table->bigIncrements('id_petani');
-            $table->string('nomor_anggota_plasma', 100)->unique();
+            $table->string('nomor_anggota_plasma', 100)->unique()->nullable();
             $table->string('nomor_anggota_koperasi', 100)->unique()->nullable();
             $table->string('NIK', 16)->unique()->nullable();
             $table->string('nama', 255);

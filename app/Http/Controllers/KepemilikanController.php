@@ -1239,7 +1239,7 @@ class KepemilikanController extends Controller
             'id_petani_baru' => 'nullable|required_if:mode,lama|exists:petani,id_petani',
             'nama' => 'nullable|string|max:255',
             'NIK' => 'nullable|string|max:16',
-            'nomor_anggota_plasma' => 'nullable|string|max:100',
+            'nomor_anggota_plasma' => 'required_if:mode,baru|string|max:100',
             'nomor_anggota_koperasi' => 'nullable|string|max:100',
             'alamat' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:50',
@@ -1327,7 +1327,7 @@ class KepemilikanController extends Controller
 
     public function updateKepemilikanSemua(Request $request, $id_kepemilikan)
     {
-        $kepemilikan = Kepemilikan::with('detailKepemilikan')->findOrFail($id_kepemilikan);
+        $kepemilikan = Kepemilikan::with('detailKepemilikan', 'petani')->findOrFail($id_kepemilikan);
 
         if ($kepemilikan->detailKepemilikan->count() === 0) {
             return back()->with('error', 'Petani ini tidak memiliki lahan.');
@@ -1352,9 +1352,21 @@ class KepemilikanController extends Controller
         // Petani lama
         $id_petani_sebelum = $kepemilikan->id_petani;
 
+        // ambil nomor plasma petani lama
+        $nomor_plasma_lama = $kepemilikan->petani->nomor_anggota_plasma;
+
         // Tentukan petani baru
         if ($validated['mode'] === 'lama') {
+
             $id_petani_sesudah = $validated['id_petani_baru'];
+
+            // Hapus nomor plasma petani lama
+            Petani::where('id_petani', $id_petani_sebelum)
+                ->update(['nomor_anggota_plasma' => null]);
+
+            // Berikan nomor plasma lama ke petani pengganti (existing)
+            Petani::where('id_petani', $id_petani_sesudah)
+                ->update(['nomor_anggota_plasma' => $nomor_plasma_lama]);
 
         } else {
 
@@ -1380,9 +1392,13 @@ class KepemilikanController extends Controller
                 $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
             }
 
+            // Hapus nomor_plasma dari petani lama
+            Petani::where('id_petani', $id_petani_sebelum)
+            ->update(['nomor_anggota_plasma' => null]);
+
             // Buat petani baru
             $petaniBaru = Petani::create([
-                'nomor_anggota_plasma' => $validated['nomor_anggota_plasma'],
+                  'nomor_anggota_plasma' => $nomor_plasma_lama,
                 'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
                 'NIK' => $validated['NIK'],
                 'nama' => $validated['nama'],
@@ -1393,6 +1409,7 @@ class KepemilikanController extends Controller
                 'pdf_scan_kk' => $kkName,
             ]);
 
+            // petani baru dibuat
             $id_petani_sesudah = $petaniBaru->id_petani;
         }
 

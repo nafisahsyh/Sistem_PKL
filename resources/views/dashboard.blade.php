@@ -354,7 +354,7 @@
                     data: {
                         labels: chartLabels,
                         datasets: [{
-                                label: 'Luas Lapangan (m²)',
+                                label: 'Luas Lapangan (M²)',
                                 data: lapanganData,
                                 backgroundColor: 'rgba(2, 102, 60, 0.85)',
                                 borderColor: '#02663C',
@@ -362,7 +362,7 @@
                                 borderRadius: 5
                             },
                             {
-                                label: 'Luas Surat (m²)',
+                                label: 'Luas Surat (M²)',
                                 data: suratData,
                                 backgroundColor: 'rgba(242, 201, 76, 0.85)',
                                 borderColor: '#F2C94C',
