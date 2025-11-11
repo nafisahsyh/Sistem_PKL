@@ -57,6 +57,7 @@ class KepemilikanController extends Controller
         }
 
         $search = strtolower($request->search ?? '');
+        $statusPengelolaan = strtolower($request->status_pengelolaan ?? '');
 
         // ===================== PENCARIAN GABUNGAN =====================
         if (!empty($search)) {
@@ -925,8 +926,15 @@ class KepemilikanController extends Controller
 
     public function cetakSemuaPDF(Request $request)
     {
+        $statusPetani = $request->input('status_petani', 'aktif');
+
         $query = Kepemilikan::with([
             'petani.desa.kecamatan',
+            'detailKepemilikan' => function ($q) use ($request) {
+                if ($request->filled('status_pengelolaan')) {
+                    $q->whereIn('status_pengelolaan', (array) $request->status_pengelolaan);
+                }
+            },
             'detailKepemilikan.lahan.desa.kecamatan',
             'detailKepemilikan.lahan.tahunTanam'
         ]);
@@ -965,11 +973,38 @@ class KepemilikanController extends Controller
             });
         });
 
+        // ===================== FILTER STATUS PETANI =====================
+        if (!empty($request->status_petani) && strtolower($request->status_petani) === 'berhenti') {
+            // Petani berhenti → punya lahan tapi nonaktif
+            $query->whereHas('petani', function ($q) {
+                $q->where('status', 'berhenti');
+            })->whereHas('detailKepemilikan', function ($q) {
+                $q->where('status_kepemilikan', 'nonaktif');
+            });
+        } else {
+            // Default → petani & lahan aktif
+            $query->whereHas('petani', function ($q) {
+                $q->where('status', 'aktif');
+            })->whereHas('detailKepemilikan', function ($q) {
+                $q->where('status_kepemilikan', 'aktif');
+            });
+        }
+
+        // ===================== FILTER STATUS PENGELOLAAN =====================
+        $statusPengelolaan = $request->filled('status_pengelolaan')
+            ? (array) $request->input('status_pengelolaan', [])
+            : ['KSM', 'Mandiri'];
+
+        $query->whereHas('detailKepemilikan', fn($q2) => $q2->whereIn('status_pengelolaan', $statusPengelolaan));
+
+
         //Ambil hasil akhir
         $kepemilikan = $query
-            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
-            ->orderBy('petani.nomor_anggota_plasma', 'asc')
-            ->select('kepemilikan.*')
+            ->orderBy(
+                Petani::select('nomor_anggota_plasma')
+                    ->whereColumn('petani.id_petani', 'kepemilikan.id_petani')
+                    ->limit(1)
+            )
             ->get();
 
         if ($kepemilikan->isEmpty()) {
@@ -977,26 +1012,28 @@ class KepemilikanController extends Controller
         }
 
         // Filter ulang detail agar sesuai juga
-        $kepemilikan->each(function ($kep) use ($request) {
-            $kep->detailKepemilikan = $kep->detailKepemilikan->filter(function ($detail) use ($request) {
-                $matchDesa = !$request->filled('desa') ||
-                    ($detail->lahan && $detail->lahan->desa->desa == $request->desa);
-                $matchTahun = !$request->filled('tahun') ||
-                    ($detail->lahan && $detail->lahan->tahunTanam->tahun == $request->tahun);
+        $kepemilikan->each(function ($kep) use ($request, $statusPengelolaan) {
+            $kep->detailKepemilikan = $kep->detailKepemilikan
+                ->whereIn('status_pengelolaan', $statusPengelolaan)
+                ->filter(function ($detail) use ($request) {
+                    $matchDesa = !$request->filled('desa') ||
+                        ($detail->lahan && $detail->lahan->desa->desa == $request->desa);
+                    $matchTahun = !$request->filled('tahun') ||
+                        ($detail->lahan && $detail->lahan->tahunTanam->tahun == $request->tahun);
 
-                if ($request->filled('search')) {
-                    $s = strtolower($request->search);
-                    $matchSearch =
-                        str_contains(strtolower($detail->kepemilikan->petani->nama ?? ''), $s) ||
-                        str_contains(strtolower($detail->kepemilikan->petani->nomor_anggota_plasma ?? ''), $s) ||
-                        str_contains(strtolower($detail->lahan->desa->desa ?? ''), $s) ||
-                        str_contains(strtolower($detail->lahan->tahunTanam->tahun ?? ''), $s);
-                } else {
-                    $matchSearch = true;
-                }
+                    if ($request->filled('search')) {
+                        $s = strtolower($request->search);
+                        $matchSearch =
+                            str_contains(strtolower($detail->kepemilikan->petani->nama ?? ''), $s) ||
+                            str_contains(strtolower($detail->kepemilikan->petani->nomor_anggota_plasma ?? ''), $s) ||
+                            str_contains(strtolower($detail->lahan->desa->desa ?? ''), $s) ||
+                            str_contains(strtolower($detail->lahan->tahunTanam->tahun ?? ''), $s);
+                    } else {
+                        $matchSearch = true;
+                    }
 
-                return $matchDesa && $matchTahun && $matchSearch;
-            });
+                    return $matchDesa && $matchTahun && $matchSearch;
+                });
         });
 
         //Hapus kepemilikan yang detail-nya kosong
@@ -1012,10 +1049,11 @@ class KepemilikanController extends Controller
             'request' => $request
         ])->setPaper('a4', 'landscape');
 
-        $namaDesa = $request->filled('desa') ? str_replace(' ', '_', $request->desa) : 'SemuaDesa';
-        $namaTahun = $request->filled('tahun') ? $request->tahun : 'SemuaTahun';
+        $namaDesa = $request->filled('desa') ? str_replace(' ', '_', $request->desa) : 'Semua Desa';
+        $namaTahun = $request->filled('tahun') ? $request->tahun : 'Semua Tahun';
+        $jenisKelola = $request->filled('status_pengelolaan') ? $request->status_pengelolaan : "Semua Kelola";
 
-        $namaFile = "Data_Kepemilikan_{$namaDesa}_{$namaTahun}.pdf";
+        $namaFile = "Data_Kepemilikan_{$namaDesa}_{$namaTahun}_{$jenisKelola}.pdf";
 
         return $pdf->download($namaFile);
     }
@@ -1303,7 +1341,6 @@ class KepemilikanController extends Controller
 
         return back()->with('success', 'Riwayat kepemilikan berhasil diperbarui.');
     }
-
 
     // HAPUS RIWAYAT
     public function deleteRiwayat($id)

@@ -116,7 +116,7 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <a class="small text-white stretched-link" href="/petani?status=aktif">Lihat Detail</a>
+                            <a href="{{ url('/petani?status=aktif') }}" class="small text-white stretched-link">Lihat Detail</a>
                             <i class="fas fa-angle-right small text-white"></i>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <a class="small text-white stretched-link" href="/petani?status=tidak_aktif">Lihat Detail</a>
+                           <a href="{{ url('/petani?status[]=tidak_aktif&status[]=berhenti') }}" class="small text-white stretched-link">Lihat Detail</a>
                             <i class="fas fa-angle-right small text-white"></i>
                         </div>
                     </div>
@@ -561,12 +561,12 @@
                                         const luasPetaMandiri = row.luas_peta_mandiri.toLocaleString();
 
                                         return [
-                                            `🌾 Petani KSM             : ${petaniKSM}`,
-                                            `🌾 Petani Mandiri         : ${petaniMandiri}`,
-                                            `📜 Luas Surat KSM      : ${luasSuratKSM} m²`,
-                                            `📜 Luas Surat Mandiri  : ${luasSuratMandiri} m²`,
-                                            `🗺️ Luas Peta KSM       : ${luasPetaKSM} m²`,
-                                            `🗺️ Luas Peta Mandiri   : ${luasPetaMandiri} m²`
+                                            `Petani KSM             : ${petaniKSM}`,
+                                            `Petani Mandiri         : ${petaniMandiri}`,
+                                            `Luas Surat KSM      : ${luasSuratKSM} m²`,
+                                            `Luas Surat Mandiri  : ${luasSuratMandiri} m²`,
+                                            `Luas Peta KSM       : ${luasPetaKSM} m²`,
+                                            `Luas Peta Mandiri   : ${luasPetaMandiri} m²`
                                         ];
                                     }
                                 }

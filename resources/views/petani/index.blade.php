@@ -16,13 +16,16 @@
 
                     {{-- Form Search --}}
                     <form action="{{ route('petani.index') }}" method="GET" class="d-flex align-items-start">
+                        <input type="hidden" name="status"
+                            value="{{ is_array(request('status')) ? implode(',', request('status')) : request('status') }}">
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari nama, NIK, atau nomor anggota..." value="{{ request('search') }}"
                             style="width: 300px;">
                         <button class="btn btn-success" type="submit" title="Search">
                             <i class="fas fa-search"></i>
                         </button>
-                        <a href="{{ route('petani.index') }}" class="btn btn-primary ms-2" title="Reset">
+                        <a href="{{ route('petani.index', request('status') ? ['status' => request('status')] : []) }}"
+                            class="btn btn-primary ms-2" title="Reset">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>

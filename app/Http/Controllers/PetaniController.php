@@ -18,6 +18,19 @@ class PetaniController extends Controller
     {
         $query = Petani::withCount('kepemilikan');
 
+        // 🔹 Filter berdasarkan status (aktif / tidak_aktif / berhenti)
+        $status = $request->query('status');
+        if ($status) {
+            if (is_array($status)) {
+                // format: ?status[]=tidak_aktif&status[]=berhenti
+                $query->whereIn('status', $status);
+            } else {
+                // format: ?status=aktif
+                $query->where('status', $status);
+            }
+        }
+
+        // Filter pencarian
         if ($request->filled('search')) {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
@@ -28,8 +41,11 @@ class PetaniController extends Controller
             });
         }
 
+        // Urutkan & paginasi
         $petani = $query->orderBy('id_petani', 'desc')->paginate(10);
-        return view('petani.index', compact('petani'));
+        $petani->appends($request->only(['search', 'status']));
+
+        return view('petani.index', compact('petani', 'status'));
     }
 
     public function create()

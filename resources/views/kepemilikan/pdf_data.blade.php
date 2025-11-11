@@ -23,7 +23,6 @@
 <div class="info">
     <p><strong>Desa:</strong> {{ $request->desa ?? 'Semua Desa' }}</p>
     <p><strong>Tahun Tanam:</strong> {{ $request->tahun ?? 'Semua Tahun' }}</p>
-    <p><strong>Tanggal Cetak:</strong> {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
 </div>
 
 @php

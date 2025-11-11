@@ -302,11 +302,6 @@
                 Tidak ada riwayat kepemilikan lahan
             </p>
         @endif
-
-        {{-- Page break tiap lahan --}}
-        @if (!$loop->last)
-            <div style="page-break-after: always;"></div>
-        @endif
     @endforeach
 
     <div class="signature">

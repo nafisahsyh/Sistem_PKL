@@ -10,6 +10,8 @@
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
+                'status_petani' => request('status_petani'),
+                'status_pengelolaan' => request('status_pengelolaan'),
             ]) }}"
                 target="_blank" class="btn btn-danger">
                 <i class="fas fa-file-pdf"></i> Cetak PDF
@@ -297,7 +299,8 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Riwayat Lahan</label>
                             <select name="status_petani" id="filter_status_petani" class="form-select">
-                                <option value="">Aktif</option> <!-- default -->
+                                <option value="aktif" {{ request('status_petani') == 'aktif' ? 'selected' : '' }}>Aktif
+                                </option>
                                 <option value="berhenti" {{ request('status_petani') == 'berhenti' ? 'selected' : '' }}>
                                     Berhenti</option>
                             </select>

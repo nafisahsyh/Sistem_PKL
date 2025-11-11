@@ -81,35 +81,63 @@ class DashboardController extends Controller
         }
 
         // Tambahan baru: Data status pengelolaan
+        // =================== PIE CHART JUMLAH PETANI =================
         $statusData = [
             'petani' => [
-                'Mandiri' => Petani::whereHas('kepemilikan.detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
-                                    ->distinct()->count('id_petani'),
-                'KSM' => Petani::whereHas('kepemilikan.detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
-                                ->distinct()->count('id_petani'),
+                'Mandiri' => Petani::whereHas('kepemilikan.detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'Mandiri')
+                        ->where('status_kepemilikan', 'aktif'); // hanya yang aktif
+                })
+                    ->distinct()
+                    ->count('id_petani'),
+
+                'KSM' => Petani::whereHas('kepemilikan.detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'KSM')
+                        ->where('status_kepemilikan', 'aktif'); // hanya yang aktif
+                })
+                    ->distinct()
+                    ->count('id_petani'),
             ],
 
+            // =================== PIE CHART JUMLAH LAHAN =================
             'lahan' => [
-                // JUMLAH LAHAN
-                'Mandiri' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
-                                ->distinct()->count('id_lahan'),
-                'KSM' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
-                            ->distinct()->count('id_lahan'),
+                'Mandiri' => Lahan::whereHas('detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'Mandiri')
+                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                })
+                    ->distinct()
+                    ->count('id_lahan'),
 
-                // ✅ TOTAL LUAS SURAT → lewat tabel detail_kepemilikan
+                'KSM' => Lahan::whereHas('detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'KSM')
+                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                })
+                    ->distinct()
+                    ->count('id_lahan'),
+
+                // TOTAL LUAS SURAT → tabel detail_kepemilikan
                 'Mandiri_surat' => DB::table('detail_kepemilikan')
-                                        ->where('status_pengelolaan','Mandiri')
-                                        ->sum('luas_surat'),
-                'KSM_surat' => DB::table('detail_kepemilikan')
-                                        ->where('status_pengelolaan','KSM')
-                                        ->sum('luas_surat'),
+                    ->where('status_pengelolaan', 'Mandiri')
+                    ->where('status_kepemilikan', 'aktif') // hanya lahan aktif
+                    ->sum('luas_surat'),
 
-                // ✅ TOTAL LUAS PETA / LAPANGAN → lewat tabel lahan
-                'Mandiri_peta' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','Mandiri'))
-                                        ->sum('luas_peta'),
-                'KSM_peta' => Lahan::whereHas('detailKepemilikan', fn($q)=>$q->where('status_pengelolaan','KSM'))
-                                    ->sum('luas_peta'),
+                'KSM_surat' => DB::table('detail_kepemilikan')
+                    ->where('status_pengelolaan', 'KSM')
+                    ->where('status_kepemilikan', 'aktif') // hanya lahan aktif
+                    ->sum('luas_surat'),
+
+                // TOTAL LUAS PETA → tabel lahan dengan relasi detail_kepemilikan aktif
+                'Mandiri_peta' => Lahan::whereHas('detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'Mandiri')
+                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                })->sum('luas_peta'),
+
+                'KSM_peta' => Lahan::whereHas('detailKepemilikan', function ($q) {
+                    $q->where('status_pengelolaan', 'KSM')
+                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                })->sum('luas_peta'),
             ],
+
         ];
 
         $pengelolaanQuery = Kepemilikan::select(
@@ -124,10 +152,10 @@ class DashboardController extends Controller
             DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN lahan.luas_peta ELSE 0 END) as luas_peta_ksm"),
             DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN lahan.luas_peta ELSE 0 END) as luas_peta_mandiri")
         )
-        ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
-        ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
-        ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
-        ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam');
+            ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
+            ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
+            ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
+            ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam');
 
         // === Tambahkan FILTER sesuai pilihan di modal
         if ($filterDesa && $filterDesa != 'all') {
@@ -153,14 +181,14 @@ class DashboardController extends Controller
                 return [
                     'desa' => $item->desa,
                     'tahun' => $item->tahun,
-                    'petani_ksm' => (int)$item->petani_ksm,
-                    'petani_mandiri' => (int)$item->petani_mandiri,
-                    'lahan_ksm' => (int)$item->lahan_ksm,
-                    'lahan_mandiri' => (int)$item->lahan_mandiri,
-                    'luas_surat_ksm' => (float)$item->luas_surat_ksm,
-                    'luas_surat_mandiri' => (float)$item->luas_surat_mandiri,
-                    'luas_peta_ksm' => (float)$item->luas_peta_ksm,
-                    'luas_peta_mandiri' => (float)$item->luas_peta_mandiri,
+                    'petani_ksm' => (int) $item->petani_ksm,
+                    'petani_mandiri' => (int) $item->petani_mandiri,
+                    'lahan_ksm' => (int) $item->lahan_ksm,
+                    'lahan_mandiri' => (int) $item->lahan_mandiri,
+                    'luas_surat_ksm' => (float) $item->luas_surat_ksm,
+                    'luas_surat_mandiri' => (float) $item->luas_surat_mandiri,
+                    'luas_peta_ksm' => (float) $item->luas_peta_ksm,
+                    'luas_peta_mandiri' => (float) $item->luas_peta_mandiri,
                 ];
             });
 
