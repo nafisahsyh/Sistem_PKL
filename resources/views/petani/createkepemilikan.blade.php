@@ -179,7 +179,7 @@
                                 <label class="form-label">Status Kepemilikan</label>
                                 <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil select-status">
                                     <option value="aktif" selected>Aktif</option>
-                                    <option value="nonaktif">Nonaktif</option>
+                                    <option value="nonaktif">Tidak Aktif</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -340,7 +340,7 @@
                 <label class="form-label">Status Kepemilikan</label>
                 <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil select-status">
                     <option value="aktif" selected>Aktif</option>
-                    <option value="nonaktif">Nonaktif</option>
+                    <option value="nonaktif">Tidak Aktif</option>
                 </select>
             </div>
             <div class="col-md-4 mb-3">

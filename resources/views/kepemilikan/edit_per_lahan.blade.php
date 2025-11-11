@@ -248,7 +248,7 @@
                                     <option value="aktif" {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>
                                         Aktif</option>
                                     <option value="nonaktif"
-                                        {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
+                                        {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak Aktif
                                     </option>
                                 </select>
                             </div>

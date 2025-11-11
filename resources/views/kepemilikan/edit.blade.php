@@ -280,7 +280,7 @@
                                             {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
                                         </option>
                                         <option value="nonaktif"
-                                            {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Nonaktif
+                                            {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak Aktif
                                         </option>
                                     </select>
                                 </div>
@@ -767,7 +767,7 @@
                     <label class="form-label">Status Kepemilikan</label>
                     <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil choices-select">
                         <option value="aktif" selected>Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
+                        <option value="nonaktif">Tidak Aktif</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">

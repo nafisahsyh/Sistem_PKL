@@ -74,7 +74,8 @@ class KepemilikanController extends Controller
                         $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
                     })
                     ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
-                        $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"]);
+                        $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
                     });
             });
         }
@@ -125,13 +126,15 @@ class KepemilikanController extends Controller
                     $namaPetani = strtolower($detail->kepemilikan->petani->nama ?? '');
                     $nomorPlasma = strtolower($detail->kepemilikan->petani->nomor_anggota_plasma ?? '');
                     $nomorKoperasi = strtolower($detail->kepemilikan->petani->nomor_anggota_koperasi ?? '');
+                    $statusPengelolaan = strtolower($detail->status_pengelolaan ?? '');
 
                     return str_contains($desa, $search)
                         || str_contains($tahun, $search)
                         || str_contains($kodeLahan, $search)
                         || str_contains($namaPetani, $search)
                         || str_contains($nomorPlasma, $search)
-                        || str_contains($nomorKoperasi, $search);
+                        || str_contains($nomorKoperasi, $search)
+                        || str_contains($statusPengelolaan, $search);
                 })->values();
                 return $item;
             });

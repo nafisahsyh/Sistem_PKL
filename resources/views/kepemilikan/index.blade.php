@@ -340,6 +340,7 @@
             const desaSelect = document.getElementById('filter_desa');
             const tahunSelect = document.getElementById('filter_tahun_tanam');
             const statusSelect = document.getElementById('filter_status');
+            const riwayatSelect = document.getElementById('filter_status_petani');
             if (desaSelect) new Choices(desaSelect, {
                 shouldSort: false,
                 searchPlaceholderValue: "Cari desa..."
@@ -349,6 +350,10 @@
                 searchPlaceholderValue: "Cari tahun..."
             });
             if (statusSelect) new Choices(statusSelect, {
+                shouldSort: false,
+                searchEnabled: false
+            });
+            if (riwayatSelect) new Choices(riwayatSelect, {
                 shouldSort: false,
                 searchEnabled: false
             });

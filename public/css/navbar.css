@@ -433,9 +433,9 @@ div.choices[data-type*="select-one"]::after {
     margin-top: 5px;
 }
 .card.p-4 {
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-    padding-top: 1.2rem !important;   /* tetap kecil */
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    padding-top: 1rem !important;   /* tetap kecil */
     padding-bottom: 1rem !important; /* tetap kecil */
 }
 

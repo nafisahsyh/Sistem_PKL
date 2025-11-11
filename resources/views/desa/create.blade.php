@@ -17,7 +17,6 @@
                         <label for="id_kecamatan" class="form-label">Kecamatan</label>
                         <select name="id_kecamatan" id="id_kecamatan"
                             class="form-select text-kecil @error('id_kecamatan') is-invalid @enderror" required>
-                            <option value="" disabled selected hidden>Pilih Kecamatan</option>
                             @foreach ($kecamatan as $item)
                                 <option value="{{ $item->id_kecamatan }}"
                                     {{ old('id_kecamatan') == $item->id_kecamatan ? 'selected' : '' }}>
@@ -54,11 +53,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const kecamatanSelect = document.getElementById('id_kecamatan');
             new Choices(kecamatanSelect, {
-                searchEnabled: false,
+                searchEnabled: true,
                 itemSelectText: '',
                 shouldSort: false,
                 placeholder: true,
-                placeholderValue: 'Pilih Kecamatan',
+                placeholderValue: 'Pilih Kecamatan',        // placeholder awal
+                searchPlaceholderValue: 'Cari Kecamatan...',   // placeholder saat search
                 allowHTML: true
             });
         });
