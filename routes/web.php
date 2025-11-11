@@ -82,6 +82,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('pbb.generate');
     Route::post('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/ganti', [KepemilikanController::class, 'updateKepemilikan'])
     ->name('kepemilikan.updateKepemilikan');
+    Route::post('/kepemilikan/update-kepemilikan-semua/{id_kepemilikan}', [KepemilikanController::class, 'updateKepemilikanSemua'])->name('kepemilikan.updateKepemilikanSemua');
     Route::get('/kepemilikan/riwayat-lahan/{id_lahan}', [KepemilikanController::class, 'riwayatLahan'])
     ->name('kepemilikan.riwayatLahan');
     Route::put('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'updateRiwayat'])

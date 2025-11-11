@@ -64,7 +64,7 @@
                 <div class="mb-3">
                     <label for="alamat" class="form-label">Alamat</label>
                     <textarea name="alamat" id="alamat" rows="3"
-                        class="form-control text-kecil @error('alamat') is-invalid @enderror" required>{{ old('alamat', $petani->alamat) }}</textarea>
+                        class="form-control text-kecil @error('alamat') is-invalid @enderror">{{ old('alamat', $petani->alamat) }}</textarea>
                     @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

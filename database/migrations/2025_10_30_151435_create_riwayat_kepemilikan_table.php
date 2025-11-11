@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_petani_sebelum');
             $table->unsignedBigInteger('id_petani_sesudah')->nullable();
 
-            $table->date('tanggal_ganti');
+            $table->date('tanggal_ganti')->nullable();
             $table->string('keterangan')->nullable();
             $table->timestamps();
 

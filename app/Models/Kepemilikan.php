@@ -31,7 +31,7 @@ class Kepemilikan extends Model
                 $kepemilikan->petani->updateStatusPetani();
             }
         });
-
+        
         static::deleted(function ($kepemilikan) {
             if ($kepemilikan->petani) {
                 $kepemilikan->petani->updateStatusPetani();

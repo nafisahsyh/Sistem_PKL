@@ -1138,7 +1138,7 @@ class KepemilikanController extends Controller
             'nomor_anggota_koperasi' => 'required|string',
             'NIK' => 'required|string|max:16',
             'nama' => 'required|string',
-            'alamat' => 'required|string',
+            'alamat' => 'nullable|string',
             'status' => 'required|in:aktif,tidak_aktif',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi angka & +62
             'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
@@ -1174,7 +1174,7 @@ class KepemilikanController extends Controller
             'nomor_anggota_koperasi' => $request->nomor_anggota_koperasi,
             'NIK' => $request->NIK,
             'nama' => $request->nama,
-            'alamat' => $request->alamat,
+            'alamat' => $request->alamat ?? null,
             'status' => $request->status,
             'no_telepon' => $no_telepon,
             'pdf_scan_ktp' => $ktpName,
@@ -1244,7 +1244,7 @@ class KepemilikanController extends Controller
             'alamat' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:50',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi nomor telepon
-            'tanggal_ganti' => 'required|date',
+            'tanggal_ganti' => 'nullable|date',
             'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
             'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
             'keterangan' => 'nullable|string',
@@ -1283,7 +1283,7 @@ class KepemilikanController extends Controller
                 'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
                 'NIK' => $validated['NIK'],
                 'nama' => $validated['nama'],
-                'alamat' => $validated['alamat'],
+                'alamat' => $validated['alamat'] ?? null,
                 'status' => $validated['status'] ?? 'aktif',
                 'no_telepon' => $no_telepon,
                 'pdf_scan_ktp' => $ktpName,
@@ -1316,7 +1316,7 @@ class KepemilikanController extends Controller
             'id_lahan' => $id_lahan,
             'id_petani_sebelum' => $id_petani_sebelum,
             'id_petani_sesudah' => $id_petani_sesudah,
-            'tanggal_ganti' => $validated['tanggal_ganti'],
+            'tanggal_ganti' => $validated['tanggal_ganti'] ?? null,
             'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
         ]);
 
@@ -1325,17 +1325,121 @@ class KepemilikanController extends Controller
             ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
     }
 
+    public function updateKepemilikanSemua(Request $request, $id_kepemilikan)
+    {
+        $kepemilikan = Kepemilikan::with('detailKepemilikan')->findOrFail($id_kepemilikan);
+
+        if ($kepemilikan->detailKepemilikan->count() === 0) {
+            return back()->with('error', 'Petani ini tidak memiliki lahan.');
+        }
+
+        $validated = $request->validate([
+            'mode' => 'required|in:lama,baru',
+            'id_petani_baru' => 'nullable|required_if:mode,lama|exists:petani,id_petani',
+            'nama' => 'nullable|string|max:255',
+            'NIK' => 'nullable|string|max:16',
+            'nomor_anggota_plasma' => 'nullable|string|max:100',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100',
+            'alamat' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:50',
+            'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/',
+            'tanggal_ganti' => 'nullable|date',
+            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        // Petani lama
+        $id_petani_sebelum = $kepemilikan->id_petani;
+
+        // Tentukan petani baru
+        if ($validated['mode'] === 'lama') {
+            $id_petani_sesudah = $validated['id_petani_baru'];
+
+        } else {
+
+            // Format nomor telepon
+            $no_telepon = $validated['no_telepon'] ?? null;
+            if ($no_telepon && substr($no_telepon, 0, 1) === '0') {
+                $no_telepon = '+62' . substr($no_telepon, 1);
+            }
+
+            // Upload file PDF
+            $ktpName = $request->hasFile('pdf_scan_ktp')
+                ? time() . '_' . $request->file('pdf_scan_ktp')->getClientOriginalName()
+                : null;
+
+            $kkName = $request->hasFile('pdf_scan_kk')
+                ? time() . '_' . $request->file('pdf_scan_kk')->getClientOriginalName()
+                : null;
+
+            if ($ktpName) {
+                $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $ktpName, 'public');
+            }
+            if ($kkName) {
+                $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
+            }
+
+            // Buat petani baru
+            $petaniBaru = Petani::create([
+                'nomor_anggota_plasma' => $validated['nomor_anggota_plasma'],
+                'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
+                'NIK' => $validated['NIK'],
+                'nama' => $validated['nama'],
+                'alamat' => $validated['alamat'] ?? null,
+                'status' => $validated['status'] ?? 'aktif',
+                'no_telepon' => $no_telepon,
+                'pdf_scan_ktp' => $ktpName,
+                'pdf_scan_kk' => $kkName,
+            ]);
+
+            $id_petani_sesudah = $petaniBaru->id_petani;
+        }
+
+        // Buat kepemilikan baru jika belum ada
+        $kepemilikanBaru = Kepemilikan::firstOrCreate(
+            ['id_petani' => $id_petani_sesudah],
+            ['tanggal_kepemilikan' => now(), 'status' => 'aktif']
+        );
+
+        // Pindahkan SEMUA lahan yang dimiliki petani lama
+        foreach ($kepemilikan->detailKepemilikan as $detail) {
+
+            // Update kepemilikan lahan
+            $detail->update([
+                'id_kepemilikan' => $kepemilikanBaru->id_kepemilikan,
+            ]);
+
+            // Simpan riwayat perpindahan tiap lahan
+            RiwayatKepemilikan::create([
+                'id_lahan' => $detail->id_lahan,
+                'id_petani_sebelum' => $id_petani_sebelum,
+                'id_petani_sesudah' => $id_petani_sesudah,
+                'tanggal_ganti' => $validated['tanggal_ganti'] ?? null,
+                'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
+            ]);
+        }
+
+        // Setelah semua dipindah → hapus kepemilikan lama
+        $kepemilikan->delete();
+
+        return redirect()->route('kepemilikan.edit', $kepemilikanBaru->id_kepemilikan)
+            ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
+
+    }
+
+
     public function updateRiwayat(Request $request, $id)
     {
         $request->validate([
-            'tanggal_ganti' => 'required|date',
+            'tanggal_ganti' => 'nullable|date',
             'keterangan' => 'nullable|string',
         ]);
 
         $riwayat = RiwayatKepemilikan::findOrFail($id);
 
         $riwayat->update([
-            'tanggal_ganti' => $request->tanggal_ganti,
+            'tanggal_ganti' => $request->tanggal_ganti ?? null,
             'keterangan' => $request->keterangan,
         ]);
 

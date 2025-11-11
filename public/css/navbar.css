@@ -432,6 +432,13 @@ div.choices[data-type*="select-one"]::after {
     font-style: italic;
     margin-top: 5px;
 }
+.card.p-4 {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    padding-top: 1.2rem !important;   /* tetap kecil */
+    padding-bottom: 1rem !important; /* tetap kecil */
+}
+
 
 .text-normal {
     font-size: 0.95rem;
@@ -614,6 +621,100 @@ input.form-control {
     border-color: #dcdcdc;
     opacity: 0.7;
 }
+
+/* ============================================================
+===  MODAL GANTI KEPEMILIKAN SEMUA LAHAN (DISAMAKAN)  ===
+   ============================================================ */
+
+/* Container Petani Baru */
+#modalGantiKepemilikanSemua #petaniBaruSemua {
+    display: block;
+}
+
+/* Label semua input/textarea */
+#modalGantiKepemilikanSemua #petaniBaruSemua label,
+#modalGantiKepemilikanSemua .mb-3 label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Input, select, textarea */
+#modalGantiKepemilikanSemua #petaniBaruSemua input.form-control,
+#modalGantiKepemilikanSemua #petaniBaruSemua select.form-select,
+#modalGantiKepemilikanSemua #petaniBaruSemua textarea.form-control,
+#modalGantiKepemilikanSemua .mb-3 input.form-control,
+#modalGantiKepemilikanSemua .mb-3 select.form-select,
+#modalGantiKepemilikanSemua .mb-3 textarea.form-control {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+/* Placeholder */
+#modalGantiKepemilikanSemua #petaniBaruSemua input::placeholder,
+#modalGantiKepemilikanSemua #petaniBaruSemua textarea::placeholder {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Textarea besar */
+#modalGantiKepemilikanSemua #petaniBaruSemua textarea.form-control,
+#modalGantiKepemilikanSemua textarea.form-control {
+    min-height: 90px;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+/* Tombol simpan */
+#modalGantiKepemilikanSemua .modal-footer .btn-success {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+}
+
+/* Dropdown Petani Lama */
+#modalGantiKepemilikanSemua #petaniLamaSemua select,
+#modalGantiKepemilikanSemua #modeSelectSemua {
+    font-size: 0.9rem;
+}
+
+/* Textarea kecil (keterangan) */
+#modalGantiKepemilikanSemua .custom-textarea {
+    min-height: 36px !important;
+    max-height: 36px !important;
+    resize: vertical;
+}
+
+/* text-muted styling */
+#modalGantiKepemilikanSemua .modal-body .text-muted {
+    color: #101010 !important;
+    font-weight: 500 !important;
+}
+
+/* Isi tabel normal */
+#modalGantiKepemilikanSemua .modal-body td {
+    font-weight: 400;
+    color: #212529;
+}
+
+/* h6 dalam modal */
+#modalGantiKepemilikanSemua h6 {
+    font-weight: 600;
+    color: #00A85A;
+}
+
+/* Garis pemisah */
+#modalGantiKepemilikanSemua hr {
+    border-color: #dcdcdc;
+    opacity: 0.7;
+}
+
+/* Header hijau */
+#modalGantiKepemilikanSemua .bg-warning {
+    background-color: #00A85A !important;
+}
+
 
 .card-footer a {
     text-decoration: none !important;

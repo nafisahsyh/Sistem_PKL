@@ -57,7 +57,7 @@
                 <div class="mb-3">
                     <label for="alamat" class="form-label">Alamat</label>
                     <textarea name="alamat" class="form-control text-kecil @error('alamat') is-invalid @enderror"
-                        placeholder="Masukkan alamat lengkap" required>{{ old('alamat') }}</textarea>
+                        placeholder="Masukkan alamat lengkap">{{ old('alamat') }}</textarea>
                     @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

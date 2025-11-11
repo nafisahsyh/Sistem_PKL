@@ -122,6 +122,14 @@
                 </div>
             </div>
 
+            <!-- BUTTON GANTI KEPEMILIKAN SEMUA LAHAN -->
+            <div class="d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#modalGantiKepemilikanSemua">
+                    <i class="fas fa-sync-alt"></i> Ganti Kepemilikan Semua Lahan
+                </button>
+            </div>
+
             {{-- ===================== DATA LAHAN ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
@@ -144,8 +152,8 @@
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
-                                    data-bs-target="#modalGantiKepemilikan"
+                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan"
+                                    data-bs-toggle="modal" data-bs-target="#modalGantiKepemilikan"
                                     data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
                                     onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
@@ -365,7 +373,7 @@
                                 <label class="form-label fw-bold">Mode</label>
                                 <select name="mode" class="form-select choices-modal" id="modeSelect" required>
                                     <option value="" disabled selected hidden>Pilih Mode</option>
-                                    <option value="lama">Gunakan Petani Lama</option>
+                                    <option value="lama" selected>Gunakan Petani Lama</option>
                                     <option value="baru">Tambah Petani Baru</option>
                                 </select>
                             </div>
@@ -430,7 +438,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Tanggal Ganti</label>
                                     <input type="date" name="tanggal_ganti" class="form-control"
-                                        value="{{ date('Y-m-d') }}" required>
+                                        value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-8 mb-3">
                                     <label class="form-label">Keterangan</label>
@@ -448,6 +456,189 @@
                 </form>
             </div>
         </div>
+
+        <!-- ======= MODAL GANTI KEPEMILIKAN SEMUA LAHAN (RAPI SAMA PERSIS) ======= -->
+        <div class="modal fade" id="modalGantiKepemilikanSemua" tabindex="-1"
+            aria-labelledby="modalGantiKepemilikanSemuaLabel" aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <form action="{{ route('kepemilikan.updateKepemilikanSemua', $kepemilikan->id_kepemilikan) }}"
+                    method="POST" enctype="multipart/form-data">
+
+                    @csrf
+
+                    <div class="modal-content rounded-4">
+
+                        <!-- HEADER -->
+                        <div class="modal-header bg-success text-white rounded-top-4">
+                            <h5 class="modal-title" id="modalGantiKepemilikanSemuaLabel">
+                                Ganti Kepemilikan Semua Lahan
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="modal-body px-4 py-3">
+
+                            {{-- MODE PILIH --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mode</label>
+                                <select name="mode" class="form-select choices-modal" id="modeSelectSemua" required>
+                                    <option value="" disabled selected hidden>Pilih Mode</option>
+                                    <option value="lama" selected>Gunakan Petani Lama</option>
+                                    <option value="baru">Tambah Petani Baru</option>
+                                </select>
+                            </div>
+
+                            {{-- PILIH PETANI LAMA --}}
+                            <div id="petaniLamaSemua" class="mb-3">
+                                <label class="form-label">Pilih Petani Pengganti</label>
+                                <select name="id_petani_baru" class="form-select choices-modal">
+                                    @foreach ($petani as $p)
+                                        @if ($p->id_petani != $kepemilikan->id_petani)
+                                            <option value="{{ $p->id_petani }}">
+                                                {{ $p->nomor_anggota_plasma }} ({{ $p->nama }})
+                                            </option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- MODE PETANI BARU (STRUKTUR SAMA PERSIS DENGAN MODAL PERTAMA) --}}
+                            <div id="petaniBaruSemua" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label>Nama Lengkap</label>
+                                        <input type="text" name="nama" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label>NIK</label>
+                                        <input type="text" name="NIK" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label>Telepon</label>
+                                        <input type="text" name="no_telepon" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label>Nomor Plasma</label>
+                                        <input type="text" name="nomor_anggota_plasma" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label>Nomor Koperasi</label>
+                                        <input type="text" name="nomor_anggota_koperasi" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label>Alamat</label>
+                                        <textarea name="alamat" class="form-control form-control-sm custom-textarea"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label>Scan KTP (PDF)</label>
+                                        <input type="file" name="pdf_scan_ktp" class="form-control"
+                                            accept="application/pdf">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label>Scan KK (PDF)</label>
+                                        <input type="file" name="pdf_scan_kk" class="form-control"
+                                            accept="application/pdf">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TANGGAL + KETERANGAN --}}
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tanggal Ganti</label>
+                                    <input type="date" name="tanggal_ganti" class="form-control"
+                                        value="{{ date('Y-m-d') }}">
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Keterangan</label>
+                                    <textarea name="keterangan" class="form-control form-control-sm custom-textarea"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="modal-footer d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- SCRIPT MODE SWITCH -->
+        <script>
+            // ================== MODAL GANTI KEPEMILIKAN SEMUA ==================
+            document.addEventListener('DOMContentLoaded', function() {
+
+                // ================== TOGGLE PETANI LAMA / BARU ==================
+                const modeSelectSemua = document.getElementById('modeSelectSemua');
+                const petaniLamaSemua = document.getElementById('petaniLamaSemua');
+                const petaniBaruSemua = document.getElementById('petaniBaruSemua');
+
+                function toggleModeSemua(value) {
+                    petaniLamaSemua.style.display = (value === 'lama') ? 'block' : 'none';
+                    petaniBaruSemua.style.display = (value === 'baru') ? 'block' : 'none';
+                }
+
+                // ========== DEFAULT MODE: lama ==========
+                if (modeSelectSemua) {
+                    modeSelectSemua.value = 'lama';
+                    toggleModeSemua('lama');
+
+                    modeSelectSemua.addEventListener('change', function() {
+                        toggleModeSemua(this.value);
+                    });
+                }
+
+                // ================== INIT CHOICES.JS UNTUK MODAL SEMUA ==================
+                const modalGantiSemua = document.getElementById('modalGantiKepemilikanSemua');
+
+                if (modalGantiSemua) {
+                    modalGantiSemua.addEventListener('shown.bs.modal', function() {
+
+                        const modalSelects = modalGantiSemua.querySelectorAll('select.choices-modal');
+
+                        modalSelects.forEach(select => {
+
+                            // Hapus instance choices lama
+                            if (select.choicesInstance) {
+                                select.choicesInstance.destroy();
+                            }
+
+                            // *** ATURAN BARU ***
+                            const isModeSelect = select.id === 'modeSelectSemua';
+
+                            const choices = new Choices(select, {
+                                searchEnabled: !isModeSelect,
+                                // MODE dropdown TIDAK BISA search
+                                // Petani Lama tetap BISA search
+                                placeholder: true,
+                                placeholderValue: 'Pilih Petani',
+                                searchPlaceholderValue: 'Cari...',
+                                shouldSort: false,
+                                itemSelectText: '',
+                                allowHTML: true
+                            });
+
+                            select.choicesInstance = choices;
+                        });
+                    });
+                }
+
+            });
+        </script>
 
 
         <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
@@ -599,98 +790,100 @@
                 </div>
             </div>
         `;
-                container.appendChild(lahanBaru);
-                lahanIndex++;
-                initChoices(lahanBaru); // init select Choices di lahan baru
-                updateHapusTombol();
-            };
+                    container.appendChild(lahanBaru);
+                    lahanIndex++;
+                    initChoices(lahanBaru); // init select Choices di lahan baru
+                    updateHapusTombol();
+                };
 
-            container.addEventListener('click', function(e) {
-                const btn = e.target.closest('.btn-hapus-lahan');
-                if (!btn) return;
+                container.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.btn-hapus-lahan');
+                    if (!btn) return;
 
-                const item = btn.closest('.lahan-item');
+                    const item = btn.closest('.lahan-item');
 
-                // Tandai hidden input 'hapus' jadi 1
-                const hapusInput = item.querySelector('input[name*="[hapus]"]');
-                if (hapusInput) hapusInput.value = 1;
+                    // Tandai hidden input 'hapus' jadi 1
+                    const hapusInput = item.querySelector('input[name*="[hapus]"]');
+                    if (hapusInput) hapusInput.value = 1;
 
-                // Sembunyikan dari user
-                item.style.display = 'none';
+                    // Sembunyikan dari user
+                    item.style.display = 'none';
 
-                // Update index & tombol hapus seperti biasa
-                updateIndices();
-                updateHapusTombol();
-            });
+                    // Update index & tombol hapus seperti biasa
+                    updateIndices();
+                    updateHapusTombol();
+                });
 
-            function updateIndices() {
-                container.querySelectorAll('.lahan-item').forEach((item, index) => {
-                    item.querySelectorAll('input, select').forEach(input => {
-                        input.name = input.name.replace(/lahan\[\d+\]/, `lahan[${index}]`);
+                function updateIndices() {
+                    container.querySelectorAll('.lahan-item').forEach((item, index) => {
+                        item.querySelectorAll('input, select').forEach(input => {
+                            input.name = input.name.replace(/lahan\[\d+\]/, `lahan[${index}]`);
+                        });
+                        item.querySelector('h6').textContent = `Lahan ${index + 1}`;
                     });
-                    item.querySelector('h6').textContent = `Lahan ${index + 1}`;
+                    lahanIndex = container.querySelectorAll('.lahan-item').length;
+                }
+
+                function updateHapusTombol() {
+                    const items = container.querySelectorAll('.lahan-item');
+                    items.forEach(item => {
+                        const btn = item.querySelector('.btn-hapus-lahan');
+                        btn.style.display = (items.length <= 1) ? 'none' : 'inline-block';
+                    });
+                }
+
+                // ================== MODAL GANTI KEPEMILIKAN ==================
+                window.setLahanId = function(id) {
+                    const inputLahan = document.getElementById('id_lahan_modal');
+                    const form = document.getElementById('formGantiKepemilikan');
+                    inputLahan.value = id;
+                    form.action =
+                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}"
+                        .replace(':id', id);
+                };
+
+                // ================== TOGGLE PETANI LAMA / BARU ==================
+                const modeSelect = document.getElementById('modeSelect');
+                const petaniLama = document.getElementById('petaniLama');
+                const petaniBaru = document.getElementById('petaniBaru');
+
+                function toggleMode(value) {
+                    petaniLama.style.display = (value === 'lama') ? 'block' : 'none';
+                    petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
+                }
+
+                // Default dan event listener
+                modeSelect.value = 'lama';
+                toggleMode('lama');
+                modeSelect.addEventListener('change', function() {
+                    toggleMode(this.value);
                 });
-                lahanIndex = container.querySelectorAll('.lahan-item').length;
-            }
+                // ================== INIT CHOICES UNTUK SELECT MODAL ==================
+                const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
+                if (modalGantiKepemilikan) {
+                    modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
+                        const modalSelects = modalGantiKepemilikan.querySelectorAll(
+                            'select.choices-modal'
+                        );
+                        modalSelects.forEach(select => {
+                            // destroy instance lama kalau ada
+                            if (select.choices) {
+                                select.choices.destroy();
+                            }
 
-            function updateHapusTombol() {
-                const items = container.querySelectorAll('.lahan-item');
-                items.forEach(item => {
-                    const btn = item.querySelector('.btn-hapus-lahan');
-                    btn.style.display = (items.length <= 1) ? 'none' : 'inline-block';
-                });
-            }
-
-            // ================== MODAL GANTI KEPEMILIKAN ==================
-            window.setLahanId = function(id) {
-                const inputLahan = document.getElementById('id_lahan_modal');
-                const form = document.getElementById('formGantiKepemilikan');
-                inputLahan.value = id;
-                form.action =
-                    "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}"
-                    .replace(':id', id);
-            };
-
-            // ================== TOGGLE PETANI LAMA / BARU ==================
-            const modeSelect = document.getElementById('modeSelect');
-            const petaniLama = document.getElementById('petaniLama');
-            const petaniBaru = document.getElementById('petaniBaru');
-
-            function toggleMode(value) {
-                petaniLama.style.display = (value === 'lama') ? 'block' : 'none';
-                petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
-            }
-
-            // Default dan event listener
-            modeSelect.value = 'lama'; toggleMode('lama'); modeSelect.addEventListener('change', function() {
-                toggleMode(this.value);
-            });
-            // ================== INIT CHOICES UNTUK SELECT MODAL ==================
-            const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
-            if (modalGantiKepemilikan) {
-                modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
-                    const modalSelects = modalGantiKepemilikan.querySelectorAll(
-                        'select.choices-modal'
-                    );
-                    modalSelects.forEach(select => {
-                        // destroy instance lama kalau ada
-                        if (select.choices) {
-                            select.choices.destroy();
-                        }
-
-                        new Choices(select, {
-                            searchEnabled: select.id ===
-                                'selectPetaniLama', // cuma search untuk petani lama
-                            placeholder: true,
-                            placeholderValue: 'Pilih Petani',
-                            searchPlaceholderValue: 'Cari petani...',
-                            shouldSort: false,
-                            itemSelectText: '',
-                            allowHTML: true
+                            new Choices(select, {
+                                searchEnabled: select.id ===
+                                    'selectPetaniLama', // cuma search untuk petani lama
+                                placeholder: true,
+                                placeholderValue: 'Pilih Petani',
+                                searchPlaceholderValue: 'Cari petani...',
+                                shouldSort: false,
+                                itemSelectText: '',
+                                allowHTML: true
+                            });
                         });
                     });
-                });
-            }
+                }
 
 
             });

@@ -4,16 +4,17 @@
 @section('content')
     <div class="container-fluid px-4 mt-5">
 
-        <h3 class="mt-3 text-brown">
+        <h3 class="mt-3" style="color: #014C2D;">
             @if (Auth::check() && Auth::user()->role === 'super_admin')
                 Dashboard Super Admin
             @else
                 Dashboard Admin
             @endif
         </h3>
+
         <h7>
-            Selamat datang <strong>{{ Auth::user()->nama ?? 'Tamu' }}</strong> di
-            <strong>Sistem Administrasi Plasma Koperasi Sawit Makmur</strong>
+            Selamat datang <span style="font-weight: 600; color: #014C2D;">{{ Auth::user()->nama ?? 'Tamu' }}</span> di
+            <span style="font-weight: 600; color: #014C2D;">Sistem Administrasi Plasma Koperasi Sawit Makmur</span>
         </h7>
 
         {{-- CARD CARDS --}}
@@ -116,7 +117,8 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <a href="{{ url('/petani?status=aktif') }}" class="small text-white stretched-link">Lihat Detail</a>
+                            <a href="{{ url('/petani?status=aktif') }}" class="small text-white stretched-link">Lihat
+                                Detail</a>
                             <i class="fas fa-angle-right small text-white"></i>
                         </div>
                     </div>
@@ -132,7 +134,8 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                           <a href="{{ url('/petani?status[]=tidak_aktif&status[]=berhenti') }}" class="small text-white stretched-link">Lihat Detail</a>
+                            <a href="{{ url('/petani?status[]=tidak_aktif&status[]=berhenti') }}"
+                                class="small text-white stretched-link">Lihat Detail</a>
                             <i class="fas fa-angle-right small text-white"></i>
                         </div>
                     </div>
@@ -148,7 +151,8 @@
         <div class="row mb-3">
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <button class="btn {{ $filterDesa || $filterTahun ? 'btn-success text-white' : 'btn-outline-success' }}"
+                    <button
+                        class="btn {{ $filterDesa || $filterTahun ? 'btn-success text-white' : 'btn-outline-success' }}"
                         data-bs-toggle="modal" data-bs-target="#modalFilterGrafik">
                         <i class="fas fa-filter me-1"></i> Filter Grafik Lahan
                     </button>

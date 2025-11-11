@@ -47,9 +47,22 @@ class DetailKepemilikan extends Model
     // Event untuk menghapus file ketika detail dihapus
     protected static function booted()
     {
+        // Setelah detail dibuat
         static::created(function ($detail) {
-            if ($detail->kepemilikan && $detail->kepemilikan->petani) {
-                $detail->kepemilikan->petani->updateStatusPetani();
+            optional($detail->kepemilikan->petani)->updateStatusPetani();
+        });
+
+        // Setelah detail diupdate
+        static::updated(function ($detail) {
+            // Cek jika kepemilikan berubah
+            if ($detail->isDirty('id_kepemilikan')) {
+                // Petani lama
+                $oldKepemilikanId = $detail->getOriginal('id_kepemilikan');
+                $oldKepemilikan = \App\Models\Kepemilikan::find($oldKepemilikanId);
+                optional($oldKepemilikan->petani)->updateStatusPetani();
+
+                // Petani baru
+                optional($detail->kepemilikan->petani)->updateStatusPetani();
             }
         });
 
