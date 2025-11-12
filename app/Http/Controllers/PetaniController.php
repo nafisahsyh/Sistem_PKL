@@ -199,6 +199,7 @@ class PetaniController extends Controller
             'lahan' => 'required|array|min:1',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
+            'lahan.*.status_pengelolaan' => 'nullable|in:KSM,Mandiri,Perusahaan',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.kode_lahan' => 'nullable|string|max:15',
             'lahan.*.nomor_SHM' => 'nullable|string|max:100',
@@ -226,6 +227,20 @@ class PetaniController extends Controller
                     'id_tahun_tanam' => $lahanData['id_tahun_tanam'],
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
+                
+            foreach ($request->lahan as $index => $lahanData) {
+                $statusKepemilikan = $lahanData['status_kepemilikan'] ?? null;
+                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
+
+                // 🔹 Sinkronisasi dua arah
+                if ($statusKepemilikan === 'nonaktif') {
+                    $statusPengelolaan = 'Perusahaan';
+                }
+
+                if ($statusPengelolaan === 'Perusahaan') {
+                    $statusKepemilikan = 'nonaktif';
+                }
+            }
 
                 $shmName = $lahanData['pdf_scan_shm'] ?? null;
                 if ($shmName && $lahanData['pdf_scan_shm']->isValid()) {
@@ -254,6 +269,7 @@ class PetaniController extends Controller
                     'status_kepemilikan' => $lahanData['status_kepemilikan'] ?? 'aktif',
                     'tanggal_mulai' => $lahanData['tanggal_mulai'],
                     'tanggal_selesai' => $lahanData['tanggal_selesai'],
+                    'status_pengelolaan' => $lahanData['status_pengelolaan'] ?? 'KSM',
                 ]);
             }
 

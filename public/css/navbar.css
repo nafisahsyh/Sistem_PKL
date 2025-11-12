@@ -794,3 +794,29 @@ input.form-control {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+/* ==== RAPIKAN TAMPILAN DATA PETANI ==== */
+.card .text-dark.fw-semibold {
+    font-size: 0.95rem; /* label seperti "Nomor Plasma" */
+}
+
+.card .fs-6.fw-medium.text-dark {
+    font-size: 0.95rem; /* isi data seperti "Aida" atau NIK */
+    font-weight: 400;
+    color: #222;
+}
+
+/* Dokumen teks yang tidak ada */
+.card .text-muted.fw-medium {
+    font-size: 0.9rem;
+}
+
+/* Tombol lihat dokumen */
+.card .btn-sm {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+}
+
+/* Jarak antar kolom biar lebih rapi */
+.card .row.mb-3 > .col-md-4 {
+    margin-bottom: 0.8rem;
+}

@@ -338,8 +338,10 @@
                                 </option>
                                 <option value="Mandiri"
                                     {{ request('status_pengelolaan') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                <option value="Perusahaan"
+                                    {{ request('status_pengelolaan') == 'Perusahaan' ? 'selected' : '' }}>Perusahaan
+                                </option>
                             </select>
-
                         </div>
 
                     </div>

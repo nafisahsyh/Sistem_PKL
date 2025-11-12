@@ -34,63 +34,84 @@
             <input type="hidden" name="id_petani" value="{{ $petani->id_petani }}">
 
             {{-- DATA PETANI --}}
-            <div class="card p-4 mb-4 shadow-sm rounded-3">
+            <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
                 <h5 class="text-brown mb-3">Data Petani</h5>
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Nomor Plasma</label>
-                        <input type="text" class="form-control text-kecil" value="{{ $petani->nomor_anggota_plasma }}"
-                            readonly>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Nomor Koperasi</label>
-                        <input type="text" class="form-control text-kecil" value="{{ $petani->nomor_anggota_koperasi }}"
-                            readonly>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">NIK</label>
-                        <input type="text" class="form-control text-kecil" value="{{ $petani->NIK }}" readonly>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Telepon</label>
-                        <input type="text" class="form-control text-kecil" value="{{ $petani->no_telepon }}" readonly>
+
+                <div class="p-4 bg-light rounded-3 border">
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Plasma</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nomor_anggota_plasma ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Koperasi</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nomor_anggota_koperasi ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">NIK</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->NIK ?? '-' }}
+                            </div>
+                        </div>
                     </div>
 
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control text-kecil" value="{{ $petani->nama }}" readonly>
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nama Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nama ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Telepon</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->no_telepon ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Alamat</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->alamat ?? '-' }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-8 mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea class="form-control text-kecil" rows="1" readonly>{{ $petani->alamat }}</textarea>
+
+                    <hr class="my-3">
+
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-2">
+                            <div class="text-dark fw-semibold">Dokumen KTP</div>
+                            <div>
+                                @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
+                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}"
+                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="fas fa-file-pdf"></i> Lihat KTP
+                                    </a>
+                                @else
+                                    <span class="text-muted fw-medium">Tidak ada dokumen</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="text-dark fw-semibold">Dokumen KK</div>
+                            <div>
+                                @if ($kepemilikan->petani->pdf_scan_kk ?? false)
+                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}"
+                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="fas fa-file-pdf"></i> Lihat KK
+                                    </a>
+                                @else
+                                    <span class="text-muted fw-medium">Tidak ada dokumen</span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Dokumen KTP</label><br>
-                    @if ($petani->pdf_scan_ktp)
-                        <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}" target="_blank"
-                            class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-file-pdf"></i> Dokumen
-                        </a>
-                    @else
-                        <span class="text-muted">Tidak ada</span>
-                    @endif
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Dokumen Kartu Keluarga</label><br>
-                    @if ($petani->pdf_scan_kk)
-                        <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}" target="_blank"
-                            class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-file-pdf"></i> Dokumen
-                        </a>
-                    @else
-                        <span class="text-muted">Tidak ada</span>
-                    @endif
                 </div>
             </div>
-
             {{-- DATA LAHAN --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
@@ -160,8 +181,9 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kelola</label>
                                 <select name="lahan[0][status_pengelolaan]" class="form-select text-kecil select-status">
-                                    <option value="KSM" selected>KSM</option>
+                                    <option value="KSM">KSM</option>
                                     <option value="Mandiri">Mandiri</option>
+                                    <option value="Perusahaan">Perusahaan</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -220,38 +242,40 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Choices untuk select yang sudah ada
-            document.querySelectorAll('.select-desa').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: true,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Desa',
-                    searchPlaceholderValue: 'Cari Desa...'
+
+            // ===== Inisialisasi Choices untuk elemen yang sudah ada =====
+            function initChoices(selectors, options = {}) {
+                document.querySelectorAll(selectors).forEach(select => {
+                    new Choices(select, options);
                 });
+            }
+
+            initChoices('.select-desa', {
+                searchEnabled: true,
+                shouldSort: false,
+                itemSelectText: '',
+                placeholderValue: 'Pilih Desa',
+                searchPlaceholderValue: 'Cari Desa...'
             });
 
-            document.querySelectorAll('.select-tahun').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: true,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Tahun Tanam',
-                    searchPlaceholderValue: 'Cari Tahun...'
-                });
-            });
-            document.querySelectorAll('.select-status').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: false,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Status',
-                });
+            initChoices('.select-tahun', {
+                searchEnabled: true,
+                shouldSort: false,
+                itemSelectText: '',
+                placeholderValue: 'Pilih Tahun Tanam',
+                searchPlaceholderValue: 'Cari Tahun...'
             });
 
-            // Tambah lahan dinamis
-            let lahanIndex = 1; // karena Lahan 1 sudah ada
+            initChoices('.select-status', {
+                searchEnabled: false,
+                shouldSort: false,
+                itemSelectText: '',
+            });
+
+            // ===== Tambah Lahan Dinamis =====
+            let lahanIndex = 1; // Lahan 1 sudah ada
             const container = document.getElementById('lahan-container');
+
 
             window.tambahLahan = function() {
                 const lahanDiv = document.createElement('div');
@@ -322,8 +346,9 @@
             <div class="col-md-4 mb-3">
                 <label class="form-label">Status Kelola</label>
                 <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
-                    <option value="KSM" selected>KSM</option>                    
+                    <option value="KSM">KSM</option>                    
                     <option value="Mandiri">Mandiri</option>
+                    <option value="Perusahaan">Perusahaan</option>
                 </select>
             </div>
             <div class="col-md-4 mb-3">
@@ -365,37 +390,44 @@
     `;
                 container.appendChild(lahanDiv);
 
-            document.querySelectorAll('.select-desa').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: true,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Desa',
-                    searchPlaceholderValue: 'Cari Desa...'
+                const form = document.querySelector('form');
+                form.addEventListener('submit', function(e) {
+                    document.querySelectorAll('.select-status, .select-desa, .select-tahun').forEach(
+                        select => {
+                            if (select.choices) {
+                                select.value = select.choices.getValue(true);
+                            }
+                        });
                 });
-            });
+                document.querySelectorAll('.select-desa').forEach(select => {
+                    new Choices(select, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        itemSelectText: '',
+                        placeholderValue: 'Pilih Desa',
+                        searchPlaceholderValue: 'Cari Desa...'
+                    });
+                });
 
-            document.querySelectorAll('.select-tahun').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: true,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Tahun Tanam',
-                    searchPlaceholderValue: 'Cari Tahun...'
+                document.querySelectorAll('.select-tahun').forEach(select => {
+                    new Choices(select, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        itemSelectText: '',
+                        placeholderValue: 'Pilih Tahun Tanam',
+                        searchPlaceholderValue: 'Cari Tahun...'
+                    });
                 });
-            });
-            document.querySelectorAll('.select-status').forEach(select => {
-                new Choices(select, {
-                    searchEnabled: false,
-                    shouldSort: false,
-                    itemSelectText: '',
-                    placeholderValue: 'Pilih Status',
+                document.querySelectorAll('.select-status').forEach(select => {
+                    new Choices(select, {
+                        searchEnabled: false,
+                        shouldSort: false,
+                        itemSelectText: '',
+                    });
                 });
-            });
 
                 lahanIndex++;
             };
-
 
             // Hapus lahan
             container.addEventListener('click', e => {
@@ -410,6 +442,8 @@
                     lahanIndex = container.children.length;
                 }
             });
+
+
         });
     </script>
 @endsection

@@ -44,81 +44,85 @@
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="id_petani" value="{{ $kepemilikan->id_petani }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
-            <div class="card p-4 mb-4 shadow-sm rounded-3">
+            <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
                 <h5 class="text-brown mb-3">Data Petani</h5>
 
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Nomor Plasma</label>
-                        <select id="id_petani" name="id_petani" class="form-select text-kecil choices-select"
-                            onchange="tampilDataPetani()">
-                            <option value="" disabled hidden>Pilih Nomor Plasma</option>
-                            @foreach ($petani as $p)
-                                <option value="{{ $p->id_petani }}" data-nama="{{ $p->nama }}"
-                                    data-nik="{{ $p->NIK }}" data-anggota="{{ $p->nomor_anggota_koperasi }}"
-                                    data-alamat="{{ $p->alamat }}"
-                                    {{ $kepemilikan->id_petani == $p->id_petani ? 'selected' : '' }}>
-                                    {{ $p->nomor_anggota_plasma }}
-                                </option>
-                            @endforeach
-                        </select>
+                <div class="p-4 bg-light rounded-3 border">
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Plasma</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Koperasi</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">NIK</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->NIK ?? '-' }}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Nomor Koperasi</label>
-                        <input type="text" id="anggota" class="form-control text-kecil"
-                            value="{{ $kepemilikan->petani->nomor_anggota_koperasi ?? '' }}" readonly>
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nama Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->nama ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Telepon</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->no_telepon ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Alamat</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $kepemilikan->petani->alamat ?? '-' }}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">NIK</label>
-                        <input type="text" id="nik" class="form-control text-kecil"
-                            value="{{ $kepemilikan->petani->NIK ?? '' }}" readonly>
-                    </div>
+                    <hr class="my-3">
 
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Telepon</label>
-                        <input type="text" id="no_telepon" class="form-control text-kecil"
-                            value="{{ $kepemilikan->petani->no_telepon ?? '' }}" readonly>
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-2">
+                            <div class="text-dark fw-semibold">Dokumen KTP</div>
+                            <div>
+                                @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
+                                    <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
+                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="fas fa-file-pdf"></i> Lihat KTP
+                                    </a>
+                                @else
+                                    <span class="text-muted fw-medium">Tidak ada dokumen</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="text-dark fw-semibold">Dokumen KK</div>
+                            <div>
+                                @if ($kepemilikan->petani->pdf_scan_kk ?? false)
+                                    <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
+                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="fas fa-file-pdf"></i> Lihat KK
+                                    </a>
+                                @else
+                                    <span class="text-muted fw-medium">Tidak ada dokumen</span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" id="nama" class="form-control text-kecil"
-                            value="{{ $kepemilikan->petani->nama ?? '' }}" readonly>
-                    </div>
-                    <div class="col-md-8 mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea id="alamat" class="form-control text-kecil" rows="1" readonly>{{ $kepemilikan->petani->alamat ?? '' }}</textarea>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Dokumen KTP</label><br>
-                    @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
-                        <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}" target="_blank"
-                            class="btn btn-sm btn-info text-white">
-                            <i class="fas fa-file-pdf"></i> Lihat
-                        </a>
-                    @else
-                        <span class="text-muted">Tidak ada dokumen</span>
-                    @endif
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Dokumen KK</label><br>
-                    @if ($kepemilikan->petani->pdf_scan_kk ?? false)
-                        <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}" target="_blank"
-                            class="btn btn-sm btn-info text-white">
-                            <i class="fas fa-file-pdf"></i> Lihat
-                        </a>
-                    @else
-                        <span class="text-muted">Tidak ada dokumen</span>
-                    @endif
                 </div>
             </div>
 
@@ -152,8 +156,8 @@
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan"
-                                    data-bs-toggle="modal" data-bs-target="#modalGantiKepemilikan"
+                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
+                                    data-bs-target="#modalGantiKepemilikan"
                                     data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
                                     onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
@@ -255,6 +259,9 @@
                                         </option>
                                         <option value="Mandiri"
                                             {{ $detail->status_pengelolaan == 'Mandiri' ? 'selected' : '' }}>Mandiri
+                                        </option>
+                                        <option value="Perusahaan"
+                                            {{ $detail->status_pengelolaan == 'Perusahaan' ? 'selected' : '' }}>Perusahaan
                                         </option>
                                     </select>
                                 </div>
@@ -852,6 +859,7 @@
                     <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil choices-select">
                         <option value="KSM" selected>KSM</option>                    
                         <option value="Mandiri">Mandiri</option>
+                        <option value="Perusahaan">Perusahaan</option>                        
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">

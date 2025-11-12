@@ -153,12 +153,12 @@
                                                 class="badge 
             @if ($detail->status_pengelolaan == 'KSM') bg-success
             @elseif ($detail->status_pengelolaan == 'Mandiri') bg-primary
+            @elseif ($detail->status_pengelolaan == 'Perusahaan') bg-warning text-dark
             @else bg-secondary @endif">
                                                 {{ $detail->status_pengelolaan ?? '-' }}
                                             </span>
                                         </td>
                                     </tr>
-
                                     <tr>
                                         <th class="text-normal text-start ps-3" width="30%">Desa</th>
                                         <td class="text-normal-sm text-start ps-3">{{ $detail->lahan->desa->desa ?? '-' }}
