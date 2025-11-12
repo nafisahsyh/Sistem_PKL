@@ -12,6 +12,8 @@
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
+                'status_pengelolaan' => request('status_pengelolaan'),
+                'status' => request('status'),
             ]) }}"
                 class="btn btn-success p-2" title="Kembali ke Data Kepemilikan">
                 <i class="fas fa-chevron-left fa-lg"></i>
@@ -64,7 +66,7 @@
                             <td class="text-normal-sm text-start ps-3">
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
                         </tr>
-                         <tr>
+                        <tr>
                             <th class="text-normal text-start ps-3">Status Petani</th>
                             <td class="text-normal-sm text-start ps-3">
                                 <span
@@ -122,7 +124,15 @@
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <strong>Data Lahan {{ $loop->iteration }}</strong>
-                    <a href="{{ route('kepemilikan.riwayatLahan', ['id_lahan' => $detail->id_lahan]) }}"
+                    <a href="{{ route('kepemilikan.riwayatLahan', [
+                        'id_lahan' => $detail->id_lahan,
+                        'page' => request('page'),
+                        'search' => request('search'),
+                        'desa' => request('desa'),
+                        'tahun' => request('tahun'),
+                        'status_pengelolaan' => request('status_pengelolaan'),
+                        'status' => request('status'),
+                    ]) }}"
                         class="btn btn-info btn-sm text-dark">
                         <i class="fas fa-history"></i> Riwayat
                     </a>

@@ -147,16 +147,40 @@
                                         {{-- tombol aksi tampil sekali di baris pertama petani --}}
                                         @if ($firstRow)
                                             @php
+                                                // Ambil parameter request supaya aman digunakan
+                                                $search = request('search');
+                                                $desa = request('desa');
+                                                $tahun = request('tahun');
+                                                $status_pengelolaan = request('status_pengelolaan');
+
+                                                // Deteksi apakah ada filter aktif
+                                                $adaFilter =
+                                                    filled($desa) || filled($tahun) || filled($status_pengelolaan);
+
                                                 // Hitung jumlah lahan aktif di kepemilikan ini
                                                 $jumlahLahan = $k->detailKepemilikan->count();
 
                                                 // Tentukan apakah harus tampil per lahan
                                                 // Sekarang termasuk juga kalau ada "search"
-                                                $tampilPerLahan =
-                                                    request()->filled('desa') ||
-                                                    request()->filled('tahun') ||
-                                                    request()->filled('status_pengelolaan') ||
-                                                    request()->filled('search');
+                                                $tampilPerLahan = false;
+
+                                                if ($adaFilter) {
+                                                    // Kalau ada filter, tampil per lahan
+                                                    $tampilPerLahan = true;
+                                                } elseif (!empty($search)) {
+                                                    // Kalau search diisi, cek isinya
+                                                    // Jika search mengandung angka 4 digit (tahun) atau cocok dengan salah satu nama desa, tampil per lahan
+                                                    $mengandungTahun = preg_match('/\b(19|20)\d{2}\b/', $search);
+                                                    $matchDesa = collect($daftarDesa ?? [])->contains(
+                                                        fn($d) => stripos($d->desa, $search) !== false,
+                                                    );
+
+                                                    if ($mengandungTahun || $matchDesa) {
+                                                        $tampilPerLahan = true;
+                                                    } else {
+                                                        $tampilPerLahan = false; // nama atau nomor plasma → normal
+                                                    }
+                                                }
                                             @endphp
 
                                             <td class="text-center align-middle" rowspan="{{ $jumlahLahan }}">

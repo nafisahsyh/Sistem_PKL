@@ -300,28 +300,55 @@
 
                             {{-- Upload file --}}
                             <div class="row">
+                                {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">File Scan SHM (PDF)</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
                                         class="form-control text-kecil" accept="application/pdf">
+
+                                    {{-- Hidden input untuk menandai penghapusan SHM --}}
+                                    <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
+                                        value="0">
+
                                     @if ($detail->pdf_scan_shm)
-                                        <small class="text-muted">File saat ini:
-                                            <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
-                                                target="_blank">Lihat
-                                                PDF</a>
-                                        </small>
+                                        <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
+                                            <small class="text-muted">
+                                                File saat ini:
+                                                <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
+                                                    target="_blank">Lihat PDF</a>
+                                            </small>
+                                            {{-- Tombol hapus file SHM --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
+                                                title="Hapus file SHM">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                     @endif
                                 </div>
+
+                                {{-- FILE PETA --}}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">File Scan Peta (PDF)</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
                                         class="form-control text-kecil" accept="application/pdf">
+
+                                    {{-- Hidden input untuk menandai penghapusan Peta --}}
+                                    <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
+                                        class="hapus_peta" value="0">
+
                                     @if ($detail->pdf_scan_peta)
-                                        <small class="text-muted">File saat ini:
-                                            <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
-                                                target="_blank">Lihat
-                                                PDF</a>
-                                        </small>
+                                        <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
+                                            <small class="text-muted">
+                                                File saat ini:
+                                                <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
+                                                    target="_blank">Lihat PDF</a>
+                                            </small>
+                                            {{-- Tombol hapus file Peta --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-peta"
+                                                title="Hapus file Peta">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -340,7 +367,17 @@
                 {{-- Tombol Perbarui / Batal --}}
                 <div class="text-start mt-3">
                     <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                    <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
+                    <a href="{{ route('kepemilikan.index', [
+                        'page' => request('page'),
+                        'search' => request('search'),
+                        'desa' => request('desa'),
+                        'tahun' => request('tahun'),
+                        'status_pengelolaan' => request('status_pengelolaan'),
+                        'status' => request('status'),
+                    ]) }}"
+                        class="btn btn-danger">
+                        Batal
+                    </a>
                 </div>
             </div>
         </form>
@@ -671,6 +708,69 @@
 
                 initChoices(document);
 
+                // Hapus file SHM
+                document.querySelectorAll('.btn-hapus-shm').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const container = this.closest('.file-shm-container');
+                        const inputHidden = container.parentElement.querySelector('.hapus_shm');
+
+                        Swal.fire({
+                            title: "Yakin ingin menghapus file SHM?",
+                            text: "File ini akan dihapus permanen dari sistem.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#198754",
+                            cancelButtonColor: "#dc3545",
+                            confirmButtonText: "Ya, hapus",
+                            cancelButtonText: "Batal"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                inputHidden.value = 1;
+                                container.remove();
+
+                                Swal.fire({
+                                    title: "Berhasil!",
+                                    text: "File SHM berhasil untuk dihapus.",
+                                    icon: "success",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                        });
+                    });
+                });
+
+                // Hapus file Peta
+                document.querySelectorAll('.btn-hapus-peta').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const container = this.closest('.file-peta-container');
+                        const inputHidden = container.parentElement.querySelector('.hapus_peta');
+
+                        Swal.fire({
+                            title: "Yakin ingin menghapus file Peta?",
+                            text: "File ini akan dihapus permanen dari sistem.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#198754",
+                            cancelButtonColor: "#dc3545",
+                            confirmButtonText: "Ya, hapus",
+                            cancelButtonText: "Batal"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                inputHidden.value = 1;
+                                container.remove();
+
+                                Swal.fire({
+                                    title: "Berhasil!",
+                                    text: "File Peta berhasil untuk dihapus.",
+                                    icon: "success",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                        });
+                    });
+                });
 
                 // ================== TAMBAH / HAPUS LAHAN ==================
                 let lahanIndex = {{ count($kepemilikan->detailKepemilikan) }};
@@ -780,15 +880,47 @@
                 </div>
             </div>                                                                     
             <div class="row">
+                <!-- === FILE SHM === -->
                 <div class="col-md-6 mb-3">
                     <label class="form-label">File Scan SHM (PDF)</label>
-                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" accept="application/pdf" class="form-control text-kecil">
+                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
+                        accept="application/pdf" class="form-control text-kecil">
+
+                    <!-- Hidden input untuk hapus SHM -->
+                    <input type="hidden" name="lahan[${lahanIndex}][hapus_shm]" 
+                        class="hapus_shm" value="0">
+
+                    <!-- Container file SHM -->
+                    <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
+                        <small class="text-muted">Belum ada file SHM yang diunggah.</small>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm" 
+                            title="Hapus file SHM">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- === FILE PETA === -->
                 <div class="col-md-6 mb-3">
                     <label class="form-label">File Scan Peta (PDF)</label>
-                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" accept="application/pdf" class="form-control text-kecil">
+                    <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
+                        accept="application/pdf" class="form-control text-kecil">
+
+                    <!-- Hidden input untuk hapus Peta -->
+                    <input type="hidden" name="lahan[${lahanIndex}][hapus_peta]" 
+                        class="hapus_peta" value="0">
+
+                    <!-- Container file Peta -->
+                    <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
+                        <small class="text-muted">Belum ada file Peta yang diunggah.</small>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-peta" 
+                            title="Hapus file Peta">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
         `;
                     container.appendChild(lahanBaru);
                     lahanIndex++;
@@ -829,6 +961,66 @@
                     items.forEach(item => {
                         const btn = item.querySelector('.btn-hapus-lahan');
                         btn.style.display = (items.length <= 1) ? 'none' : 'inline-block';
+                    });
+                }
+
+                // === HAPUS FILE SHM ===
+                if (e.target.closest('.btn-hapus-shm')) {
+                    const btn = e.target.closest('.btn-hapus-shm');
+                    const container = btn.closest('.file-shm-container');
+                    const inputHidden = container.parentElement.querySelector('.hapus_shm');
+
+                    Swal.fire({
+                        title: "Yakin ingin menghapus file SHM?",
+                        text: "File ini akan dihapus permanen dari sistem.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#198754",
+                        cancelButtonColor: "#dc3545",
+                        confirmButtonText: "Ya, hapus",
+                        cancelButtonText: "Batal"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            inputHidden.value = 1;
+                            container.remove();
+                            Swal.fire({
+                                title: "Berhasil!",
+                                text: "File SHM berhasil untuk dihapus.",
+                                icon: "success",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                }
+
+                // === HAPUS FILE PETA ===
+                if (e.target.closest('.btn-hapus-peta')) {
+                    const btn = e.target.closest('.btn-hapus-peta');
+                    const container = btn.closest('.file-peta-container');
+                    const inputHidden = container.parentElement.querySelector('.hapus_peta');
+
+                    Swal.fire({
+                        title: "Yakin ingin menghapus file Peta?",
+                        text: "File ini akan dihapus permanen dari sistem.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#198754",
+                        cancelButtonColor: "#dc3545",
+                        confirmButtonText: "Ya, hapus",
+                        cancelButtonText: "Batal"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            inputHidden.value = 1;
+                            container.remove();
+                            Swal.fire({
+                                title: "Berhasil!",
+                                text: "File Peta berhasil untuk dihapus.",
+                                icon: "success",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
                     });
                 }
 

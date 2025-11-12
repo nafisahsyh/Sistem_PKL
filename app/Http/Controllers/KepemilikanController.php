@@ -9,6 +9,7 @@ use App\Models\Petani;
 use App\Models\Lahan;
 use App\Models\Desa;
 use App\Models\Tahun_Tanam;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Pbb;
 use App\Models\RiwayatKepemilikan;
 
@@ -75,7 +76,7 @@ class KepemilikanController extends Controller
                     })
                     ->orWhereHas('detailKepemilikan', function ($q2) use ($search) {
                         $q2->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
-                        ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
+                            ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
                     });
             });
         }
@@ -377,13 +378,30 @@ class KepemilikanController extends Controller
 
             ]);
 
-            // Handle file upload (pakai index)
-            if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+            // === HANDLE FILE SHM ===
+            if ($request->input("lahan.$index.hapus_shm") == 1) {
+                if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_shm);
+                }
+                $detail->update(['pdf_scan_shm' => null]);
+            } elseif ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_shm);
+                }
                 $path = $request->file("lahan.$index.pdf_scan_shm")->store('pdf_scan_shm', 'public');
                 $detail->update(['pdf_scan_shm' => $path]);
             }
 
-            if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+            // === HANDLE FILE PETA ===
+            if ($request->input("lahan.$index.hapus_peta") == 1) {
+                if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_peta);
+                }
+                $detail->update(['pdf_scan_peta' => null]);
+            } elseif ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_peta);
+                }
                 $path = $request->file("lahan.$index.pdf_scan_peta")->store('pdf_scan_peta', 'public');
                 $detail->update(['pdf_scan_peta' => $path]);
             }
@@ -408,8 +426,14 @@ class KepemilikanController extends Controller
             ]);
         }
 
-        return redirect()->route('kepemilikan.index', $request->query())
-            ->with('success', 'Semua data lahan berhasil diperbarui.');
+        return redirect()->route('kepemilikan.index', [
+            'page' => $request->input('page'),
+            'search' => $request->input('search'),
+            'desa' => $request->input('desa'),
+            'tahun' => $request->input('tahun'),
+            'status_pengelolaan' => $request->input('status_pengelolaan'),
+            'status' => $request->input('status'),
+        ])->with('success', 'Data Kepemilikan Berhasil Diperbarui!');
     }
 
     public function destroyPerLahan($id_kepemilikan, $id_lahan)
@@ -612,16 +636,33 @@ class KepemilikanController extends Controller
                 $lahan->luas_peta = $lahanData['luas_peta'];
                 $lahan->save();
 
-                // Handle file SHM
-                // File SHM
-                if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                // === HANDLE FILE SHM ===
+                if (!empty($lahanData['hapus_shm']) && $lahanData['hapus_shm'] == 1) {
+                    if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_shm);
+                    }
+                    $shmPath = null;
+                } elseif ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                    // Upload baru
+                    if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_shm);
+                    }
                     $shmPath = $request->file("lahan.$index.pdf_scan_shm")->store('shm_pdf', 'public');
                 } else {
                     $shmPath = $detail->pdf_scan_shm ?? null;
                 }
 
-                // File Peta
-                if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                // === HANDLE FILE PETA ===
+                if (!empty($lahanData['hapus_peta']) && $lahanData['hapus_peta'] == 1) {
+                    if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_peta);
+                    }
+                    $petaPath = null;
+                } elseif ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                    // Upload baru
+                    if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_peta);
+                    }
                     $petaPath = $request->file("lahan.$index.pdf_scan_peta")->store('peta_pdf', 'public');
                 } else {
                     $petaPath = $detail->pdf_scan_peta ?? null;
@@ -651,7 +692,7 @@ class KepemilikanController extends Controller
 
             DB::commit();
             // Ambil query parameter sebelumnya: page, search, desa, tahun
-            $queryParams = request()->only(['page', 'search', 'desa', 'tahun']);
+            $queryParams = request()->only(['page', 'search', 'desa', 'tahun', 'status_pengelolaan', 'status']);
 
             return redirect()->route('kepemilikan.index', $queryParams)
                 ->with('success', 'Data kepemilikan berhasil diperbarui.');
@@ -1242,7 +1283,7 @@ class KepemilikanController extends Controller
             'id_petani_baru' => 'nullable|required_if:mode,lama|exists:petani,id_petani',
             'nama' => 'nullable|string|max:255',
             'NIK' => 'nullable|string|max:16',
-            'nomor_anggota_plasma' => 'required_if:mode,baru|string|max:100',
+            'nomor_anggota_plasma' => 'nullable|required_if:mode,baru|string|max:100',
             'nomor_anggota_koperasi' => 'nullable|string|max:100',
             'alamat' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:50',
@@ -1397,11 +1438,11 @@ class KepemilikanController extends Controller
 
             // Hapus nomor_plasma dari petani lama
             Petani::where('id_petani', $id_petani_sebelum)
-            ->update(['nomor_anggota_plasma' => null]);
+                ->update(['nomor_anggota_plasma' => null]);
 
             // Buat petani baru
             $petaniBaru = Petani::create([
-                  'nomor_anggota_plasma' => $nomor_plasma_lama,
+                'nomor_anggota_plasma' => $nomor_plasma_lama,
                 'nomor_anggota_koperasi' => $validated['nomor_anggota_koperasi'],
                 'NIK' => $validated['NIK'],
                 'nama' => $validated['nama'],
