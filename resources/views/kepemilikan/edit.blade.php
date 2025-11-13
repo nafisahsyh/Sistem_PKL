@@ -158,10 +158,10 @@
                                 @endif
                                 <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
                                     data-bs-target="#modalGantiKepemilikan"
-                                    data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
-                                    onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
+                                    onclick="setLahanId({{ $detail->id_lahan ?? 0 }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
                                 </button>
+
                             </div>
 
                             <h6 class="text-brown mb-3">Lahan {{ $index + 1 }}</h6>
@@ -620,9 +620,41 @@
             </div>
         </div>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
         <!-- SCRIPT MODE SWITCH -->
         <script>
+            const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
+
+            if (modalGantiKepemilikan) {
+                modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
+                    const modalSelects = modalGantiKepemilikan.querySelectorAll('select.choices-modal');
+
+                    modalSelects.forEach(select => {
+                        // Hancurkan instance lama jika ada
+                        if (select.choicesInstance) {
+                            select.choicesInstance.destroy();
+                        }
+
+                        // Inisialisasi Choices baru
+                        const isModeSelect = select.id === 'modeSelect';
+                        const isPetaniLama = select.id === 'selectPetaniLama';
+
+                        const choices = new Choices(select, {
+                            searchEnabled: isPetaniLama, // hanya petani lama bisa search
+                            shouldSort: false,
+                            itemSelectText: '',
+                            allowHTML: true,
+                            placeholder: true,
+                            placeholderValue: 'Pilih Petani',
+                            searchPlaceholderValue: 'Cari...',
+                        });
+
+                        // Simpan instance-nya untuk bisa di-destroy nanti
+                        select.choicesInstance = choices;
+                    });
+                });
+            }
+
             // ================== MODAL GANTI KEPEMILIKAN SEMUA ==================
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -683,7 +715,6 @@
 
             });
         </script>
-
 
         <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
         <script>
@@ -1032,16 +1063,6 @@
                     });
                 }
 
-                // ================== MODAL GANTI KEPEMILIKAN ==================
-                window.setLahanId = function(id) {
-                    const inputLahan = document.getElementById('id_lahan_modal');
-                    const form = document.getElementById('formGantiKepemilikan');
-                    inputLahan.value = id;
-                    form.action =
-                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}"
-                        .replace(':id', id);
-                };
-
                 // ================== TOGGLE PETANI LAMA / BARU ==================
                 const modeSelect = document.getElementById('modeSelect');
                 const petaniLama = document.getElementById('petaniLama');
@@ -1087,6 +1108,18 @@
 
 
             });
+
+            // ========== FUNGSI GANTI ID LAHAN (GLOBAL) ==========
+            function setLahanId(id) {
+                const inputLahan = document.getElementById('id_lahan_modal');
+                const form = document.getElementById('formGantiKepemilikan');
+                inputLahan.value = id;
+
+                // Update action form agar sesuai id lahan yang dipilih
+                const baseAction =
+                    "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => 'ID_LAHAN']) }}";
+                form.action = baseAction.replace('ID_LAHAN', id);
+            }
         </script>
 
     @endsection
