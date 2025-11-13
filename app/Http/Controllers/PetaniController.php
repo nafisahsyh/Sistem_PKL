@@ -162,6 +162,7 @@ class PetaniController extends Controller
             'pdf_scan_ktp' => $ktpName,
             'pdf_scan_kk' => $kkName,
         ]);
+        $dataUpdate = [];
 
         // Jangan ubah status jika sudah berhenti
         if ($petani->status !== 'berhenti') {
@@ -222,25 +223,14 @@ class PetaniController extends Controller
             $kepemilikan = Kepemilikan::create(['id_petani' => $request->id_petani]);
 
             foreach ($request->lahan as $lahanData) {
+                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? 'KSM';
+                $statusKepemilikan = ($statusPengelolaan === 'Perusahaan') ? 'nonaktif' : 'aktif';
+
                 $lahan = Lahan::create([
                     'id_desa' => $lahanData['id_desa'],
                     'id_tahun_tanam' => $lahanData['id_tahun_tanam'],
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
-                
-            foreach ($request->lahan as $index => $lahanData) {
-                $statusKepemilikan = $lahanData['status_kepemilikan'] ?? null;
-                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
-
-                // 🔹 Sinkronisasi dua arah
-                if ($statusKepemilikan === 'nonaktif') {
-                    $statusPengelolaan = 'Perusahaan';
-                }
-
-                if ($statusPengelolaan === 'Perusahaan') {
-                    $statusKepemilikan = 'nonaktif';
-                }
-            }
 
                 $shmName = $lahanData['pdf_scan_shm'] ?? null;
                 if ($shmName && $lahanData['pdf_scan_shm']->isValid()) {
@@ -266,11 +256,22 @@ class PetaniController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
-                    'status_kepemilikan' => $lahanData['status_kepemilikan'] ?? 'aktif',
+                    'status_kepemilikan' => $statusKepemilikan,
                     'tanggal_mulai' => $lahanData['tanggal_mulai'],
                     'tanggal_selesai' => $lahanData['tanggal_selesai'],
-                    'status_pengelolaan' => $lahanData['status_pengelolaan'] ?? 'KSM',
+                    'status_pengelolaan' => $statusPengelolaan,
                 ]);
+            }
+
+            // ============ CEK STATUS PETANI ===========
+            $petani = Petani::find($request->id_petani);
+            $adaLahanAktif = $petani->kepemilikan()
+                ->whereHas('detailKepemilikan', fn($q) => $q->where('status_kepemilikan', 'aktif'))
+                ->exists();
+
+            if (!$adaLahanAktif) {
+                $petani->status = 'berhenti';
+                $petani->save();
             }
 
             DB::commit();
