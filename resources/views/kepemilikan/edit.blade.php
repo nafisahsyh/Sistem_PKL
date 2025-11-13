@@ -722,14 +722,13 @@
 
                 // ===== Choices untuk LAHAN UTAMA =====
                 function initChoices(context = document) {
-                    // Semua select
                     context.querySelectorAll('select.choices-select').forEach(select => {
                         if (!select.classList.contains('choices-main-initialized')) {
 
-                            // Hanya aktifkan search jika ada class 'choices-search'
                             const searchEnabled = select.classList.contains('choices-search');
 
-                            new Choices(select, {
+                            // simpan instance Choices di elemen supaya bisa diakses nanti
+                            const instance = new Choices(select, {
                                 searchEnabled: searchEnabled,
                                 shouldSort: false,
                                 itemSelectText: '',
@@ -739,12 +738,73 @@
                                 searchPlaceholderValue: select.dataset.searchPlaceholder || ''
                             });
 
+                            select.choicesInstance = instance; // <--- tambahkan baris ini
                             select.classList.add('choices-main-initialized');
                         }
                     });
                 }
 
+
                 initChoices(document);
+
+                // ======== Sinkronisasi Status Pengelolaan <-> Status Kepemilikan (VERSI CHOICES.JS) ========
+                function syncStatusHandlers(context = document) {
+                    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
+                        pengelolaanSelect => {
+                            pengelolaanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const kepemilikanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_kepemilikan]"]`);
+                                if (!kepemilikanSelect) return;
+
+                                if (this.value === 'Perusahaan') {
+                                    // Ubah ke Tidak Aktif
+                                    kepemilikanSelect.value = 'nonaktif';
+                                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                                    if (kepemilikanSelect.choicesInstance) {
+                                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
+                                    }
+                                } else if (this.value === 'KSM' || this.value === 'Mandiri') {
+                                    // Balik ke Aktif
+                                    kepemilikanSelect.value = 'aktif';
+                                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                                    if (kepemilikanSelect.choicesInstance) {
+                                        kepemilikanSelect.choicesInstance.setChoiceByValue('aktif');
+                                    }
+                                }
+                            });
+                        });
+
+                    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
+                        kepemilikanSelect => {
+                            kepemilikanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const pengelolaanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_pengelolaan]"]`);
+                                if (!pengelolaanSelect) return;
+
+                                if (this.value === 'nonaktif') {
+                                    // Kalau Tidak Aktif → otomatis Perusahaan
+                                    pengelolaanSelect.value = 'Perusahaan';
+                                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                    if (pengelolaanSelect.choicesInstance) {
+                                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                                    }
+                                } else if (this.value === 'aktif') {
+                                    // Kalau Aktif → ubah ke KSM (default)
+                                    pengelolaanSelect.value = 'KSM';
+                                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                    if (pengelolaanSelect.choicesInstance) {
+                                        pengelolaanSelect.choicesInstance.setChoiceByValue('KSM');
+                                    }
+                                }
+                            });
+                        });
+                }
+
+                syncStatusHandlers(document);
 
                 // Hapus file SHM
                 document.querySelectorAll('.btn-hapus-shm').forEach(btn => {
@@ -963,7 +1023,8 @@
         `;
                     container.appendChild(lahanBaru);
                     lahanIndex++;
-                    initChoices(lahanBaru); // init select Choices di lahan baru
+                    initChoices(lahanBaru);
+                    syncStatusHandlers(lahanBaru); // init select Choices di lahan baru
                     updateHapusTombol();
                 };
 
