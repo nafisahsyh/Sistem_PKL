@@ -87,8 +87,8 @@
                             <div class="text-dark fw-semibold">Dokumen KTP</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
-                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}"
-                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}" target="_blank"
+                                        class="btn btn-sm btn-outline-primary mt-1">
                                         <i class="fas fa-file-pdf"></i> Lihat KTP
                                     </a>
                                 @else
@@ -100,8 +100,8 @@
                             <div class="text-dark fw-semibold">Dokumen KK</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_kk ?? false)
-                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}"
-                                        target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                    <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}" target="_blank"
+                                        class="btn btn-sm btn-outline-primary mt-1">
                                         <i class="fas fa-file-pdf"></i> Lihat KK
                                     </a>
                                 @else
@@ -243,43 +243,90 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // ===== Inisialisasi Choices untuk elemen yang sudah ada =====
-            function initChoices(selectors, options = {}) {
-                document.querySelectorAll(selectors).forEach(select => {
-                    new Choices(select, options);
+            // ===== Inisialisasi Choices dan simpan instance =====
+            function initChoices(select, options = {}) {
+                const c = new Choices(select, options);
+                select.choicesInstance = c;
+                return c;
+            }
+
+            // ===== Sinkronisasi Status Pengelolaan <-> Status Kepemilikan =====
+            function syncStatusHandlers(context = document) {
+                // Dari Status Pengelolaan → Kepemilikan
+                context.querySelectorAll('select[name$="[status_pengelolaan]"]').forEach(pengelolaanSelect => {
+                    pengelolaanSelect.addEventListener('change', function() {
+                        const index = this.name.match(/\d+/)[0];
+                        const kepemilikanSelect = context.querySelector(
+                            `select[name="lahan[${index}][status_kepemilikan]"]`);
+                        if (!kepemilikanSelect) return;
+
+                        let targetValue = 'aktif';
+                        if (this.value === 'Perusahaan') targetValue = 'nonaktif';
+
+                        // Update Choices jika ada
+                        if (kepemilikanSelect.choicesInstance) {
+                            kepemilikanSelect.choicesInstance.setChoiceByValue(targetValue);
+                        } else {
+                            kepemilikanSelect.value = targetValue;
+                        }
+
+                        kepemilikanSelect.dispatchEvent(new Event('change'));
+                    });
+                });
+
+                // Dari Status Kepemilikan → Pengelolaan
+                context.querySelectorAll('select[name$="[status_kepemilikan]"]').forEach(kepemilikanSelect => {
+                    kepemilikanSelect.addEventListener('change', function() {
+                        const index = this.name.match(/\d+/)[0];
+                        const pengelolaanSelect = context.querySelector(
+                            `select[name="lahan[${index}][status_pengelolaan]"]`);
+                        if (!pengelolaanSelect) return;
+
+                        let targetValue = 'KSM';
+                        if (this.value === 'nonaktif') targetValue = 'Perusahaan';
+
+                        if (pengelolaanSelect.choicesInstance) {
+                            pengelolaanSelect.choicesInstance.setChoiceByValue(targetValue);
+                        } else {
+                            pengelolaanSelect.value = targetValue;
+                        }
+
+                        pengelolaanSelect.dispatchEvent(new Event('change'));
+                    });
                 });
             }
 
-            initChoices('.select-desa', {
+            // ===== Inisialisasi Choices untuk lahan awal =====
+            document.querySelectorAll('.select-desa').forEach(s => initChoices(s, {
                 searchEnabled: true,
                 shouldSort: false,
                 itemSelectText: '',
                 placeholderValue: 'Pilih Desa',
                 searchPlaceholderValue: 'Cari Desa...'
-            });
-
-            initChoices('.select-tahun', {
+            }));
+            document.querySelectorAll('.select-tahun').forEach(s => initChoices(s, {
                 searchEnabled: true,
                 shouldSort: false,
                 itemSelectText: '',
                 placeholderValue: 'Pilih Tahun Tanam',
                 searchPlaceholderValue: 'Cari Tahun...'
-            });
-
-            initChoices('.select-status', {
+            }));
+            document.querySelectorAll('.select-status').forEach(s => initChoices(s, {
                 searchEnabled: false,
                 shouldSort: false,
-                itemSelectText: '',
-            });
+                itemSelectText: ''
+            }));
+
+            syncStatusHandlers(document);
 
             // ===== Tambah Lahan Dinamis =====
-            let lahanIndex = 1; // Lahan 1 sudah ada
+            let lahanIndex = document.querySelectorAll('.lahan-item').length;
             const container = document.getElementById('lahan-container');
-
 
             window.tambahLahan = function() {
                 const lahanDiv = document.createElement('div');
                 lahanDiv.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
+
                 lahanDiv.innerHTML = `
         <div class="d-flex justify-content-end mb-2">
             <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
@@ -287,6 +334,7 @@
             </button>
         </div>
         <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
+
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label class="form-label">Desa</label>
@@ -306,14 +354,14 @@
             </div>
             <div class="col-md-3 mb-3">
                 <label class="form-label">Kode</label>
-                <input type="text" name="lahan[${lahanIndex}][kode_lahan]"
-                    class="form-control text-kecil" min="0">
+                <input type="text" name="lahan[${lahanIndex}][kode_lahan]" class="form-control text-kecil">
             </div>
             <div class="col-md-3 mb-3">
                 <label class="form-label">Nomor Kavling</label>
                 <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label class="form-label">Nomor SHM</label>
@@ -325,9 +373,10 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" min="0">
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label class="form-label">Nomor Sporadik</label>
@@ -342,11 +391,12 @@
                 <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label class="form-label">Status Kelola</label>
                 <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
-                    <option value="KSM">KSM</option>                    
+                    <option value="KSM">KSM</option>
                     <option value="Mandiri">Mandiri</option>
                     <option value="Perusahaan">Perusahaan</option>
                 </select>
@@ -360,6 +410,7 @@
                 <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
             </div>
         </div>
+
         <div class="row mt-3">
             <div class="col-md-4 mb-3">
                 <label class="form-label">Status Kepemilikan</label>
@@ -377,6 +428,7 @@
                 <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
             </div>
         </div>
+
         <div class="row mt-3">
             <div class="col-md-6 mb-3">
                 <label class="form-label">PDF SHM</label>
@@ -387,49 +439,36 @@
                 <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" class="form-control" accept="application/pdf">
             </div>
         </div>
-    `;
+        `;
+
                 container.appendChild(lahanDiv);
 
-                const form = document.querySelector('form');
-                form.addEventListener('submit', function(e) {
-                    document.querySelectorAll('.select-status, .select-desa, .select-tahun').forEach(
-                        select => {
-                            if (select.choices) {
-                                select.value = select.choices.getValue(true);
-                            }
-                        });
-                });
-                document.querySelectorAll('.select-desa').forEach(select => {
-                    new Choices(select, {
-                        searchEnabled: true,
-                        shouldSort: false,
-                        itemSelectText: '',
-                        placeholderValue: 'Pilih Desa',
-                        searchPlaceholderValue: 'Cari Desa...'
-                    });
-                });
+                // Inisialisasi Choices untuk select baru
+                lahanDiv.querySelectorAll('.select-desa').forEach(s => initChoices(s, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Desa',
+                    searchPlaceholderValue: 'Cari Desa...'
+                }));
+                lahanDiv.querySelectorAll('.select-tahun').forEach(s => initChoices(s, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    itemSelectText: '',
+                    placeholderValue: 'Pilih Tahun Tanam',
+                    searchPlaceholderValue: 'Cari Tahun...'
+                }));
+                lahanDiv.querySelectorAll('.select-status').forEach(s => initChoices(s, {
+                    searchEnabled: false,
+                    shouldSort: false,
+                    itemSelectText: ''
+                }));
 
-                document.querySelectorAll('.select-tahun').forEach(select => {
-                    new Choices(select, {
-                        searchEnabled: true,
-                        shouldSort: false,
-                        itemSelectText: '',
-                        placeholderValue: 'Pilih Tahun Tanam',
-                        searchPlaceholderValue: 'Cari Tahun...'
-                    });
-                });
-                document.querySelectorAll('.select-status').forEach(select => {
-                    new Choices(select, {
-                        searchEnabled: false,
-                        shouldSort: false,
-                        itemSelectText: '',
-                    });
-                });
-
+                syncStatusHandlers(lahanDiv);
                 lahanIndex++;
             };
 
-            // Hapus lahan
+            // ===== Hapus Lahan =====
             container.addEventListener('click', e => {
                 if (e.target.closest('.btn-hapus-lahan')) {
                     e.target.closest('.lahan-item').remove();
@@ -443,7 +482,15 @@
                 }
             });
 
+            // ===== Form Submit =====
+            document.querySelector('form').addEventListener('submit', function() {
+                document.querySelectorAll('.select-status, .select-desa, .select-tahun').forEach(select => {
+                    if (select.choicesInstance) select.value = select.choicesInstance.getValue(
+                        true);
+                });
+            });
 
         });
     </script>
+
 @endsection
