@@ -24,11 +24,19 @@
                 {{-- 🔍 Filter & Search --}}
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     {{-- Tombol Filter di kiri --}}
-                    <button
-                        class="btn {{ request()->filled('desa') || request()->filled('tahun') ? 'btn-success text-white' : 'btn-outline-success' }}"
+                    @php
+                        $filterAktif =
+                            request()->filled('desa') ||
+                            request()->filled('tahun') ||
+                            request()->filled('status_petani') ||
+                            request()->filled('status_pengelolaan');
+                    @endphp
+
+                    <button class="btn {{ $filterAktif ? 'btn-success text-white' : 'btn-outline-success' }}"
                         data-bs-toggle="modal" data-bs-target="#filterModal" title="Filter Data">
                         <i class="fas fa-filter"></i> Filter
                     </button>
+
 
                     {{-- Search bar di kanan --}}
                     <form action="{{ route('kepemilikan.index') }}" method="GET"
