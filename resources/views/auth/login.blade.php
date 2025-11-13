@@ -44,7 +44,7 @@
 
                 <div class="form-group text-start">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="login" class="form-control" placeholder="Username / Email"
+                    <input type="text" name="login" class="form-control" placeholder="Username/Email"
                         value="{{ old('login') }}" required autofocus>
                     @error('login')
                         <p class="error-text">{{ $message }}</p>

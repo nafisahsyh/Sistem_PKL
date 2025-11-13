@@ -46,7 +46,22 @@
 
                             {{-- Pertahankan filter / query lain --}}
                             @foreach (request()->except('page') as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @if (is_array($value))
+                                    @foreach ($value as $subKey => $subValue)
+                                        @if (is_array($subValue))
+                                            @foreach ($subValue as $innerKey => $innerValue)
+                                                <input type="hidden"
+                                                    name="{{ $key }}[{{ $subKey }}][{{ $innerKey }}]"
+                                                    value="{{ $innerValue }}">
+                                            @endforeach
+                                        @else
+                                            <input type="hidden" name="{{ $key }}[{{ $subKey }}]"
+                                                value="{{ $subValue }}">
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
                             @endforeach
 
                             <input type="number" name="page" value="{{ $paginator->currentPage() }}" min="1"

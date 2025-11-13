@@ -32,7 +32,7 @@ class KepemilikanController extends Controller
     public function index(Request $request)
     {
         $query = Kepemilikan::select('kepemilikan.*')
-            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
             ->with([
                 'petani.desa.kecamatan',
                 'detailKepemilikan.lahan.desa.kecamatan',
@@ -45,7 +45,8 @@ class KepemilikanController extends Controller
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'berhenti');
             })->whereHas('detailKepemilikan', function ($q) {
-                $q->where('status_kepemilikan', 'nonaktif'); // untuk petani berhenti
+                $q->where('status_kepemilikan', 'nonaktif') // untuk petani berhenti
+                ->where('status_pengelolaan', 'Perusahaan');
             });
         } else {
             $query->whereHas('petani', function ($q) {

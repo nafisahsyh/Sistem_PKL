@@ -59,7 +59,7 @@
 @endphp
 
 @foreach ($pages as $pageIndex => $page)
-    <table>
+    <table class="table table-bordered table-striped align-middle text-center" style="width: 100%; table-layout: auto; word-wrap: break-word;">
         <thead>
             <tr>
                 <th>No</th>

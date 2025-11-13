@@ -94,10 +94,19 @@
                                         <span class="text-muted">Tidak ada</span>
                                     @endif
                                 </td>
-                                <td class="text-center"
-                                    style="width: {{ $p->kepemilikanAktif()->count() == 0 ? '180px' : '150px' }};">
-                                    {{-- tombol tambah muncul hanya kalau belum punya data kepemilikan --}}
-                                    @if ($p->kepemilikanAktif()->count() == 0 && $p->status !== 'berhenti')
+                                @php
+                                    // cek apakah petani punya lahan aktif
+                                    $adaLahanAktif = $p
+                                        ->kepemilikanAktif()
+                                        ->whereHas('detailKepemilikan', function ($q) {
+                                            $q->where('status_kepemilikan', 'aktif');
+                                        })
+                                        ->exists();
+                                @endphp
+
+                                <td class="text-center" style="width: {{ $adaLahanAktif ? '150px' : '180px' }};">
+                                    {{-- tombol tambah muncul hanya kalau belum punya lahan aktif dan petani tidak berhenti --}}
+                                    @if (!$adaLahanAktif && $p->status !== 'berhenti')
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
                                             class="btn btn-success btn-sm me-1" title="Tambah Kepemilikan">
                                             <i class="fas fa-plus"></i>
