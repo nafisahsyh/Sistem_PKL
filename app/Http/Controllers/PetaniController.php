@@ -193,54 +193,67 @@ class PetaniController extends Controller
         return view('petani.createkepemilikan', compact('petani', 'desa', 'tahun_tanam'));
     }
 
-    public function storeKepemilikan(Request $request)
-    {
-        $request->validate([
-            'id_petani' => 'required|exists:petani,id_petani',
-            'lahan' => 'required|array|min:1',
-            'lahan.*.id_desa' => 'required|exists:desa,id_desa',
-            'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
-            'lahan.*.status_pengelolaan' => 'nullable|in:KSM,Mandiri,Perusahaan',
-            'lahan.*.luas_peta' => 'required|numeric|min:0',
-            'lahan.*.kode_lahan' => 'nullable|string|max:15',
-            'lahan.*.nomor_SHM' => 'nullable|string|max:100',
-            'lahan.*.nama_SHM' => 'nullable|string|max:100',
-            'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
-            'lahan.*.nama_sporadik' => 'nullable|string|max:100',
-            'lahan.*.nomor_kavling' => 'nullable|string|max:100',
-            'lahan.*.luas_surat' => 'nullable|numeric|min:0',
-            'lahan.*.nomor_pbb' => 'nullable|string|max:100',
-            'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
-            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
-            'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
-            'lahan.*.status_kepemilikan' => 'nullable|in:aktif,nonaktif',
-            'lahan.*.tanggal_mulai' => 'nullable|date',
-            'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+public function storeKepemilikan(Request $request)
+{
+    $request->validate([
+        'id_petani' => 'required|exists:petani,id_petani',
+        'lahan' => 'required|array|min:1',
+        'lahan.*.id_desa' => 'required|exists:desa,id_desa',
+        'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
+        'lahan.*.status_pengelolaan' => 'nullable|in:KSM,Mandiri,Perusahaan',
+        'lahan.*.luas_peta' => 'required|numeric|min:0',
+        'lahan.*.kode_lahan' => 'nullable|string|max:15',
+        'lahan.*.nomor_SHM' => 'nullable|string|max:100',
+        'lahan.*.nama_SHM' => 'nullable|string|max:100',
+        'lahan.*.nomor_sporadik' => 'nullable|string|max:100',
+        'lahan.*.nama_sporadik' => 'nullable|string|max:100',
+        'lahan.*.nomor_kavling' => 'nullable|string|max:100',
+        'lahan.*.luas_surat' => 'nullable|numeric|min:0',
+        'lahan.*.nomor_pbb' => 'nullable|string|max:100',
+        'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
+        'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
+        'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
+        'lahan.*.status_kepemilikan' => 'nullable|in:aktif,nonaktif',
+        'lahan.*.tanggal_mulai' => 'nullable|date',
+        'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $kepemilikan = Kepemilikan::create([
+            'id_petani' => $request->id_petani,
         ]);
 
-        DB::beginTransaction();
-        try {
-            $kepemilikan = Kepemilikan::create(['id_petani' => $request->id_petani]);
-
             foreach ($request->lahan as $lahanData) {
-                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? 'KSM';
-                $statusKepemilikan = ($statusPengelolaan === 'Perusahaan') ? 'nonaktif' : 'aktif';
-
                 $lahan = Lahan::create([
                     'id_desa' => $lahanData['id_desa'],
                     'id_tahun_tanam' => $lahanData['id_tahun_tanam'],
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
+                
+            foreach ($request->lahan as $index => $lahanData) {
+                $statusKepemilikan = $lahanData['status_kepemilikan'] ?? null;
+                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
+
+                // 🔹 Sinkronisasi dua arah
+                if ($statusKepemilikan === 'nonaktif') {
+                    $statusPengelolaan = 'Perusahaan';
+                }
+
+                if ($statusPengelolaan === 'Perusahaan') {
+                    $statusKepemilikan = 'nonaktif';
+                }
+            }
 
                 $shmName = $lahanData['pdf_scan_shm'] ?? null;
                 if ($shmName && $lahanData['pdf_scan_shm']->isValid()) {
                     $shmName = $lahanData['pdf_scan_shm']->store('shm_pdf', 'public');
                 }
 
-                $petaName = $lahanData['pdf_scan_peta'] ?? null;
-                if ($petaName && $lahanData['pdf_scan_peta']->isValid()) {
-                    $petaName = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
-                }
+            $petaName = null;
+            if (!empty($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
+                $petaName = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
+            }
 
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
@@ -256,29 +269,18 @@ class PetaniController extends Controller
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
-                    'status_kepemilikan' => $statusKepemilikan,
+                    'status_kepemilikan' => $lahanData['status_kepemilikan'] ?? 'aktif',
                     'tanggal_mulai' => $lahanData['tanggal_mulai'],
                     'tanggal_selesai' => $lahanData['tanggal_selesai'],
-                    'status_pengelolaan' => $statusPengelolaan,
+                    'status_pengelolaan' => $lahanData['status_pengelolaan'] ?? 'KSM',
                 ]);
             }
 
-            // ============ CEK STATUS PETANI ===========
-            $petani = Petani::find($request->id_petani);
-            $adaLahanAktif = $petani->kepemilikan()
-                ->whereHas('detailKepemilikan', fn($q) => $q->where('status_kepemilikan', 'aktif'))
-                ->exists();
-
-            if (!$adaLahanAktif) {
-                $petani->status = 'berhenti';
-                $petani->save();
-            }
-
-            DB::commit();
-            return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        DB::commit();
+        return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
+}
 }

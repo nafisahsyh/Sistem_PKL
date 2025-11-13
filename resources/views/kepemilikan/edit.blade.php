@@ -158,10 +158,10 @@
                                 @endif
                                 <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
                                     data-bs-target="#modalGantiKepemilikan"
-                                    data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
-                                    onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
+                                    onclick="setLahanId({{ $detail->id_lahan ?? 0 }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
                                 </button>
+
                             </div>
 
                             <h6 class="text-brown mb-3">Lahan {{ $index + 1 }}</h6>
@@ -620,9 +620,41 @@
             </div>
         </div>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
         <!-- SCRIPT MODE SWITCH -->
         <script>
+            const modalGantiKepemilikan = document.getElementById('modalGantiKepemilikan');
+
+            if (modalGantiKepemilikan) {
+                modalGantiKepemilikan.addEventListener('shown.bs.modal', function() {
+                    const modalSelects = modalGantiKepemilikan.querySelectorAll('select.choices-modal');
+
+                    modalSelects.forEach(select => {
+                        // Hancurkan instance lama jika ada
+                        if (select.choicesInstance) {
+                            select.choicesInstance.destroy();
+                        }
+
+                        // Inisialisasi Choices baru
+                        const isModeSelect = select.id === 'modeSelect';
+                        const isPetaniLama = select.id === 'selectPetaniLama';
+
+                        const choices = new Choices(select, {
+                            searchEnabled: isPetaniLama, // hanya petani lama bisa search
+                            shouldSort: false,
+                            itemSelectText: '',
+                            allowHTML: true,
+                            placeholder: true,
+                            placeholderValue: 'Pilih Petani',
+                            searchPlaceholderValue: 'Cari...',
+                        });
+
+                        // Simpan instance-nya untuk bisa di-destroy nanti
+                        select.choicesInstance = choices;
+                    });
+                });
+            }
+
             // ================== MODAL GANTI KEPEMILIKAN SEMUA ==================
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -684,21 +716,19 @@
             });
         </script>
 
-
         <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
                 // ===== Choices untuk LAHAN UTAMA =====
                 function initChoices(context = document) {
-                    // Semua select
                     context.querySelectorAll('select.choices-select').forEach(select => {
                         if (!select.classList.contains('choices-main-initialized')) {
 
-                            // Hanya aktifkan search jika ada class 'choices-search'
                             const searchEnabled = select.classList.contains('choices-search');
 
-                            new Choices(select, {
+                            // simpan instance Choices di elemen supaya bisa diakses nanti
+                            const instance = new Choices(select, {
                                 searchEnabled: searchEnabled,
                                 shouldSort: false,
                                 itemSelectText: '',
@@ -708,12 +738,73 @@
                                 searchPlaceholderValue: select.dataset.searchPlaceholder || ''
                             });
 
+                            select.choicesInstance = instance; // <--- tambahkan baris ini
                             select.classList.add('choices-main-initialized');
                         }
                     });
                 }
 
+
                 initChoices(document);
+
+                // ======== Sinkronisasi Status Pengelolaan <-> Status Kepemilikan (VERSI CHOICES.JS) ========
+                function syncStatusHandlers(context = document) {
+                    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
+                        pengelolaanSelect => {
+                            pengelolaanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const kepemilikanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_kepemilikan]"]`);
+                                if (!kepemilikanSelect) return;
+
+                                if (this.value === 'Perusahaan') {
+                                    // Ubah ke Tidak Aktif
+                                    kepemilikanSelect.value = 'nonaktif';
+                                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                                    if (kepemilikanSelect.choicesInstance) {
+                                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
+                                    }
+                                } else if (this.value === 'KSM' || this.value === 'Mandiri') {
+                                    // Balik ke Aktif
+                                    kepemilikanSelect.value = 'aktif';
+                                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                                    if (kepemilikanSelect.choicesInstance) {
+                                        kepemilikanSelect.choicesInstance.setChoiceByValue('aktif');
+                                    }
+                                }
+                            });
+                        });
+
+                    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
+                        kepemilikanSelect => {
+                            kepemilikanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const pengelolaanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_pengelolaan]"]`);
+                                if (!pengelolaanSelect) return;
+
+                                if (this.value === 'nonaktif') {
+                                    // Kalau Tidak Aktif → otomatis Perusahaan
+                                    pengelolaanSelect.value = 'Perusahaan';
+                                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                    if (pengelolaanSelect.choicesInstance) {
+                                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                                    }
+                                } else if (this.value === 'aktif') {
+                                    // Kalau Aktif → ubah ke KSM (default)
+                                    pengelolaanSelect.value = 'KSM';
+                                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                    if (pengelolaanSelect.choicesInstance) {
+                                        pengelolaanSelect.choicesInstance.setChoiceByValue('KSM');
+                                    }
+                                }
+                            });
+                        });
+                }
+
+                syncStatusHandlers(document);
 
                 // Hapus file SHM
                 document.querySelectorAll('.btn-hapus-shm').forEach(btn => {
@@ -932,7 +1023,8 @@
         `;
                     container.appendChild(lahanBaru);
                     lahanIndex++;
-                    initChoices(lahanBaru); // init select Choices di lahan baru
+                    initChoices(lahanBaru);
+                    syncStatusHandlers(lahanBaru); // init select Choices di lahan baru
                     updateHapusTombol();
                 };
 
@@ -1032,16 +1124,6 @@
                     });
                 }
 
-                // ================== MODAL GANTI KEPEMILIKAN ==================
-                window.setLahanId = function(id) {
-                    const inputLahan = document.getElementById('id_lahan_modal');
-                    const form = document.getElementById('formGantiKepemilikan');
-                    inputLahan.value = id;
-                    form.action =
-                        "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => ':id']) }}"
-                        .replace(':id', id);
-                };
-
                 // ================== TOGGLE PETANI LAMA / BARU ==================
                 const modeSelect = document.getElementById('modeSelect');
                 const petaniLama = document.getElementById('petaniLama');
@@ -1087,6 +1169,18 @@
 
 
             });
+
+            // ========== FUNGSI GANTI ID LAHAN (GLOBAL) ==========
+            function setLahanId(id) {
+                const inputLahan = document.getElementById('id_lahan_modal');
+                const form = document.getElementById('formGantiKepemilikan');
+                inputLahan.value = id;
+
+                // Update action form agar sesuai id lahan yang dipilih
+                const baseAction =
+                    "{{ route('kepemilikan.updateKepemilikan', ['id_kepemilikan' => $kepemilikan->id_kepemilikan, 'id_lahan' => 'ID_LAHAN']) }}";
+                form.action = baseAction.replace('ID_LAHAN', id);
+            }
         </script>
 
     @endsection
