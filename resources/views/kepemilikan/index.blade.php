@@ -329,7 +329,7 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Riwayat Lahan</label>
+                            <label class="form-label fw-bold">Status Petani</label>
                             <select name="status_petani" id="filter_status_petani" class="form-select">
                                 <option value="aktif" {{ request('status_petani') == 'aktif' ? 'selected' : '' }}>Aktif
                                 </option>
