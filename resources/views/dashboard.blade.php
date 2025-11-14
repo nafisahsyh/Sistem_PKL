@@ -1,5 +1,7 @@
 @extends('theme.default')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
+
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
@@ -148,9 +150,10 @@
         <hr class="mt-4 mb-4">
 
         {{-- ===================== FILTER & GRAFIK LAHAN ===================== --}}
-        <div class="row mb-3">
-            <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="row mb-0 align-items-center">
+            <div class="col-md-8 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                {{-- Tombol Filter --}}
+                <div>
                     <button
                         class="btn {{ $filterDesa || $filterTahun ? 'btn-success text-white' : 'btn-outline-success' }}"
                         data-bs-toggle="modal" data-bs-target="#modalFilterGrafik">
@@ -164,8 +167,35 @@
                         </a>
                     @endif
                 </div>
+
+                {{-- Dropdown Tampilkan --}}
+                <form method="GET"
+                    action="{{ auth()->user()->role == 'super_admin' ? route('dashboard.super') : route('dashboard.admin') }}"
+                    class="d-flex align-items-center gap-2">
+
+                    <div style="margin-top:10px;">
+                        <form method="GET"
+                            action="{{ auth()->user()->role == 'super_admin' ? route('dashboard.super') : route('dashboard.admin') }}">
+                            <select name="limit" id="limit" class="form-select select-one" style="width: 130px;">
+                                <option value="5" {{ request('limit') == 5 ? 'selected' : '' }}>5 data</option>
+                                <option value="10" {{ request('limit') == 10 ? 'selected' : '' }}>10 data</option>
+                                <option value="all" {{ request('limit') == 'all' ? 'selected' : '' }}>Semua</option>
+                            </select>
+                        </form>
+                    </div>
+
+
+                    @if ($filterDesa)
+                        <input type="hidden" name="desa" value="{{ $filterDesa }}">
+                    @endif
+                    @if ($filterTahun)
+                        <input type="hidden" name="tahun" value="{{ $filterTahun }}">
+                    @endif
+                </form>
+
             </div>
         </div>
+
 
         {{-- ===================== GRAFIK LAHAN ===================== --}}
         <div class="row mb-4">
@@ -173,6 +203,7 @@
             <div class="col-md-8">
                 <div class="card p-2 shadow-sm w-100">
                     <h6 class="text-center mb-2" style="font-size: 14px;">Luas Lahan per Desa & Tahun Tanam</h6>
+                    {{-- Dropdown jumlah data --}}
                     @if (count($chartData) == 0)
                         <p class="text-center text-muted my-3">Belum ada data untuk grafik.</p>
                     @else
@@ -341,7 +372,6 @@
         {{-- ==================== LIBRARY ==================== --}}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
         {{-- ==================== CHART 1: LUAS LAHAN ==================== --}}
         @if (count($chartData) > 0)
             <script>
@@ -410,9 +440,6 @@
                 });
             </script>
         @endif
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
         <script>
             const petaniMandiri = {{ $statusData['petani']['Mandiri'] }};
@@ -613,6 +640,21 @@
                         shouldSort: false,
                         searchPlaceholderValue: 'Cari...'
                     });
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const limitSelect = document.getElementById('limit');
+
+                const choicesLimit = new Choices(limitSelect, {
+                    searchEnabled: false,
+                    itemSelectText: '',
+                    shouldSort: false
+                });
+
+                limitSelect.addEventListener('change', function() {
+                    limitSelect.form.submit();
                 });
             });
         </script>

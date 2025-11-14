@@ -74,6 +74,14 @@ class DashboardController extends Controller
             ->with(['desa:id_desa,desa', 'tahunTanam:id_tahun_tanam,tahun'])
             ->get();
 
+        // Tambahan: ambil limit dari request (default 5)
+        $limitData = $request->input('limit', 5);
+
+        // Potong data sesuai pilihan dropdown
+        if ($limitData != 'all') {
+            $dataLahan = $dataLahan->take((int)$limitData);
+        }
+
         $chartData = [];
         foreach ($dataLahan as $row) {
             $chartData[] = [
