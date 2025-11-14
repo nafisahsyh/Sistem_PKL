@@ -64,8 +64,8 @@
 <body>
 
     <div class="header-section">
-        <h2>DATA KEPEMILIKAN LAHAN PETANI</h2>
-        <h4>
+        <h2>DATA KEPEMILIKAN LAHAN PETANI PLASMA</h2>
+        <h4 style="margin-bottom: 3%; margin-top: 2%;">
             Desa: {{ $request->desa ?? 'Semua Desa' }} ||
             Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }} ||
             Status Petani: {{ ucfirst($request->status_petani ?? 'Aktif') }} ||
@@ -84,14 +84,14 @@
                 <th style="width: 3%;">No</th>
                 <th style="width: 10%;">Nomor Plasma</th>
                 <th style="width: 10%;">Nomor Koperasi</th>
-                <th style="width: 15%;">Nama Lengkap</th>
+                <th style="width: 13%;">Nama Lengkap</th>
                 <th style="width: 10%;">Desa</th>
                 <th style="width: 8%;">Tahun Tanam</th>
                 <th style="width: 8%;">Kode</th>
                 <th style="width: 8%;">No. Kavling</th>
-                <th style="width: 8%;">Luas Lapangan</th>
-                <th style="width: 8%;">Luas Surat</th>
-                <th style="width: 15%;">No. SHM</th>
+                <th style="width: 10%;">Luas Lapangan</th>
+                <th style="width: 10%;">Luas Surat</th>
+                <th style="width: 12%;">No. SHM</th>
                 <th style="width: 9%;">Status Kelola</th>
             </tr>
         </thead>

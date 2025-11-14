@@ -15,7 +15,7 @@
                         <label for="nomor_anggota_plasma" class="form-label">Nomor Plasma</label>
                         <input type="text" name="nomor_anggota_plasma"
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
-                            value="{{ old('nomor_anggota_plasma') }}" placeholder="Masukkan nomor anggota plasma" required>
+                            value="{{ old('nomor_anggota_plasma') }}" placeholder="Masukkan nomor anggota plasma">
                         @error('nomor_anggota_plasma')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

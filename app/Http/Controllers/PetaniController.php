@@ -56,7 +56,7 @@ class PetaniController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nomor_anggota_plasma' => 'required|string|max:100|unique:petani',
+            'nomor_anggota_plasma' => 'nullable|string|max:100|unique:petani',
             'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani',
             'NIK' => 'nullable|string|size:16|unique:petani',
             'nama' => 'required|string|max:255',

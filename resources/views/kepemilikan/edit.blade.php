@@ -964,7 +964,7 @@ syncStatusHandlers(document);
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Tanggal Mulai</label>
-                    <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil" value="${new Date().toISOString().split('T')[0]}">
+                    <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Tanggal Selesai</label>
