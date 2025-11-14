@@ -66,9 +66,9 @@
     <div class="header-section">
         <h2>DATA KEPEMILIKAN LAHAN PETANI</h2>
         <h4>
-            Desa: {{ $request->desa ?? 'Semua Desa' }} || 
-            Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }} || 
-            Status Petani: {{ ucfirst($request->status_petani ?? 'Aktif') }} || 
+            Desa: {{ $request->desa ?? 'Semua Desa' }} ||
+            Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }} ||
+            Status Petani: {{ ucfirst($request->status_petani ?? 'Aktif') }} ||
             Status Kelola:
             @if ($request->filled('status_pengelolaan'))
                 {{ implode(', ', (array) $request->status_pengelolaan) }}
@@ -122,6 +122,9 @@
                         $noSHM = $detail->nomor_SHM ?? '-';
                         $kodeLahan = $detail->kode_lahan ?? '-';
                         $statusKelola = $detail->status_pengelolaan ?? '-';
+
+                        $luasPetaText = number_format($luasPeta, 2) . ' M²';
+                        $luasSuratText = number_format($luasSurat, 2) . ' M²';
                     @endphp
 
                     <tr>
@@ -142,8 +145,8 @@
                         <td>{{ $tahunNama }}</td>
                         <td>{{ $kodeLahan }}</td>
                         <td>{{ $noKavling }}</td>
-                        <td>{{ number_format($luasPeta, 2, ',', '.') }}</td>
-                        <td>{{ number_format($luasSurat, 2, ',', '.') }}</td>
+                        <td>{{ $luasPetaText }}</td>
+                        <td>{{ $luasSuratText }}</td>
                         <td>{{ $noSHM }}</td>
                         <td>{{ $statusKelola }}</td>
                     </tr>
