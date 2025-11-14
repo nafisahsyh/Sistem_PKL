@@ -747,64 +747,57 @@
 
                 initChoices(document);
 
-                // ======== Sinkronisasi Status Pengelolaan <-> Status Kepemilikan (VERSI CHOICES.JS) ========
-                function syncStatusHandlers(context = document) {
-                    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
-                    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
-                        pengelolaanSelect => {
-                            pengelolaanSelect.addEventListener('change', function() {
-                                const index = this.name.match(/\d+/)[0];
-                                const kepemilikanSelect = context.querySelector(
-                                    `select[name="lahan[${index}][status_kepemilikan]"]`);
-                                if (!kepemilikanSelect) return;
+function syncStatusHandlers(context = document) {
+    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
+    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
+        pengelolaanSelect => {
+            pengelolaanSelect.addEventListener('change', function() {
+                const index = this.name.match(/\d+/)[0];
+                const kepemilikanSelect = context.querySelector(
+                    `select[name="lahan[${index}][status_kepemilikan]"]`
+                );
+                if (!kepemilikanSelect) return;
 
-                                if (this.value === 'Perusahaan') {
-                                    // Ubah ke Tidak Aktif
-                                    kepemilikanSelect.value = 'nonaktif';
-                                    kepemilikanSelect.dispatchEvent(new Event('change'));
-                                    if (kepemilikanSelect.choicesInstance) {
-                                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
-                                    }
-                                } else if (this.value === 'KSM' || this.value === 'Mandiri') {
-                                    // Balik ke Aktif
-                                    kepemilikanSelect.value = 'aktif';
-                                    kepemilikanSelect.dispatchEvent(new Event('change'));
-                                    if (kepemilikanSelect.choicesInstance) {
-                                        kepemilikanSelect.choicesInstance.setChoiceByValue('aktif');
-                                    }
-                                }
-                            });
-                        });
+                if (this.value === 'Perusahaan') {
+                    // Perusahaan → otomatis nonaktif
+                    kepemilikanSelect.value = 'nonaktif';
+                    if (kepemilikanSelect.choicesInstance) {
+                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
+                    }
+                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                } 
+                // ❌ Jangan paksa ke Aktif untuk Mandiri/KSM
+            });
+        }
+    );
 
-                    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
-                    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
-                        kepemilikanSelect => {
-                            kepemilikanSelect.addEventListener('change', function() {
-                                const index = this.name.match(/\d+/)[0];
-                                const pengelolaanSelect = context.querySelector(
-                                    `select[name="lahan[${index}][status_pengelolaan]"]`);
-                                if (!pengelolaanSelect) return;
+    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
+    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
+        kepemilikanSelect => {
+            kepemilikanSelect.addEventListener('change', function() {
+                const index = this.name.match(/\d+/)[0];
+                const pengelolaanSelect = context.querySelector(
+                    `select[name="lahan[${index}][status_pengelolaan]"]`
+                );
+                if (!pengelolaanSelect) return;
 
-                                if (this.value === 'nonaktif') {
-                                    // Kalau Tidak Aktif → otomatis Perusahaan
-                                    pengelolaanSelect.value = 'Perusahaan';
-                                    pengelolaanSelect.dispatchEvent(new Event('change'));
-                                    if (pengelolaanSelect.choicesInstance) {
-                                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
-                                    }
-                                } else if (this.value === 'aktif') {
-                                    // Kalau Aktif → ubah ke KSM (default)
-                                    pengelolaanSelect.value = 'KSM';
-                                    pengelolaanSelect.dispatchEvent(new Event('change'));
-                                    if (pengelolaanSelect.choicesInstance) {
-                                        pengelolaanSelect.choicesInstance.setChoiceByValue('KSM');
-                                    }
-                                }
-                            });
-                        });
+                if (this.value === 'nonaktif') {
+                    // Tidak Aktif → otomatis Perusahaan
+                    pengelolaanSelect.value = 'Perusahaan';
+                    if (pengelolaanSelect.choicesInstance) {
+                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                    }
+                    pengelolaanSelect.dispatchEvent(new Event('change'));
                 }
+i
+            });
+        }
+    );
+}
 
-                syncStatusHandlers(document);
+// Inisialisasi
+syncStatusHandlers(document);
+
 
                 // Hapus file SHM
                 document.querySelectorAll('.btn-hapus-shm').forEach(btn => {

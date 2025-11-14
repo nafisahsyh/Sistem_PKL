@@ -225,17 +225,18 @@ class PetaniController extends Controller
 
             foreach ($request->lahan as $lahanData) {
                 // ambil status dari input
-                $statusKepemilikan = $lahanData['status_kepemilikan'] ?? 'aktif';
-                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? 'KSM';
+            $statusKepemilikan = $lahanData['status_kepemilikan'] ?? 'aktif';
 
-                // 🔹 sinkronisasi dua arah
-                if ($statusKepemilikan === 'nonaktif') {
-                    $statusPengelolaan = 'Perusahaan';
-                }
+            // ambil dari input user dulu, jangan paksa KSM
+            $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
 
-                if ($statusPengelolaan === 'Perusahaan') {
-                    $statusKepemilikan = 'nonaktif';
-                }
+            // 🔹 sinkronisasi hanya berlaku jika status kepemilikan nonaktif dan bukan Mandiri
+            if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan !== 'Mandiri') {
+                $statusPengelolaan = 'Perusahaan';
+            }
+
+            // jika tetap null (user tidak pilih), baru default ke KSM
+            $statusPengelolaan = $statusPengelolaan ?? 'KSM';
 
                 // simpan data lahan
                 $lahan = Lahan::create([

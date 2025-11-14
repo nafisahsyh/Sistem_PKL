@@ -40,30 +40,21 @@ class KepemilikanController extends Controller
             ])
             ->orderBy('petani.nomor_anggota_plasma', 'asc');
 
+        $statusPetaniRequest = strtolower($request->status_petani ?? '');
+        $statusPengelolaanRequest = strtolower($request->status_pengelolaan ?? '');
+        $search = strtolower($request->search ?? '');
+
         // ===================== FILTER STATUS PETANI =====================
-        if (!empty($request->status_petani) && strtolower($request->status_petani) === 'berhenti') {
+        if ($statusPetaniRequest === 'berhenti') {
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'berhenti');
-            })->whereHas('detailKepemilikan', function ($q) {
-                $q->where('status_kepemilikan', 'nonaktif') // untuk petani berhenti
-                ->where('status_pengelolaan', 'Perusahaan');
             });
+            // Jangan paksa whereHas detailKepemilikan di sini
         } else {
+            // Default petani aktif
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'aktif');
-            })->whereHas('detailKepemilikan', function ($q) use ($request) {
-                if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
-                    // kalau Perusahaan → ambil status_kepemilikan = nonaktif
-                    if (strtolower($request->status_pengelolaan) === 'perusahaan') {
-                        $q->where('status_kepemilikan', 'nonaktif');
-                    } else {
-                        $q->where('status_kepemilikan', 'aktif');
-                    }
-                } else {
-                    $q->where('status_kepemilikan', 'aktif'); // default
-                }
             });
-
         }
 
         $search = strtolower($request->search ?? '');
@@ -151,35 +142,58 @@ class KepemilikanController extends Controller
 
         }
 
-        // ===================== FILTER ULANG DI COLLECTION =====================
-        $kepemilikan->getCollection()->transform(function ($item) use ($request) {
-            $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request) {
+        $kepemilikan->getCollection()->transform(function ($item) use ($request, $search) {
+            $item->detailKepemilikan = $item->detailKepemilikan->filter(function ($detail) use ($request, $item, $search) {
+                $statusPetani = strtolower($item->petani->status ?? '');
+                $statusKepemilikan = strtolower($detail->status_kepemilikan ?? '');
+                $statusPengelolaan = strtolower($detail->status_pengelolaan ?? '');
+                $filterPengelolaan = strtolower($request->status_pengelolaan ?? '');
+                $filterPetani = strtolower($request->status_petani ?? '');
+                $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' || strtolower($detail->lahan->desa->desa ?? '') === strtolower($request->desa);
+                $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
+                $isSearch = !empty($search);
 
-                // Filter desa/tahun tetap
-                $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' 
-                    || ($detail->lahan->desa->desa ?? '') === $request->desa;
+                // ===================== PETANI BERHENTI =====================
+                if ($statusPetani === 'berhenti') {
+                    if ($filterPetani !== 'berhenti') return false;
 
-                $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' 
-                    || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
+                    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+                        return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
+                    }
 
-                // Filter status_pengelolaan
-                $byStatusPengelolaan = empty($request->status_pengelolaan) 
-                    || strtolower($request->status_pengelolaan) === 'semua' 
-                    || strtolower($detail->status_pengelolaan) == strtolower($request->status_pengelolaan);
+                    // tampil semua lahan berhenti (Mandiri/Perusahaan)
+                    return $byDesa && $byTahun;
+                }
 
-                // Filter status_kepemilikan
-                // Kalau user pakai filter status_pengelolaan, biarkan nonaktif tampil
-                $byStatusKepemilikan = empty($request->status_pengelolaan) 
-                    || strtolower($request->status_pengelolaan) === 'semua'
-                    ? $detail->status_kepemilikan === 'aktif' 
-                    : true;
+                // ===================== PETANI AKTIF =====================
+                if ($statusPetani === 'aktif') {
+                    // Jika ada filter pengelolaan → tampil sesuai filter
+                    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+                        return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
+                    }
 
-                return $byDesa && $byTahun && $byStatusPengelolaan && $byStatusKepemilikan;
+                    // Perusahaan nonaktif → tampil hanya kalau search atau filter pengelolaan
+                    if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan === 'perusahaan') {
+                        if ($isSearch || (!empty($filterPengelolaan) && strtolower($filterPengelolaan) === 'perusahaan')) {
+                            return $byDesa && $byTahun;
+                        }
+                        return false; // index default → tidak tampil
+                    }
+
+                    // Lahan aktif Mandiri → tampil selalu
+                    if ($statusKepemilikan === 'aktif') {
+                        return $byDesa && $byTahun;
+                    }
+
+                    return false; // nonaktif Mandiri → tidak tampil
+                }
+
+
+                return false;
             })->values();
 
             return $item;
         });
-
 
         // hapus data tanpa detail
         $kepemilikan->setCollection(

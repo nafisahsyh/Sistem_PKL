@@ -257,13 +257,13 @@
                     pengelolaanSelect.addEventListener('change', function() {
                         const index = this.name.match(/\d+/)[0];
                         const kepemilikanSelect = context.querySelector(
-                            `select[name="lahan[${index}][status_kepemilikan]"]`);
+                            `select[name="lahan[${index}][status_kepemilikan]"]`
+                        );
                         if (!kepemilikanSelect) return;
 
                         let targetValue = 'aktif';
                         if (this.value === 'Perusahaan') targetValue = 'nonaktif';
-
-                        // Update Choices jika ada
+                        // ❌ Jangan paksa value untuk Mandiri/KSM
                         if (kepemilikanSelect.choicesInstance) {
                             kepemilikanSelect.choicesInstance.setChoiceByValue(targetValue);
                         } else {
@@ -279,22 +279,23 @@
                     kepemilikanSelect.addEventListener('change', function() {
                         const index = this.name.match(/\d+/)[0];
                         const pengelolaanSelect = context.querySelector(
-                            `select[name="lahan[${index}][status_pengelolaan]"]`);
+                            `select[name="lahan[${index}][status_pengelolaan]"]`
+                        );
                         if (!pengelolaanSelect) return;
 
-                        let targetValue = 'KSM';
-                        if (this.value === 'nonaktif') targetValue = 'Perusahaan';
-
-                        if (pengelolaanSelect.choicesInstance) {
-                            pengelolaanSelect.choicesInstance.setChoiceByValue(targetValue);
-                        } else {
-                            pengelolaanSelect.value = targetValue;
+                        // ❌ Hanya ubah jika status_kepemilikan = nonaktif
+                        if (this.value === 'nonaktif') {
+                            if (pengelolaanSelect.choicesInstance) {
+                                pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                            } else {
+                                pengelolaanSelect.value = 'Perusahaan';
+                            }
+                            pengelolaanSelect.dispatchEvent(new Event('change'));
                         }
-
-                        pengelolaanSelect.dispatchEvent(new Event('change'));
                     });
                 });
             }
+
 
             // ===== Inisialisasi Choices untuk lahan awal =====
             document.querySelectorAll('.select-desa').forEach(s => initChoices(s, {
