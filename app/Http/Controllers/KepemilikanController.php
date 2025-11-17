@@ -1471,15 +1471,7 @@ class KepemilikanController extends Controller
         if ($validated['mode'] === 'lama') {
 
             $id_petani_sesudah = $validated['id_petani_baru'];
-
-            // Hapus nomor plasma petani lama
-            Petani::where('id_petani', $id_petani_sebelum)
-                ->update(['nomor_anggota_plasma' => null]);
-
-            // Berikan nomor plasma lama ke petani pengganti (existing)
-            Petani::where('id_petani', $id_petani_sesudah)
-                ->update(['nomor_anggota_plasma' => $nomor_plasma_lama]);
-
+            
         } else {
 
             // Format nomor telepon
