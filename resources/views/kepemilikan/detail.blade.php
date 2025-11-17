@@ -13,7 +13,7 @@
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
                 'status_pengelolaan' => request('status_pengelolaan'),
-                'status' => request('status'),
+                'status_petani' => request('status_petani'),
             ]) }}"
                 class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>

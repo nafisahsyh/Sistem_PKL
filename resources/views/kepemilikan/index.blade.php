@@ -201,6 +201,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
+                                                        'status_petani' => $status_petani, 
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-info btn-sm">
@@ -214,6 +215,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
+                                                        'status_petani' => $status_petani, 
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-warning btn-sm">
@@ -240,6 +242,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
+                                                        'status_petani' => $status_petani, // ← ini yang kurang
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-info btn-sm">
@@ -252,6 +255,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
+                                                        'status_petani' => $status_petani, 
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-warning btn-sm">

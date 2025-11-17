@@ -231,6 +231,7 @@ class KepemilikanController extends Controller
             'search' => $request->search,
             'desa' => $request->desa,
             'tahun' => $request->tahun,
+            'status_petani' => $request->status_petani,
             'status_pengelolaan' => $request->status_pengelolaan,
         ]);
     }
