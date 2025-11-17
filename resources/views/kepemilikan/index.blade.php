@@ -147,8 +147,8 @@
                                         @endif
 
                                         {{-- kolom kode lahan, tampil tiap baris --}}
-                                        <td class="text-center">{{ $detail->kode_lahan ?? '-' }}</td>
-                                        <td class="text-center">
+                                        <td class="align-middle text-center">{{ $detail->kode_lahan ?? '-' }}</td>
+                                        <td class="align-middle text-center">
                                             {{ $detail->status_pengelolaan ?? '-' }}
                                         </td>
 
@@ -201,7 +201,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
-                                                        'status_petani' => $status_petani, 
+                                                        'status_petani' => request('status_petani'),
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-info btn-sm">
@@ -215,7 +215,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
-                                                        'status_petani' => $status_petani, 
+                                                        'status_petani' => request('status_petani'),
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-warning btn-sm">
@@ -242,7 +242,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
-                                                        'status_petani' => $status_petani, // ← ini yang kurang
+                                                        'status_petani' => request('status_petani'), // ← ini yang kurang
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-info btn-sm">
@@ -255,7 +255,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
-                                                        'status_petani' => $status_petani, 
+                                                        'status_petani' => request('status_petani'),
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-warning btn-sm">
@@ -395,6 +395,16 @@
                 shouldSort: false,
                 searchEnabled: false
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('resetFilter');
+            if (btn) {
+                btn.addEventListener('click', function(e) {
+                    // navigasi paksa ke route index tanpa query
+                    window.location.href = "{{ route('kepemilikan.index') }}";
+                });
+            }
         });
     </script>
 

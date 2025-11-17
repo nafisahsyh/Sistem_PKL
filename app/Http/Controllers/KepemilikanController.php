@@ -155,7 +155,8 @@ class KepemilikanController extends Controller
 
                 // ===================== PETANI BERHENTI =====================
                 if ($statusPetani === 'berhenti') {
-                    if ($filterPetani !== 'berhenti') return false;
+                    if ($filterPetani !== 'berhenti')
+                        return false;
 
                     if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
                         return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
@@ -231,7 +232,6 @@ class KepemilikanController extends Controller
             'search' => $request->search,
             'desa' => $request->desa,
             'tahun' => $request->tahun,
-            'status_petani' => $request->status_petani,
             'status_pengelolaan' => $request->status_pengelolaan,
         ]);
     }
@@ -575,27 +575,27 @@ class KepemilikanController extends Controller
                     'luas_peta' => $lahanData['luas_peta'],
                 ]);
 
-            $statusKepemilikan = match($lahanData['status_pengelolaan']) {
-                'Perusahaan' => 'nonaktif',
-                'Mandiri', 'KSM' => 'aktif',
-            };
+                $statusKepemilikan = match ($lahanData['status_pengelolaan']) {
+                    'Perusahaan' => 'nonaktif',
+                    'Mandiri', 'KSM' => 'aktif',
+                };
 
                 // 🔹 Simpan detail kepemilikan
-            DetailKepemilikan::create([
-                'id_kepemilikan' => $kepemilikan->id_kepemilikan,
-                'id_lahan' => $lahan->id_lahan,
-                'kode_lahan' => $lahanData['kode_lahan'] ?? null,
-                'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
-                'nama_SHM' => $lahanData['nama_SHM'] ?? null,
-                'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
-                'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
-                'nomor_kavling' => $lahanData['nomor_kavling'] ?? null,
-                'luas_surat' => $lahanData['luas_surat'] ?? null,
-                'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
-                'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
-                'status_pengelolaan' => $lahanData['status_pengelolaan'],
-                'status_kepemilikan' => $statusKepemilikan, // <- ambil per lahan
-            ]);
+                DetailKepemilikan::create([
+                    'id_kepemilikan' => $kepemilikan->id_kepemilikan,
+                    'id_lahan' => $lahan->id_lahan,
+                    'kode_lahan' => $lahanData['kode_lahan'] ?? null,
+                    'nomor_SHM' => $lahanData['nomor_SHM'] ?? null,
+                    'nama_SHM' => $lahanData['nama_SHM'] ?? null,
+                    'nomor_sporadik' => $lahanData['nomor_sporadik'] ?? null,
+                    'nama_sporadik' => $lahanData['nama_sporadik'] ?? null,
+                    'nomor_kavling' => $lahanData['nomor_kavling'] ?? null,
+                    'luas_surat' => $lahanData['luas_surat'] ?? null,
+                    'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
+                    'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
+                    'status_pengelolaan' => $lahanData['status_pengelolaan'],
+                    'status_kepemilikan' => $statusKepemilikan, // <- ambil per lahan
+                ]);
 
             }
 
@@ -1352,7 +1352,7 @@ class KepemilikanController extends Controller
             'id_petani_baru' => 'nullable|required_if:mode,lama|exists:petani,id_petani',
             'nama' => 'nullable|string|max:255',
             'NIK' => 'nullable|string|max:16',
-            'nomor_anggota_plasma' => 'nullable|required_if:mode,baru|string|max:100',
+            'nomor_anggota_plasma' => 'nullable|string|max:100',
             'nomor_anggota_koperasi' => 'nullable|string|max:100',
             'alamat' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:50',
@@ -1472,7 +1472,7 @@ class KepemilikanController extends Controller
         if ($validated['mode'] === 'lama') {
 
             $id_petani_sesudah = $validated['id_petani_baru'];
-            
+
         } else {
 
             // Format nomor telepon
@@ -1574,6 +1574,13 @@ class KepemilikanController extends Controller
         RiwayatKepemilikan::findOrFail($id)->delete();
 
         return back()->with('success', 'Riwayat kepemilikan berhasil dihapus.');
+    }
+
+    public function resetFilter()
+    {
+        session()->forget('filter_kepemilikan');
+
+        return redirect()->route('kepemilikan.index');
     }
 
 }

@@ -91,6 +91,12 @@
                                 {{ $kepemilikan->petani->alamat ?? '-' }}
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Status Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ ucfirst($kepemilikan->petani->status ?? '-') }}
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-3">
@@ -223,7 +229,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
-                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
+                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}" required>
                                 </div>
                             </div>
 
@@ -567,7 +573,8 @@
 
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Plasma</label>
-                                        <input type="text" name="nomor_anggota_plasma" class="form-control">
+                                        <input type="text" name="nomor_anggota_plasma" class="form-control"
+                                            value="{{ $kepemilikan->petani->nomor_anggota_plasma ?? '' }}" readonly>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Koperasi</label>
@@ -655,6 +662,25 @@
                 });
             }
 
+            //-- === === === === === === TOGGLE MODE UNTUK MODAL SATUAN === === === === === ===//
+            document.addEventListener('DOMContentLoaded', function() {
+                const modeSelect = document.getElementById('modeSelect');
+                const petaniLama = document.getElementById('petaniLama');
+                const petaniBaru = document.getElementById('petaniBaru');
+
+                function toggleMode(value) {
+                    petaniLama.style.display = (value === 'lama') ? 'block' : 'none';
+                    petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
+                }
+
+                if (modeSelect) {
+                    toggleMode(modeSelect.value);
+                    modeSelect.addEventListener('change', function() {
+                        toggleMode(this.value);
+                    });
+                }
+            });
+
             // ================== MODAL GANTI KEPEMILIKAN SEMUA ==================
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -712,7 +738,6 @@
                         });
                     });
                 }
-
             });
         </script>
 
@@ -743,60 +768,58 @@
                         }
                     });
                 }
-
-
                 initChoices(document);
 
-function syncStatusHandlers(context = document) {
-    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
-    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
-        pengelolaanSelect => {
-            pengelolaanSelect.addEventListener('change', function() {
-                const index = this.name.match(/\d+/)[0];
-                const kepemilikanSelect = context.querySelector(
-                    `select[name="lahan[${index}][status_kepemilikan]"]`
-                );
-                if (!kepemilikanSelect) return;
+                function syncStatusHandlers(context = document) {
+                    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
+                        pengelolaanSelect => {
+                            pengelolaanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const kepemilikanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_kepemilikan]"]`
+                                );
+                                if (!kepemilikanSelect) return;
 
-                if (this.value === 'Perusahaan') {
-                    // Perusahaan → otomatis nonaktif
-                    kepemilikanSelect.value = 'nonaktif';
-                    if (kepemilikanSelect.choicesInstance) {
-                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
-                    }
-                    kepemilikanSelect.dispatchEvent(new Event('change'));
-                } 
-                // ❌ Jangan paksa ke Aktif untuk Mandiri/KSM
-            });
-        }
-    );
+                                if (this.value === 'Perusahaan') {
+                                    // Perusahaan → otomatis nonaktif
+                                    kepemilikanSelect.value = 'nonaktif';
+                                    if (kepemilikanSelect.choicesInstance) {
+                                        kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
+                                    }
+                                    kepemilikanSelect.dispatchEvent(new Event('change'));
+                                }
+                                // ❌ Jangan paksa ke Aktif untuk Mandiri/KSM
+                            });
+                        }
+                    );
 
-    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
-    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
-        kepemilikanSelect => {
-            kepemilikanSelect.addEventListener('change', function() {
-                const index = this.name.match(/\d+/)[0];
-                const pengelolaanSelect = context.querySelector(
-                    `select[name="lahan[${index}][status_pengelolaan]"]`
-                );
-                if (!pengelolaanSelect) return;
+                    // 🔹 Sinkron dari Status Kepemilikan → Pengelolaan
+                    context.querySelectorAll('select[name^="lahan"][name$="[status_kepemilikan]"]').forEach(
+                        kepemilikanSelect => {
+                            kepemilikanSelect.addEventListener('change', function() {
+                                const index = this.name.match(/\d+/)[0];
+                                const pengelolaanSelect = context.querySelector(
+                                    `select[name="lahan[${index}][status_pengelolaan]"]`
+                                );
+                                if (!pengelolaanSelect) return;
 
-                if (this.value === 'nonaktif') {
-                    // Tidak Aktif → otomatis Perusahaan
-                    pengelolaanSelect.value = 'Perusahaan';
-                    if (pengelolaanSelect.choicesInstance) {
-                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
-                    }
-                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                if (this.value === 'nonaktif') {
+                                    // Tidak Aktif → otomatis Perusahaan
+                                    pengelolaanSelect.value = 'Perusahaan';
+                                    if (pengelolaanSelect.choicesInstance) {
+                                        pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                                    }
+                                    pengelolaanSelect.dispatchEvent(new Event('change'));
+                                }
+                                i
+                            });
+                        }
+                    );
                 }
-i
-            });
-        }
-    );
-}
 
-// Inisialisasi
-syncStatusHandlers(document);
+                // Inisialisasi
+                syncStatusHandlers(document);
 
 
                 // Hapus file SHM
@@ -918,7 +941,7 @@ syncStatusHandlers(document);
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Luas Lapangan (M²)</label>
-                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
+                    <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
                 </div>
             </div>
 

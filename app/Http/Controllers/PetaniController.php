@@ -114,7 +114,7 @@ class PetaniController extends Controller
     public function update(Request $request, Petani $petani)
     {
         $request->validate([
-            'nomor_anggota_plasma' => 'required|string|max:100|unique:petani,nomor_anggota_plasma,' . $petani->id_petani . ',id_petani',
+            'nomor_anggota_plasma' => 'nullable|string|max:100|unique:petani,nomor_anggota_plasma,' . $petani->id_petani . ',id_petani',
             'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani,nomor_anggota_koperasi,' . $petani->id_petani . ',id_petani',
             'NIK' => 'nullable|string|size:16|unique:petani,NIK,' . $petani->id_petani . ',id_petani',
             'nama' => 'required|string|max:255',
@@ -225,18 +225,18 @@ class PetaniController extends Controller
 
             foreach ($request->lahan as $lahanData) {
                 // ambil status dari input
-            $statusKepemilikan = $lahanData['status_kepemilikan'] ?? 'aktif';
+                $statusKepemilikan = $lahanData['status_kepemilikan'] ?? 'aktif';
 
-            // ambil dari input user dulu, jangan paksa KSM
-            $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
+                // ambil dari input user dulu, jangan paksa KSM
+                $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
 
-            // 🔹 sinkronisasi hanya berlaku jika status kepemilikan nonaktif dan bukan Mandiri
-            if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan !== 'Mandiri') {
-                $statusPengelolaan = 'Perusahaan';
-            }
+                // 🔹 sinkronisasi hanya berlaku jika status kepemilikan nonaktif dan bukan Mandiri
+                if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan !== 'Mandiri') {
+                    $statusPengelolaan = 'Perusahaan';
+                }
 
-            // jika tetap null (user tidak pilih), baru default ke KSM
-            $statusPengelolaan = $statusPengelolaan ?? 'KSM';
+                // jika tetap null (user tidak pilih), baru default ke KSM
+                $statusPengelolaan = $statusPengelolaan ?? 'KSM';
 
                 // simpan data lahan
                 $lahan = Lahan::create([
@@ -289,7 +289,12 @@ class PetaniController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('kepemilikan.index')->with('success', 'Data kepemilikan berhasil ditambahkan.');
+            return redirect()->route('kepemilikan.index', [
+                'desa' => $request->desa,
+                'tahun' => $request->tahun,
+                'status_petani' => $request->status_petani,
+                'status_pengelolaan' => $request->status_pengelolaan,
+            ])->with('success', 'Data kepemilikan berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

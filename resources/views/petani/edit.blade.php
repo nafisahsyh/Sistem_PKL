@@ -20,7 +20,7 @@
                             class="form-control text-kecil @error('nomor_anggota_plasma') is-invalid @enderror"
                             id="nomor_anggota_plasma" name="nomor_anggota_plasma"
                             value="{{ old('nomor_anggota_plasma', $petani->nomor_anggota_plasma) }}"
-                            placeholder="Masukkan nomor plasma" required>
+                            placeholder="Masukkan nomor plasma">
                         @error('nomor_anggota_plasma')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

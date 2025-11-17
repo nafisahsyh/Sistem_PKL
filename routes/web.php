@@ -70,7 +70,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/edit', [KepemilikanController::class, 'editPerLahan'])
         ->name('kepemilikan.editPerLahan');
     Route::put('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/update', [KepemilikanController::class, 'updatePerLahan'])
-    ->name('kepemilikan.updatePerLahan');
+        ->name('kepemilikan.updatePerLahan');
     Route::get('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/pdf', [KepemilikanController::class, 'pdfPerLahan'])
         ->name('kepemilikan.pdfPerLahan');
     Route::delete('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}', [KepemilikanController::class, 'destroyPerLahan'])
@@ -81,15 +81,14 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::post('/pbb/generate/{id_detail_kepemilikan}', [KepemilikanController::class, 'generatePbbTahunBaru'])
         ->name('pbb.generate');
     Route::post('/kepemilikan/{id_kepemilikan}/lahan/{id_lahan}/ganti', [KepemilikanController::class, 'updateKepemilikan'])
-    ->name('kepemilikan.updateKepemilikan');
+        ->name('kepemilikan.updateKepemilikan');
     Route::post('/kepemilikan/update-kepemilikan-semua/{id_kepemilikan}', [KepemilikanController::class, 'updateKepemilikanSemua'])->name('kepemilikan.updateKepemilikanSemua');
     Route::get('/kepemilikan/riwayat-lahan/{id_lahan}', [KepemilikanController::class, 'riwayatLahan'])
-    ->name('kepemilikan.riwayatLahan');
+        ->name('kepemilikan.riwayatLahan');
     Route::put('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'updateRiwayat'])
-    ->name('riwayat.update');
+        ->name('riwayat.update');
     Route::delete('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'deleteRiwayat'])
-    ->name('riwayat.destroy');
-
+        ->name('riwayat.destroy');
 });
 
 // hanya super admin

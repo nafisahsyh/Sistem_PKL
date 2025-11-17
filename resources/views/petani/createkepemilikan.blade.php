@@ -159,7 +159,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                                 <input type="number" step="0.01" name="lahan[0][luas_peta]"
-                                    class="form-control text-kecil" min="0">
+                                    class="form-control text-kecil" min="0" required>
                             </div>
                         </div>
                         <div class="row">
@@ -230,6 +230,12 @@
 
                 <button type="button" class="btn btn-success" onclick="tambahLahan()">+ Tambah Lahan</button>
             </div>
+
+            {{-- Hidden filter --}}
+            <input type="hidden" name="desa" value="{{ request('desa') }}">
+            <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+            <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
+            <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
 
             {{-- STATUS KEPEMILIKAN --}}
             <div class="text-start mt-3">
@@ -374,7 +380,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil">
+                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
             </div>
         </div>
 

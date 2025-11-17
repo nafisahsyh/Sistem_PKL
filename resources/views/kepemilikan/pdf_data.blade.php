@@ -82,16 +82,16 @@
         <thead>
             <tr>
                 <th style="width: 3%;">No</th>
-                <th style="width: 10%;">Nomor Plasma</th>
-                <th style="width: 10%;">Nomor Koperasi</th>
+                <th style="width: 7%;">Nomor Plasma</th>
+                <th style="width: 7%;">Nomor Koperasi</th>
                 <th style="width: 13%;">Nama Lengkap</th>
-                <th style="width: 10%;">Desa</th>
+                <th style="width: 15%;">Desa</th>
                 <th style="width: 8%;">Tahun Tanam</th>
                 <th style="width: 8%;">Kode</th>
                 <th style="width: 8%;">No. Kavling</th>
                 <th style="width: 10%;">Luas Lapangan</th>
                 <th style="width: 10%;">Luas Surat</th>
-                <th style="width: 12%;">No. SHM</th>
+                <th style="width: 16%;">No. SHM</th>
                 <th style="width: 9%;">Status Kelola</th>
             </tr>
         </thead>

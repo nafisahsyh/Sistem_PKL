@@ -92,6 +92,12 @@
                                 {{ $kepemilikan->petani->alamat ?? '-' }}
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Status Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ ucfirst($kepemilikan->petani->status ?? '-') }}
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-3">
@@ -224,7 +230,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Luas Sesuai Lapangan (M²)</label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
-                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}">
+                                        class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}" required>
                                 </div>
                             </div>
 
