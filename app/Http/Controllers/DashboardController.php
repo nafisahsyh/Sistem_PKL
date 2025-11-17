@@ -153,21 +153,23 @@ class DashboardController extends Controller
         ];
 
         $pengelolaanQuery = Kepemilikan::select(
-            'desa.desa',
-            'tahun_tanam.tahun',
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as petani_ksm"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as petani_mandiri"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as lahan_ksm"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as lahan_mandiri"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_ksm"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_mandiri"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN lahan.luas_peta ELSE 0 END) as luas_peta_ksm"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN lahan.luas_peta ELSE 0 END) as luas_peta_mandiri")
-        )
+                'desa.desa',
+                'tahun_tanam.tahun',
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as petani_ksm"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as petani_mandiri"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as lahan_ksm"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as lahan_mandiri"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_ksm"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_mandiri"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN lahan.luas_peta ELSE 0 END) as luas_peta_ksm"),
+                DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN lahan.luas_peta ELSE 0 END) as luas_peta_mandiri")
+            )
             ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
             ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')   // ⬅ WAJIB
             ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
-            ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam');
+            ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam')
+            ->where('petani.status', 'aktif');     // ⬅ WAJIB BANGET
 
         // Hanya filter khusus untuk grafik Kelola
         if ($filterDesaKelola && $filterDesaKelola != 'all') {
