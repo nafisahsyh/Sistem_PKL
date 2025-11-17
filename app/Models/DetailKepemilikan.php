@@ -80,5 +80,31 @@ class DetailKepemilikan extends Model
                 }
             });
         });
+
+        static::updated(function ($detail) {
+            $detail->cekStatusPetaniJikaSemuaPerusahaan();
+        });
+
+        static::creating(function ($detail) {
+            $detail->cekStatusPetaniJikaSemuaPerusahaan();
+        });
+    }
+
+    public function cekStatusPetaniJikaSemuaPerusahaan()
+    {
+        $petani = $this->kepemilikan->petani;
+
+        // Hitung jumlah total lahan milik petani
+        $total = $petani->detailKepemilikan()->count();
+
+        // Hitung berapa lahan yang status_pengelolaan = perusahaan
+        $perusahaan = $petani->detailKepemilikan()
+            ->where('status_pengelolaan', 'perusahaan')
+            ->count();
+
+        // Jika SEMUA lahan sudah di perusahaan → otomatis berhenti
+        if ($total > 0 && $total === $perusahaan) {
+            $petani->update(['status' => 'berhenti']);
+        }
     }
 }
