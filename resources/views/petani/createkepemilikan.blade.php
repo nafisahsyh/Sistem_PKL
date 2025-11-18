@@ -78,6 +78,12 @@
                                 {{ $petani->alamat ?? '-' }}
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-dark fw-semibold">Status Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ ucfirst($petani->status ?? '-') }}
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-3">
