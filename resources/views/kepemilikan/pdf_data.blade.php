@@ -65,7 +65,7 @@
 
     <div class="header-section">
         <h2>DATA KEPEMILIKAN LAHAN PETANI PLASMA</h2>
-        <h4 style="margin-bottom: 3%; margin-top: 2%;">
+        <h4 style="margin-bottom: 2%; margin-top: 1%;">
             Desa: {{ $request->desa ?? 'Semua Desa' }} ||
             Tahun Tanam: {{ $request->tahun ?? 'Semua Tahun' }} ||
             Status Petani: {{ ucfirst($request->status_petani ?? 'Aktif') }} ||
@@ -85,13 +85,14 @@
                 <th style="width: 7%;">Nomor Plasma</th>
                 <th style="width: 7%;">Nomor Koperasi</th>
                 <th style="width: 13%;">Nama Lengkap</th>
-                <th style="width: 15%;">Desa</th>
+                <th style="width: 13%;">Desa</th>
                 <th style="width: 8%;">Tahun Tanam</th>
                 <th style="width: 8%;">Kode</th>
                 <th style="width: 8%;">No. Kavling</th>
                 <th style="width: 10%;">Luas Lapangan</th>
                 <th style="width: 10%;">Luas Surat</th>
                 <th style="width: 16%;">No. SHM</th>
+                <th style="width: 14%;">No. Sporadik</th>
                 <th style="width: 9%;">Status Kelola</th>
             </tr>
         </thead>
@@ -120,6 +121,7 @@
                         $luasSurat = (float) ($detail->luas_surat ?? 0);
                         $noKavling = $detail->nomor_kavling ?? '-';
                         $noSHM = $detail->nomor_SHM ?? '-';
+                        $noSporadik = $detail->nomor_sporadik ?? '-';
                         $kodeLahan = $detail->kode_lahan ?? '-';
                         $statusKelola = $detail->status_pengelolaan ?? '-';
 
@@ -148,6 +150,7 @@
                         <td>{{ $luasPetaText }}</td>
                         <td>{{ $luasSuratText }}</td>
                         <td>{{ $noSHM }}</td>
+                        <td>{{ $noSporadik }}</td>
                         <td>{{ $statusKelola }}</td>
                     </tr>
                 @endforeach

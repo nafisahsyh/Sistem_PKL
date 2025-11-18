@@ -57,7 +57,7 @@ class PetaniController extends Controller
     {
         $request->validate([
             'nomor_anggota_plasma' => 'nullable|string|max:100|unique:petani',
-            'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100',
             'NIK' => 'nullable|string|size:16|unique:petani',
             'nama' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:255',
@@ -115,7 +115,7 @@ class PetaniController extends Controller
     {
         $request->validate([
             'nomor_anggota_plasma' => 'nullable|string|max:100|unique:petani,nomor_anggota_plasma,' . $petani->id_petani . ',id_petani',
-            'nomor_anggota_koperasi' => 'nullable|string|max:100|unique:petani,nomor_anggota_koperasi,' . $petani->id_petani . ',id_petani',
+            'nomor_anggota_koperasi' => 'nullable|string|max:100',
             'NIK' => 'nullable|string|size:16|unique:petani,NIK,' . $petani->id_petani . ',id_petani',
             'nama' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:255',
@@ -289,12 +289,83 @@ class PetaniController extends Controller
             }
 
             DB::commit();
+
+            // ===================== QUERY SAMA PERSIS DENGAN INDEX =====================
+            $pageQuery = Kepemilikan::select('kepemilikan.id_kepemilikan')
+                ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+                ->leftJoin('detail_kepemilikan', 'detail_kepemilikan.id_kepemilikan', '=', 'kepemilikan.id_kepemilikan')
+                ->leftJoin('lahan', 'lahan.id_lahan', '=', 'detail_kepemilikan.id_lahan')
+                ->leftJoin('desa', 'desa.id_desa', '=', 'lahan.id_desa')
+                ->leftJoin('tahun_tanam', 'tahun_tanam.id_tahun_tanam', '=', 'lahan.id_tahun_tanam')
+                ->orderBy('petani.nomor_anggota_plasma', 'asc');
+
+            // ===================== FILTER STATUS PETANI =====================
+            if (strtolower($request->status_petani) === 'berhenti') {
+
+                $pageQuery->where('petani.status', 'berhenti');
+
+            } else {
+                $pageQuery->where('petani.status', 'aktif');
+            }
+
+            // ===================== FILTER SEARCH =====================
+            if (!empty($request->search)) {
+                $search = strtolower($request->search);
+
+                $pageQuery->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(petani.nama) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(petani.nomor_anggota_plasma) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(petani.nomor_anggota_koperasi) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(desa.desa) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(tahun_tanam.tahun) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(detail_kepemilikan.kode_lahan) like ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(detail_kepemilikan.status_pengelolaan) like ?', ["%{$search}%"]);
+                });
+            }
+
+            // ===================== FILTER STATUS PENGELOLAAN =====================
+            if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
+                $pageQuery->whereRaw('LOWER(detail_kepemilikan.status_pengelolaan) = ?', [
+                    strtolower($request->status_pengelolaan)
+                ]);
+            }
+
+            // ===================== FILTER DESA =====================
+            if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
+                $pageQuery->where('desa.desa', $request->desa);
+            }
+
+            // ===================== FILTER TAHUN TANAM =====================
+            if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
+                $pageQuery->where('tahun_tanam.tahun', $request->tahun);
+            }
+
+            // ===================== ONLY DATA YANG PUNYA DETAIL =====================
+            $pageQuery->whereNotNull('detail_kepemilikan.id_detail_kepemilikan');
+
+            // ===================== AMBIL ID BERDASARKAN FILTER INDEX =====================
+            $filteredIds = $pageQuery->pluck('kepemilikan.id_kepemilikan')->unique()->values()->toArray();
+
+            // ===================== CARI POSISI DATA BARU =====================
+            $position = array_search($kepemilikan->id_kepemilikan, $filteredIds);
+
+            // Jika tidak ketemu (harusnya tidak mungkin)
+            if ($position === false) {
+                $page = 1;
+            } else {
+                $page = ceil(($position + 1) / 10);
+            }
+
+            // ===================== REDIRECT DENGAN FILTER LENGKAP =====================
             return redirect()->route('kepemilikan.index', [
+                'page' => $page,
+                'search' => $request->search,
                 'desa' => $request->desa,
                 'tahun' => $request->tahun,
-                'status_petani' => $request->status_petani,
                 'status_pengelolaan' => $request->status_pengelolaan,
+                'status_petani' => $request->status_petani,
             ])->with('success', 'Data kepemilikan berhasil ditambahkan');
+
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

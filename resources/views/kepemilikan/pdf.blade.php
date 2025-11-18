@@ -127,6 +127,10 @@
         .signature p {
             margin-bottom: 60px;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 
@@ -197,6 +201,12 @@
     <div class="section-title">Data Kepemilikan & Lahan</div>
 
     @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
+
+        {{-- Page break: Setiap lahan baru pindah halaman --}}
+        @if ($index > 0)
+            <div class="page-break"></div>
+        @endif
+
         <table class="card">
             <thead>
                 <tr>
@@ -279,11 +289,22 @@
                 </tr>
                 <tr>
                     <th>Tanggal Mulai</th>
-                    <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+                    <td>
+                        @if ($detail->tanggal_mulai)
+                            {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}
+                        @else
+                            -
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                    <td>
+                        @if ($detail->tanggal_selesai)
+                            {{ \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') }}
+                        @else
+                            -
+                        @endif
                     </td>
                 </tr>
             </tbody>
@@ -295,6 +316,11 @@
         @endphp
 
         @if ($riwayatList->isNotEmpty())
+            {{-- Jika ini LAHAN PERTAMA, riwayat selalu pindah ke halaman berikutnya --}}
+            @if ($index == 0)
+                <div class="page-break"></div>
+            @endif
+
             <div class="section-title">Riwayat Kepemilikan Lahan {{ $index + 1 }}</div>
             <table class="card riwayat-table">
                 <thead>

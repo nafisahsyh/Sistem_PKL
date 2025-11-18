@@ -108,6 +108,10 @@
             background: none;
             color: #000;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 
@@ -176,6 +180,10 @@
 
     {{-- Data Lahan --}}
     @foreach ($groupDetails as $detail)
+        {{-- Page break: Setiap lahan baru pindah halaman --}}
+        @if (!$loop->first)
+            <div class="page-break"></div>
+        @endif
         <div class="section-title">Data Kepemilikan & Lahan</div>
         <table class="card">
             <thead>
@@ -258,11 +266,22 @@
                 </tr>
                 <tr>
                     <th>Tanggal Mulai</th>
-                    <td>{{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}</td>
+                    <td>
+                        @if ($detail->tanggal_mulai)
+                            {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}
+                        @else
+                            -
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <th>Tanggal Selesai</th>
-                    <td>{{ $detail->tanggal_selesai ? \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') : '-' }}
+                    <td>
+                        @if ($detail->tanggal_selesai)
+                            {{ \Carbon\Carbon::parse($detail->tanggal_selesai)->format('d-m-Y') }}
+                        @else
+                            -
+                        @endif
                     </td>
                 </tr>
             </tbody>
@@ -274,6 +293,11 @@
         @endphp
 
         @if ($riwayatList->isNotEmpty())
+            {{-- Jika ini LAHAN PERTAMA, riwayat selalu pindah ke halaman berikutnya --}}
+            @if ($loop->first)
+                <div class="page-break"></div>
+            @endif
+
             <div class="section-title">Riwayat Kepemilikan Lahan</div>
             <table>
                 <thead>

@@ -927,7 +927,10 @@ class KepemilikanController extends Controller
         $finalPath = storage_path('app/public/kepemilikan_gabungan.pdf');
         $pdfMerger->Output($finalPath, 'F');
 
-        return response()->download($finalPath, 'Data Kepemilikan Lahan ' . $kepemilikan->petani->nama . '.pdf');
+        return response()->download(
+            $finalPath,
+            'Data Kepemilikan Lahan ' . ucwords(strtolower($kepemilikan->petani->nama)) . '.pdf'
+        );
     }
 
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
@@ -1030,11 +1033,12 @@ class KepemilikanController extends Controller
 
         return response()->download(
             $finalPath,
-            'Kepemilikan '
-            . ($petani->nama ?? 'Tanpa Nama')
+            'Data Kepemilikan Lahan '
+            . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
             . ' - ' . $desaTarget
             . ' (' . $tahunTarget . ').pdf'
         );
+
     }
 
     public function cetakSemuaPDF(Request $request)
@@ -1346,6 +1350,14 @@ class KepemilikanController extends Controller
             abort(404, 'Lahan tidak ditemukan.');
         }
 
+        $filters = [
+            'search' => $request->search,
+            'desa' => $request->desa,
+            'tahun' => $request->tahun,
+            'status_pengelolaan' => $request->status_pengelolaan,
+            'status_petani' => $request->status_petani,
+        ];
+
         $validated = $request->validate([
             'mode' => 'required|in:lama,baru',
             'id_petani_lama' => 'required|exists:petani,id_petani',
@@ -1430,11 +1442,12 @@ class KepemilikanController extends Controller
             'id_petani_sebelum' => $id_petani_sebelum,
             'id_petani_sesudah' => $id_petani_sesudah,
             'tanggal_ganti' => $validated['tanggal_ganti'] ?? null,
-            'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
+            'keterangan' => $validated['keterangan'] ?? 'Jual beli',
         ]);
 
 
         return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
+            ->with($filters)
             ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
     }
 
@@ -1445,6 +1458,14 @@ class KepemilikanController extends Controller
         if ($kepemilikan->detailKepemilikan->count() === 0) {
             return back()->with('error', 'Petani ini tidak memiliki lahan.');
         }
+
+        $filters = [
+            'search' => $request->search,
+            'desa' => $request->desa,
+            'tahun' => $request->tahun,
+            'status_pengelolaan' => $request->status_pengelolaan,
+            'status_petani' => $request->status_petani,
+        ];
 
         $validated = $request->validate([
             'mode' => 'required|in:lama,baru',
@@ -1538,7 +1559,7 @@ class KepemilikanController extends Controller
                 'id_petani_sebelum' => $id_petani_sebelum,
                 'id_petani_sesudah' => $id_petani_sesudah,
                 'tanggal_ganti' => $validated['tanggal_ganti'] ?? null,
-                'keterangan' => $validated['keterangan'] ?? 'Perubahan kepemilikan lahan',
+                'keterangan' => $validated['keterangan'] ?? 'Jual beli',
             ]);
         }
 
@@ -1546,8 +1567,8 @@ class KepemilikanController extends Controller
         $kepemilikan->delete();
 
         return redirect()->route('kepemilikan.edit', $kepemilikanBaru->id_kepemilikan)
-            ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
-
+            ->with($filters)
+            ->with('success', 'Kepemilikan seluruh lahan berhasil dipindahkan.');
     }
 
 
@@ -1574,13 +1595,6 @@ class KepemilikanController extends Controller
         RiwayatKepemilikan::findOrFail($id)->delete();
 
         return back()->with('success', 'Riwayat kepemilikan berhasil dihapus.');
-    }
-
-    public function resetFilter()
-    {
-        session()->forget('filter_kepemilikan');
-
-        return redirect()->route('kepemilikan.index');
     }
 
 }

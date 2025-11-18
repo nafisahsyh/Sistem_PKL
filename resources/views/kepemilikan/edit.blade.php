@@ -487,8 +487,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Tanggal Ganti</label>
-                                    <input type="date" name="tanggal_ganti" class="form-control"
-                                        value="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tanggal_ganti" class="form-control">
                                 </div>
                                 <div class="col-md-8 mb-3">
                                     <label class="form-label">Keterangan</label>
@@ -604,8 +603,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Tanggal Ganti</label>
-                                    <input type="date" name="tanggal_ganti" class="form-control"
-                                        value="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tanggal_ganti" class="form-control">
                                 </div>
                                 <div class="col-md-8 mb-3">
                                     <label class="form-label">Keterangan</label>

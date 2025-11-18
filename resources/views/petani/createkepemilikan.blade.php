@@ -179,7 +179,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Luas Sesuai Surat (M²)</label>
-                                <input type="number" step="0.01" name="lahan[0][luas_surat]"
+                                <input type="number" step="0.01" min="0" name="lahan[0][luas_surat]"
                                     class="form-control text-kecil">
                             </div>
                         </div>
@@ -386,7 +386,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
+                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
             </div>
         </div>
 
@@ -401,7 +401,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">Luas Sesuai Surat (M²)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
+                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
             </div>
         </div>
 
