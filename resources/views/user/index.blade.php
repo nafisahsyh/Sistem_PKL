@@ -4,7 +4,7 @@
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
     <div class="container-fluid px-4 mt-5">
-        <h3 class="mt-4 text-brown">Data User</h3>
+        <h3 class="mt-4 text-brown">Data Pengguna</h3>
 
         <div class="card shadow-sm rounded-3">
             <div class="card-body">

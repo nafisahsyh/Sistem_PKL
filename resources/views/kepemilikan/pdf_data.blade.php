@@ -73,7 +73,7 @@
             @if ($request->filled('status_pengelolaan'))
                 {{ implode(', ', (array) $request->status_pengelolaan) }}
             @else
-                KSM, Mandiri
+                Semua Kelola
             @endif
         </h4>
     </div>

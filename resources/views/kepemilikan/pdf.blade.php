@@ -198,15 +198,14 @@
     </table>
 
     {{-- Data Kepemilikan & Lahan --}}
-    <div class="section-title">Data Kepemilikan & Lahan</div>
-
     @forelse ($kepemilikan->detailKepemilikan as $index => $detail)
 
-        {{-- Page break: Setiap lahan baru pindah halaman --}}
+    {{-- Page break: Setiap lahan baru pindah halaman --}}
         @if ($index > 0)
             <div class="page-break"></div>
         @endif
-
+    
+        <div class="section-title">Data Kepemilikan & Lahan</div>
         <table class="card">
             <thead>
                 <tr>

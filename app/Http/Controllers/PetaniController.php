@@ -120,22 +120,33 @@ class PetaniController extends Controller
             'nama' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif,berhenti',
-            'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi angka & +62
+            'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/',
             'pdf_scan_ktp' => 'nullable|file|mimes:pdf|max:10240',
             'pdf_scan_kk' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        // format nomor telepon
+        // Format nomor telepon
         $no_telepon = $request->no_telepon;
-        if ($no_telepon) {
-            if (substr($no_telepon, 0, 1) === '0') {
-                $no_telepon = '+62' . substr($no_telepon, 1);
-            }
+        if ($no_telepon && substr($no_telepon, 0, 1) === '0') {
+            $no_telepon = '+62' . substr($no_telepon, 1);
         }
 
         $ktpName = $petani->pdf_scan_ktp;
         $kkName = $petani->pdf_scan_kk;
 
+        // Hapus file KTP
+        if ($request->hapus_ktp == 1 && $petani->pdf_scan_ktp) {
+            Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_ktp);
+            $ktpName = null;
+        }
+
+        // Hapus file KK
+        if ($request->hapus_kk == 1 && $petani->pdf_scan_kk) {
+            Storage::disk('public')->delete('ktp_pdf/' . $petani->pdf_scan_kk);
+            $kkName = null;
+        }
+
+        // Upload KTP baru
         if ($request->hasFile('pdf_scan_ktp')) {
             if ($ktpName && Storage::disk('public')->exists('ktp_pdf/' . $ktpName)) {
                 Storage::disk('public')->delete('ktp_pdf/' . $ktpName);
@@ -144,6 +155,7 @@ class PetaniController extends Controller
             $request->file('pdf_scan_ktp')->storeAs('ktp_pdf', $ktpName, 'public');
         }
 
+        // Upload KK baru
         if ($request->hasFile('pdf_scan_kk')) {
             if ($kkName && Storage::disk('public')->exists('ktp_pdf/' . $kkName)) {
                 Storage::disk('public')->delete('ktp_pdf/' . $kkName);
@@ -152,7 +164,8 @@ class PetaniController extends Controller
             $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
         }
 
-        $petani->update([
+        /*=================== GABUNGKAN SEMUA UPDATE DALAM SATU ARRAY =============*/
+        $dataUpdate = [
             'nomor_anggota_plasma' => $request->nomor_anggota_plasma,
             'nomor_anggota_koperasi' => $request->nomor_anggota_koperasi,
             'NIK' => $request->NIK,
@@ -161,20 +174,20 @@ class PetaniController extends Controller
             'no_telepon' => $no_telepon,
             'pdf_scan_ktp' => $ktpName,
             'pdf_scan_kk' => $kkName,
-        ]);
+        ];
 
-        // Jangan ubah status jika sudah berhenti
+        // Status tidak berubah jika sudah berhenti
         if ($petani->status !== 'berhenti') {
             $dataUpdate['status'] = $request->status;
         }
 
+        // UPDATE SEKALI SAJA
         $petani->update($dataUpdate);
 
-        // Ambil page dari query string untuk redirect
-        $page = $request->input('page', 1); // ambil dari POST
+        // Redirect, tetap di page yang sama
+        $page = $request->input('page', 1);
         return redirect()->route('petani.index', ['page' => $page])
             ->with('success', 'Data petani berhasil diperbarui.');
-
     }
 
     public function destroy(Petani $petani)

@@ -49,6 +49,12 @@
                         @if (request()->filled('tahun'))
                             <input type="hidden" name="tahun" value="{{ request('tahun') }}">
                         @endif
+                        @if (request()->filled('status_petani'))
+                            <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
+                        @endif
+                        @if (request()->filled('status_pengelolaan'))
+                            <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+                        @endif
 
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari nama petani, nomor plasma, atau desa..." value="{{ request('search') }}"
@@ -58,7 +64,8 @@
                             <i class="fas fa-search"></i>
                         </button>
 
-                        <a href="{{ route('kepemilikan.index') }}" class="btn btn-primary ms-2" title="Reset">
+                        <a href="{{ route('kepemilikan.index', request()->except('search')) }}" class="btn btn-primary ms-2"
+                            title="Reset">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>

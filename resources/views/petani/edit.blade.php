@@ -64,7 +64,7 @@
                 <div class="mb-3">
                     <label for="alamat" class="form-label">Alamat</label>
                     <textarea name="alamat" id="alamat" rows="3"
-                        class="form-control text-kecil @error('alamat') is-invalid @enderror">{{ old('alamat', $petani->alamat) }}</textarea>
+                        class="form-control text-kecil @error('alamat') is-invalid @enderror" placeholder="Masukkan alamat lengkap">{{ old('alamat', $petani->alamat) }}</textarea>
                     @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -91,50 +91,61 @@
                             <option value="tidak_aktif"
                                 {{ old('status', $petani->status) == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif
                             </option>
-                            <option value="berhenti"
-                                {{ old('status', $petani->status) == 'berhenti' ? 'selected' : '' }}>Berhenti
+                            <option value="berhenti" {{ old('status', $petani->status) == 'berhenti' ? 'selected' : '' }}>
+                                Berhenti
                             </option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
 
-                <div class="row">
+                    <!-- inputan KTP -->
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_ktp" class="form-label">File Scan KTP (PDF)</label>
-                        <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp"
-                            class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
+                        <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp" class="form-control text-kecil"
                             accept="application/pdf">
+
+                        <!-- hidden: penanda hapus file KTP -->
+                        <input type="hidden" name="hapus_ktp" id="hapus_ktp" value="0">
 
                         @if ($petani->pdf_scan_ktp)
-                            <small class="text-muted">
-                                File saat ini:
-                                <a href="{{ asset('storage/' . $petani->pdf_scan_ktp) }}" target="_blank">Lihat PDF</a>
-                            </small>
-                        @endif
+                            <div class="file-ktp-container mt-1 d-flex align-items-center gap-2">
+                                <small class="text-muted">
+                                    File saat ini:
+                                    <a href="{{ asset('storage/' . $petani->pdf_scan_ktp) }}" target="_blank">Lihat
+                                        PDF</a>
+                                </small>
 
-                        @error('pdf_scan_ktp')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-ktp">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        @endif
                     </div>
+
+                    <!-- inputan KK -->
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_kk" class="form-label">File Scan KK (PDF)</label>
-                        <input type="file" name="pdf_scan_kk" id="pdf_scan_kk"
-                            class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
+                        <input type="file" name="pdf_scan_kk" id="pdf_scan_kk" class="form-control text-kecil"
                             accept="application/pdf">
 
-                        @if ($petani->pdf_scan_kk)
-                            <small class="text-muted">
-                                File saat ini:
-                                <a href="{{ asset('storage/' . $petani->pdf_scan_kk) }}" target="_blank">Lihat PDF</a>
-                            </small>
-                        @endif
+                        <!-- hidden: penanda hapus file KK -->
+                        <input type="hidden" name="hapus_kk" id="hapus_kk" value="0">
 
-                        @error('pdf_scan_kk')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        @if ($petani->pdf_scan_kk)
+                            <div class="file-kk-container mt-1 d-flex align-items-center gap-2">
+                                <small class="text-muted">
+                                    File saat ini:
+                                    <a href="{{ asset('storage/' . $petani->pdf_scan_kk) }}" target="_blank">Lihat
+                                        PDF</a>
+                                </small>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-kk">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -161,6 +172,70 @@
                     allowHTML: true
                 });
             }
+        });
+
+        // Hapus file KTP
+        document.querySelectorAll('.btn-hapus-ktp').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const container = this.closest('.file-ktp-container');
+                const inputHidden = document.getElementById('hapus_ktp');
+
+                Swal.fire({
+                    title: "Hapus file KTP?",
+                    text: "File akan dihapus permanen dari sistem.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, hapus",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#198754",
+                    cancelButtonColor: "#dc3545",
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        inputHidden.value = 1;
+                        container.remove();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: "File KTP berhasil untuk dihapus.",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+        });
+
+        // Hapus file KK
+        document.querySelectorAll('.btn-hapus-kk').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const container = this.closest('.file-kk-container');
+                const inputHidden = document.getElementById('hapus_kk');
+
+                Swal.fire({
+                    title: "Hapus file KK?",
+                    text: "File akan dihapus permanen dari sistem.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, hapus",
+                    cancelButtonText: "Batal",
+                    confirmButtonColor: "#198754",
+                    cancelButtonColor: "#dc3545",
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        inputHidden.value = 1;
+                        container.remove();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: "File KK berhasil untuk dihapus.",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection

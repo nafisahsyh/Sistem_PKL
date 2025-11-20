@@ -573,7 +573,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Plasma</label>
                                         <input type="text" name="nomor_anggota_plasma" class="form-control"
-                                            value="{{ $kepemilikan->petani->nomor_anggota_plasma ?? '' }}" readonly>
+                                            value="{{ $kepemilikan->petani->nomor_anggota_plasma ?? '' }}">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Koperasi</label>

@@ -153,8 +153,17 @@ class KepemilikanController extends Controller
                 $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
                 $isSearch = !empty($search);
 
+                if ($filterPetani === 'berhenti' && $statusPetani !== 'berhenti') {
+                    return false; // cegah petani aktif muncul
+                }
+
                 // ===================== PETANI BERHENTI =====================
                 if ($statusPetani === 'berhenti') {
+                    
+                    // Jika search aktif → TAMPILKAN semua detail yang cocok
+                    if (!empty($search)) {
+                        return $byDesa && $byTahun;
+                    }
                     if ($filterPetani !== 'berhenti')
                         return false;
 
@@ -1108,9 +1117,15 @@ class KepemilikanController extends Controller
         }
 
         // ===================== FILTER STATUS PENGELOLAAN =====================
-        $statusPengelolaan = $request->filled('status_pengelolaan')
-            ? (array) $request->input('status_pengelolaan', [])
-            : ['KSM', 'Mandiri'];
+        // Jika petani berhenti, maka tampilkan semua status kelola
+        if (!empty($request->status_petani) && strtolower($request->status_petani) === 'berhenti') {
+            $statusPengelolaan = ['KSM', 'Mandiri', 'Perusahaan'];
+        } else {
+            // Jika aktif, baru gunakan filter normal
+            $statusPengelolaan = $request->filled('status_pengelolaan')
+                ? (array) $request->status_pengelolaan
+                : ['KSM', 'Mandiri'];
+        }
 
         $query->whereHas('detailKepemilikan', fn($q2) => $q2->whereIn('status_pengelolaan', $statusPengelolaan));
 
@@ -1350,6 +1365,8 @@ class KepemilikanController extends Controller
             abort(404, 'Lahan tidak ditemukan.');
         }
 
+        $page = $request->page ?? 1;
+
         $filters = [
             'search' => $request->search,
             'desa' => $request->desa,
@@ -1448,6 +1465,7 @@ class KepemilikanController extends Controller
 
         return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
             ->with($filters)
+            ->with('page', $page)
             ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
     }
 
@@ -1459,6 +1477,7 @@ class KepemilikanController extends Controller
             return back()->with('error', 'Petani ini tidak memiliki lahan.');
         }
 
+        $page = $request->page ?? 1;
         $filters = [
             'search' => $request->search,
             'desa' => $request->desa,
@@ -1568,9 +1587,9 @@ class KepemilikanController extends Controller
 
         return redirect()->route('kepemilikan.edit', $kepemilikanBaru->id_kepemilikan)
             ->with($filters)
+            ->with('page', $page)
             ->with('success', 'Kepemilikan seluruh lahan berhasil dipindahkan.');
     }
-
 
     public function updateRiwayat(Request $request, $id)
     {
