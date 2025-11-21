@@ -35,10 +35,11 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>Nomor Plasma</th>
-                            <th>Nomor Koperasi</th>
+                            <th>No Plasma</th>
+                            <th>No Koperasi</th>
                             <th>NIK</th>
                             <th>Nama</th>
+                            <th>Telepon</th>
                             <th>Status</th>
                             <th>KTP</th>
                             <th>KK</th>
@@ -54,6 +55,7 @@
                                 <td class="text-center">{{ $p->nomor_anggota_koperasi ?: '—' }}</td>
                                 <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td>{{ $p->nama ?? '—' }}</td>
+                                <td class="text-center">{{ $p->no_telepon ?? '—' }}</td>
                                 <td class="text-center">
                                     @php
                                         if ($p->status === 'aktif') {
@@ -104,7 +106,7 @@
                                         ->exists();
                                 @endphp
 
-                                <td class="text-center" style="width: {{ $adaLahanAktif ? '150px' : '180px' }};">
+                                <td class="text-center" style="width: {{ $adaLahanAktif ? '125px' : '145px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya lahan aktif dan petani tidak berhenti --}}
                                     @if (!$adaLahanAktif && $p->status !== 'berhenti')
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
@@ -129,7 +131,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center py-5">
+                                <td colspan="11" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
                                     <p class="text-muted mb-0" style="font-size: 0.9rem;">Belum ada data petani</p>
                                 </td>

@@ -69,7 +69,7 @@
                         <label for="no_telepon" class="form-label">Nomor Telepon</label>
                         <input type="text" class="form-control text-kecil @error('no_telepon') is-invalid @enderror"
                             id="no_telepon" name="no_telepon" value="{{ old('no_telepon') }}"
-                            placeholder="0812xxxx atau +62812xxxx">
+                            placeholder="08xxxx atau +628xxxx">
                         @error('no_telepon')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

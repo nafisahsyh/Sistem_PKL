@@ -85,7 +85,7 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>Nomor Plasma</th>
+                            <th>No Plasma</th>
                             <th>Nama Petani</th>
                             <th>Status Petani</th>
                             <th>Desa</th>
