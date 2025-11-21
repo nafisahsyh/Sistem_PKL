@@ -92,7 +92,7 @@
                                 @if (!empty($kepemilikan->petani->pdf_scan_ktp))
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
                                         target="_blank" class="btn btn-info btn-sm text-dark">
-                                        <i class="fas fa-file-pdf"></i> Lihat
+                                        <i class="fas fa-file-alt"></i> Lihat
                                     </a>
                                 @else
                                     <span class="text-muted">Tidak ada file</span>
@@ -106,7 +106,7 @@
                                 @if (!empty($kepemilikan->petani->pdf_scan_kk))
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
                                         target="_blank" class="btn btn-info btn-sm text-dark">
-                                        <i class="fas fa-file-pdf"></i> Lihat
+                                        <i class="fas fa-file-alt"></i> Lihat
                                     </a>
                                 @else
                                     <span class="text-muted">Tidak ada file</span>
@@ -258,7 +258,7 @@
                                     @if (!empty($detail->pdf_scan_shm))
                                         <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}" target="_blank"
                                             class="btn btn-info btn-sm text-dark">
-                                            <i class="fas fa-file-pdf"></i> Lihat
+                                            <i class="fas fa-file-alt"></i> Lihat
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak ada file</span>
@@ -273,7 +273,7 @@
                                     @if (!empty($detail->pdf_scan_peta))
                                         <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}" target="_blank"
                                             class="btn btn-info btn-sm text-dark">
-                                            <i class="fas fa-file-pdf"></i> Lihat
+                                            <i class="fas fa-file-alt"></i> Lihat
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak ada file</span>

@@ -92,27 +92,29 @@
                         <div class="col-md-4 mb-2">
                             <div class="text-dark fw-semibold">Dokumen KTP</div>
                             <div>
-                                @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
+                                @if ($petani->pdf_scan_ktp)
                                     <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_ktp) }}" target="_blank"
                                         class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-pdf"></i> Lihat KTP
+                                        <i class="fas fa-file-alt"></i> Lihat KTP
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
                                 @endif
+
                             </div>
                         </div>
                         <div class="col-md-4 mb-2">
                             <div class="text-dark fw-semibold">Dokumen KK</div>
                             <div>
-                                @if ($kepemilikan->petani->pdf_scan_kk ?? false)
+                                @if ($petani->pdf_scan_kk)
                                     <a href="{{ asset('storage/ktp_pdf/' . $petani->pdf_scan_kk) }}" target="_blank"
                                         class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-pdf"></i> Lihat KK
+                                        <i class="fas fa-file-alt"></i> Lihat KK
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
                                 @endif
+
                             </div>
                         </div>
                     </div>
@@ -221,16 +223,19 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">PDF SHM</label>
+                                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
-                                    accept="application/pdf">
+                                    accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="text-muted">Maksimal 10MB.</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">PDF Peta</label>
+                                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
                                 <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control"
-                                    accept="application/pdf">
+                                    accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="text-muted">Maksimal 10MB.</small>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -444,12 +449,16 @@
 
         <div class="row mt-3">
             <div class="col-md-6 mb-3">
-                <label class="form-label">PDF SHM</label>
-                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" class="form-control" accept="application/pdf">
+                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
+                    class="form-control"
+                    accept=".pdf,.jpg,.jpeg,.png">
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label">PDF Peta</label>
-                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" class="form-control" accept="application/pdf">
+                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
+                    class="form-control"
+                    accept=".pdf,.jpg,.jpeg,.png">
             </div>
         </div>
         `;

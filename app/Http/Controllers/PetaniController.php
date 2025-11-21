@@ -63,8 +63,9 @@ class PetaniController extends Controller
             'alamat' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif, berhenti',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi angka & +62
-            'pdf_scan_ktp' => 'nullable|file|mimes:pdf|max:10240',
-            'pdf_scan_kk' => 'nullable|file|mimes:pdf|max:10240',
+            'pdf_scan_ktp' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+
         ]);
 
         // format nomor telepon
@@ -121,8 +122,9 @@ class PetaniController extends Controller
             'alamat' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,tidak_aktif,berhenti',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/',
-            'pdf_scan_ktp' => 'nullable|file|mimes:pdf|max:10240',
-            'pdf_scan_kk' => 'nullable|file|mimes:pdf|max:10240',
+            'pdf_scan_ktp' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+
         ]);
 
         // Format nomor telepon
@@ -223,8 +225,8 @@ class PetaniController extends Controller
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
-            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
-            'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_shm' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'lahan.*.pdf_scan_peta' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
             'lahan.*.status_kepemilikan' => 'nullable|in:aktif,nonaktif',
             'lahan.*.tanggal_mulai' => 'nullable|date',
             'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
@@ -261,12 +263,15 @@ class PetaniController extends Controller
                 // simpan file pdf kalau ada
                 $shmName = null;
                 if (!empty($lahanData['pdf_scan_shm']) && $lahanData['pdf_scan_shm']->isValid()) {
-                    $shmName = $lahanData['pdf_scan_shm']->store('shm_pdf', 'public');
+                    $shmName = 'shm_pdf/' . time() . '_' . $lahanData['pdf_scan_shm']->getClientOriginalName();
+                    $lahanData['pdf_scan_shm']->storeAs('shm_pdf', basename($shmName), 'public');
                 }
 
                 $petaName = null;
-                if (!empty($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
-                    $petaName = $lahanData['pdf_scan_peta']->store('peta_pdf', 'public');
+                    if (!empty($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
+                        $petaName = 'peta_pdf/' . time() . '_' . $lahanData['pdf_scan_peta']->getClientOriginalName();
+                        $lahanData['pdf_scan_peta']->storeAs('peta_pdf', basename($petaName), 'public');
+
                 }
 
                 // buat detail kepemilikan

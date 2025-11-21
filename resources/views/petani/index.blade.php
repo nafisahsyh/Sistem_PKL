@@ -80,7 +80,7 @@
                                     @if ($p->pdf_scan_ktp)
                                         <a href="{{ asset('storage/ktp_pdf/' . $p->pdf_scan_ktp) }}" target="_blank"
                                             class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-file-pdf"></i> Lihat
+                                            <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak ada</span>
@@ -90,7 +90,7 @@
                                     @if ($p->pdf_scan_kk)
                                         <a href="{{ asset('storage/ktp_pdf/' . $p->pdf_scan_kk) }}" target="_blank"
                                             class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-file-pdf"></i> Lihat
+                                            <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak ada</span>

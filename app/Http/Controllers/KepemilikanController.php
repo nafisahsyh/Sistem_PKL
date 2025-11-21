@@ -436,32 +436,38 @@ class KepemilikanController extends Controller
             ]);
 
             // === HANDLE FILE SHM ===
-            if ($request->input("lahan.$index.hapus_shm") == 1) {
-                if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
-                    Storage::disk('public')->delete($detail->pdf_scan_shm);
-                }
-                $detail->update(['pdf_scan_shm' => null]);
-            } elseif ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+            if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                // Kalau upload file baru → ganti
                 if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
                     Storage::disk('public')->delete($detail->pdf_scan_shm);
                 }
                 $path = $request->file("lahan.$index.pdf_scan_shm")->store('pdf_scan_shm', 'public');
                 $detail->update(['pdf_scan_shm' => $path]);
+
+            } elseif ($request->input("lahan.$index.hapus_shm") == 1) {
+                // Kalau tekan hapus file
+                if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_shm);
+                }
+                $detail->update(['pdf_scan_shm' => null]);
             }
 
+
             // === HANDLE FILE PETA ===
-            if ($request->input("lahan.$index.hapus_peta") == 1) {
-                if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
-                    Storage::disk('public')->delete($detail->pdf_scan_peta);
-                }
-                $detail->update(['pdf_scan_peta' => null]);
-            } elseif ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+            if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
                 if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
                     Storage::disk('public')->delete($detail->pdf_scan_peta);
                 }
                 $path = $request->file("lahan.$index.pdf_scan_peta")->store('pdf_scan_peta', 'public');
                 $detail->update(['pdf_scan_peta' => $path]);
+
+            } elseif ($request->input("lahan.$index.hapus_peta") == 1) {
+                if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                    Storage::disk('public')->delete($detail->pdf_scan_peta);
+                }
+                $detail->update(['pdf_scan_peta' => null]);
             }
+
         }
 
         // Sinkronisasi jumlah PBB
@@ -658,8 +664,8 @@ class KepemilikanController extends Controller
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
             'lahan.*.kode_lahan' => 'nullable|string|max:15',
-            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
-            'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_shm' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'lahan.*.pdf_scan_peta' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
             'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
             'lahan.*.tanggal_mulai' => 'nullable|date',
             'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
@@ -703,6 +709,7 @@ class KepemilikanController extends Controller
                 if ($detailId) {
                     // data lama → update
                     $detail = DetailKepemilikan::find($detailId);
+                    $detail->refresh();
                     $lahan = Lahan::find($lahanData['id_lahan']);
                 } else {
                     // data baru → buat baru
@@ -718,34 +725,43 @@ class KepemilikanController extends Controller
                 $lahan->save();
 
                 // === HANDLE FILE SHM ===
-                if (!empty($lahanData['hapus_shm']) && $lahanData['hapus_shm'] == 1) {
-                    if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
-                        Storage::disk('public')->delete($detail->pdf_scan_shm);
-                    }
-                    $shmPath = null;
-                } elseif ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                if ($request->hasFile("lahan.$index.pdf_scan_shm")) {
+                    // Upload baru → langsung ganti
                     if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
                         Storage::disk('public')->delete($detail->pdf_scan_shm);
                     }
                     $shmPath = $request->file("lahan.$index.pdf_scan_shm")->store('shm_pdf', 'public');
+
+                } elseif (!empty($lahanData['hapus_shm']) && $lahanData['hapus_shm'] == 1) {
+                    // Tombol hapus diklik
+                    if (!empty($detail->pdf_scan_shm) && Storage::disk('public')->exists($detail->pdf_scan_shm)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_shm);
+                    }
+                    $shmPath = null;
+
                 } else {
+                    // Tidak upload & tidak hapus → pertahankan file lama
                     $shmPath = $detail->pdf_scan_shm ?? null;
                 }
 
+
                 // === HANDLE FILE PETA ===
-                if (!empty($lahanData['hapus_peta']) && $lahanData['hapus_peta'] == 1) {
-                    if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
-                        Storage::disk('public')->delete($detail->pdf_scan_peta);
-                    }
-                    $petaPath = null;
-                } elseif ($request->hasFile("lahan.$index.pdf_scan_peta")) {
+                if ($request->hasFile("lahan.$index.pdf_scan_peta")) {
                     if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
                         Storage::disk('public')->delete($detail->pdf_scan_peta);
                     }
                     $petaPath = $request->file("lahan.$index.pdf_scan_peta")->store('peta_pdf', 'public');
+
+                } elseif (!empty($lahanData['hapus_peta']) && $lahanData['hapus_peta'] == 1) {
+                    if (!empty($detail->pdf_scan_peta) && Storage::disk('public')->exists($detail->pdf_scan_peta)) {
+                        Storage::disk('public')->delete($detail->pdf_scan_peta);
+                    }
+                    $petaPath = null;
+
                 } else {
                     $petaPath = $detail->pdf_scan_peta ?? null;
                 }
+
 
                 // Simpan detail
                 $detail->fill([
@@ -867,84 +883,111 @@ class KepemilikanController extends Controller
 
     public function cetakPDF($id)
     {
+        foreach (glob(storage_path('app/public/kepemilikan_gabungan_*.pdf')) as $file) {
+            if (file_exists($file)) unlink($file);
+        }
         $kepemilikan = Kepemilikan::with([
             'petani',
             'detailKepemilikan.lahan.desa.kecamatan',
             'detailKepemilikan.lahan.tahunTanam'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('kepemilikan.pdf', compact('kepemilikan'))
-            ->setPaper('a4', 'portrait');
+        // 1️⃣ Generate PDF utama dengan uniqid
+        $pathMain = storage_path('app/public/' . uniqid() . '_kepemilikan.pdf');
+        Pdf::loadView('kepemilikan.pdf', compact('kepemilikan'))
+            ->setPaper('a4', 'portrait')
+            ->save($pathMain);
 
-        $pathMain = storage_path('app/public/kepemilikan.pdf');
-        $pdf->save($pathMain);
-
+        // 2️⃣ Siapkan semua lampiran
         $lampiranFiles = [];
 
-        // Tambahkan KTP & KK
-        if ($kepemilikan->petani->pdf_scan_ktp && file_exists(storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp))) {
-            $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp);
-        }
-        if ($kepemilikan->petani->pdf_scan_kk && file_exists(storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk))) {
-            $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk);
-        }
+        $ktpPath = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp);
+        if ($kepemilikan->petani->pdf_scan_ktp && file_exists($ktpPath)) $lampiranFiles[] = $ktpPath;
 
-        // Tambahkan SHM & PETA
+        $kkPath = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk);
+        if ($kepemilikan->petani->pdf_scan_kk && file_exists($kkPath)) $lampiranFiles[] = $kkPath;
+
         foreach ($kepemilikan->detailKepemilikan as $detail) {
-            // hapus duplikasi path
-            $pathShm = storage_path('app/public/' . $detail->pdf_scan_shm);
-            $pathPeta = storage_path('app/public/' . $detail->pdf_scan_peta);
+            $shmPath = storage_path('app/public/' . $detail->pdf_scan_shm);
+            if ($detail->pdf_scan_shm && file_exists($shmPath)) $lampiranFiles[] = $shmPath;
 
-            if ($detail->pdf_scan_shm && file_exists(filename: $pathShm)) {
-                $lampiranFiles[] = $pathShm;
-            }
+            $petaPath = storage_path('app/public/' . $detail->pdf_scan_peta);
+            if ($detail->pdf_scan_peta && file_exists($petaPath)) $lampiranFiles[] = $petaPath;
+        }
 
-            if ($detail->pdf_scan_peta && file_exists($pathPeta)) {
-                $lampiranFiles[] = $pathPeta;
+        // 3️⃣ Konversi semua lampiran ke PDF sementara
+        $tempFiles = [];
+        foreach ($lampiranFiles as $file) {
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                $tempPath = storage_path('app/public/temp_' . uniqid() . '.pdf');
+                Pdf::loadView('kepemilikan.image_pdf', ['image' => $file])
+                    ->setPaper('a4', 'portrait')
+                    ->save($tempPath);
+                $tempFiles[] = $tempPath; // Hanya file sementara
+            } elseif ($ext === 'pdf') {
+                $tempFiles[] = $file; // PDF lama langsung ditambahkan, jangan hapus nanti
             }
         }
 
-        // Merge semua PDF
+        // 4️⃣ Merge PDF utama + lampiran
         $pdfMerger = new Fpdi();
 
-        // Tambah file utama
-        $pageCount = $pdfMerger->setSourceFile($pathMain);
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $tpl = $pdfMerger->importPage($i);
-            $size = $pdfMerger->getTemplateSize($tpl);
-            $pdfMerger->AddPage('P', [$size['width'], $size['height']]);
-            $pdfMerger->useTemplate($tpl);
-        }
-
-        // Tambah semua lampiran (otomatis detect orientasi)
-        foreach ($lampiranFiles as $file) {
-            $pageCount = $pdfMerger->setSourceFile($file);
+        // Tambah PDF utama
+        if (file_exists($pathMain)) {
+            $pageCount = $pdfMerger->setSourceFile($pathMain);
             for ($i = 1; $i <= $pageCount; $i++) {
                 $tpl = $pdfMerger->importPage($i);
                 $size = $pdfMerger->getTemplateSize($tpl);
-
-                if ($size['width'] > $size['height']) {
-                    $pdfMerger->AddPage('L', [$size['width'], $size['height']]);
-                } else {
-                    $pdfMerger->AddPage('P', [$size['width'], $size['height']]);
-                }
-
+                $pdfMerger->AddPage('P', [$size['width'], $size['height']]);
                 $pdfMerger->useTemplate($tpl);
             }
         }
 
-        $finalPath = storage_path('app/public/kepemilikan_gabungan.pdf');
+        // Tambah semua lampiran
+        foreach ($tempFiles as $file) {
+            if (!file_exists($file)) continue;
+            $pageCount = $pdfMerger->setSourceFile($file);
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tpl = $pdfMerger->importPage($i);
+                $size = $pdfMerger->getTemplateSize($tpl);
+                $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
+                $pdfMerger->AddPage($orientation, [$size['width'], $size['height']]);
+                $pdfMerger->useTemplate($tpl);
+            }
+        }
+
+        // 5️⃣ Simpan PDF gabungan
+        $finalPath = storage_path('app/public/kepemilikan_gabungan_' . uniqid() . '.pdf');
         $pdfMerger->Output($finalPath, 'F');
 
+        // 6️⃣ Hapus semua PDF sementara
+        foreach ($tempFiles as $f) {
+            // Hanya hapus file sementara hasil convert gambar
+            if (basename($f) !== $f && str_starts_with(basename($f), 'temp_') && file_exists($f)) {
+                unlink($f);
+            }
+        }
+
+        if (file_exists($pathMain)) unlink($pathMain);
+
+        // 7️⃣ Download PDF gabungan
         return response()->download(
             $finalPath,
-            'Data Kepemilikan Lahan ' . ucwords(strtolower($kepemilikan->petani->nama)) . '.pdf'
+            'Data Kepemilikan Lahan ' . ucwords(strtolower($kepemilikan->petani->nama ?? 'Tanpa Nama')) . '.pdf'
         );
     }
 
+
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
     {
-        // Ambil detail yang diklik dulu
+        // 🔹 Hapus semua PDF gabungan lama sebelum generate baru
+        foreach (glob(storage_path('app/public/kepemilikan_per_lahan_gabungan_*.pdf')) as $file) {
+            if (file_exists($file)) unlink($file);
+        }
+
+        // Ambil detail yang diklik
         $selectedDetail = DetailKepemilikan::with([
             'lahan.desa.kecamatan',
             'lahan.tahunTanam',
@@ -955,7 +998,7 @@ class KepemilikanController extends Controller
         $kepemilikan = $selectedDetail->kepemilikan;
         $petani = $kepemilikan->petani;
 
-        // Tentukan desa & tahun dari lahan yang diklik
+        // Tentukan desa & tahun target
         $desaTarget = $selectedDetail->lahan->desa->desa ?? null;
         $tahunTarget = $selectedDetail->lahan->tahunTanam->tahun ?? null;
 
@@ -963,18 +1006,14 @@ class KepemilikanController extends Controller
         $groupDetails = DetailKepemilikan::with(['lahan.desa.kecamatan', 'lahan.tahunTanam', 'pbb'])
             ->where('id_kepemilikan', $id_kepemilikan)
             ->whereHas('lahan', function ($q) use ($desaTarget, $tahunTarget) {
-                $q->whereHas('desa', function ($qq) use ($desaTarget) {
-                    $qq->where('desa', $desaTarget);
-                })->whereHas('tahunTanam', function ($qq) use ($tahunTarget) {
-                    $qq->where('tahun', $tahunTarget);
-                });
+                $q->whereHas('desa', fn($qq) => $qq->where('desa', $desaTarget))
+                ->whereHas('tahunTanam', fn($qq) => $qq->where('tahun', $tahunTarget));
             })->get();
 
         // Pastikan semua detail punya PBB tahun berjalan
         $tahunSekarang = Carbon::now()->year;
         foreach ($groupDetails as $detail) {
-            $pbbTahunIni = $detail->pbb->firstWhere('tahun', $tahunSekarang);
-            if (!$pbbTahunIni) {
+            if (!$detail->pbb->firstWhere('tahun', $tahunSekarang)) {
                 Pbb::create([
                     'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
                     'tahun' => $tahunSekarang,
@@ -984,30 +1023,27 @@ class KepemilikanController extends Controller
             }
         }
 
-        // Refresh relasi pbb
         $groupDetails->load('pbb');
 
-        // Generate PDF dengan semua detail
-        $pdf = Pdf::loadView('kepemilikan.pdf_per_lahan', [
+        // 1️⃣ Generate PDF utama dengan uniqid
+        $pathMain = storage_path('app/public/' . uniqid() . '_kepemilikan_per_lahan.pdf');
+        Pdf::loadView('kepemilikan.pdf_per_lahan', [
             'kepemilikan' => $kepemilikan,
             'groupDetails' => $groupDetails,
             'desaTarget' => $desaTarget,
             'tahunTarget' => $tahunTarget,
-        ])->setPaper('a4', 'portrait');
+        ])->setPaper('a4', 'portrait')
+        ->save($pathMain);
 
-        $pathMain = storage_path('app/public/kepemilikan_per_lahan.pdf');
-        $pdf->save($pathMain);
-
-        // Lampiran PDF KTP/KK
+        // 2️⃣ Siapkan semua lampiran
         $lampiranFiles = [];
+
         if ($petani->pdf_scan_ktp && file_exists(storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_ktp))) {
             $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_ktp);
         }
         if ($petani->pdf_scan_kk && file_exists(storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_kk))) {
             $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_kk);
         }
-
-        // Lampiran PDF SHM & Peta untuk semua lahan
         foreach ($groupDetails as $detail) {
             if ($detail->pdf_scan_shm && file_exists(storage_path('app/public/' . $detail->pdf_scan_shm))) {
                 $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_shm);
@@ -1017,38 +1053,70 @@ class KepemilikanController extends Controller
             }
         }
 
-        // Merge PDF seperti sebelumnya
-        $pdfMerger = new Fpdi();
-        $pageCount = $pdfMerger->setSourceFile($pathMain);
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $tpl = $pdfMerger->importPage($i);
-            $size = $pdfMerger->getTemplateSize($tpl);
-            $pdfMerger->AddPage('P', [$size['width'], $size['height']]);
-            $pdfMerger->useTemplate($tpl);
+        // 3️⃣ Konversi semua lampiran ke PDF sementara
+        $tempFiles = [];
+        foreach ($lampiranFiles as $file) {
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                $tempPath = storage_path('app/public/temp_' . uniqid() . '.pdf');
+                Pdf::loadView('kepemilikan.image_pdf', ['image' => $file])
+                    ->setPaper('a4', 'portrait')
+                    ->save($tempPath);
+                $tempFiles[] = $tempPath;
+            } else {
+                $tempFiles[] = $file; // PDF tetap
+            }
         }
 
-        foreach ($lampiranFiles as $file) {
-            $pageCount = $pdfMerger->setSourceFile($file);
+        // 4️⃣ Merge PDF utama + lampiran
+        $pdfMerger = new Fpdi();
+
+        // Tambah PDF utama
+        if (file_exists($pathMain)) {
+            $pageCount = $pdfMerger->setSourceFile($pathMain);
             for ($i = 1; $i <= $pageCount; $i++) {
                 $tpl = $pdfMerger->importPage($i);
                 $size = $pdfMerger->getTemplateSize($tpl);
-                $pdfMerger->AddPage($size['width'] > $size['height'] ? 'L' : 'P', [$size['width'], $size['height']]);
+                $pdfMerger->AddPage('P', [$size['width'], $size['height']]);
                 $pdfMerger->useTemplate($tpl);
             }
         }
 
-        $finalPath = storage_path('app/public/kepemilikan_per_lahan_gabungan.pdf');
+        // Tambah semua lampiran
+        foreach ($tempFiles as $file) {
+            if (!file_exists($file)) continue;
+            $pageCount = $pdfMerger->setSourceFile($file);
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tpl = $pdfMerger->importPage($i);
+                $size = $pdfMerger->getTemplateSize($tpl);
+                $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
+                $pdfMerger->AddPage($orientation, [$size['width'], $size['height']]);
+                $pdfMerger->useTemplate($tpl);
+            }
+        }
+
+        // 5️⃣ Simpan PDF gabungan
+        $finalPath = storage_path('app/public/kepemilikan_per_lahan_gabungan_' . uniqid() . '.pdf');
         $pdfMerger->Output($finalPath, 'F');
 
+        // 6️⃣ Hapus semua PDF sementara dan utama
+        foreach ($tempFiles as $f) {
+            if (basename($f) !== $f && str_starts_with(basename($f), 'temp_') && file_exists($f)) {
+                unlink($f);
+            }
+        }
+        if (file_exists($pathMain)) unlink($pathMain);
+
+        // 7️⃣ Download PDF gabungan
         return response()->download(
             $finalPath,
-            'Data Kepemilikan Lahan '
+            'Data Kepemilikan Lahan ' 
             . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
             . ' - ' . $desaTarget
             . ' (' . $tahunTarget . ').pdf'
         );
-
     }
+
 
     public function cetakSemuaPDF(Request $request)
     {
@@ -1273,8 +1341,8 @@ class KepemilikanController extends Controller
             'alamat' => 'nullable|string',
             'status' => 'required|in:aktif,tidak_aktif',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi angka & +62
-            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
-            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_ktp' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
         ]);
 
         // Format nomor telepon
@@ -1387,8 +1455,8 @@ class KepemilikanController extends Controller
             'status' => 'nullable|string|max:50',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/', // validasi nomor telepon
             'tanggal_ganti' => 'nullable|date',
-            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
-            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_ktp' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -1497,8 +1565,8 @@ class KepemilikanController extends Controller
             'status' => 'nullable|string|max:50',
             'no_telepon' => 'nullable|regex:/^\+?[0-9]+$/',
             'tanggal_ganti' => 'nullable|date',
-            'pdf_scan_ktp' => 'nullable|mimes:pdf|max:10240',
-            'pdf_scan_kk' => 'nullable|mimes:pdf|max:10240',
+            'pdf_scan_ktp' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
+            'pdf_scan_kk' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
             'keterangan' => 'nullable|string',
         ]);
 

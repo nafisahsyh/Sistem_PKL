@@ -109,7 +109,7 @@
                                 @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
                                         target="_blank" class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-pdf"></i> Lihat KTP
+                                        <i class="fas fa-file-alt"></i> Lihat KTP
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
@@ -122,7 +122,7 @@
                                 @if ($kepemilikan->petani->pdf_scan_kk ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
                                         target="_blank" class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-pdf"></i> Lihat KK
+                                        <i class="fas fa-file-alt"></i> Lihat KK
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
@@ -316,9 +316,9 @@
                             <div class="row">
                                 {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">File Scan SHM (PDF)</label>
+                                    <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
-                                        class="form-control text-kecil" accept="application/pdf">
+                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
                                     {{-- Hidden input untuk menandai penghapusan SHM --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
@@ -329,7 +329,7 @@
                                             <small class="text-muted">
                                                 File saat ini:
                                                 <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
-                                                    target="_blank">Lihat PDF</a>
+                                                    target="_blank">Lihat File</a>
                                             </small>
                                             {{-- Tombol hapus file SHM --}}
                                             <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
@@ -342,9 +342,9 @@
 
                                 {{-- FILE PETA --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">File Scan Peta (PDF)</label>
+                                    <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
-                                        class="form-control text-kecil" accept="application/pdf">
+                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
                                     {{-- Hidden input untuk menandai penghapusan Peta --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
@@ -355,7 +355,7 @@
                                             <small class="text-muted">
                                                 File saat ini:
                                                 <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
-                                                    target="_blank">Lihat PDF</a>
+                                                    target="_blank">Lihat File</a>
                                             </small>
                                             {{-- Tombol hapus file Peta --}}
                                             <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-peta"
@@ -465,12 +465,12 @@
                                 <div class="col-md-6 mb-3">
                                     <label>Scan KTP (PDF)</label>
                                     <input type="file" name="pdf_scan_ktp" class="form-control"
-                                        accept="application/pdf">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Scan KK (PDF)</label>
                                     <input type="file" name="pdf_scan_kk" class="form-control"
-                                        accept="application/pdf">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
                             </div>
                         </div>

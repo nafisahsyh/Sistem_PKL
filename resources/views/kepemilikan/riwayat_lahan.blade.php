@@ -228,7 +228,7 @@
                         <div class="mb-3">
                             <label class="form-label">Tanggal Ganti</label>
                             <input type="date" name="tanggal_ganti" class="form-control"
-                                value="{{ $item->tanggal_ganti }}" required>
+                                value="{{ $item->tanggal_ganti }}">
                         </div>
 
                         <div class="mb-3">

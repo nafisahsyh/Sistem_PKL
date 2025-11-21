@@ -89,32 +89,32 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Scan KTP (PDF)</label>
+                        <label for="pdf_scan_ktp" class="form-label">Scan KTP (PDF / JPG / PNG)</label>
                         <input type="file" name="pdf_scan_ktp"
                             class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
-                            accept="application/pdf">
+                            accept=".pdf,.jpg,.jpeg,.png">
                         @error('pdf_scan_ktp')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
+                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Scan KK (PDF)</label>
+                        <label for="pdf_scan_kk" class="form-label">Scan KK (PDF / JPG / PNG)</label>
                         <input type="file" name="pdf_scan_kk"
                             class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
-                            accept="application/pdf">
+                            accept=".pdf,.jpg,.jpeg,.png">
                         @error('pdf_scan_kk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted-small">Hanya file PDF, maksimal 10MB.</small>
+                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                     </div>
-                </div>
 
-                <div class="text-start mt-3">
-                    <button type="submit" class="btn btn-success me-2">Simpan</button>
-                    <a href="{{ route('petani.index') }}" class="btn btn-danger">Batal</a>
-                </div>
+
+                    <div class="text-start mt-3">
+                        <button type="submit" class="btn btn-success me-2">Simpan</button>
+                        <a href="{{ route('petani.index') }}" class="btn btn-danger">Batal</a>
+                    </div>
             </form>
         </div>
     </div>
