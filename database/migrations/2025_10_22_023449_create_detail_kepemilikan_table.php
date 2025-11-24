@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,15 +16,17 @@ return new class extends Migration
             $table->unsignedBigInteger('id_lahan');       // FK ke lahan
 
             // Data legalitas & pajak tiap lahan
-            $table->string('kode_lahan',15)->nullable();
+            $table->string('kode_lahan', 15)->nullable();
             $table->string('nomor_SHM', 100)->nullable();
-            $table->string('nama_SHM',100)->nullable();
+            $table->string('nama_SHM', 100)->nullable();
             $table->string('nomor_sporadik', 100)->nullable();
-            $table->string('nama_sporadik',100)->nullable();
+            $table->string('nama_sporadik', 100)->nullable();
             $table->string('nomor_kavling', 100)->nullable();
             $table->decimal('luas_surat', 10, 2)->nullable();
             $table->string('nomor_pbb', 100)->nullable();
             $table->decimal('jumlah_pbb', 10, 2)->nullable();
+            $table->decimal('koordinat_x', 12, 8)->nullable();
+            $table->decimal('koordinat_y', 12, 8)->nullable();
             $table->enum('posisi_surat', ['Notaris', 'PTP', 'Koperasi', 'Petani'])->nullable();
             $table->string('status_penyerahan')->nullable();
             $table->string('pdf_scan_shm', 255)->nullable();

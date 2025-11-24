@@ -256,6 +256,17 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th class="text-normal text-start ps-3">Koordinat Lahan</th>
+                                        <td class="text-normal-sm text-start ps-3">
+                                            @php
+                                                $x = $detail->koordinat_x;
+                                                $y = $detail->koordinat_y;
+
+                                                echo $x && $y ? $x . ', ' . $y : '- , -';
+                                            @endphp
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th class="text-normal text-start ps-3">Status Lahan</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             <span
@@ -282,7 +293,8 @@
                                     </tr>
                                     <tr>
                                         <th class="text-normal text-start ps-3">Status Penyerahan Surat </th>
-                                        <td class="text-normal-sm text-start ps-3">{{ $detail->status_penyerahan ?? '-' }}</td>
+                                        <td class="text-normal-sm text-start ps-3">{{ $detail->status_penyerahan ?? '-' }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th class="text-normal text-start ps-3">File SHM</th>

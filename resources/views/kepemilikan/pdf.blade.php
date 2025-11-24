@@ -283,6 +283,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Koordinat Lahan</th>
+                    <td>
+                        @php
+                            $x = $detail->koordinat_x;
+                            $y = $detail->koordinat_y;
+
+                            echo $x && $y ? $x . ', ' . $y : '- , -';
+                        @endphp
+                    </td>
+                </tr>
+                <tr>
                     <th>Status Kepemilikan</th>
                     <td>{{ ucfirst($detail->status_kepemilikan ?? '-') }}</td>
                 </tr>

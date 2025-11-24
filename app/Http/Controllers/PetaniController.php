@@ -225,6 +225,8 @@ class PetaniController extends Controller
             'lahan.*.luas_surat' => 'nullable|numeric|min:0',
             'lahan.*.nomor_pbb' => 'nullable|string|max:100',
             'lahan.*.jumlah_pbb' => 'nullable|numeric|min:0',
+            'lahan.*.koordinat_x' => 'nullable|numeric|between:-180,180',
+            'lahan.*.koordinat_y' => 'nullable|numeric|between:-90,90',
             'lahan.*.posisi surat' => 'nullable|in:Notaris,PTP,Koperasi,Petani',
             'lahan.*.status_penyerahan' => 'nullable|string|max:100',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
@@ -270,9 +272,9 @@ class PetaniController extends Controller
                 }
 
                 $petaName = null;
-                    if (!empty($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
-                        $petaName = 'peta_pdf/' . time() . '_' . $lahanData['pdf_scan_peta']->getClientOriginalName();
-                        $lahanData['pdf_scan_peta']->storeAs('peta_pdf', basename($petaName), 'public');
+                if (!empty($lahanData['pdf_scan_peta']) && $lahanData['pdf_scan_peta']->isValid()) {
+                    $petaName = 'peta_pdf/' . time() . '_' . $lahanData['pdf_scan_peta']->getClientOriginalName();
+                    $lahanData['pdf_scan_peta']->storeAs('peta_pdf', basename($petaName), 'public');
 
                 }
 
@@ -291,6 +293,8 @@ class PetaniController extends Controller
                     'luas_surat' => $lahanData['luas_surat'] ?? null,
                     'nomor_pbb' => $lahanData['nomor_pbb'] ?? null,
                     'jumlah_pbb' => $lahanData['jumlah_pbb'] ?? null,
+                    'koordinat_x' => $lahanData['koordinat_x'] ?? null,
+                    'koordinat_y' => $lahanData['koordinat_y'] ?? null,
                     'pdf_scan_shm' => $shmName,
                     'pdf_scan_peta' => $petaName,
                     'status_kepemilikan' => $statusKepemilikan,
