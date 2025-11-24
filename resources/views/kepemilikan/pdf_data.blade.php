@@ -183,7 +183,7 @@
                                         ->unique()
                                         ->toArray();
 
-                                    echo implode(' / ', array_reverse($riwayat));
+                                    echo empty($riwayat) ? '-' : implode(' / ', array_reverse($riwayat));
                                 @endphp
                             </td>
                         @endif
