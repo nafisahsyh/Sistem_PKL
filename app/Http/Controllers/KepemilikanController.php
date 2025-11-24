@@ -1121,6 +1121,7 @@ class KepemilikanController extends Controller
     public function cetakSemuaPDF(Request $request)
     {
         $statusPetani = $request->input('status_petani', 'aktif');
+        $exclude = $request->exclude ?? [];
 
         $query = Kepemilikan::with([
             'petani.desa.kecamatan',
@@ -1130,7 +1131,8 @@ class KepemilikanController extends Controller
                 }
             },
             'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahunTanam'
+            'detailKepemilikan.lahan.tahunTanam',
+            'detailKepemilikan.lahan.riwayatKepemilikan.petaniSebelum',
         ]);
 
         //Gabungkan semua filter utama
@@ -1247,7 +1249,7 @@ class KepemilikanController extends Controller
         $pdf = Pdf::loadView('kepemilikan.pdf_data', [
             'kepemilikan' => $kepemilikan,
             'request' => $request
-        ])->setPaper('a4', 'landscape');
+        ])->setPaper([0, 0, 609.4488, 934.423], 'landscape');
 
         $namaDesa = $request->filled('desa') ? str_replace(' ', '_', $request->desa) : 'Semua Desa';
         $namaTahun = $request->filled('tahun') ? $request->tahun : 'Semua Tahun';
@@ -1258,7 +1260,6 @@ class KepemilikanController extends Controller
         return $pdf->download($namaFile);
     }
 
-    // data PBB per lahan //
     //Menandai PBB tahun tertentu sebagai lunas
     public function tandaiLunasPbb($id_pbb)
     {

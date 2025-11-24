@@ -160,6 +160,7 @@
 .bg-blue {
     background-color: #4925DB !important;
 }
+
 .bg-pastel {
     background-color: #269F95 !important;
 }
@@ -206,7 +207,8 @@
     color: #fff;
     font-weight: normal !important;
     font-size: 0.9rem;
-    border: 1px solid #cce1d7; /* 🌿 batas kolom terlihat */
+    border: 1px solid #cce1d7;
+    /* 🌿 batas kolom terlihat */
 }
 
 .table-custom tbody tr:nth-child(odd) {
@@ -432,17 +434,21 @@ div.choices[data-type*="select-one"]::after {
     font-style: italic;
     margin-top: 5px;
 }
+
 .card.p-4 {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
-    padding-top: 1rem !important;   /* tetap kecil */
-    padding-bottom: 1rem !important; /* tetap kecil */
+    padding-top: 1rem !important;
+    /* tetap kecil */
+    padding-bottom: 1rem !important;
+    /* tetap kecil */
 }
 
 
 .text-normal {
     font-size: 0.95rem;
-    font-weight: 600; /* normal */
+    font-weight: 600;
+    /* normal */
 }
 
 .text-normal-sm {
@@ -452,7 +458,8 @@ div.choices[data-type*="select-one"]::after {
 .password-toggle {
     position: absolute;
     top: 70%;
-    right: 1rem; /* agak ke kiri biar masuk ke dalam input */
+    right: 1rem;
+    /* agak ke kiri biar masuk ke dalam input */
     transform: translateY(-50%);
     cursor: pointer;
     color: #555;
@@ -465,12 +472,15 @@ div.choices[data-type*="select-one"]::after {
 }
 
 input.form-control {
-    padding-right: 2.5rem !important; /* kasih ruang untuk ikon mata */
+    padding-right: 2.5rem !important;
+    /* kasih ruang untuk ikon mata */
 }
 
 .table td .btn {
-    margin: 0 0.5px !important; /* jarak kanan-kiri kecil dan seragam */
+    margin: 0 0.5px !important;
+    /* jarak kanan-kiri kecil dan seragam */
 }
+
 .table td form {
     display: inline-block;
     margin: 0;
@@ -479,27 +489,31 @@ input.form-control {
 
 /* HUMBERGER BAR */
 .custom {
-  font-size: 20px; /* ubah sesuai kebutuhan */
+    font-size: 20px;
+    /* ubah sesuai kebutuhan */
 }
 
 /* ---------- Ukuran Teks Modal ---------- */
 
 /* Judul modal */
 .modal-title {
-    font-size: 1rem; /* default lebih besar */
+    font-size: 1rem;
+    /* default lebih besar */
     font-weight: 600;
 }
 
 /* Label form */
 .modal-body .form-label {
-    font-size: 0.95rem; /* ukuran label */
+    font-size: 0.95rem;
+    /* ukuran label */
     font-weight: 500;
 }
 
 /* Input, select, textarea */
 .modal-body .form-control,
 .modal-body .form-select {
-    font-size: 0.95rem; /* ukuran teks di input/select */
+    font-size: 0.95rem;
+    /* ukuran teks di input/select */
 }
 
 /* Textarea */
@@ -524,7 +538,8 @@ input.form-control {
 /* Container Petani Baru */
 #gantiPemilikModal #petaniBaru,
 #modalGantiKepemilikan #petaniBaru {
-    display: block; /* nanti JS bisa toggle */
+    display: block;
+    /* nanti JS bisa toggle */
 }
 
 /* Label semua input/textarea di Petani Baru */
@@ -719,6 +734,7 @@ input.form-control {
 .card-footer a {
     text-decoration: none !important;
 }
+
 .card-footer a:hover {
     text-decoration: none !important;
 }
@@ -746,9 +762,12 @@ input.form-control {
     font-size: 0.75rem !important;
     padding: 3px 8px !important;
 }
+
 .goto-of-text {
-    margin-left: 10px;   /* tambah jarak ke kiri */
-    margin-right: 10px;  /* tambah jarak ke kanan */
+    margin-left: 10px;
+    /* tambah jarak ke kiri */
+    margin-right: 10px;
+    /* tambah jarak ke kanan */
     font-size: 0.85rem;
     font-weight: 500;
 }
@@ -759,7 +778,8 @@ input.form-control {
 .card {
     border: none;
     border-radius: 12px;
-    padding: 0.6rem !important; /* dari p-4 jadi lebih kecil */
+    padding: 0.6rem !important;
+    /* dari p-4 jadi lebih kecil */
 }
 
 /* Card body lebih ringkas */
@@ -775,11 +795,13 @@ input.form-control {
 
 /* Ukuran ikon & angka disesuaikan */
 .card-body i {
-    font-size: 1.5rem; /* tadinya fa-2x = 2rem */
+    font-size: 1.5rem;
+    /* tadinya fa-2x = 2rem */
 }
 
 .card-body h3 {
-    font-size: 1.4rem; /* dari 1.75rem-an jadi lebih kecil */
+    font-size: 1.4rem;
+    /* dari 1.75rem-an jadi lebih kecil */
     font-weight: 600;
 }
 
@@ -794,13 +816,16 @@ input.form-control {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 /* ==== RAPIKAN TAMPILAN DATA PETANI ==== */
 .card .text-dark.fw-semibold {
-    font-size: 0.95rem; /* label seperti "Nomor Plasma" */
+    font-size: 0.95rem;
+    /* label seperti "Nomor Plasma" */
 }
 
 .card .fs-6.fw-medium.text-dark {
-    font-size: 0.95rem; /* isi data seperti "Aida" atau NIK */
+    font-size: 0.95rem;
+    /* isi data seperti "Aida" atau NIK */
     font-weight: 400;
     color: #222;
 }
@@ -817,6 +842,24 @@ input.form-control {
 }
 
 /* Jarak antar kolom biar lebih rapi */
-.card .row.mb-3 > .col-md-4 {
+.card .row.mb-3>.col-md-4 {
     margin-bottom: 0.8rem;
+}
+
+/* Membuat modal benar-benar center */
+.modal-dialog-centered-custom {
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100% - 60px);
+    /* biar tidak terlalu tinggi */
+}
+
+/* Ukuran modal lebih kecil */
+.modal-sm-custom {
+    max-width: 450px;
+}
+
+/* Agar modal-body tidak terlalu tinggi */
+.modal-body {
+    padding: 15px 20px;
 }

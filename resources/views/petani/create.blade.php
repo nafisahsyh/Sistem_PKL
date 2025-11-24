@@ -89,7 +89,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Scan KTP (PDF / JPG / PNG)</label>
+                        <label for="pdf_scan_ktp" class="form-label">Scan KTP</label>
                         <input type="file" name="pdf_scan_ktp"
                             class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
                             accept=".pdf,.jpg,.jpeg,.png">
@@ -100,7 +100,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_kk" class="form-label">Scan KK (PDF / JPG / PNG)</label>
+                        <label for="pdf_scan_kk" class="form-label">Scan KK</label>
                         <input type="file" name="pdf_scan_kk"
                             class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
                             accept=".pdf,.jpg,.jpeg,.png">

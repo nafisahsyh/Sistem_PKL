@@ -21,11 +21,6 @@
             padding: 0;
         }
 
-        .header-section {
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -37,7 +32,6 @@
             border: 1px solid #000;
             padding: 5px 7px;
             text-align: center;
-            vertical-align: middle;
         }
 
         th {
@@ -53,10 +47,6 @@
         td,
         th {
             page-break-inside: avoid !important;
-        }
-
-        .page-break {
-            page-break-before: always;
         }
     </style>
 </head>
@@ -78,32 +68,75 @@
         </h4>
     </div>
 
+    @php $exclude = $request->exclude ?? []; @endphp
+
     <table>
         <thead>
             <tr>
                 <th style="width: 3%;">No</th>
-                <th style="width: 7%;">Nomor Plasma</th>
-                <th style="width: 7%;">Nomor Koperasi</th>
-                <th style="width: 13%;">Nama Lengkap</th>
-                <th style="width: 13%;">Desa</th>
-                <th style="width: 8%;">Tahun Tanam</th>
-                <th style="width: 8%;">Kode</th>
-                <th style="width: 8%;">No. Kavling</th>
-                <th style="width: 10%;">Luas Lapangan</th>
-                <th style="width: 10%;">Luas Surat</th>
-                <th style="width: 16%;">No. SHM</th>
-                <th style="width: 14%;">No. Sporadik</th>
-                <th style="width: 9%;">Status Kelola</th>
+
+                @if (!in_array('nomor_plasma', $exclude))
+                    <th style="width: 7%;">Nomor Plasma</th>
+                @endif
+
+                @if (!in_array('nomor_koperasi', $exclude))
+                    <th style="width: 7%;">Nomor Koperasi</th>
+                @endif
+
+                @if (!in_array('nama', $exclude))
+                    <th style="width: 13%;">Petani Sekarang</th>
+                @endif
+
+                @if (!in_array('riwayat', $exclude))
+                    <th style="width: 13%;">Petani Sebelum</th>
+                @endif
+
+                @if (!in_array('desa', $exclude))
+                    <th style="width: 13%;">Desa</th>
+                @endif
+
+                @if (!in_array('tahun', $exclude))
+                    <th style="width: 8%;">Tahun Tanam</th>
+                @endif
+
+                @if (!in_array('kode', $exclude))
+                    <th style="width: 8%;">Kode</th>
+                @endif
+
+                @if (!in_array('kavling', $exclude))
+                    <th style="width: 8%;">No. Kavling</th>
+                @endif
+
+                @if (!in_array('luas_peta', $exclude))
+                    <th style="width: 10%;">Luas Lapangan</th>
+                @endif
+
+                @if (!in_array('luas_surat', $exclude))
+                    <th style="width: 10%;">Luas Surat</th>
+                @endif
+
+                @if (!in_array('shm', $exclude))
+                    <th style="width: 16%;">No. SHM</th>
+                @endif
+
+                @if (!in_array('sporadik', $exclude))
+                    <th style="width: 14%;">No. Sporadik</th>
+                @endif
+
+                @if (!in_array('status_pengelolaan', $exclude))
+                    <th style="width: 9%;">Status Kelola</th>
+                @endif
             </tr>
         </thead>
+
         <tbody>
+
             @php $noGlobal = 1; @endphp
 
             @foreach ($kepemilikan as $k)
                 @php
                     $details = $k->detailKepemilikan->values();
 
-                    // skip jika petani berhenti dan semua lahannya dikelola perusahaan
                     if (
                         $k->status_kepemilikan === 'berhenti' &&
                         $details->every(fn($d) => $d->status_pengelolaan === 'Perusahaan')
@@ -114,51 +147,96 @@
 
                 @foreach ($details as $i => $detail)
                     @php
-                        $lahan = $detail->lahan ?? null;
+                        $lahan = $detail->lahan;
                         $desaNama = $lahan->desa->desa ?? '-';
                         $tahunNama = $lahan->tahunTanam->tahun ?? '-';
-                        $luasPeta = (float) ($lahan->luas_peta ?? 0);
-                        $luasSurat = (float) ($detail->luas_surat ?? 0);
-                        $noKavling = $detail->nomor_kavling ?? '-';
-                        $noSHM = $detail->nomor_SHM ?? '-';
-                        $noSporadik = $detail->nomor_sporadik ?? '-';
-                        $kodeLahan = $detail->kode_lahan ?? '-';
-                        $statusKelola = $detail->status_pengelolaan ?? '-';
-
-                        $luasPetaText = number_format($luasPeta, 2) . ' M²';
-                        $luasSuratText = number_format($luasSurat, 2) . ' M²';
+                        $luasPeta = number_format((float) ($lahan->luas_peta ?? 0), 2) . ' M²';
+                        $luasSurat = number_format((float) ($detail->luas_surat ?? 0), 2) . ' M²';
                     @endphp
 
                     <tr>
-                        @if ($i === 0)
-                            <td>{{ $noGlobal++ }}</td>
-                            <td>{{ $k->petani->nomor_anggota_plasma ?? '-' }}</td>
-                            <td>{{ $k->petani->nomor_anggota_koperasi ?? '-' }}</td>
-                            <td>{{ $k->petani->nama ?? '-' }}</td>
-                        @else
-                            {{-- baris kosong untuk data yang sama --}}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        {{-- NO --}}
+                        <td>{{ $i === 0 ? $noGlobal++ : '' }}</td>
+
+                        {{-- NOMOR PLASMA --}}
+                        @if (!in_array('nomor_plasma', $exclude))
+                            <td>{{ $i === 0 ? $k->petani->nomor_anggota_plasma ?? '-' : '' }}</td>
                         @endif
 
-                        <td>{{ $desaNama }}</td>
-                        <td>{{ $tahunNama }}</td>
-                        <td>{{ $kodeLahan }}</td>
-                        <td>{{ $noKavling }}</td>
-                        <td>{{ $luasPetaText }}</td>
-                        <td>{{ $luasSuratText }}</td>
-                        <td>{{ $noSHM }}</td>
-                        <td>{{ $noSporadik }}</td>
-                        <td>{{ $statusKelola }}</td>
+                        {{-- NOMOR KOPERASI --}}
+                        @if (!in_array('nomor_koperasi', $exclude))
+                            <td>{{ $i === 0 ? $k->petani->nomor_anggota_koperasi ?? '-' : '' }}</td>
+                        @endif
+
+                        {{-- NAMA PETANI SEKARANG --}}
+                        @if (!in_array('nama', $exclude))
+                            <td>{{ $i === 0 ? $k->petani->nama ?? '-' : '' }}</td>
+                        @endif
+
+                        {{-- PETANI SEBELUM --}}
+                        @if (!in_array('riwayat', $exclude))
+                            <td>
+                                @php
+                                    $riwayat = $detail->lahan->riwayatKepemilikan
+                                        ->pluck('petaniSebelum.nama')
+                                        ->filter()
+                                        ->unique()
+                                        ->toArray();
+
+                                    echo implode(' / ', array_reverse($riwayat));
+                                @endphp
+                            </td>
+                        @endif
+
+                        {{-- DESA --}}
+                        @if (!in_array('desa', $exclude))
+                            <td>{{ $desaNama }}</td>
+                        @endif
+
+                        {{-- TAHUN --}}
+                        @if (!in_array('tahun', $exclude))
+                            <td>{{ $tahunNama }}</td>
+                        @endif
+
+                        {{-- KODE --}}
+                        @if (!in_array('kode', $exclude))
+                            <td>{{ $detail->kode_lahan ?? '-' }}</td>
+                        @endif
+
+                        {{-- KAVLING --}}
+                        @if (!in_array('kavling', $exclude))
+                            <td>{{ $detail->nomor_kavling ?? '-' }}</td>
+                        @endif
+
+                        {{-- LUAS ETA --}}
+                        @if (!in_array('luas_peta', $exclude))
+                            <td>{{ $lahan->luas_peta ? $luasPeta : '-' }}</td>
+                        @endif
+
+                        {{-- LUAS SURAT --}}
+                        @if (!in_array('luas_surat', $exclude))
+                            <td>{{ $detail->luas_surat ? $luasSurat : '-' }}</td>
+                        @endif
+
+                        {{-- SHM --}}
+                        @if (!in_array('shm', $exclude))
+                            <td>{{ $detail->nomor_SHM ?? '-' }}</td>
+                        @endif
+
+                        {{-- SPORADIK --}}
+                        @if (!in_array('sporadik', $exclude))
+                            <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
+                        @endif
+
+                        {{-- STATUS PENGELOLAAN --}}
+                        @if (!in_array('status_pengelolaan', $exclude))
+                            <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
+                        @endif
                     </tr>
                 @endforeach
             @endforeach
-
         </tbody>
     </table>
-
 </body>
 
 </html>

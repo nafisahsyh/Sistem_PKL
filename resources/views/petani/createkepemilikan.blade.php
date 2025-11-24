@@ -223,16 +223,16 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                <label class="form-label">Scan SHM</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">
-                                <small class="text-muted">Maksimal 10MB.</small>
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                <label class="form-label">Scan Peta</label>
                                 <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">
-                                <small class="text-muted">Maksimal 10MB.</small>
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                             </div>
                         </div>
 

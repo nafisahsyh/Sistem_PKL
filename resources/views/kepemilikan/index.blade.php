@@ -6,16 +6,9 @@
     <div class="container-fluid px-4 mt-5">
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="text-brown mb-0">Data Kepemilikan</h3>
-            <a href="{{ route('kepemilikan.cetakSemuaPDF', [
-                'search' => request('search'),
-                'desa' => request('desa'),
-                'tahun' => request('tahun'),
-                'status_petani' => request('status_petani'),
-                'status_pengelolaan' => request('status_pengelolaan'),
-            ]) }}"
-                target="_blank" class="btn btn-danger">
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalCetakPDF">
                 <i class="fas fa-file-pdf"></i> Cetak PDF
-            </a>
+            </button>
         </div>
 
         <div class="card shadow-sm rounded-3">
@@ -370,6 +363,60 @@
                         </a>
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-check me-1"></i> Terapkan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== MODAL CETAK PDF ======== -->
+    <div class="modal fade" id="modalCetakPDF" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-centered-custom modal-sm-custom">
+            <div class="modal-content">
+
+                <form action="{{ route('kepemilikan.cetakSemuaPDF') }}" method="GET" target="_blank">
+
+                    <div class="modal-header" style="background-color: #dc3545">
+                        <h5 class="modal-title" style="color:white">Pilih Kolom</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        {{-- FILTER --}}
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        <input type="hidden" name="desa" value="{{ request('desa') }}">
+                        <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                        <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
+                        <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+
+                        <p class="mb-2">Pilih kolom yang ingin disembunyikan:</p>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label><input type="checkbox" name="exclude[]" value="nomor_plasma"> Nomor
+                                    Plasma</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="nomor_koperasi"> Nomor
+                                    Koperasi</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="nama"> Petani Sekarang</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="riwayat"> Petani Sebelum</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="desa"> Desa</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="tahun"> Tahun Tanam</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="kode"> Kode Lahan</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="kavling"> Nomor Kavling</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="luas_peta"> Luas
+                                    Lapangan</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="luas_surat"> Luas Surat</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="status_pengelolaan"> Status
+                                    Kelola</label><br>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">
+                            Cetak PDF
                         </button>
                     </div>
                 </form>
