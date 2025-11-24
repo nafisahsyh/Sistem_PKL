@@ -300,7 +300,7 @@ class PetaniController extends Controller
                     'status_kepemilikan' => $statusKepemilikan,
                     'tanggal_mulai' => $lahanData['tanggal_mulai'] ?? null,
                     'tanggal_selesai' => $lahanData['tanggal_selesai'] ?? null,
-                    'status_pengelolaan' => $statusPengelolaan,
+                    'status_pengelolaan' => $statusPengelolaan['status_pengelolaan'] ?? null,
                 ]);
             }
 

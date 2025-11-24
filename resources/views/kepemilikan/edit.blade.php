@@ -256,12 +256,11 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kelola</label>
-                                    <!-- Status Kelola (tidak ada search) -->
                                     <select name="lahan[{{ $index }}][status_pengelolaan]"
-                                        class="form-select text-kecil choices-select" required>
+                                        class="form-select text-kecil choices-select">
+                                        <option value="">Pilih Status Kelola</option>
                                         <option value="KSM"
-                                            {{ $detail->status_pengelolaan == 'KSM' || is_null($detail->status_pengelolaan) ? 'selected' : '' }}>
-                                            KSM
+                                            {{ $detail->status_pengelolaan == 'KSM' ? 'selected' : '' }}>KSM
                                         </option>
                                         <option value="Mandiri"
                                             {{ $detail->status_pengelolaan == 'Mandiri' ? 'selected' : '' }}>Mandiri
@@ -281,7 +280,7 @@
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
                                         class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
                                 </div>
-                                <div class="mt-3 mb-2">
+                                <div class="mt-2 mb-2">
                                     <h6 class="text-brown mb-3">Koordinat Lahan</h6>
                                 </div>
 
@@ -305,7 +304,7 @@
                             </div>
 
                             {{-- Status & Tanggal --}}
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
                                     <select name="lahan[{{ $index }}][status_kepemilikan]"
@@ -331,7 +330,7 @@
                                         value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Posisi Surat</label>
                                     <select name="lahan[{{ $index }}][posisi_surat]"
@@ -357,7 +356,7 @@
                             </div>
 
                             {{-- Upload file --}}
-                            <div class="row mt-3">
+                            <div class="row mt-2">
                                 {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
@@ -1015,7 +1014,8 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kelola</label>
                                     <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil choices-select">
-                                        <option value="KSM" selected>KSM</option>                    
+                                        <option value="">Pilih Status Kelola</option>
+                                        <option value="KSM">KSM</option>                    
                                         <option value="Mandiri">Mandiri</option>
                                         <option value="Perusahaan">Perusahaan</option>                        
                                     </select>
@@ -1028,7 +1028,7 @@
                                     <label class="form-label">Jumlah PBB</label>
                                     <input type="text" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                                 </div>
-                                <div class="mt-3 mb-2">
+                                <div class="mt-2 mb-2">
                                     <h6 class="text-brown mb-3">Koordinat Lahan</h6>
                                 </div>
                                 <div class="row">
@@ -1048,7 +1048,7 @@
                                             placeholder="Contoh: -3.12345678">
                                     </div>
                                 </div>
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
                                     <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil choices-select">
@@ -1065,7 +1065,7 @@
                                     <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Posisi Surat</label>
                                     <select name="lahan[${lahanIndex}][posisi_surat]" class="form-select text-kecil choices-select">
@@ -1083,7 +1083,7 @@
                                         placeholder="Masukkan keterangan">
                                 </div>
                             </div>
-                            <div class="row mt-3">
+                            <div class="row mt-2">
                                 <!-- === FILE SHM === -->
                                 <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>

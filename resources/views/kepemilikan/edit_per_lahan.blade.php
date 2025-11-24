@@ -257,12 +257,11 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kelola</label>
-                                    <!-- Status Kelola (tidak ada search) -->
                                     <select name="lahan[{{ $index }}][status_pengelolaan]"
-                                        class="form-select text-kecil choices-select" required>
+                                        class="form-select text-kecil choices-select">
+                                        <option value="">Pilih Status Kelola</option>
                                         <option value="KSM"
-                                            {{ $detail->status_pengelolaan == 'KSM' || is_null($detail->status_pengelolaan) ? 'selected' : '' }}>
-                                            KSM
+                                            {{ $detail->status_pengelolaan == 'KSM' ? 'selected' : '' }}>KSM
                                         </option>
                                         <option value="Mandiri"
                                             {{ $detail->status_pengelolaan == 'Mandiri' ? 'selected' : '' }}>Mandiri
@@ -284,27 +283,25 @@
                                 </div>
                             </div>
 
-                            <div class="mt-3 mb-2">
-                                <h6 class="text-brown mb-3">Koordinat Lahan</h6>
-                            </div>
-                            <div class="row">
+                            <div class="row mt-2">
+                                <h6 class="text-brown">Koordinat Lahan</h6>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Koordinat X</label>
-                                    <input type="number" step="0.00000001" name="lahan[{{ $index }}][koordinat_x]"
-                                        class="form-control text-kecil" value="{{ $detail->koordinat_x }}"
-                                        placeholder="Contoh: 114.12345678">
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_x]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_x }}" placeholder="Contoh: 114.12345678">
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Koordinat Y</label>
-                                    <input type="number" step="0.00000001" name="lahan[{{ $index }}][koordinat_y]"
-                                        class="form-control text-kecil" value="{{ $detail->koordinat_y }}"
-                                        placeholder="Contoh: -3.12345678">
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_y]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_y }}" placeholder="Contoh: -3.12345678">
                                 </div>
                             </div>
 
                             {{-- Status & Tanggal --}}
-                            <div class="row mt-3">
+                            <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
                                     <select name="lahan[{{ $index }}][status_kepemilikan]"
@@ -331,7 +328,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Posisi Surat</label>
                                     <select name="lahan[{{ $index }}][posisi_surat]"
@@ -357,7 +354,7 @@
                             </div>
 
                             {{-- Upload file --}}
-                            <div class="row">
+                            <div class="row mt-2">
                                 {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>

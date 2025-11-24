@@ -189,6 +189,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kelola</label>
                                 <select name="lahan[0][status_pengelolaan]" class="form-select text-kecil select-status">
+                                    <option value="">Pilih Status Kelola</option>
                                     <option value="KSM">KSM</option>
                                     <option value="Mandiri">Mandiri</option>
                                     <option value="Perusahaan">Perusahaan</option>
@@ -450,6 +451,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kelola</label>
                                 <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
+                                    <option value="">Pilih Status Kelola</option>
                                     <option value="KSM">KSM</option>
                                     <option value="Mandiri">Mandiri</option>
                                     <option value="Perusahaan">Perusahaan</option>
@@ -464,12 +466,12 @@
                                 <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                             </div>
                         </div>
-                        <div class="mt-3 mb-2">
+                        <div class="mt-2 mb-2">
                             <h6 class="text-brown mb-3">Koordinat Lahan</h6>
                         </div>
 
                         <div class="row">
-                             <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Koordinat X</label>
                                 <input type="number" step="0.00000001" name="lahan[0][koordinat_x]"
                                     class="form-control text-kecil" placeholder="Contoh: 114.12345678">
@@ -482,7 +484,7 @@
                             </div>
                         </div>
 
-                        <div class="row mt-3">
+                        <div class="row mt-2">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kepemilikan</label>
                                 <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil select-status">
@@ -499,7 +501,7 @@
                                 <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mt-2">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Posisi Surat</label>
                                 <select name="lahan[${lahanIndex}][posisi_surat]" class="form-select text-kecil select-status">
@@ -517,7 +519,7 @@
                                     placeholder="Masukkan keterangan">
                             </div>
                         </div>
-                        <div class="row mt-3">
+                        <div class="row mt-2">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
                                 <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 

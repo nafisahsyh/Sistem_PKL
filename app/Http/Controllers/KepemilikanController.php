@@ -386,7 +386,7 @@ class KepemilikanController extends Controller
             'id_petani' => 'required|exists:petani,id_petani',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
-            'lahan.*.status_pengelolaan' => 'required|in:KSM,Mandiri,Perusahaan',
+            'lahan.*.status_pengelolaan' => 'nullable|in:KSM,Mandiri,Perusahaan',
         ]);
 
         // Update petani di kepemilikan utama
@@ -666,7 +666,7 @@ class KepemilikanController extends Controller
             'id_petani' => 'required|exists:petani,id_petani',
             'lahan' => 'required',
             'lahan.*.id_detail_kepemilikan' => 'nullable|exists:detail_kepemilikan,id_detail_kepemilikan',
-            'lahan.*.status_pengelolaan' => 'required|in:KSM,Mandiri,Perusahaan',
+            'lahan.*.status_pengelolaan' => 'nullable|in:KSM,Mandiri,Perusahaan',
             'lahan.*.id_lahan' => 'nullable|exists:lahan,id_lahan',
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
