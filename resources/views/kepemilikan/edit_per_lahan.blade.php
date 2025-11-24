@@ -312,6 +312,31 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Posisi Surat</label>
+                                    <select name="lahan[{{ $index }}][posisi_surat]"
+                                        class="form-select text-kecil choices-select">
+                                        <option value="">Pilih Posisi Surat</option>
+                                        <option value="Koperasi"
+                                            {{ $detail->posisi_surat == 'Koperasi' ? 'selected' : '' }}>Koperasi
+                                        </option>
+                                        <option value="Notaris"
+                                            {{ $detail->posisi_surat == 'Notaris' ? 'selected' : '' }}>Notaris</option>
+                                        <option value="PTP" {{ $detail->posisi_surat == 'PTP' ? 'selected' : '' }}>
+                                            PTP</option>
+                                        <option value="Petani" {{ $detail->posisi_surat == 'Petani' ? 'selected' : '' }}>
+                                            Petani</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Status Penyerahan Surat</label>
+                                    <input type="text" name="lahan[{{ $index }}][status_penyerahan]"
+                                        class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
+                                </div>
+                            </div>
+
                             {{-- Upload file --}}
                             <div class="row">
                                 {{-- FILE SHM --}}

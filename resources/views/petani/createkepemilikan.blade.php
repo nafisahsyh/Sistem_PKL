@@ -223,16 +223,36 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Posisi Surat</label>
+                                <select name="lahan[0][posisi_surat]" class="form-select text-kecil select-status">
+                                    <option value="">Pilih Posisi Surat</option>
+                                    <option value="Koperasi">Koperasi</option>
+                                    <option value="Notaris">Notaris</option>
+                                    <option value="PTP">PTP</option>
+                                    <option value="Petani">Petani</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status Penyerahan Surat</label>
+                                <input type="text" name="lahan[0][status_penyerahan]" class="form-control text-kecil"
+                                    placeholder="Masukkan keterangan">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">
-                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                    PNG (maks. 10MB).</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan Peta</label>
                                 <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">
-                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                    PNG (maks. 10MB).</small>
                             </div>
                         </div>
 
@@ -346,122 +366,143 @@
                 lahanDiv.classList.add('border', 'rounded', 'p-3', 'mb-4', 'bg-light', 'lahan-item');
 
                 lahanDiv.innerHTML = `
-        <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
-                <i class="fa-solid fa-trash-can"></i>
-            </button>
-        </div>
-        <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
+                        <div class="d-flex justify-content-end mb-2">
+                            <button type="button" class="btn btn-sm btn-danger btn-hapus-lahan">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        <h6 class="text-brown mb-3">Lahan ${lahanIndex + 1}</h6>
 
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <label class="form-label">Desa</label>
-                <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil select-desa">
-                    @foreach ($desa as $d)
-                        <option value="{{ $d->id_desa }}">{{ $d->desa }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3 mb-3">
-                <label class="form-label">Tahun Tanam</label>
-                <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil select-tahun">
-                    @foreach ($tahun_tanam as $t)
-                        <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3 mb-3">
-                <label class="form-label">Kode</label>
-                <input type="text" name="lahan[${lahanIndex}][kode_lahan]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-3 mb-3">
-                <label class="form-label">Nomor Kavling</label>
-                <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
-            </div>
-        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Desa</label>
+                                <select name="lahan[${lahanIndex}][id_desa]" class="form-select text-kecil select-desa">
+                                    @foreach ($desa as $d)
+                                        <option value="{{ $d->id_desa }}">{{ $d->desa }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Tahun Tanam</label>
+                                <select name="lahan[${lahanIndex}][id_tahun_tanam]" class="form-select text-kecil select-tahun">
+                                    @foreach ($tahun_tanam as $t)
+                                        <option value="{{ $t->id_tahun_tanam }}">{{ $t->tahun }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Kode</label>
+                                <input type="text" name="lahan[${lahanIndex}][kode_lahan]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nomor Kavling</label>
+                                <input type="text" name="lahan[${lahanIndex}][nomor_kavling]" class="form-control text-kecil">
+                            </div>
+                        </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Nomor SHM</label>
-                <input type="text" name="lahan[${lahanIndex}][nomor_SHM]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Nama SHM</label>
-                <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
-                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
-            </div>
-        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor SHM</label>
+                                <input type="text" name="lahan[${lahanIndex}][nomor_SHM]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama SHM</label>
+                                <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
+                            </div>
+                        </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Nomor Sporadik</label>
-                <input type="text" name="lahan[${lahanIndex}][nomor_sporadik]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Nama Sporadik</label>
-                <input type="text" name="lahan[${lahanIndex}][nama_sporadik]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Luas Sesuai Surat (M²)</label>
-                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
-            </div>
-        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor Sporadik</label>
+                                <input type="text" name="lahan[${lahanIndex}][nomor_sporadik]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nama Sporadik</label>
+                                <input type="text" name="lahan[${lahanIndex}][nama_sporadik]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Luas Sesuai Surat (M²)</label>
+                                <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_surat]" class="form-control text-kecil">
+                            </div>
+                        </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Status Kelola</label>
-                <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
-                    <option value="KSM">KSM</option>
-                    <option value="Mandiri">Mandiri</option>
-                    <option value="Perusahaan">Perusahaan</option>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Nomor PBB</label>
-                <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Jumlah PBB (Rp)</label>
-                <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
-            </div>
-        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kelola</label>
+                                <select name="lahan[${lahanIndex}][status_pengelolaan]" class="form-select text-kecil select-status">
+                                    <option value="KSM">KSM</option>
+                                    <option value="Mandiri">Mandiri</option>
+                                    <option value="Perusahaan">Perusahaan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Nomor PBB</label>
+                                <input type="text" name="lahan[${lahanIndex}][nomor_pbb]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Jumlah PBB (Rp)</label>
+                                <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
+                            </div>
+                        </div>
 
-        <div class="row mt-3">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Status Kepemilikan</label>
-                <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil select-status">
-                    <option value="aktif" selected>Aktif</option>
-                    <option value="nonaktif">Tidak Aktif</option>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Tanggal Mulai</label>
-                <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Tanggal Selesai</label>
-                <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
-            </div>
-        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status Kepemilikan</label>
+                                <select name="lahan[${lahanIndex}][status_kepemilikan]" class="form-select text-kecil select-status">
+                                    <option value="aktif" selected>Aktif</option>
+                                    <option value="nonaktif">Tidak Aktif</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="date" name="lahan[${lahanIndex}][tanggal_mulai]" class="form-control text-kecil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="date" name="lahan[${lahanIndex}][tanggal_selesai]" class="form-control text-kecil">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Posisi Surat</label>
+                                <select name="lahan[${lahanIndex}][posisi_surat]" class="form-select text-kecil select-status">
+                                    <option value="">Pilih Posisi Surat</option>
+                                    <option value="Koperasi">Koperasi</option>
+                                    <option value="Notaris">Notaris</option>
+                                    <option value="PTP">PTP</option>
+                                    <option value="Petani">Petani</option>
+                                </select>
+                            </div>
 
-        <div class="row mt-3">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
-                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
-                    class="form-control"
-                    accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
-                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
-                    class="form-control"
-                    accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-        </div>
-        `;
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status Penyerahan Surat</label>
+                                <input type="text" name="lahan[${lahanIndex}]status_penyerahan]" class="form-control text-kecil"
+                                    placeholder="Masukkan keterangan">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                    PNG (maks. 10MB).</small>                                    
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                    PNG (maks. 10MB).</small>                                    
+                            </div>
+                        </div>
+                        `;
 
                 container.appendChild(lahanDiv);
 

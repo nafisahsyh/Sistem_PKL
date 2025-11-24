@@ -284,6 +284,15 @@
                         @endif
                     </td>
                 </tr>
+
+                <tr>
+                    <th>Posisi Surat</th>
+                    <td>{{ $detail->posisi_surat ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Status Penyerahan Surat</th>
+                    <td>{{ $detail->status_penyerahan ?? '-' }}</td>
+                </tr>
             </tbody>
         </table>
 

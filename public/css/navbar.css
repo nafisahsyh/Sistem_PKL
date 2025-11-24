@@ -613,8 +613,8 @@ input.form-control {
 /* Styling text-muted di dalam modal */
 #gantiPemilikModal .modal-body .text-muted,
 #modalGantiKepemilikan .modal-body .text-muted {
-    color: #101010 !important;
-    font-weight: 500 !important;
+    color: #6c757d !important;
+    font-size: 0.8rem !important;
 }
 
 /* Supaya tulisan isi tabel (td) tetap normal */
@@ -703,8 +703,8 @@ input.form-control {
 
 /* text-muted styling */
 #modalGantiKepemilikanSemua .modal-body .text-muted {
-    color: #101010 !important;
-    font-weight: 500 !important;
+    color: #6c757d !important;
+    font-size: 0.8rem !important;
 }
 
 /* Isi tabel normal */

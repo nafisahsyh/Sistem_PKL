@@ -277,6 +277,14 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th class="text-normal text-start ps-3">Posisi Surat</th>
+                                        <td class="text-normal-sm text-start ps-3">{{ $detail->posisi_surat ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-normal text-start ps-3">Status Penyerahan Surat </th>
+                                        <td class="text-normal-sm text-start ps-3">{{ $detail->status_penyerahan ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
                                         <th class="text-normal text-start ps-3">File SHM</th>
                                         <td class="text-normal-sm text-start ps-3">
                                             @if (!empty($detail->pdf_scan_shm))

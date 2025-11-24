@@ -20,6 +20,8 @@ class DetailKepemilikan extends Model
         'luas_surat',
         'nomor_pbb',
         'jumlah_pbb',
+        'posisi_surat',
+        'status_penyerahan',
         'pdf_scan_shm',
         'pdf_scan_peta',
         'status_kepemilikan',
