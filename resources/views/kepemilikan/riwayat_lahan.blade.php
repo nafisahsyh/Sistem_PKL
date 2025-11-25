@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @section('content')
-    <div class="container mt-5">
+    <div class="container-fluid px-4 mt-5">
 
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">

@@ -5,7 +5,7 @@
 @section('content')
     <div class="container-fluid px-4 mt-5">
         {{-- button back --}}
-        <div class="d-flex align-items-center mb-3">
+        <div class="d-flex align-items-center mb-4">
             {{-- Tombol Back --}}
             <a href="{{ route('kepemilikan.index', [
                 'page' => request('page'),
@@ -18,7 +18,7 @@
             </a>
 
             {{-- Judul Halaman --}}
-            <h4 class="text-brown mb-0 ms-3">Edit Data Kepemilikan</h4>
+            <h4 class="text-brown mb-0">Edit Data Kepemilikan</h4>
         </div>
 
         {{-- ALERT PESAN --}}
@@ -49,7 +49,7 @@
             {{-- ===================== DATA PETANI ===================== --}}
             {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
-                <h5 class="text-brown mb-3">Data Petani</h5>
+                <h5 class="text-green-custom mb-3">Data Petani</h5>
 
                 <div class="p-4 bg-light rounded-3 border">
                     <div class="row mb-3">
@@ -132,11 +132,11 @@
                     </div>
                 </div>
             </div>
-            <hr class="my-4">
+
             {{-- ===================== DATA LAHAN ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
+                    <h5 class="text-green-custom mb-3">Data Lahan & Detail Kepemilikan</h5>
                 </div>
 
                 {{-- Filter hanya lahan yang sesuai --}}

@@ -35,7 +35,7 @@
 
             {{-- DATA PETANI --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
-                <h5 class="text-brown mb-3">Data Petani</h5>
+                <h5 class="text-green-custom mb-3">Data Petani</h5>
 
                 <div class="p-4 bg-light rounded-3 border">
                     <div class="row mb-3">
@@ -122,7 +122,7 @@
             </div>
             {{-- DATA LAHAN --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
-                <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
+                <h5 class="text-green-custom mb-3">Data Lahan & Detail Kepemilikan</h5>
                 <div id="lahan-container">
                     {{-- Lahan 1 --}}
                     <div class="border rounded p-3 mb-4 bg-light lahan-item">

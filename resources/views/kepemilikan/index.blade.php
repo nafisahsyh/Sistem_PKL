@@ -85,7 +85,7 @@
                             <th>Tahun Tanam</th>
                             <th>Kode</th>
                             <th>Status Kelola</th>
-                            <th style="width: 180px;">Aksi</th>
+                            <th style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

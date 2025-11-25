@@ -6,7 +6,7 @@
 @section('content')
     <div class="container-fluid px-4 mt-5">
         {{-- button back --}}
-        <div class="d-flex align-items-center mb-3">
+        <div class="d-flex align-items-center mb-4">
             {{-- Tombol Back --}}
             <a href="{{ route('kepemilikan.index', [
                 'page' => request('page'),
@@ -19,7 +19,7 @@
             </a>
 
             {{-- Judul Halaman --}}
-            <h4 class="text-brown mb-0 ms-3">Edit Data Kepemilikan</h4>
+            <h4 class="text-brown mb-0">Edit Data Kepemilikan</h4>
         </div>
 
         {{-- ALERT PESAN --}}
@@ -48,7 +48,7 @@
 
             {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
-                <h5 class="text-brown mb-3">Data Petani</h5>
+                <h5 class="text-green-custom mb-3">Data Petani</h5>
 
                 <div class="p-4 bg-light rounded-3 border">
                     <div class="row mb-3">
@@ -142,7 +142,7 @@
 
             {{-- ===================== DATA LAHAN ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
-                <h5 class="text-brown mb-3">Data Lahan & Detail Kepemilikan</h5>
+                <h5 class="text-green-custom mb-3">Data Lahan & Detail Kepemilikan</h5>
 
                 <div id="lahan-container">
                     @foreach ($kepemilikan->detailKepemilikan as $index => $detail)
@@ -421,21 +421,22 @@
                 <input type="hidden" name="search" value="{{ request('search') }}">
                 <input type="hidden" name="desa" value="{{ request('desa') }}">
                 <input type="hidden" name="tahun" value="{{ request('tahun') }}">
-                {{-- Tombol Perbarui / Batal --}}
-                <div class="text-start mt-3">
-                    <button type="submit" class="btn btn-success me-2">Perbarui</button>
-                    <a href="{{ route('kepemilikan.index', [
-                        'page' => request('page'),
-                        'search' => request('search'),
-                        'desa' => request('desa'),
-                        'tahun' => request('tahun'),
-                        'status_pengelolaan' => request('status_pengelolaan'),
-                        'status' => request('status'),
-                    ]) }}"
-                        class="btn btn-danger">
-                        Batal
-                    </a>
-                </div>
+
+            </div>
+            {{-- Tombol Perbarui / Batal --}}
+            <div class="text-start mt-3">
+                <button type="submit" class="btn btn-success me-2">Perbarui</button>
+                <a href="{{ route('kepemilikan.index', [
+                    'page' => request('page'),
+                    'search' => request('search'),
+                    'desa' => request('desa'),
+                    'tahun' => request('tahun'),
+                    'status_pengelolaan' => request('status_pengelolaan'),
+                    'status' => request('status'),
+                ]) }}"
+                    class="btn btn-danger">
+                    Batal
+                </a>
             </div>
         </form>
 
@@ -839,7 +840,7 @@
                                     }
                                     kepemilikanSelect.dispatchEvent(new Event('change'));
                                 }
-                                // ❌ Jangan paksa ke Aktif untuk Mandiri/KSM
+                                // Jangan paksa ke Aktif untuk Mandiri/KSM
                             });
                         }
                     );
