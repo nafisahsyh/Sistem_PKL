@@ -178,10 +178,13 @@ class PetaniController extends Controller
             'pdf_scan_kk' => $kkName,
         ];
 
-        // Status tidak berubah jika sudah berhenti
-        if ($petani->status !== 'berhenti') {
-            $dataUpdate['status'] = $request->status;
-        }
+        // MASUKKAN DI SINI
+        $dataUpdate['status'] = $request->status;
+
+        // // Status tidak berubah jika sudah berhenti
+        // if ($petani->status !== 'berhenti') {
+        //     $dataUpdate['status'] = $request->status;
+        // }
 
         // UPDATE SEKALI SAJA
         $petani->update($dataUpdate);

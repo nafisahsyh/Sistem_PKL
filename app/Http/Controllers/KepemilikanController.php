@@ -159,7 +159,7 @@ class KepemilikanController extends Controller
 
                 // ===================== PETANI BERHENTI =====================
                 if ($statusPetani === 'berhenti') {
-                    
+
                     // Jika search aktif → TAMPILKAN semua detail yang cocok
                     if (!empty($search)) {
                         return $byDesa && $byTahun;
@@ -420,8 +420,8 @@ class KepemilikanController extends Controller
             // Update detail kepemilikan
             $detail->update([
                 'kode_lahan' => $data['kode_lahan'],
-                'posisi_surat'=> $data['posisi_surat'],
-                'status_penyerahan'=> $data['status_penyerahan'],
+                'posisi_surat' => $data['posisi_surat'],
+                'status_penyerahan' => $data['status_penyerahan'],
                 'nomor_SHM' => $data['nomor_SHM'],
                 'nama_SHM' => $data['nama_SHM'],
                 'nomor_kavling' => $data['nomor_kavling'],
@@ -492,6 +492,14 @@ class KepemilikanController extends Controller
                 'status' => 'belum',
             ]);
         }
+
+        $hasActive = DetailKepemilikan::where('id_kepemilikan', $kepemilikan->id_kepemilikan)
+            ->where('status_kepemilikan', 'aktif')
+            ->exists();
+
+        $kepemilikan->petani->update([
+            'status' => $hasActive ? 'aktif' : 'berhenti'
+        ]);
 
         return redirect()->route('kepemilikan.index', [
             'page' => $request->input('page'),
@@ -801,6 +809,14 @@ class KepemilikanController extends Controller
                 $detail->save();
             }
 
+            $hasActiveLand = DetailKepemilikan::where('id_kepemilikan', $kepemilikan->id_kepemilikan)
+                ->where('status_kepemilikan', 'aktif')
+                ->exists();
+
+            $kepemilikan->petani->update([
+                'status' => $hasActiveLand ? 'aktif' : 'berhenti'
+            ]);
+
             DB::commit();
 
             $queryParams = request()->only(['page', 'search', 'desa', 'tahun', 'status_pengelolaan', 'status']);
@@ -900,7 +916,8 @@ class KepemilikanController extends Controller
     public function cetakPDF($id)
     {
         foreach (glob(storage_path('app/public/kepemilikan_gabungan_*.pdf')) as $file) {
-            if (file_exists($file)) unlink($file);
+            if (file_exists($file))
+                unlink($file);
         }
         $kepemilikan = Kepemilikan::with([
             'petani',
@@ -918,17 +935,21 @@ class KepemilikanController extends Controller
         $lampiranFiles = [];
 
         $ktpPath = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp);
-        if ($kepemilikan->petani->pdf_scan_ktp && file_exists($ktpPath)) $lampiranFiles[] = $ktpPath;
+        if ($kepemilikan->petani->pdf_scan_ktp && file_exists($ktpPath))
+            $lampiranFiles[] = $ktpPath;
 
         $kkPath = storage_path('app/public/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk);
-        if ($kepemilikan->petani->pdf_scan_kk && file_exists($kkPath)) $lampiranFiles[] = $kkPath;
+        if ($kepemilikan->petani->pdf_scan_kk && file_exists($kkPath))
+            $lampiranFiles[] = $kkPath;
 
         foreach ($kepemilikan->detailKepemilikan as $detail) {
             $shmPath = storage_path('app/public/' . $detail->pdf_scan_shm);
-            if ($detail->pdf_scan_shm && file_exists($shmPath)) $lampiranFiles[] = $shmPath;
+            if ($detail->pdf_scan_shm && file_exists($shmPath))
+                $lampiranFiles[] = $shmPath;
 
             $petaPath = storage_path('app/public/' . $detail->pdf_scan_peta);
-            if ($detail->pdf_scan_peta && file_exists($petaPath)) $lampiranFiles[] = $petaPath;
+            if ($detail->pdf_scan_peta && file_exists($petaPath))
+                $lampiranFiles[] = $petaPath;
         }
 
         // 3️⃣ Konversi semua lampiran ke PDF sementara
@@ -963,7 +984,8 @@ class KepemilikanController extends Controller
 
         // Tambah semua lampiran
         foreach ($tempFiles as $file) {
-            if (!file_exists($file)) continue;
+            if (!file_exists($file))
+                continue;
             $pageCount = $pdfMerger->setSourceFile($file);
             for ($i = 1; $i <= $pageCount; $i++) {
                 $tpl = $pdfMerger->importPage($i);
@@ -986,7 +1008,8 @@ class KepemilikanController extends Controller
             }
         }
 
-        if (file_exists($pathMain)) unlink($pathMain);
+        if (file_exists($pathMain))
+            unlink($pathMain);
 
         // 7️⃣ Download PDF gabungan
         return response()->download(
@@ -1000,7 +1023,8 @@ class KepemilikanController extends Controller
     {
         // 🔹 Hapus semua PDF gabungan lama sebelum generate baru
         foreach (glob(storage_path('app/public/kepemilikan_per_lahan_gabungan_*.pdf')) as $file) {
-            if (file_exists($file)) unlink($file);
+            if (file_exists($file))
+                unlink($file);
         }
 
         // Ambil detail yang diklik
@@ -1023,7 +1047,7 @@ class KepemilikanController extends Controller
             ->where('id_kepemilikan', $id_kepemilikan)
             ->whereHas('lahan', function ($q) use ($desaTarget, $tahunTarget) {
                 $q->whereHas('desa', fn($qq) => $qq->where('desa', $desaTarget))
-                ->whereHas('tahunTanam', fn($qq) => $qq->where('tahun', $tahunTarget));
+                    ->whereHas('tahunTanam', fn($qq) => $qq->where('tahun', $tahunTarget));
             })->get();
 
         // Pastikan semua detail punya PBB tahun berjalan
@@ -1049,7 +1073,7 @@ class KepemilikanController extends Controller
             'desaTarget' => $desaTarget,
             'tahunTarget' => $tahunTarget,
         ])->setPaper('a4', 'portrait')
-        ->save($pathMain);
+            ->save($pathMain);
 
         // 2️⃣ Siapkan semua lampiran
         $lampiranFiles = [];
@@ -1100,7 +1124,8 @@ class KepemilikanController extends Controller
 
         // Tambah semua lampiran
         foreach ($tempFiles as $file) {
-            if (!file_exists($file)) continue;
+            if (!file_exists($file))
+                continue;
             $pageCount = $pdfMerger->setSourceFile($file);
             for ($i = 1; $i <= $pageCount; $i++) {
                 $tpl = $pdfMerger->importPage($i);
@@ -1121,12 +1146,13 @@ class KepemilikanController extends Controller
                 unlink($f);
             }
         }
-        if (file_exists($pathMain)) unlink($pathMain);
+        if (file_exists($pathMain))
+            unlink($pathMain);
 
         // 7️⃣ Download PDF gabungan
         return response()->download(
             $finalPath,
-            'Data Kepemilikan Lahan ' 
+            'Data Kepemilikan Lahan '
             . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
             . ' - ' . $desaTarget
             . ' (' . $tahunTarget . ').pdf'
