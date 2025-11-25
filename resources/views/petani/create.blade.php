@@ -44,10 +44,10 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama Lengkap</label>
+                        <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" name="nama"
                             class="form-control text-kecil @error('nama') is-invalid @enderror" value="{{ old('nama') }}"
-                            placeholder="Masukkan nama lengkap" required>
+                            placeholder="Masukkan nama petani" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="status" class="form-label">Status</label>
+                        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
                         <select name="status" id="status"
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
                             <option value="aktif" selected>Aktif</option>
@@ -89,7 +89,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Scan KTP</label>
+                        <label for="pdf_scan_ktp" class="form-label">Dokumen KTP</label>
                         <input type="file" name="pdf_scan_ktp"
                             class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
                             accept=".pdf,.jpg,.jpeg,.png">
@@ -100,7 +100,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_kk" class="form-label">Scan KK</label>
+                        <label for="pdf_scan_kk" class="form-label">Dokumen KK</label>
                         <input type="file" name="pdf_scan_kk"
                             class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
                             accept=".pdf,.jpg,.jpeg,.png">

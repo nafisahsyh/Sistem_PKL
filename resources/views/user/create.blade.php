@@ -15,7 +15,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
-                            id="nama" name="nama" value="{{ old('nama') }}" placeholder="Masukkan nama lengkap"
+                            id="nama" name="nama" value="{{ old('nama') }}" placeholder="Masukkan nama"
                             required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>

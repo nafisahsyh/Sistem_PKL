@@ -36,7 +36,7 @@
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
-                            <th style="width: 150px;">Aksi</th>
+                            <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

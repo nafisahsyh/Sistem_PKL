@@ -51,10 +51,10 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama Lengkap</label>
+                        <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
                             id="nama" name="nama" value="{{ old('nama', $petani->nama) }}"
-                            placeholder="Masukan nama lengkap" required>
+                            placeholder="Masukan nama petani" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="status" class="form-label">Status</label>
+                        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
                         <select name="status" id="status"
                             class="form-select text-kecil @error('status') is-invalid @enderror" required>
                             <option value="" disabled hidden>Pilih Status</option>
@@ -101,12 +101,12 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">File Scan KTP (PDF / JPG / PNG)</label>
+                        <label for="pdf_scan_ktp" class="form-label">Dokumen KTP</label>
                         <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp" class="form-control text-kecil"
                             accept=".pdf,.jpg,.jpeg,.png">
 
                         <input type="hidden" name="hapus_ktp" id="hapus_ktp" value="0">
-
+                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                         @if ($petani->pdf_scan_ktp)
                             <div class="file-ktp-container mt-2 d-flex align-items-center gap-2">
                                 <small class="text-muted">
@@ -125,12 +125,12 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_kk" class="form-label">File Scan KK (PDF / JPG / PNG)</label>
+                        <label for="pdf_scan_kk" class="form-label">Dokumen KK</label>
                         <input type="file" name="pdf_scan_kk" id="pdf_scan_kk" class="form-control text-kecil"
                             accept=".pdf,.jpg,.jpeg,.png">
 
                         <input type="hidden" name="hapus_kk" id="hapus_kk" value="0">
-
+                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
                         @if ($petani->pdf_scan_kk)
                             <div class="file-kk-container mt-2 d-flex align-items-center gap-2">
                                 <small class="text-muted">

@@ -12,7 +12,7 @@
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
-                    <label for="kecamatan" class="form-label">Nama Kecamatan</label>
+                    <label for="kecamatan" class="form-label">Nama Kecamatan <span class="text-danger">*</span></label>
                     <input type="text" class="form-control text-kecil @error('kecamatan') is-invalid @enderror" id="kecamatan"
                         name="kecamatan" value="{{ old('kecamatan', $kecamatan->kecamatan) }}" placeholder="Perbarui nama kecamatan" required>
                     {{-- Pesan error di bawah input --}}

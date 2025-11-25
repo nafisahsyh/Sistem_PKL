@@ -637,7 +637,7 @@
                                         <label>Dokumen KTP</label>
                                         <input type="file" name="pdf_scan_ktp" class="form-control"
                                             accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
                                             PNG (maks. 10MB).</small>
                                     </div>
 
@@ -645,7 +645,7 @@
                                         <label>Dokumen KK</label>
                                         <input type="file" name="pdf_scan_kk" class="form-control"
                                             accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
+                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
                                             PNG (maks. 10MB).</small>
                                     </div>
                                 </div>

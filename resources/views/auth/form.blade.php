@@ -25,7 +25,7 @@
     <!-- Form kanan -->
     <div class="login-form text-center">
       <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
-      <h3 class="fw-bold mb-4">Ubah Kata Sandi</h3>
+      <h3 class="fw-bold mb-4">Ubah Password</h3>
 
       {{-- Alert error --}}
       @if($errors->any())
@@ -44,17 +44,17 @@
               <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email', request('email')) }}" required>
           </div>
 
-         <div class="form-group mb-3 position-relative">
+          <div class="form-group mb-3 position-relative">
             <i class="fas fa-lock position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             <input type="password" id="password" name="password" class="form-control ps-5" placeholder="Password Baru" required>
             <span id="toggle-password" class="password-toggle"><i class="fas fa-eye"></i></span>
-         </div>
+          </div>
 
-         <div class="form-group mb-3 position-relative">
+          <div class="form-group mb-3 position-relative">
             <i class="fas fa-lock position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%);"></i>
             <input type="password" id="password_confirmation" name="password_confirmation" class="form-control ps-5" placeholder="Konfirmasi Password" required>
             <span id="toggle-password-confirmation" class="password-toggle"><i class="fas fa-eye"></i></span>
-         </div>
+          </div>
 
           <button type="submit" class="btn-login">Ubah Kata Sandi</button>
 

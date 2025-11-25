@@ -15,7 +15,7 @@
             <div class="row">
                 {{-- Pilihan Kecamatan --}}
                 <div class="col-md-6 mb-3">
-                    <label for="id_kecamatan" class="form-label">Kecamatan</label>
+                    <label for="id_kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
                     <select name="id_kecamatan" id="id_kecamatan"
                         class="form-select text-kecil @error('id_kecamatan') is-invalid @enderror" required>
                         <option value="" disabled hidden>Pilih Kecamatan</option>
@@ -33,7 +33,7 @@
 
                 {{-- Nama Desa --}}
                 <div class="col-md-6 mb-3">
-                    <label for="desa" class="form-label">Nama Desa</label>
+                    <label for="desa" class="form-label">Nama Desa <span class="text-danger">*</span></label>
                     <input type="text" class="form-control text-kecil @error('desa') is-invalid @enderror"
                         id="desa" name="desa" value="{{ old('desa', $desa->desa) }}" placeholder="Perbarui nama desa" required>
                     @error('desa')

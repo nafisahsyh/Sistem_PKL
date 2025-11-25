@@ -14,17 +14,17 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama</label>
+                        <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-kecil @error('nama') is-invalid @enderror"
                             id="nama" name="nama" value="{{ old('nama', $user->nama) }}"
-                            placeholder="Perbarui nama lengkap" required>
+                            placeholder="Perbarui nama" required>
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="username" class="form-label">Username</label>
+                        <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-kecil @error('username') is-invalid @enderror"
                             id="username" name="username" value="{{ old('username', $user->username) }}"
                             placeholder="Perbarui username" required>
@@ -36,7 +36,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                         <input type="email" class="form-control text-kecil @error('email') is-invalid @enderror"
                             id="email" name="email" value="{{ old('email', $user->email) }}"
                             placeholder="Perbarui email" required>
@@ -47,10 +47,11 @@
 
                     {{-- Role --}}
                     <div class="col-md-6 mb-3">
-                        <label for="role" class="form-label">Role</label>
+                        <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                         <select name="role" id="role"
                             class="form-select text-kecil @error('role') is-invalid @enderror"
-                            {{ $user->role == 'super_admin' && $superAdminCount == 1 ? 'disabled' : '' }} required>
+                            {{ $user->id_user == auth()->user()->id_user || ($user->role == 'super_admin' && $superAdminCount == 1) ? 'disabled' : '' }}
+                            required>
                             <option value="" disabled hidden>Pilih role</option>
                             <option value="super_admin" {{ old('role', $user->role) == 'super_admin' ? 'selected' : '' }}>
                                 Super Admin</option>
@@ -59,6 +60,10 @@
                             <option value="karyawan" {{ old('role', $user->role) == 'karyawan' ? 'selected' : '' }}>
                                 Karyawan</option>
                         </select>
+
+                        @if ($user->id_user == auth()->user()->id_user || ($user->role == 'super_admin' && $superAdminCount == 1))
+                            <input type="hidden" name="role" value="{{ $user->role }}">
+                        @endif
 
                         @if ($user->role == 'super_admin' && $superAdminCount == 1)
                             <small class="text-muted-small">
@@ -77,23 +82,29 @@
                         <label for="password" class="form-label">
                             Password <small class="text-muted">(Kosongkan jika tidak ingin diubah)</small>
                         </label>
-                        <input type="password" class="form-control text-kecil @error('password') is-invalid @enderror"
-                            id="password" name="password" placeholder="Perbarui password jika perlu">
-                        <span id="toggle-password" class="password-toggle">
-                            <i class="fas fa-eye-slash"></i>
-                        </span>
+                        <div class="password-wrapper position-relative">
+                            <input type="password" class="form-control text-kecil @error('password') is-invalid @enderror"
+                                id="password" name="password" placeholder="Perbarui password jika perlu">
+                            <span id="toggle-password" class="password-toggle">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+
+                        <small class="text-muted-small">Password minimal 8 karakter</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                        <input type="password" class="form-control text-kecil" id="password_confirmation"
-                            name="password_confirmation" placeholder="Ulangi password">
-                        <span id="toggle-confirm-password" class="password-toggle">
-                            <i class="fas fa-eye-slash"></i>
-                        </span>
+                        <div class="password-wrapper position-relative">
+                            <input type="password" class="form-control text-kecil" id="password_confirmation"
+                                name="password_confirmation" placeholder="Ulangi password">
+                            <span id="toggle-confirm-password" class="password-toggle">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

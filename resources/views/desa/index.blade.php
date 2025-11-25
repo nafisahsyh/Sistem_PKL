@@ -32,7 +32,7 @@
                             <th style="width: 50px;">No</th>
                             <th>Nama Desa</th>
                             <th>Nama Kecamatan</th>
-                            <th style="width: 150px;">Aksi</th>
+                            <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

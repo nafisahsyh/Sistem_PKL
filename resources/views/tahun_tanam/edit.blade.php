@@ -13,7 +13,7 @@
                 @method('PUT')
 
                 <div class="mb-3">
-                    <label for="tahun" class="form-label">Tahun Tanam</label>
+                    <label for="tahun" class="form-label">Tahun Tanam <span class="text-danger">*</span></label>
                     <input type="text" class="form-control text-kecil @error('tahun') is-invalid @enderror" id="tahun"
                         name="tahun" value="{{ old('tahun', $tahun_tanam->tahun) }}" placeholder="Perbarui tahun tanam" required>
                     @error('tahun')
