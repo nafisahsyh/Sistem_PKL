@@ -87,7 +87,7 @@
                             <td class="text-normal-sm text-start ps-3">{{ $kepemilikan->petani->alamat ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Scan KTP</th>
+                            <th class="text-normal text-start ps-3">Dokumen KTP</th>
                             <td class="text-normal-sm text-start ps-3">
                                 @if (!empty($kepemilikan->petani->pdf_scan_ktp))
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
@@ -101,7 +101,7 @@
                         </tr>
 
                         <tr>
-                            <th class="text-normal text-start ps-3">Scan KK</th>
+                            <th class="text-normal text-start ps-3">Dokumen KK</th>
                             <td class="text-normal-sm text-start ps-3">
                                 @if (!empty($kepemilikan->petani->pdf_scan_kk))
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
