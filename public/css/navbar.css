@@ -455,9 +455,13 @@ div.choices[data-type*="select-one"]::after {
     font-size: 0.95rem;
 }
 
-.password-toggle {
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .password-toggle {
     position: absolute;
-    top: 70%;
+    top: 50%;
     right: 1rem;
     /* agak ke kiri biar masuk ke dalam input */
     transform: translateY(-50%);
@@ -862,4 +866,21 @@ input.form-control {
 /* Agar modal-body tidak terlalu tinggi */
 .modal-body {
     padding: 15px 20px;
+}
+.invalid-feedback {
+    font-size: 0.8rem;
+    margin-top: 3px;
+    font-style: italic;
+}
+#password.is-invalid,
+#password_confirmation.is-invalid {
+    background-image: none !important;
+}
+
+
+#password-strength-bar {
+    height: 5px;
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
 }
