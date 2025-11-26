@@ -31,20 +31,35 @@
                     @endif
 
                     {{-- Menu umum untuk admin & super admin --}}
-                    <a class="nav-link {{ Request::is('kecamatan') ? 'active' : '' }}" href="/kecamatan">
-                        <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        Kecamatan
-                    </a>
-
-                    <a class="nav-link {{ Request::is('desa') ? 'active' : '' }}" href="/desa">
-                        <div class="sb-nav-link-icon"><i class="fas fa-map"></i></div>
-                        Desa
-                    </a>
-
-                    <a class="nav-link {{ Request::is('tahun_tanam') ? 'active' : '' }}" href="/tahun_tanam">
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#collapseAreaTanam" aria-expanded="false" aria-controls="collapseAreaTanam">
                         <div class="sb-nav-link-icon"><i class="fas fa-seedling"></i></div>
-                        Tahun Tanam
+                        Area Tanam
                     </a>
+
+                    <div class="collapse 
+    {{ Request::is('kecamatan') || Request::is('desa') || Request::is('tahun_tanam') ? 'show' : '' }}"
+                        id="collapseAreaTanam">
+
+                        <nav class="sb-sidenav-menu-nested nav">
+
+                            <a class="nav-link {{ Request::is('kecamatan') ? 'active' : '' }}" href="/kecamatan">
+                                <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                Kecamatan
+                            </a>
+
+                            <a class="nav-link {{ Request::is('desa') ? 'active' : '' }}" href="/desa">
+                                <div class="sb-nav-link-icon"><i class="fas fa-map"></i></div>
+                                Desa
+                            </a>
+
+                            <a class="nav-link {{ Request::is('tahun_tanam') ? 'active' : '' }}" href="/tahun_tanam">
+                                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+                                Tahun Tanam
+                            </a>
+
+                        </nav>
+                    </div>
 
                     <a class="nav-link {{ Request::is('petani') ? 'active' : '' }}" href="/petani">
                         <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
