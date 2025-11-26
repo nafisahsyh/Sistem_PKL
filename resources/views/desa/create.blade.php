@@ -31,7 +31,7 @@
 
                     {{-- Nama Desa --}}
                     <div class="col-md-6 mb-3">
-                        <label for="desa" class="form-label">Nama Desa <span class="text-danger">*</span></label>
+                        <label for="desa" class="form-label">Desa <span class="text-danger">*</span></label>
                         <input type="text" class="form-control text-kecil @error('desa') is-invalid @enderror"
                             id="desa" name="desa" value="{{ old('desa') }}" placeholder="Masukkan nama desa" required>
                         @error('desa')

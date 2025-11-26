@@ -19,7 +19,7 @@
             </a>
 
             {{-- Judul Halaman --}}
-            <h4 class="text-brown mb-0">Edit Data Kepemilikan</h4>
+            <h4 class="text-brown mb-0 ms-2">Edit Data Kepemilikan</h4>
         </div>
 
         {{-- ALERT PESAN --}}
@@ -359,13 +359,16 @@
                             <div class="row mt-2">
                                 {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                    <label class="form-label">Scan SHM</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
                                         class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
                                     {{-- Hidden input untuk menandai penghapusan SHM --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
                                         value="0">
+
+                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
+                                        PNG (maks. 10MB).</small>
 
                                     @if ($detail->pdf_scan_shm)
                                         <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
@@ -385,13 +388,15 @@
 
                                 {{-- FILE PETA --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                    <label class="form-label">Scan Peta</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
                                         class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
                                     {{-- Hidden input untuk menandai penghapusan Peta --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
                                         class="hapus_peta" value="0">
+                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
+                                        PNG (maks. 10MB).</small>
 
                                     @if ($detail->pdf_scan_peta)
                                         <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
@@ -1087,7 +1092,7 @@
                             <div class="row mt-2">
                                 <!-- === FILE SHM === -->
                                 <div class="col-md-6 mb-3">
-                                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                <label class="form-label">Scan SHM</label>
                                     <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
                                         accept=".pdf,.jpg,.jpeg,.png" class="form-control text-kecil">
 
@@ -1095,6 +1100,9 @@
                                     <input type="hidden" name="lahan[${lahanIndex}][hapus_shm]" 
                                         class="hapus_shm" value="0">
 
+                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
+                                    PNG (maks. 10MB).</small>      
+                                                        
                                     <!-- Container file SHM -->
                                     <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
                                         <small class="text-muted">Belum ada file SHM yang diunggah.</small>
@@ -1107,13 +1115,15 @@
 
                                 <!-- === FILE PETA === -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                    <label class="form-label">Scan Peta</label>
                                     <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
                                         accept=".pdf,.jpg,.jpeg,.png" class="form-control text-kecil">
 
                                     <!-- Hidden input untuk hapus Peta -->
                                     <input type="hidden" name="lahan[${lahanIndex}][hapus_peta]" 
                                         class="hapus_peta" value="0">
+                                        
+                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>                                    
 
                                     <!-- Container file Peta -->
                                     <div class="file-peta-container mt-1 d-flex align-items-center gap-2">

@@ -16,7 +16,7 @@
                 <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                     <tr>
                         <th style="width: 50px;">No</th>
-                        <th>Tahun</th>
+                        <th>Tahun Tanam</th>
                         <th style="width: 120px;">Aksi</th>
                     </tr>
                 </thead>

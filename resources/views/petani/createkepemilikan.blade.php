@@ -317,7 +317,7 @@
 
                         let targetValue = 'aktif';
                         if (this.value === 'Perusahaan') targetValue = 'nonaktif';
-                        // ❌ Jangan paksa value untuk Mandiri/KSM
+                        //Jangan paksa value untuk Mandiri/KSM
                         if (kepemilikanSelect.choicesInstance) {
                             kepemilikanSelect.choicesInstance.setChoiceByValue(targetValue);
                         } else {
@@ -337,7 +337,7 @@
                         );
                         if (!pengelolaanSelect) return;
 
-                        // ❌ Hanya ubah jika status_kepemilikan = nonaktif
+                        //Hanya ubah jika status_kepemilikan = nonaktif
                         if (this.value === 'nonaktif') {
                             if (pengelolaanSelect.choicesInstance) {
                                 pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
@@ -521,7 +521,7 @@
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                <label class="form-label">Scan SHM</label>
                                 <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
                                     class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">
@@ -529,7 +529,7 @@
                                     PNG (maks. 10MB).</small>                                    
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                <label class="form-label">Scan Peta</label>
                                 <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
                                     class="form-control"
                                     accept=".pdf,.jpg,.jpeg,.png">

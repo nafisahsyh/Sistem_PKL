@@ -477,6 +477,7 @@
                         title: "Yakin ingin menghapus?",
                         text: "Data yang dihapus tidak dapat dikembalikan!",
                         icon: 'warning',
+                        iconColor: '#dc3545',
                         showCancelButton: true,
                         confirmButtonColor: '#198754',
                         cancelButtonColor: '#dc3545',

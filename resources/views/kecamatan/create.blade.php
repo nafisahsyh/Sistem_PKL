@@ -11,7 +11,7 @@
             <form action="{{ route('kecamatan.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
-                    <label for="kecamatan" class="form-label">Nama Kecamatan <span class="text-danger">*</span></label>
+                    <label for="kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
                     <input type="text" class="form-control text-kecil @error('kecamatan') is-invalid @enderror" id="kecamatan"
                         name="kecamatan" value="{{ old('kecamatan') }}" placeholder="Masukkan nama kecamatan" required>
                     {{-- Pesan error langsung di bawah input --}}

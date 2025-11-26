@@ -83,7 +83,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted">Tidak ada</span>
+                                        <span class="text-muted"> - </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -93,7 +93,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted">Tidak ada</span>
+                                        <span class="text-muted"> - </span>
                                     @endif
                                 </td>
                                 @php
@@ -157,6 +157,7 @@
                     Swal.fire({
                         title: "Yakin ingin menghapus?",
                         text: "Data yang dihapus tidak dapat dikembalikan!",
+                        iconColor: '#dc3545',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#198754',

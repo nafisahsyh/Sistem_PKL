@@ -30,8 +30,8 @@
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th style="width: 50px;">No</th>
-                            <th>Nama Desa</th>
-                            <th>Nama Kecamatan</th>
+                            <th>Desa</th>
+                            <th>Kecamatan</th>
                             <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
