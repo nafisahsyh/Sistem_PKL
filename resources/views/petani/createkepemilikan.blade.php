@@ -205,23 +205,7 @@
                                     class="form-control text-kecil">
                             </div>
                         </div>
-                        <div class="mt-3 mb-2">
-                            <h6 class="text-brown mb-3">Koordinat Lahan</h6>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Koordinat X</label>
-                                <input type="number" step="0.00000001" name="lahan[0][koordinat_x]"
-                                    class="form-control text-kecil" placeholder="Contoh: 114.12345678">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Koordinat Y</label>
-                                <input type="number" step="0.00000001" name="lahan[0][koordinat_y]"
-                                    class="form-control text-kecil" placeholder="Contoh: -3.12345678">
-                            </div>
-                        </div>
-                        <div class="row mt-3">
+                        <div class="row mt-2">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kepemilikan</label>
                                 <select name="lahan[0][status_kepemilikan]" class="form-select text-kecil select-status">
@@ -256,7 +240,20 @@
                                     placeholder="Masukkan keterangan">
                             </div>
                         </div>
-                        <div class="row mt-3">
+                        <div class="row mt-2">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Koordinat X</label>
+                                <input type="number" step="0.00000001" name="lahan[0][koordinat_x]"
+                                    class="form-control text-kecil" placeholder="Contoh: 114.12345678">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Koordinat Y</label>
+                                <input type="number" step="0.00000001" name="lahan[0][koordinat_y]"
+                                    class="form-control text-kecil" placeholder="Contoh: -3.12345678">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
@@ -466,24 +463,6 @@
                                 <input type="number" step="0.01" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                             </div>
                         </div>
-                        <div class="mt-2 mb-2">
-                            <h6 class="text-brown mb-3">Koordinat Lahan</h6>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Koordinat X</label>
-                                <input type="number" step="0.00000001" name="lahan[${lahanIndex}][koordinat_x]"
-                                    class="form-control text-kecil" placeholder="Contoh: 114.12345678">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Koordinat Y</label>
-                                <input type="number" step="0.00000001" name="lahan[${lahanIndex}][koordinat_y]"
-                                    class="form-control text-kecil" placeholder="Contoh: -3.12345678">
-                            </div>
-                        </div>
-
                         <div class="row mt-2">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status Kepemilikan</label>
@@ -517,6 +496,19 @@
                                 <label class="form-label">Status Penyerahan Surat</label>
                                 <input type="text" name="lahan[${lahanIndex}][status_penyerahan]" class="form-control text-kecil"
                                     placeholder="Masukkan keterangan">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Koordinat X</label>
+                                <input type="number" step="0.00000001" name="lahan[${lahanIndex}][koordinat_x]"
+                                    class="form-control text-kecil" placeholder="Contoh: 114.12345678">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Koordinat Y</label>
+                                <input type="number" step="0.00000001" name="lahan[${lahanIndex}][koordinat_y]"
+                                    class="form-control text-kecil" placeholder="Contoh: -3.12345678">
                             </div>
                         </div>
                         <div class="row mt-2">

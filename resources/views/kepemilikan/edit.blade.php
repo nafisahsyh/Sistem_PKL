@@ -280,11 +280,61 @@
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
                                         class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
                                 </div>
-                                <div class="mt-2 mb-2">
-                                    <h6 class="text-brown mb-3">Koordinat Lahan</h6>
-                                </div>
 
-                                <div class="row">
+                                {{-- Status & Tanggal --}}
+                                <div class="row mt-2">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Status Kepemilikan</label>
+                                        <select name="lahan[{{ $index }}][status_kepemilikan]"
+                                            class="form-select text-kecil choices-select">
+                                            <option value="aktif"
+                                                {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
+                                            </option>
+                                            <option value="nonaktif"
+                                                {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak
+                                                Aktif
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Tanggal Mulai</label>
+                                        <input type="date" name="lahan[{{ $index }}][tanggal_mulai]"
+                                            class="form-control text-kecil"
+                                            value="{{ $detail->tanggal_mulai ? date('Y-m-d', strtotime($detail->tanggal_mulai)) : '' }}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Tanggal Selesai</label>
+                                        <input type="date" name="lahan[{{ $index }}][tanggal_selesai]"
+                                            class="form-control text-kecil"
+                                            value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Posisi Surat</label>
+                                        <select name="lahan[{{ $index }}][posisi_surat]"
+                                            class="form-select text-kecil choices-select">
+                                            <option value="">Pilih Posisi Surat</option>
+                                            <option value="Koperasi"
+                                                {{ $detail->posisi_surat == 'Koperasi' ? 'selected' : '' }}>Koperasi
+                                            </option>
+                                            <option value="Notaris"
+                                                {{ $detail->posisi_surat == 'Notaris' ? 'selected' : '' }}>Notaris</option>
+                                            <option value="PTP" {{ $detail->posisi_surat == 'PTP' ? 'selected' : '' }}>
+                                                PTP</option>
+                                            <option value="Petani"
+                                                {{ $detail->posisi_surat == 'Petani' ? 'selected' : '' }}>
+                                                Petani</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Status Penyerahan Surat</label>
+                                        <input type="text" name="lahan[{{ $index }}][status_penyerahan]"
+                                            class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Koordinat X</label>
                                         <input type="number" step="0.00000001"
@@ -302,119 +352,67 @@
                                     </div>
                                 </div>
                             </div>
+                                {{-- Upload file --}}
+                                <div class="row mt-2">
+                                    {{-- FILE SHM --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Scan SHM</label>
+                                        <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
+                                            class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
-                            {{-- Status & Tanggal --}}
-                            <div class="row mt-2">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Status Kepemilikan</label>
-                                    <select name="lahan[{{ $index }}][status_kepemilikan]"
-                                        class="form-select text-kecil choices-select">
-                                        <option value="aktif"
-                                            {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
-                                        </option>
-                                        <option value="nonaktif"
-                                            {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak Aktif
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Tanggal Mulai</label>
-                                    <input type="date" name="lahan[{{ $index }}][tanggal_mulai]"
-                                        class="form-control text-kecil"
-                                        value="{{ $detail->tanggal_mulai ? date('Y-m-d', strtotime($detail->tanggal_mulai)) : '' }}">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Tanggal Selesai</label>
-                                    <input type="date" name="lahan[{{ $index }}][tanggal_selesai]"
-                                        class="form-control text-kecil"
-                                        value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Posisi Surat</label>
-                                    <select name="lahan[{{ $index }}][posisi_surat]"
-                                        class="form-select text-kecil choices-select">
-                                        <option value="">Pilih Posisi Surat</option>
-                                        <option value="Koperasi"
-                                            {{ $detail->posisi_surat == 'Koperasi' ? 'selected' : '' }}>Koperasi
-                                        </option>
-                                        <option value="Notaris"
-                                            {{ $detail->posisi_surat == 'Notaris' ? 'selected' : '' }}>Notaris</option>
-                                        <option value="PTP" {{ $detail->posisi_surat == 'PTP' ? 'selected' : '' }}>
-                                            PTP</option>
-                                        <option value="Petani" {{ $detail->posisi_surat == 'Petani' ? 'selected' : '' }}>
-                                            Petani</option>
-                                    </select>
-                                </div>
+                                        {{-- Hidden input untuk menandai penghapusan SHM --}}
+                                        <input type="hidden" name="lahan[{{ $index }}][hapus_shm]"
+                                            class="hapus_shm" value="0">
 
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Status Penyerahan Surat</label>
-                                    <input type="text" name="lahan[{{ $index }}][status_penyerahan]"
-                                        class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
-                                </div>
-                            </div>
+                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
+                                            PNG (maks. 10MB).</small>
 
-                            {{-- Upload file --}}
-                            <div class="row mt-2">
-                                {{-- FILE SHM --}}
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan SHM</label>
-                                    <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
-                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
+                                        @if ($detail->pdf_scan_shm)
+                                            <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
+                                                <small class="text-muted">
+                                                    File saat ini:
+                                                    <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
+                                                        target="_blank">Lihat File</a>
+                                                </small>
+                                                {{-- Tombol hapus file SHM --}}
+                                                <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
+                                                    title="Hapus file SHM">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
 
-                                    {{-- Hidden input untuk menandai penghapusan SHM --}}
-                                    <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
-                                        value="0">
+                                    {{-- FILE PETA --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Scan Peta</label>
+                                        <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
+                                            class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
 
-                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                        PNG (maks. 10MB).</small>
+                                        {{-- Hidden input untuk menandai penghapusan Peta --}}
+                                        <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
+                                            class="hapus_peta" value="0">
+                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
+                                            PNG (maks. 10MB).</small>
 
-                                    @if ($detail->pdf_scan_shm)
-                                        <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
-                                            <small class="text-muted">
-                                                File saat ini:
-                                                <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
-                                                    target="_blank">Lihat File</a>
-                                            </small>
-                                            {{-- Tombol hapus file SHM --}}
-                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
-                                                title="Hapus file SHM">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                {{-- FILE PETA --}}
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan Peta</label>
-                                    <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
-                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
-
-                                    {{-- Hidden input untuk menandai penghapusan Peta --}}
-                                    <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
-                                        class="hapus_peta" value="0">
-                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                        PNG (maks. 10MB).</small>
-
-                                    @if ($detail->pdf_scan_peta)
-                                        <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
-                                            <small class="text-muted">
-                                                File saat ini:
-                                                <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
-                                                    target="_blank">Lihat File</a>
-                                            </small>
-                                            {{-- Tombol hapus file Peta --}}
-                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-peta"
-                                                title="Hapus file Peta">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    @endif
+                                        @if ($detail->pdf_scan_peta)
+                                            <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
+                                                <small class="text-muted">
+                                                    File saat ini:
+                                                    <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
+                                                        target="_blank">Lihat File</a>
+                                                </small>
+                                                {{-- Tombol hapus file Peta --}}
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-danger btn-hapus-peta"
+                                                    title="Hapus file Peta">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                     @endforeach
                 </div>
 
@@ -1037,23 +1035,6 @@
                                 <div class="mt-2 mb-2">
                                     <h6 class="text-brown mb-3">Koordinat Lahan</h6>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Koordinat X</label>
-                                        <input type="number" step="0.00000001"
-                                            name="lahan[${lahanIndex}][koordinat_x]"
-                                            class="form-control text-kecil"
-                                            placeholder="Contoh: 114.12345678">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Koordinat Y</label>
-                                        <input type="number" step="0.00000001"
-                                            name="lahan[${lahanIndex}][koordinat_y]"
-                                            class="form-control text-kecil"
-                                            placeholder="Contoh: -3.12345678">
-                                    </div>
-                                </div>
                             <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
@@ -1089,6 +1070,23 @@
                                         placeholder="Masukkan keterangan">
                                 </div>
                             </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Koordinat X</label>
+                                        <input type="number" step="0.00000001"
+                                            name="lahan[${lahanIndex}][koordinat_x]"
+                                            class="form-control text-kecil"
+                                            placeholder="Contoh: 114.12345678">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Koordinat Y</label>
+                                        <input type="number" step="0.00000001"
+                                            name="lahan[${lahanIndex}][koordinat_y]"
+                                            class="form-control text-kecil"
+                                            placeholder="Contoh: -3.12345678">
+                                    </div>
+                                </div>
                             <div class="row mt-2">
                                 <!-- === FILE SHM === -->
                                 <div class="col-md-6 mb-3">

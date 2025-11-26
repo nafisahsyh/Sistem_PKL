@@ -283,23 +283,6 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
-                                <h6 class="text-brown">Koordinat Lahan</h6>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Koordinat X</label>
-                                    <input type="number" step="0.00000001"
-                                        name="lahan[{{ $index }}][koordinat_x]" class="form-control text-kecil"
-                                        value="{{ $detail->koordinat_x }}" placeholder="Contoh: 114.12345678">
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Koordinat Y</label>
-                                    <input type="number" step="0.00000001"
-                                        name="lahan[{{ $index }}][koordinat_y]" class="form-control text-kecil"
-                                        value="{{ $detail->koordinat_y }}" placeholder="Contoh: -3.12345678">
-                                </div>
-                            </div>
-
                             {{-- Status & Tanggal --}}
                             <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
@@ -352,7 +335,21 @@
                                         class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
                                 </div>
                             </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Koordinat X</label>
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_x]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_x }}" placeholder="Contoh: 114.12345678">
+                                </div>
 
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Koordinat Y</label>
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_y]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_y }}" placeholder="Contoh: -3.12345678">
+                                </div>
+                            </div>
                             {{-- Upload file --}}
                             <div class="row mt-2">
                                 {{-- FILE SHM --}}
