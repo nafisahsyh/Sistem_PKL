@@ -59,18 +59,22 @@
                     {{-- Transaksi --}}
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                         data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
-                        <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                         Transaksi
                     </a>
                     <div class="collapse" id="collapseTransaksi">
                         <nav class="sb-sidenav-menu-nested nav">
                             <a class="nav-link" href="/pembelian">
-                                <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
-                                Pemasukan
+                                <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
+                                Kelola KSM
                             </a>
                             <a class="nav-link" href="/penjualan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                                Pengeluaran
+                                Kelola Mandiri
+                            </a>
+                            <a class="nav-link" href="/penjualan">
+                                <div class="sb-nav-link-icon"><i class="fas fa-people-arrows"></i></div>
+                                Bagi Hasil
                             </a>
                         </nav>
                     </div>
@@ -78,18 +82,18 @@
                     {{-- Laporan --}}
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                         data-bs-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
-                        <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
                         Laporan
                     </a>
                     <div class="collapse" id="collapseLaporan">
                         <nav class="sb-sidenav-menu-nested nav">
                             <a class="nav-link" href="/laporan_pembelian">
-                                <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
-                                Pemasukan
+                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                                Buku Besar
                             </a>
                             <a class="nav-link" href="/laporan_penjualan">
-                                <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                                Pengeluaran
+                                <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
+                                Catatan Saldo
                             </a>
                         </nav>
                     </div>
