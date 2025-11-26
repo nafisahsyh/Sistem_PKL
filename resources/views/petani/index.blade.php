@@ -55,7 +55,23 @@
                                 <td class="text-center">{{ $p->nomor_anggota_koperasi ?: '—' }}</td>
                                 <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td>{{ $p->nama ?? '—' }}</td>
-                                <td class="text-center">{{ $p->no_telepon ?? '—' }}</td>
+                                <td class="text-center">
+                                    @if ($p->no_telepon)
+                                        @php
+                                            // Buang tanda + supaya bisa diolah
+                                            $nomor = ltrim($p->no_telepon, '+');
+
+                                            // Tampilkan versi 0xxxx (misal +62812 → 0812)
+                                            $tampil = '0' . substr($nomor, 2);
+                                        @endphp
+
+                                        <a href="https://wa.me/{{ $nomor }}" target="_blank">
+                                            {{ $tampil }}
+                                        </a>
+                                    @else
+                                        —
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     @php
                                         if ($p->status === 'aktif') {
@@ -83,7 +99,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted"> - </span>
+                                        <span class="text-muted">Tidak ada</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -93,7 +109,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted"> - </span>
+                                        <span class="text-muted">Tidak ada</span>
                                     @endif
                                 </td>
                                 @php
@@ -157,7 +173,6 @@
                     Swal.fire({
                         title: "Yakin ingin menghapus?",
                         text: "Data yang dihapus tidak dapat dikembalikan!",
-                        iconColor: '#dc3545',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#198754',
