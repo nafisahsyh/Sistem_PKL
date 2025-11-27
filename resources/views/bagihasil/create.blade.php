@@ -115,7 +115,53 @@
         document.addEventListener('DOMContentLoaded', function() {
             const desaSelect = document.getElementById('id_desa');
             const tahunSelect = document.getElementById('id_tahun_tanam');
+            const bulanSelect = document.getElementById('bulan');
             const totalLuasInput = document.getElementById('total_luas');
+
+            // Nama bulan Indonesia
+            const namaBulan = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+
+            // Ganti opsi bulan dengan bahasa Indonesia
+            if (bulanSelect) {
+                bulanSelect.innerHTML = '<option value="">Pilih Bulan</option>';
+                namaBulan.forEach((bulan, index) => {
+                    const option = document.createElement('option');
+                    option.value = index + 1;
+                    option.text = bulan;
+                    if (@json(old('bulan', 0)) == index + 1) option.selected = true;
+                    bulanSelect.appendChild(option);
+                });
+            }
+
+            // Inisialisasi Choices.js dengan placeholder spesifik dan maxItemVisible
+            const choicesOptionsDesa = {
+                shouldSort: false,
+                placeholderValue: "Pilih Desa",
+                searchPlaceholderValue: "Cari desa...",
+                maxItemVisible: 5
+            };
+
+            const choicesOptionsTahun = {
+                shouldSort: false,
+                placeholderValue: "Pilih Tahun Tanam",
+                searchPlaceholderValue: "Cari tahun tanam...",
+                maxItemVisible: 5
+            };
+
+            const choicesOptionsBulan = {
+                shouldSort: false,
+                placeholderValue: "Pilih Bulan",
+                searchPlaceholderValue: "Cari bulan...",
+                maxItemVisible: 5
+            };
+
+            if (desaSelect) new Choices(desaSelect, choicesOptionsDesa);
+            if (tahunSelect) new Choices(tahunSelect, choicesOptionsTahun);
+            if (bulanSelect) new Choices(bulanSelect, choicesOptionsBulan);
+
 
             function fetchTotalLuas() {
                 const idDesa = desaSelect.value;

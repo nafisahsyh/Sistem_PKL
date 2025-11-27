@@ -912,3 +912,9 @@ input.form-control {
 .sb-sidenav .sb-sidenav-menu::-webkit-scrollbar-thumb:hover {
     background-color: #027a48 !important; /* sama → tidak terlihat hover */
 }
+
+/* Batasi tinggi dropdown Choices.js */
+.choices__list--dropdown {
+    max-height: 300px; /* tinggi dropdown */
+    overflow-y: auto;  /* scroll jika item lebih tinggi */
+}

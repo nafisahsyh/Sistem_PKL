@@ -77,22 +77,31 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                         Transaksi
                     </a>
-                    <div class="collapse" id="collapseTransaksi">
+
+                    <div class="collapse 
+    {{ request()->is('bagi-hasil-bulanan') || request()->is('penjualan') || request()->is('bagi-hasil') ? 'show' : '' }}"
+                        id="collapseTransaksi">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="/bagi-hasil-bulanan">
+
+                            <a class="nav-link {{ request()->is('bagi-hasil-bulanan') ? 'active' : '' }}"
+                                href="/bagi-hasil-bulanan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
                                 Kelola KSM
                             </a>
-                            <a class="nav-link" href="/penjualan">
+
+                            <a class="nav-link {{ request()->is('penjualan') ? 'active' : '' }}" href="/penjualan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
                                 Kelola Mandiri
                             </a>
-                            <a class="nav-link" href="/penjualan">
+
+                            <a class="nav-link {{ request()->is('bagi-hasil') ? 'active' : '' }}" href="/bagi-hasil">
                                 <div class="sb-nav-link-icon"><i class="fas fa-people-arrows"></i></div>
                                 Bagi Hasil
                             </a>
+
                         </nav>
                     </div>
+
 
                     {{-- Laporan --}}
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
@@ -100,18 +109,27 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
                         Laporan
                     </a>
-                    <div class="collapse" id="collapseLaporan">
+
+                    <div class="collapse 
+    {{ request()->is('laporan_pembelian') || request()->is('laporan_penjualan') ? 'show' : '' }}"
+                        id="collapseLaporan">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="/laporan_pembelian">
+
+                            <a class="nav-link {{ request()->is('laporan_pembelian') ? 'active' : '' }}"
+                                href="/laporan_pembelian">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Buku Besar
                             </a>
-                            <a class="nav-link" href="/laporan_penjualan">
+
+                            <a class="nav-link {{ request()->is('laporan_penjualan') ? 'active' : '' }}"
+                                href="/laporan_penjualan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
                                 Catatan Saldo
                             </a>
+
                         </nav>
                     </div>
+
                 @endif
 
             </div>

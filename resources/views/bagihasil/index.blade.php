@@ -103,7 +103,23 @@
                                     {{ number_format($totalLuasHa, 2) }} Ha
                                 </td>
                                 <td class="text-center">
-                                    {{ DateTime::createFromFormat('!m', $b->bulan)->format('F') }}
+                                    @php
+                                        $bulanIndonesia = [
+                                            1 => 'Januari',
+                                            2 => 'Februari',
+                                            3 => 'Maret',
+                                            4 => 'April',
+                                            5 => 'Mei',
+                                            6 => 'Juni',
+                                            7 => 'Juli',
+                                            8 => 'Agustus',
+                                            9 => 'September',
+                                            10 => 'Oktober',
+                                            11 => 'November',
+                                            12 => 'Desember',
+                                        ];
+                                    @endphp
+                                    {{ $bulanIndonesia[$b->bulan] ?? '-' }}
                                 </td>
 
                                 <td class="text-center">{{ $b->tahun }}</td>
@@ -117,11 +133,26 @@
                                 </td>
 
                                 <td class="text-center">
+
+                                    {{-- DETAIL --}}
                                     <a href="{{ route('bagi-hasil-bulanan.show', $b->id_bagi_bulanan) }}"
-                                        class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i> Lihat Detail
+                                        class="btn btn-sm btn-info me-1" title="Detail">
+                                        <i class="fas fa-eye"></i>
                                     </a>
+
+                                    {{-- EDIT --}}
+                                    <a href="{{ route('bagi-hasil-bulanan.edit', $b->id_bagi_bulanan) }}"
+                                        class="btn btn-sm btn-warning me-1" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <form action="{{ route('bagi-hasil-bulanan.destroy', $b) }}" method="POST"
+                                        class="d-inline delete-form"> @csrf @method('DELETE') <button type="button"
+                                            class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash"></i></button>
+                                    </form>
+
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
@@ -150,7 +181,7 @@
 
                 <div class="modal-header bg-success text-white rounded-top-4">
                     <h5 class="modal-title">
-                        <i class="fas fa-filter me-2"></i> Filter Bagi Hasil Bulanan
+                        <i class="fas fa-filter me-2"></i> Filter Bagi Hasil Per Bulan
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -160,7 +191,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Desa</label>
-                            <select name="id_desa" class="form-select">
+                            <select id="filter_desa" name="id_desa" class="form-select">
                                 <option value="">Semua Desa</option>
                                 @foreach ($desa as $d)
                                     <option value="{{ $d->id_desa }}"
@@ -173,7 +204,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tahun Tanam</label>
-                            <select name="id_tahun_tanam" class="form-select">
+                            <select id="filter_tahun_tanam" name="id_tahun_tanam" class="form-select">
                                 <option value="">Semua Tahun Tanam</option>
                                 @foreach ($tahunTanam as $t)
                                     <option value="{{ $t->id_tahun_tanam }}"
@@ -200,4 +231,73 @@
             </div>
         </div>
     </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const desaSelect = document.getElementById('filter_desa');
+            const tahunSelect = document.getElementById('filter_tahun_tanam');
+
+            if (desaSelect) new Choices(desaSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari desa..."
+            });
+            if (tahunSelect) new Choices(tahunSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari tahun tanam..."
+            });
+
+            const btnReset = document.getElementById('resetFilter');
+            if (btnReset) {
+                btnReset.addEventListener('click', function() {
+                    window.location.href = "{{ route('bagi-hasil-bulanan.index') }}";
+                });
+            }
+        });
+    </script>
+
+    {{-- SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('.delete-form');
+
+                    Swal.fire({
+                        title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;color:#000;'>Yakin ingin menghapus?</h3>",
+                        html: "<p style='font-size:14px;margin:0;color:#000;'>Data yang dihapus tidak dapat dikembalikan!</p>",
+                        icon: 'warning',
+                        iconColor: '#dc3545',
+                        showCancelButton: true,
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Hapus',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    {{-- Notifikasi sukses --}}
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: "<h3 style='font-size:15px;margin-bottom:0;color:#000;'>Berhasil</h3>",
+                text: "{{ session('success') }}",
+                confirmButtonColor: '#198754',
+                timer: 1800,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
 @endsection

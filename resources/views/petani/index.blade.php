@@ -51,7 +51,7 @@
                             <tr>
                                 <td class="text-center">
                                     {{ ($petani->currentPage() - 1) * $petani->perPage() + $loop->iteration }}</td>
-                                <td>{{ $p->nomor_anggota_plasma ?? '—' }}</td>
+                                <td class="text-center">{{ $p->nomor_anggota_plasma ?? '—' }}</td>
                                 <td class="text-center">{{ $p->nomor_anggota_koperasi ?: '—' }}</td>
                                 <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td>{{ $p->nama ?? '—' }}</td>
@@ -99,7 +99,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted">Tidak ada</span>
+                                        <span class="text-muted"> - </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -109,7 +109,7 @@
                                             <i class="fas fa-file-alt"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted">Tidak ada</span>
+                                        <span class="text-muted"> - </span>
                                     @endif
                                 </td>
                                 @php
