@@ -30,10 +30,24 @@ class BagiHasilController extends Controller
             $query->where('id_tahun_tanam', $request->id_tahun_tanam);
         }
 
+        // SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('desa', function ($q2) use ($search) {
+                    $q2->where('desa', 'like', "%$search%");
+                })
+                    ->orWhereHas('tahunTanam', function ($q2) use ($search) {
+                        $q2->where('tahun', 'like', "%$search%");
+                    });
+            });
+        }
+
         // ORDER BY → tahun terbaru, bulan terbaru
         $bulanan = $query->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString(); // biar search & filter tetap saat pagination
 
         return view('bagihasil.index', [
             'bulanan' => $bulanan,
