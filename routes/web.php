@@ -9,6 +9,7 @@ use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PetaniController;
+use App\Http\Controllers\BagiHasilController;
 
 
 
@@ -89,6 +90,13 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('riwayat.update');
     Route::delete('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'deleteRiwayat'])
         ->name('riwayat.destroy');
+    Route::get('bagi-hasil-bulanan/total-luas', [BagiHasilController::class, 'getTotalLuas'])->name('bagi-hasil.total-luas');
+    Route::post('bagi-hasil-bulanan/store-bulanan', [BagiHasilController::class, 'storeBulanan'])
+        ->name('bagi-hasil-bulanan.store-bulanan');
+    Route::resource('bagi-hasil-bulanan', BagiHasilController::class);
+    Route::resource('bagi-periode', BagiHasilController::class);
+
+
 });
 
 // hanya super admin

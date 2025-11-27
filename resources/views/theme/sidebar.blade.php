@@ -79,7 +79,7 @@
                     </a>
                     <div class="collapse" id="collapseTransaksi">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="/pembelian">
+                            <a class="nav-link" href="/bagi-hasil-bulanan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
                                 Kelola KSM
                             </a>
