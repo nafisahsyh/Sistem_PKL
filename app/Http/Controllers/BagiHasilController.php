@@ -390,76 +390,78 @@ class BagiHasilController extends Controller
     }
 
 
-public function show($id)
-{
-    $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
+    public function show($id)
+    {
+        $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
 
-    // Ambil semua detail petani
-    $petaniList = DetailKepemilikan::where('status_pengelolaan', 'ksm')
-        ->where('status_kepemilikan', 'aktif')
-        ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
-        ->whereHas('lahan', fn($q) =>
-            $q->where('id_desa', $bulanan->id_desa)
-              ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
-        )
-        ->with(['kepemilikan.petani', 'kepemilikan', 'lahan'])
-        ->get();
+        // Ambil semua detail petani
+        $petaniList = DetailKepemilikan::where('status_pengelolaan', 'ksm')
+            ->where('status_kepemilikan', 'aktif')
+            ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
+            ->whereHas(
+                'lahan',
+                fn($q) =>
+                $q->where('id_desa', $bulanan->id_desa)
+                    ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+            )
+            ->with(['kepemilikan.petani', 'kepemilikan', 'lahan'])
+            ->get();
 
-    // Filter search jika ada
-    $search = request('search');
-    if ($search) {
-        $petaniList = $petaniList->filter(function ($item) use ($search) {
-            $p = $item->kepemilikan->petani;
-            return str_contains($p->nomor_anggota_plasma, $search)
-                || str_contains($p->nomor_anggota_koperasi, $search)
-                || str_contains(strtolower($p->nama), strtolower($search));
-        });
-    }
+        // Filter search jika ada
+        $search = request('search');
+        if ($search) {
+            $petaniList = $petaniList->filter(function ($item) use ($search) {
+                $p = $item->kepemilikan->petani;
+                return str_contains($p->nomor_anggota_plasma, $search)
+                    || str_contains($p->nomor_anggota_koperasi, $search)
+                    || str_contains(strtolower($p->nama), strtolower($search));
+            });
+        }
 
-    // Hitung total luas
-    $totalLuasHa = $petaniList->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
+        // Hitung total luas
+        $totalLuasHa = $petaniList->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
 
-    // Group per petani
-    $petaniGrouped = $petaniList->groupBy(fn($item) => $item->kepemilikan->id_petani);
+        // Group per petani
+        $petaniGrouped = $petaniList->groupBy(fn($item) => $item->kepemilikan->id_petani);
 
-    $petaniData = collect();
-    foreach ($petaniGrouped as $kepemilikanId => $items) {
-        $kepemilikan = $items->first()->kepemilikan;
-        $petani = $kepemilikan->petani;
+        $petaniData = collect();
+        foreach ($petaniGrouped as $kepemilikanId => $items) {
+            $kepemilikan = $items->first()->kepemilikan;
+            $petani = $kepemilikan->petani;
 
-        $totalLuasPetani = $items->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
-        $nominal = $totalLuasHa > 0 ? ($bulanan->total_bagian / $totalLuasHa) * $totalLuasPetani : 0;
+            $totalLuasPetani = $items->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
+            $nominal = $totalLuasHa > 0 ? ($bulanan->total_bagian / $totalLuasHa) * $totalLuasPetani : 0;
 
-        $petaniData->push([
-            'no_plasma' => $petani->nomor_anggota_plasma ?? '-',
-            'no_koperasi' => $petani->nomor_anggota_koperasi ?? '-',
-            'nama_petani' => $petani->nama ?? '-',
-            'luas_ha' => $totalLuasPetani,
-            'nominal' => $nominal,
+            $petaniData->push([
+                'no_plasma' => $petani->nomor_anggota_plasma ?? '-',
+                'no_koperasi' => $petani->nomor_anggota_koperasi ?? '-',
+                'nama_petani' => $petani->nama ?? '-',
+                'luas_ha' => $totalLuasPetani,
+                'nominal' => $nominal,
+            ]);
+        }
+
+        // --- Pagination manual ---
+        $perPage = 10; // bisa ganti 15
+        $page = request()->get('page', 1);
+        $offset = ($page - 1) * $perPage;
+
+        $paginated = new LengthAwarePaginator(
+            $petaniData->slice($offset, $perPage)->values(),
+            $petaniData->count(),
+            $perPage,
+            $page,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
+
+        // Tambahkan nomor urut per halaman
+        $noStart = ($page - 1) * $perPage + 1;
+
+        return view('bagihasil.detail', [
+            'bulanan' => $bulanan,
+            'petaniData' => $paginated,
+            'totalLuasHa' => $totalLuasHa,
+            'noStart' => $noStart
         ]);
     }
-
-    // --- Pagination manual ---
-    $perPage = 10; // bisa ganti 15
-    $page = request()->get('page', 1);
-    $offset = ($page - 1) * $perPage;
-
-    $paginated = new LengthAwarePaginator(
-        $petaniData->slice($offset, $perPage)->values(),
-        $petaniData->count(),
-        $perPage,
-        $page,
-        ['path' => Paginator::resolveCurrentPath()]
-    );
-
-    // Tambahkan nomor urut per halaman
-    $noStart = ($page - 1) * $perPage + 1;
-
-    return view('bagihasil.detail', [
-        'bulanan' => $bulanan,
-        'petaniData' => $paginated,
-        'totalLuasHa' => $totalLuasHa,
-        'noStart' => $noStart
-    ]);
-}
 }
