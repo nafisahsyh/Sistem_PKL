@@ -92,12 +92,16 @@
                 <div class="mb-3">
                     <label for="total_bagian" class="form-label">Total Bagian (20%) <span
                             class="text-danger">*</span></label>
-                    <input type="number" name="total_bagian"
-                        class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
-                        value="{{ old('total_bagian') }}" placeholder="Masukkan total bagian" required>
-                    @error('total_bagian')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <div class="input-group">
+                        <span class="input-group-text rp-addon">Rp</span>
+                        <input type="text" name="total_bagian" id="total_bagian"
+                            class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
+                            value="{{ old('total_bagian', $bulanan->total_bagian) }}" placeholder="Masukkan total bagian"
+                            required>
+                        @error('total_bagian')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="text-start mt-3">
@@ -135,6 +139,24 @@
                     bulanSelect.appendChild(option);
                 });
             }
+
+            // inputan sesuai Rp
+            const totalBagian = document.getElementById('total_bagian');
+
+            function formatRupiah(value) {
+                if (!value) return '';
+                // hapus semua selain angka
+                value = value.toString().replace(/\D/g, '');
+                return new Intl.NumberFormat('id-ID').format(value);
+            }
+
+            // format saat load
+            totalBagian.value = formatRupiah(totalBagian.value);
+
+            // format saat input
+            totalBagian.addEventListener('input', function() {
+                this.value = formatRupiah(this.value);
+            });
 
             // Inisialisasi Choices.js dengan placeholder spesifik dan maxItemVisible
             const choicesOptionsDesa = {

@@ -128,7 +128,7 @@
                                     {{ \Carbon\Carbon::parse($b->tanggal_bagi)->format('d-m-Y') }}
                                 </td>
 
-                                <td class="text-end">
+                                <td class="text-center">
                                     Rp {{ number_format($b->total_bagian, 0, ',', '.') }}
                                 </td>
 
