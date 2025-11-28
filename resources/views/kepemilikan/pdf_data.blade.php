@@ -175,15 +175,25 @@
 
                         {{-- PETANI SEBELUM --}}
                         @if (!in_array('riwayat', $exclude))
-                            <td>
+                            <td style="text-align: left;">
                                 @php
+                                    // Ambil nama petani sebelumnya urut dari yang paling awal
                                     $riwayat = $detail->lahan->riwayatKepemilikan
+                                        ->sortBy('id') // pastikan urut dari petani pertama
                                         ->pluck('petaniSebelum.nama')
                                         ->filter()
-                                        ->unique()
-                                        ->toArray();
+                                        ->values(); // reset index
 
-                                    echo empty($riwayat) ? '-' : implode(' / ', array_reverse($riwayat));
+                                    if ($riwayat->isEmpty()) {
+                                        echo '-';
+                                    } else {
+                                        // Format menjadi list bernomor
+                                        $output = '';
+                                        foreach ($riwayat as $index => $nama) {
+                                            $output .= $index + 1 . '. ' . $nama . '<br>';
+                                        }
+                                        echo $output;
+                                    }
                                 @endphp
                             </td>
                         @endif
