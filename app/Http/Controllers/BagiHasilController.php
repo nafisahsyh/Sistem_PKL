@@ -548,4 +548,24 @@ class BagiHasilController extends Controller
         return $pdf->download($namaFile);
     }
 
+    public function cetakPdf(Request $request)
+
+    {
+        $query = BagiHasilBulanan::with(['desa', 'tahunTanam']);
+
+        if ($request->filled('id_desa')) {
+            $query->where('id_desa', $request->id_desa);
+        }
+
+        if ($request->filled('id_tahun_tanam')) {
+            $query->where('id_tahun_tanam', $request->id_tahun_tanam);
+        }
+
+        $bulanan = $query->get();
+
+        $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
+            ->setPaper('a4', 'potrait');
+
+        return $pdf->stream('laporan-bagi-hasil.pdf');
+    }
 }

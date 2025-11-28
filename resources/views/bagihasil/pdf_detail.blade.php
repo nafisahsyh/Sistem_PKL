@@ -98,13 +98,15 @@
     <div class="header">
         <table>
             <tr>
-                <td width="15%" style="text-align:center;">
+                <td width="15%" style="text-align:center; vertical-align: middle;">
                     <img src="{{ public_path('logo.png') }}" alt="Logo">
                 </td>
-                <td style="text-align:center;">
-                    <h2><strong>KOPERASI SAWIT MAKMUR</strong></h2>
-                    <h3>KABUPATEN TANAH LAUT</h3>
-                    <h4>KALIMANTAN SELATAN</h4>
+
+                <td width="85%" style="text-align:center; transform: translateX(-40px);">
+                    <h2 style="margin:0;"><strong>KOPERASI SAWIT MAKMUR</strong></h2>
+                    <h3 style="margin:0;">KABUPATEN TANAH LAUT</h3>
+                    <h4 style="margin:0;">KALIMANTAN SELATAN</h4>
+
                     <p style="font-size: 11px; margin:2px 0 0;">
                         Alamat: Jl. A. Yani Kel. Sarang Halang RT. 04 Kec. Pelaihari
                     </p>
@@ -114,6 +116,7 @@
                 </td>
             </tr>
         </table>
+
         <div class="kop-line"></div>
     </div>
 

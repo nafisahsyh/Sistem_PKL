@@ -121,22 +121,25 @@
     <div class="header">
         <table>
             <tr>
-                <td width="15%" style="text-align: center; padding-right: 0px; padding-left: 15px">
-                    <img src="{{ public_path('logo.png') }}" alt="Logo" style="width: 95px; height: auto;">
+                <td width="15%" style="text-align:center; vertical-align: middle;">
+                    <img src="{{ public_path('logo.png') }}" alt="Logo">
                 </td>
-                <td style="text-align: center;">
-                    <h2 style="font-size: 18px;"><strong>KOPERASI SAWIT MAKMUR</strong></h2>
-                    <h3 style="font-size: 15px;">KABUPATEN TANAH LAUT</h3>
-                    <h4 style="font-size: 14px;">KALIMANTAN SELATAN</h4>
-                    <p style="font-size: 11px; margin: 2px 0 0 0;">
+
+                <td width="85%" style="text-align:center; transform: translateX(-40px);">
+                    <h2 style="margin:0;"><strong>KOPERASI SAWIT MAKMUR</strong></h2>
+                    <h3 style="margin:0;">KABUPATEN TANAH LAUT</h3>
+                    <h4 style="margin:0;">KALIMANTAN SELATAN</h4>
+
+                    <p style="font-size: 11px; margin:2px 0 0;">
                         Alamat: Jl. A. Yani Kel. Sarang Halang RT. 04 Kec. Pelaihari
                     </p>
-                    <p style="font-size: 11px; margin: 0;">
+                    <p style="font-size: 11px; margin:0;">
                         Email: <strong>kop.sm.13@gmail.com</strong>
                     </p>
                 </td>
             </tr>
         </table>
+
         <div class="kop-line"></div>
     </div>
 
@@ -260,7 +263,7 @@
                         @endif
                     </td>
                 </tr>
-                 <tr>
+                <tr>
                     <th>Koordinat Lahan</th>
                     <td>
                         @php

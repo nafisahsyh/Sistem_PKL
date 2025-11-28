@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\KepemilikanController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\KecamatanController;
-use App\Http\Controllers\DesaController;
-use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DesaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PetaniController;
 use App\Http\Controllers\BagiHasilController;
-
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KecamatanController;
+use App\Http\Controllers\TahunTanamController;
+use App\Http\Controllers\KepemilikanController;
 
 
 Route::get('/', function () {
@@ -95,9 +95,11 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('bagi-hasil-bulanan.store-bulanan');
     Route::get('/bagi-hasil-bulanan/{id}/pdf', [BagiHasilController::class, 'detailPdf'])
         ->name('bagi-hasil-bulanan.pdf');
+    Route::get('/bagi-hasil-bulanan/pdf', [BagiHasilController::class, 'cetakPdf'])->name('bagi-hasil-bulanan.list-pdf');
+
+
     Route::resource('bagi-hasil-bulanan', BagiHasilController::class);
     Route::resource('bagi-periode', BagiHasilController::class);
-
 });
 
 // hanya super admin

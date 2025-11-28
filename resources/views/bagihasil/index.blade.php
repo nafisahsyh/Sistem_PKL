@@ -12,13 +12,17 @@
         {{-- HEADER + BUTTON TAMBAH --}}
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="text-brown mb-0">Bagi Hasil Per Bulan</h3>
+            <a href="{{ route('bagi-hasil-bulanan.list-pdf') }}?id_desa={{ request('id_desa') }}&id_tahun_tanam={{ request('id_tahun_tanam') }}"
+                target="_blank" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
         </div>
 
         {{-- CARD TABLE --}}
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
 
-                {{-- 🔍 FILTER BUTTON + SEARCH --}}
+                {{-- FILTER BUTTON + SEARCH --}}
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
 
                     <div class="d-flex gap-2">
@@ -47,7 +51,8 @@
                         @endif
 
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari desa atau tahun tanam..." value="{{ request('search') }}" style="width: 250px;">
+                            placeholder="Cari desa atau tahun tanam..." value="{{ request('search') }}"
+                            style="width: 250px;">
 
                         <button class="btn btn-success" type="submit">
                             <i class="fas fa-search"></i>
@@ -59,7 +64,7 @@
                     </form>
                 </div>
 
-                {{-- 🌱 TABLE --}}
+                {{-- TABLE --}}
                 <table class="table table-bordered table-striped align-middle table-custom">
                     <thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
                         <tr>
