@@ -101,12 +101,12 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Dokumen KTP</label>
+                        <label for="pdf_scan_ktp" class="form-label">Scan KTP</label>
                         <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp" class="form-control text-kecil"
-                            accept=".pdf,.jpg,.jpeg,.png">
+                            accept="application/pdf">
 
                         <input type="hidden" name="hapus_ktp" id="hapus_ktp" value="0">
-                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                         @if ($petani->pdf_scan_ktp)
                             <div class="file-ktp-container mt-2 d-flex align-items-center gap-2">
                                 <small class="text-muted">
@@ -125,12 +125,12 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_kk" class="form-label">Dokumen KK</label>
+                        <label for="pdf_scan_kk" class="form-label">Scan KK</label>
                         <input type="file" name="pdf_scan_kk" id="pdf_scan_kk" class="form-control text-kecil"
-                            accept=".pdf,.jpg,.jpeg,.png">
+                            accept="application/pdf">
 
                         <input type="hidden" name="hapus_kk" id="hapus_kk" value="0">
-                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                         @if ($petani->pdf_scan_kk)
                             <div class="file-kk-container mt-2 d-flex align-items-center gap-2">
                                 <small class="text-muted">

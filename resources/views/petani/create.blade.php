@@ -89,25 +89,25 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_ktp" class="form-label">Dokumen KTP</label>
+                        <label for="pdf_scan_ktp" class="form-label">Scan KTP</label>
                         <input type="file" name="pdf_scan_ktp"
                             class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
-                            accept=".pdf,.jpg,.jpeg,.png">
+                            accept="application/pdf">
                         @error('pdf_scan_ktp')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="pdf_scan_kk" class="form-label">Dokumen KK</label>
+                        <label for="pdf_scan_kk" class="form-label">Scan KK</label>
                         <input type="file" name="pdf_scan_kk"
                             class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
-                            accept=".pdf,.jpg,.jpeg,.png">
+                            accept="application/pdf">
                         @error('pdf_scan_kk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>
+                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                     </div>
 
 

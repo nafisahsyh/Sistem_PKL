@@ -104,12 +104,12 @@
 
                     <div class="row align-items-center">
                         <div class="col-md-4 mb-2">
-                            <div class="text-dark fw-semibold">Dokumen KTP</div>
+                            <div class="text-dark fw-semibold">Scan KTP</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
                                         target="_blank" class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-alt"></i> Lihat KTP
+                                        <i class="fas fa-file-pdf"></i> Lihat KTP
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
@@ -117,12 +117,12 @@
                             </div>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <div class="text-dark fw-semibold">Dokumen KK</div>
+                            <div class="text-dark fw-semibold">Scan KK</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_kk ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
                                         target="_blank" class="btn btn-sm btn-outline-primary mt-1">
-                                        <i class="fas fa-file-alt"></i> Lihat KK
+                                        <i class="fas fa-file-pdf"></i> Lihat KK
                                     </a>
                                 @else
                                     <span class="text-muted fw-medium">Tidak ada dokumen</span>
@@ -354,9 +354,9 @@
                             <div class="row mt-2">
                                 {{-- FILE SHM --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan SHM (PDF / JPG / PNG)</label>
+                                    <label class="form-label">Scan SHM</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
-                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
+                                        class="form-control text-kecil" accept="application/pdf">
 
                                     {{-- Hidden input untuk menandai penghapusan SHM --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
@@ -380,9 +380,9 @@
 
                                 {{-- FILE PETA --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Scan Peta (PDF / JPG / PNG)</label>
+                                    <label class="form-label">Scan Peta</label>
                                     <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
-                                        class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
+                                        class="form-control text-kecil" accept="application/pdf">
 
                                     {{-- Hidden input untuk menandai penghapusan Peta --}}
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
@@ -503,12 +503,12 @@
                                 <div class="col-md-6 mb-3">
                                     <label>Scan KTP (PDF)</label>
                                     <input type="file" name="pdf_scan_ktp" class="form-control"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                        accept="application/pdf">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Scan KK (PDF)</label>
                                     <input type="file" name="pdf_scan_kk" class="form-control"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                        accept="application/pdf">
                                 </div>
                             </div>
                         </div>

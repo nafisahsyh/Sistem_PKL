@@ -103,7 +103,7 @@
 
                     <div class="row align-items-center">
                         <div class="col-md-4 mb-2">
-                            <div class="text-dark fw-semibold">Dokumen KTP</div>
+                            <div class="text-dark fw-semibold">Scan KTP</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_ktp) }}"
@@ -116,7 +116,7 @@
                             </div>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <div class="text-dark fw-semibold">Dokumen KK</div>
+                            <div class="text-dark fw-semibold">Scan KK</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_kk ?? false)
                                     <a href="{{ asset('storage/ktp_pdf/' . $kepemilikan->petani->pdf_scan_kk) }}"
@@ -352,67 +352,64 @@
                                     </div>
                                 </div>
                             </div>
-                                {{-- Upload file --}}
-                                <div class="row mt-2">
-                                    {{-- FILE SHM --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Scan SHM</label>
-                                        <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
-                                            class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
+                            {{-- Upload file --}}
+                            <div class="row mt-2">
+                                {{-- FILE SHM --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Scan SHM</label>
+                                    <input type="file" name="lahan[{{ $index }}][pdf_scan_shm]"
+                                        class="form-control text-kecil" accept="application/pdf">
 
-                                        {{-- Hidden input untuk menandai penghapusan SHM --}}
-                                        <input type="hidden" name="lahan[{{ $index }}][hapus_shm]"
-                                            class="hapus_shm" value="0">
+                                    {{-- Hidden input untuk menandai penghapusan SHM --}}
+                                    <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
+                                        value="0">
 
-                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
 
-                                        @if ($detail->pdf_scan_shm)
-                                            <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
-                                                <small class="text-muted">
-                                                    File saat ini:
-                                                    <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
-                                                        target="_blank">Lihat File</a>
-                                                </small>
-                                                {{-- Tombol hapus file SHM --}}
-                                                <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
-                                                    title="Hapus file SHM">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        @endif
-                                    </div>
+                                    @if ($detail->pdf_scan_shm)
+                                        <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
+                                            <small class="text-muted">
+                                                File saat ini:
+                                                <a href="{{ asset('storage/' . $detail->pdf_scan_shm) }}"
+                                                    target="_blank">Lihat File</a>
+                                            </small>
+                                            {{-- Tombol hapus file SHM --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-shm"
+                                                title="Hapus file SHM">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
 
-                                    {{-- FILE PETA --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Scan Peta</label>
-                                        <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
-                                            class="form-control text-kecil" accept=".pdf,.jpg,.jpeg,.png">
+                                {{-- FILE PETA --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Scan Peta</label>
+                                    <input type="file" name="lahan[{{ $index }}][pdf_scan_peta]"
+                                        class="form-control text-kecil" accept="application/pdf">
 
-                                        {{-- Hidden input untuk menandai penghapusan Peta --}}
-                                        <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
-                                            class="hapus_peta" value="0">
-                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                    {{-- Hidden input untuk menandai penghapusan Peta --}}
+                                    <input type="hidden" name="lahan[{{ $index }}][hapus_peta]"
+                                        class="hapus_peta" value="0">
+                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
 
-                                        @if ($detail->pdf_scan_peta)
-                                            <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
-                                                <small class="text-muted">
-                                                    File saat ini:
-                                                    <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
-                                                        target="_blank">Lihat File</a>
-                                                </small>
-                                                {{-- Tombol hapus file Peta --}}
-                                                <button type="button"
-                                                    class="btn btn-sm btn-outline-danger btn-hapus-peta"
-                                                    title="Hapus file Peta">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        @endif
-                                    </div>
+                                    @if ($detail->pdf_scan_peta)
+                                        <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
+                                            <small class="text-muted">
+                                                File saat ini:
+                                                <a href="{{ asset('storage/' . $detail->pdf_scan_peta) }}"
+                                                    target="_blank">Lihat File</a>
+                                            </small>
+                                            {{-- Tombol hapus file Peta --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-hapus-peta"
+                                                title="Hapus file Peta">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
+                        </div>
                     @endforeach
                 </div>
 
@@ -519,18 +516,18 @@
                                         <textarea name="alamat" class="form-control form-control-sm custom-textarea"></textarea>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label>Dokumen KTP</label>
+                                        <label>Scan KTP</label>
                                         <input type="file" name="pdf_scan_ktp" class="form-control"
-                                            accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                            accept="application/pdf">
+                                        <small class="text-muted" style="font-style: italic">Jenis file diterima: PDF
+                                            (maks. 10MB).</small>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label>Dokumen KK</label>
+                                        <label>Scan KK</label>
                                         <input type="file" name="pdf_scan_kk" class="form-control"
-                                            accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted" style="font-style: italic">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                            accept="application/pdf">
+                                        <small class="text-muted" style="font-style: italic">Jenis file diterima: PDF
+                                            (maks. 10MB).</small>
                                     </div>
                                 </div>
                             </div>
@@ -638,19 +635,17 @@
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label>Dokumen KTP</label>
+                                        <label>Scan KTP</label>
                                         <input type="file" name="pdf_scan_ktp" class="form-control"
-                                            accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                            accept="application/pdf">
+                                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label>Dokumen KK</label>
+                                        <label>Scan KK</label>
                                         <input type="file" name="pdf_scan_kk" class="form-control"
-                                            accept=".pdf,.jpg,.jpeg,.png">
-                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                            PNG (maks. 10MB).</small>
+                                            accept="application/pdf">
+                                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                                     </div>
                                 </div>
                             </div>
@@ -1092,14 +1087,13 @@
                                 <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM</label>
                                     <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
-                                        accept=".pdf,.jpg,.jpeg,.png" class="form-control text-kecil">
+                                    accept="application/pdf" class="form-control text-kecil">
 
                                     <!-- Hidden input untuk hapus SHM -->
                                     <input type="hidden" name="lahan[${lahanIndex}][hapus_shm]" 
                                         class="hapus_shm" value="0">
 
-                                    <small class="text-muted-small">Jenis file: PDF, JPG, JPEG,
-                                    PNG (maks. 10MB).</small>      
+                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>      
                                                         
                                     <!-- Container file SHM -->
                                     <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
@@ -1115,13 +1109,13 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Scan Peta</label>
                                     <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
-                                        accept=".pdf,.jpg,.jpeg,.png" class="form-control text-kecil">
+                                    accept="application/pdf" class="form-control text-kecil">
 
                                     <!-- Hidden input untuk hapus Peta -->
                                     <input type="hidden" name="lahan[${lahanIndex}][hapus_peta]" 
                                         class="hapus_peta" value="0">
                                         
-                                        <small class="text-muted-small">Jenis file: PDF, JPG, JPEG, PNG (maks. 10MB).</small>                                    
+                                        <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>                                    
 
                                     <!-- Container file Peta -->
                                     <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
