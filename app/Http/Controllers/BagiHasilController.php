@@ -106,7 +106,7 @@ class BagiHasilController extends Controller
             'bulan' => 'required|integer|min:1|max:12',
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
-            'total_bagian' => 'required|numeric',
+            'total_bagian' => 'required|numeric|min:1',
         ]);
 
         DB::transaction(function () use ($data) {
@@ -267,7 +267,7 @@ class BagiHasilController extends Controller
             'bulan' => 'required|integer|min:1|max:12',
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
-            'total_bagian' => 'required|numeric',
+            'total_bagian' => 'required|numeric|min:1',
         ]);
 
 
