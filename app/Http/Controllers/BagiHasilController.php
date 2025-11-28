@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+// Model yang terikat
 use App\Models\Desa;
 use App\Models\Saldo;
 use App\Models\Transaksi;
@@ -11,9 +12,16 @@ use App\Models\BagiHasilPetani;
 use App\Models\BagiHasilBulanan;
 use App\Models\BagiHasilPeriode;
 use App\Models\DetailKepemilikan;
+
+// Database dan Pagination
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use DateTime;
+
+//Import PDF
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class BagiHasilController extends Controller
 {
@@ -76,6 +84,11 @@ class BagiHasilController extends Controller
     // Input bagi hasil per bulan
     public function storeBulanan(Request $request)
     {
+        //Konversi menghilangkan titik koma
+        $request->merge([
+            'total_bagian' => str_replace(['Rp', '.', ' '], '', $request->total_bagian)
+        ]);
+
         $data = $request->validate([
             'id_desa' => 'required|integer',
             'id_tahun_tanam' => 'required|integer',
@@ -185,7 +198,6 @@ class BagiHasilController extends Controller
             ->with('success', 'Data bulanan dan periode berhasil diproses.');
     }
 
-
     public function getTotalLuas(Request $request)
     {
         $idDesa = $request->query('id_desa');
@@ -236,6 +248,11 @@ class BagiHasilController extends Controller
     // UPDATE
     public function update(Request $request, $id)
     {
+        //Pembersihan titik koma
+        $request->merge([
+            'total_bagian' => preg_replace('/[^0-9]/', '', $request->total_bagian)
+        ]);
+
         $data = $request->validate([
             'id_desa' => 'required|integer',
             'id_tahun_tanam' => 'required|integer',
@@ -464,4 +481,71 @@ class BagiHasilController extends Controller
             'noStart' => $noStart
         ]);
     }
+
+    //Mengambil data petani untuk PDF dari Show()
+
+    public function detailPdf($id)
+    {
+        $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
+
+        // Ambil semua detail petani
+        $petaniList = DetailKepemilikan::where('status_pengelolaan', 'ksm')
+            ->where('status_kepemilikan', 'aktif')
+            ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
+            ->whereHas(
+                'lahan',
+                fn($q) =>
+                $q->where('id_desa', $bulanan->id_desa)
+                    ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+            )
+            ->with(['kepemilikan.petani', 'kepemilikan', 'lahan'])
+            ->get();
+
+        // Hitung total luas keseluruhan
+        $totalLuasHa = $petaniList->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
+
+        // Group per petani
+        $petaniGrouped = $petaniList->groupBy(fn($item) => $item->kepemilikan->id_petani);
+
+        // Data untuk PDF (harus format ARRAY)
+        $petaniData = collect();
+
+        foreach ($petaniGrouped as $items) {
+
+            $kepemilikan = $items->first()->kepemilikan;
+            $petani = $kepemilikan->petani;
+
+            $totalLuasPetani = $items->sum(fn($i) => ($i->lahan->luas_peta ?? 0) / 10000);
+
+            $nominal = $totalLuasHa > 0
+                ? ($bulanan->total_bagian / $totalLuasHa) * $totalLuasPetani
+                : 0;
+
+            $petaniData->push([
+                'nomor_anggota_plasma' => $petani->nomor_anggota_plasma ?? '-',
+                'nomor_anggota_koperasi' => $petani->nomor_anggota_koperasi ?? '-',
+                'nama_petani' => $petani->nama ?? '-',
+                'luas_ha' => $totalLuasPetani,
+                'nominal' => $nominal,
+            ]);
+        }
+
+        // Generate PDF
+        $pdf = Pdf::loadView('bagihasil.pdf_detail', [
+            'bulanan' => $bulanan,
+            'petaniData' => $petaniData, // COLLECTION tapi valuenya array
+            'totalLuasHa' => $totalLuasHa,
+        ]);
+
+        // Nama file otomatis
+        $namaFile =
+            'Bagi Hasil - ' .
+            $bulanan->desa->desa . ' - ' .
+            $bulanan->tahunTanam->tahun . ' - ' .
+            DateTime::createFromFormat('!m', $bulanan->bulan)->format('F') . ' ' .
+            $bulanan->tahun . '.pdf';
+
+        return $pdf->download($namaFile);
+    }
+
 }

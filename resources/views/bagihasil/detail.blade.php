@@ -5,6 +5,8 @@
     <div class="container-fluid px-4 mt-5">
         {{-- Header dengan tombol kembali --}}
         <div class="d-flex align-items-center mb-4 gap-2">
+
+            {{-- Tombol kembali --}}
             <a href="{{ route('bagi-hasil-bulanan.index', [
                 'page' => request('page'),
                 'search' => request('search'),
@@ -14,7 +16,17 @@
                 class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
+
+            {{-- Judul --}}
             <h4 class="text-brown mb-0">Detail Bagi Hasil Bulanan</h4>
+
+            {{-- Tombol Aksi (PDF) di kanan --}}
+            <div class="ms-auto d-flex gap-2">
+                <a href="{{ route('bagi-hasil-bulanan.pdf', $bulanan->id_bagi_bulanan) }}" class="btn btn-danger shadow-sm"
+                    target="_blank">
+                    <i class="fa fa-file-pdf"></i> Cetak PDF
+                </a>
+            </div>
         </div>
 
         {{-- Informasi Bulanan --}}

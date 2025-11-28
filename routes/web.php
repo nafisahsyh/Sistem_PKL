@@ -93,9 +93,10 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('bagi-hasil-bulanan/total-luas', [BagiHasilController::class, 'getTotalLuas'])->name('bagi-hasil.total-luas');
     Route::post('bagi-hasil-bulanan/store-bulanan', [BagiHasilController::class, 'storeBulanan'])
         ->name('bagi-hasil-bulanan.store-bulanan');
+    Route::get('/bagi-hasil-bulanan/{id}/pdf', [BagiHasilController::class, 'detailPdf'])
+        ->name('bagi-hasil-bulanan.pdf');
     Route::resource('bagi-hasil-bulanan', BagiHasilController::class);
     Route::resource('bagi-periode', BagiHasilController::class);
-
 
 });
 
