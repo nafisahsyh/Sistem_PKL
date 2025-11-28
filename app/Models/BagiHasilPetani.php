@@ -14,6 +14,13 @@ class BagiHasilPetani extends Model
         'id_petani',
         'total_luas_ksm',
         'total_nominal',
+
+        // snapshot fields
+        'nama_petani_snapshot',
+        'nik_petani_snapshot',
+        'alamat_petani_snapshot',
+        'nomor_plasma_snapshot',
+        'nomor_koperasi_snapshot',
     ];
 
     public function periode()

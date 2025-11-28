@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+
+@php
+    $bulanIndo = [
+        1 => 'Januari',
+        2 => 'Februari',
+        3 => 'Maret',
+        4 => 'April',
+        5 => 'Mei',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'Agustus',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Desember',
+    ];
+@endphp
+
 <html lang="id">
 
 <head>
@@ -14,7 +32,9 @@
             margin: 25px;
         }
 
-        h2, h3, h4 {
+        h2,
+        h3,
+        h4 {
             text-align: center;
             margin: 0;
             padding: 0;
@@ -73,7 +93,8 @@
             text-align: left;
         }
 
-        .no-border td, .no-border th {
+        .no-border td,
+        .no-border th {
             border: none;
         }
 
@@ -138,8 +159,9 @@
         </tr>
         <tr>
             <th>Bulan</th>
-            <td>: {{ DateTime::createFromFormat('!m', $bulanan->bulan)->format('F') }}</td>
+            <td>: {{ $bulanIndo[$bulanan->bulan] ?? '-' }}</td>
         </tr>
+
         <tr>
             <th>Tahun</th>
             <td>: {{ $bulanan->tahun }}</td>
@@ -192,4 +214,5 @@
     </div>
 
 </body>
+
 </html>

@@ -16,6 +16,13 @@ return new class extends Migration
             $table->decimal('total_luas_ksm', 10, 2);
             $table->decimal('total_nominal', 15, 2);
 
+            // SNAPSHOT DATA PETANI (untuk histori tidak berubah)
+            $table->string('nama_petani_snapshot')->nullable();
+            $table->string('nik_petani_snapshot')->nullable();
+            $table->string('alamat_petani_snapshot')->nullable();
+            $table->string('nomor_plasma_snapshot')->nullable();
+            $table->string('nomor_koperasi_snapshot')->nullable();
+
             $table->timestamps();
 
             $table->foreign('id_bagi_periode')->references('id_bagi_periode')->on('bagi_hasil_periode')->onDelete('cascade');
