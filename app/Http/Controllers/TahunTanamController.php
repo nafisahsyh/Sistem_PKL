@@ -25,10 +25,6 @@ class TahunTanamController extends Controller
     {
         $request->validate([
             'tahun' => 'required|digits:4|unique:tahun_tanam,tahun',
-        ], [
-            'tahun.required' => 'Tahun wajib diisi.',
-            'tahun.digits' => 'Tahun harus 4 digit.',
-            'tahun.unique' => 'Tahun sudah ada, silakan masukkan tahun lain.',
         ]);
 
         Tahun_Tanam::create([
@@ -50,10 +46,6 @@ class TahunTanamController extends Controller
     {
         $request->validate([
             'tahun' => 'required|digits:4|unique:tahun_tanam,tahun,' . $id . ',id_tahun_tanam',
-        ], [
-            'tahun.required' => 'Tahun wajib diisi.',
-            'tahun.digits' => 'Tahun harus 4 digit.',
-            'tahun.unique' => 'Tahun sudah ada, silakan masukkan tahun lain.',
         ]);
 
         $tahun_tanam = Tahun_Tanam::findOrFail($id);
