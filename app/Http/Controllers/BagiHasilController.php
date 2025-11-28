@@ -40,31 +40,42 @@ class BagiHasilController extends Controller
             $query->where('id_tahun_tanam', $request->id_tahun_tanam);
         }
 
+        // FILTER PERIODE (YYYY-MM)
+        if ($request->filled('bulan_start')) {
+            $query->whereRaw("
+            CONCAT(tahun, '-', LPAD(bulan,2,'0')) >= ?
+        ", [$request->bulan_start]);
+        }
+
+        if ($request->filled('bulan_end')) {
+            $query->whereRaw("
+            CONCAT(tahun, '-', LPAD(bulan,2,'0')) <= ?
+        ", [$request->bulan_end]);
+        }
+
         // SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
-                $q->whereHas('desa', function ($q2) use ($search) {
-                    $q2->where('desa', 'like', "%$search%");
-                })
-                    ->orWhereHas('tahunTanam', function ($q2) use ($search) {
-                        $q2->where('tahun', 'like', "%$search%");
-                    });
+                $q->whereHas('desa', fn($d) => $d->where('desa', 'like', "%$search%"))
+                    ->orWhereHas('tahunTanam', fn($t) => $t->where('tahun', 'like', "%$search%"));
             });
         }
 
-        // ORDER BY → tahun terbaru, bulan terbaru
+        // ORDER
         $bulanan = $query->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
             ->paginate(20)
-            ->withQueryString(); // biar search & filter tetap saat pagination
+            ->withQueryString();
 
         return view('bagihasil.index', [
-            'bulanan' => $bulanan,
-            'desa' => Desa::all(),
-            'tahunTanam' => Tahun_Tanam::all(),
+            'bulanan'     => $bulanan,
+            'desa'        => Desa::all(),
+            'tahunTanam'  => Tahun_Tanam::all(),
         ]);
     }
+
 
     public function create()
     {
@@ -549,22 +560,49 @@ class BagiHasilController extends Controller
     }
 
     public function cetakPdf(Request $request)
-
     {
         $query = BagiHasilBulanan::with(['desa', 'tahunTanam']);
 
+        // Filter Desa
         if ($request->filled('id_desa')) {
             $query->where('id_desa', $request->id_desa);
         }
 
+        // Filter Tahun Tanam
         if ($request->filled('id_tahun_tanam')) {
             $query->where('id_tahun_tanam', $request->id_tahun_tanam);
         }
 
-        $bulanan = $query->get();
+        // Filter Periode - Bulan & Tahun
+        if ($request->filled('bulan_start')) {
+            [$startYear, $startMonth] = explode('-', $request->bulan_start);
+            $query->where(function ($q) use ($startYear, $startMonth) {
+                $q->where('tahun', '>', $startYear)
+                    ->orWhere(function ($q2) use ($startYear, $startMonth) {
+                        $q2->where('tahun', $startYear)
+                            ->where('bulan', '>=', $startMonth);
+                    });
+            });
+        }
+
+        if ($request->filled('bulan_end')) {
+            [$endYear, $endMonth] = explode('-', $request->bulan_end);
+            $query->where(function ($q) use ($endYear, $endMonth) {
+                $q->where('tahun', '<', $endYear)
+                    ->orWhere(function ($q2) use ($endYear, $endMonth) {
+                        $q2->where('tahun', $endYear)
+                            ->where('bulan', '<=', $endMonth);
+                    });
+            });
+        }
+
+        // Ambil data akhir
+        $bulanan = $query->orderBy('tahun', 'desc')
+            ->orderBy('bulan', 'desc')
+            ->get();
 
         $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
-            ->setPaper('a4', 'potrait');
+            ->setPaper('a4', 'portrait');
 
         return $pdf->stream('laporan-bagi-hasil.pdf');
     }

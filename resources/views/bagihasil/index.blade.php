@@ -12,7 +12,7 @@
         {{-- HEADER + BUTTON TAMBAH --}}
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="text-brown mb-0">Bagi Hasil Per Bulan</h3>
-            <a href="{{ route('bagi-hasil-bulanan.list-pdf') }}?id_desa={{ request('id_desa') }}&id_tahun_tanam={{ request('id_tahun_tanam') }}"
+            <a href="{{ route('bagi-hasil-bulanan.list-pdf') }}?id_desa={{ request('id_desa') }}&id_tahun_tanam={{ request('id_tahun_tanam') }}&bulan_start={{ request('bulan_start') }}&bulan_end={{ request('bulan_end') }}"
                 target="_blank" class="btn btn-danger">
                 <i class="fas fa-file-pdf"></i> Cetak PDF
             </a>
@@ -38,17 +38,31 @@
                         </button>
                     </div>
 
-                    {{-- SEARCH pindahkan ke sini --}}
                     <form action="{{ route('bagi-hasil-bulanan.index') }}" method="GET"
-                        class="d-flex align-items-start flex-wrap ms-auto">
+                        class="d-flex align-items-start flex-wrap justify-content-end">
 
-                        {{-- Keep filters --}}
+                        {{-- Keep filter desa & tahun tanam --}}
                         @if (request()->filled('id_desa'))
                             <input type="hidden" name="id_desa" value="{{ request('id_desa') }}">
                         @endif
                         @if (request()->filled('id_tahun_tanam'))
                             <input type="hidden" name="id_tahun_tanam" value="{{ request('id_tahun_tanam') }}">
                         @endif
+
+                        {{-- FILTER PERIODE --}}
+                        <div class="month-wrap me-2">
+                            <input type="month" name="bulan_start"
+                                class="form-control form-control-sm auto-submit month-input"
+                                value="{{ request('bulan_start') }}">
+                            <span class="month-label">Bulan Awal</span>
+                        </div>
+
+                        <div class="month-wrap me-2">
+                            <input type="month" name="bulan_end"
+                                class="form-control form-control-sm auto-submit month-input"
+                                value="{{ request('bulan_end') }}">
+                            <span class="month-label">Bulan Akhir</span>
+                        </div>
 
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari desa atau tahun tanam..." value="{{ request('search') }}"
@@ -235,7 +249,9 @@
                 </form>
             </div>
         </div>
+
     </div>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
@@ -305,4 +321,13 @@
             });
         </script>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.auto-submit').forEach(input => {
+                input.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            });
+        });
+    </script>
 @endsection

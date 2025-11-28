@@ -945,3 +945,38 @@ input.form-control {
     padding: 0.375rem 0.75rem;
     /* padding default Bootstrap */
 }
+
+.month-wrap {
+    position: relative;
+    width: 150px;
+}
+
+.month-input {
+    position: relative;
+    z-index: 2;
+}
+
+/* Placeholder palsu */
+.month-label {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 13px;
+    pointer-events: none; /* tidak mengganggu klik */
+    transition: 0.15s;
+    opacity: 0.7;
+}
+
+/* Sembunyikan saat input ada value */
+.month-input:not(:placeholder-shown) + .month-label,
+.month-input[value]:not([value=""]) + .month-label {
+    opacity: 0;
+}
+
+/* Paksakan icon tanggal mepet kanan */
+.month-input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 3px;
+}
