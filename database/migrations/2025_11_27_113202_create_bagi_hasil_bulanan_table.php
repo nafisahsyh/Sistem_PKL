@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->bigIncrements('id_bagi_bulanan');
             $table->unsignedBigInteger('id_desa');
             $table->unsignedBigInteger('id_tahun_tanam');
+            $table->decimal('luasan_total_snapshot', 10, 2)->nullable();
             $table->unsignedTinyInteger('bulan'); // 1–12
             $table->year('tahun');
             $table->date('tanggal_bagi');

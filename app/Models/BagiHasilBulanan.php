@@ -27,5 +27,8 @@ class BagiHasilBulanan extends Model
     {
         return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam');
     }
-
+    public function periode()
+    {
+        return $this->hasOne(BagiHasilPeriode::class, 'id_bagi_bulanan', 'id_bagi_bulanan');
+    }
 }

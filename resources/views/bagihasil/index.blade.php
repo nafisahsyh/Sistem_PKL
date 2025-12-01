@@ -103,23 +103,7 @@
                                 <td>{{ $b->desa->desa }}</td>
                                 <td class="text-center">{{ $b->tahunTanam->tahun }}</td>
                                 <td class="text-center">
-                                    @php
-                                        $totalLuasM2 = \App\Models\DetailKepemilikan::where('status_pengelolaan', 'ksm')
-                                            ->where('status_kepemilikan', 'aktif')
-                                            ->whereHas(
-                                                'lahan',
-                                                fn($q) => $q
-                                                    ->where('id_desa', $b->id_desa)
-                                                    ->where('id_tahun_tanam', $b->id_tahun_tanam),
-                                            )
-                                            ->with('lahan')
-                                            ->get()
-                                            ->sum(fn($item) => $item->lahan->luas_peta ?? 0);
-
-                                        $totalLuasHa = $totalLuasM2 / 10000;
-                                    @endphp
-
-                                    {{ number_format($totalLuasHa, 2) }} Ha
+                                    {{ number_format($b->luasan_total_snapshot, 2) }} Ha
                                 </td>
                                 <td class="text-center">
                                     @php
