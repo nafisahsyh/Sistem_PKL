@@ -155,9 +155,12 @@ class BagiHasilController extends Controller
             // Hitung total luas lahan (Ha)
             $totalLuasHa = $kelola->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
 
+
             if ($totalLuasHa == 0) {
                 throw new \Exception('Total luas lahan 0, bagi hasil tidak bisa diproses.');
             }
+            $bulan->luasan_total_snapshot = $totalLuasHa;
+            $bulan->save();
 
             foreach ($kelola as $kepemilikan) {
                 $luasHa = ($kepemilikan->lahan->luas_peta ?? 0) / 10000;
@@ -429,6 +432,7 @@ class BagiHasilController extends Controller
         $petaniData = $periode
             ? BagiHasilPetani::where('id_bagi_periode', $periode->id_bagi_periode)
             ->select(
+                'id_petani',
                 'nama_petani_snapshot as nama_petani',
                 'nik_petani_snapshot as nik_petani',
                 'nomor_plasma_snapshot as no_plasma',
@@ -437,19 +441,21 @@ class BagiHasilController extends Controller
                 'total_nominal as nominal'
             )
             ->get()
-            ->groupBy('nik_petani') // gunakan 'nik_petani_snapshot' jika pakai kolom snapshot
+            ->groupBy('id_petani')   // ← FIX TERPENTING
             ->map(function ($group) {
                 return [
+                    'id_petani'   => $group->first()->id_petani,
                     'nama_petani' => $group->first()->nama_petani,
-                    'nik_petani' => $group->first()->nik_petani,
-                    'no_plasma' => $group->first()->no_plasma,
+                    'nik_petani'  => $group->first()->nik_petani,
+                    'no_plasma'   => $group->first()->no_plasma,
                     'no_koperasi' => $group->first()->no_koperasi,
-                    'luas_ha' => $group->sum('luas_ha'),       // akumulasi luas
-                    'nominal' => $group->sum('nominal'),       // akumulasi nominal
+                    'luas_ha'     => $group->sum('luas_ha'),
+                    'nominal'     => $group->sum('nominal'),
                 ];
             })
             ->values()
             : collect();
+
 
         // Filter search jika ada
         $search = request('search');
@@ -486,8 +492,6 @@ class BagiHasilController extends Controller
             'noStart' => $noStart
         ]);
     }
-
-
 
     //Mengambil data petani untuk PDF dari Show()
 

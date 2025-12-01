@@ -68,7 +68,9 @@
                             <td>{{ number_format($totalLuasHa, 2) }}</td>
                             <td>{{ $namaBulan[$bulanan->bulan] ?? '-' }}</td>
                             <td>{{ $bulanan->tahun }}</td>
-                            <td>{{ \Carbon\Carbon::parse($bulanan->tanggal_bagi)->format('d-m-Y') }}</td>
+                            <td>
+                                {{ $bulanan->tanggal_bagi ? \Carbon\Carbon::parse($bulanan->tanggal_bagi)->format('d-m-Y') : '-' }}
+                            </td>
                             <td>Rp {{ number_format($bulanan->total_bagian, 0, ',', '.') }}</td>
 
                         </tr>
