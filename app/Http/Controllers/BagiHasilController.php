@@ -70,9 +70,9 @@ class BagiHasilController extends Controller
             ->withQueryString();
 
         return view('bagihasil.index', [
-            'bulanan'     => $bulanan,
-            'desa'        => Desa::all(),
-            'tahunTanam'  => Tahun_Tanam::all(),
+            'bulanan' => $bulanan,
+            'desa' => Desa::all(),
+            'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
 
@@ -431,29 +431,29 @@ class BagiHasilController extends Controller
         // Ambil snapshot petani dan akumulasi per petani
         $petaniData = $periode
             ? BagiHasilPetani::where('id_bagi_periode', $periode->id_bagi_periode)
-            ->select(
-                'id_petani',
-                'nama_petani_snapshot as nama_petani',
-                'nik_petani_snapshot as nik_petani',
-                'nomor_plasma_snapshot as no_plasma',
-                'nomor_koperasi_snapshot as no_koperasi',
-                'total_luas_ksm as luas_ha',
-                'total_nominal as nominal'
-            )
-            ->get()
-            ->groupBy('id_petani')   // ← FIX TERPENTING
-            ->map(function ($group) {
-                return [
-                    'id_petani'   => $group->first()->id_petani,
-                    'nama_petani' => $group->first()->nama_petani,
-                    'nik_petani'  => $group->first()->nik_petani,
-                    'no_plasma'   => $group->first()->no_plasma,
-                    'no_koperasi' => $group->first()->no_koperasi,
-                    'luas_ha'     => $group->sum('luas_ha'),
-                    'nominal'     => $group->sum('nominal'),
-                ];
-            })
-            ->values()
+                ->select(
+                    'id_petani',
+                    'nama_petani_snapshot as nama_petani',
+                    'nik_petani_snapshot as nik_petani',
+                    'nomor_plasma_snapshot as no_plasma',
+                    'nomor_koperasi_snapshot as no_koperasi',
+                    'total_luas_ksm as luas_ha',
+                    'total_nominal as nominal'
+                )
+                ->get()
+                ->groupBy('id_petani')   // ← FIX TERPENTING
+                ->map(function ($group) {
+                    return [
+                        'id_petani' => $group->first()->id_petani,
+                        'nama_petani' => $group->first()->nama_petani,
+                        'nik_petani' => $group->first()->nik_petani,
+                        'no_plasma' => $group->first()->no_plasma,
+                        'no_koperasi' => $group->first()->no_koperasi,
+                        'luas_ha' => $group->sum('luas_ha'),
+                        'nominal' => $group->sum('nominal'),
+                    ];
+                })
+                ->values()
             : collect();
 
 
@@ -472,12 +472,12 @@ class BagiHasilController extends Controller
         $page = request()->get('page', 1);
         $offset = ($page - 1) * $perPage;
 
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginated = new LengthAwarePaginator(
             $petaniData->slice($offset, $perPage)->values(),
             $petaniData->count(),
             $perPage,
             $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            ['path' => Paginator::resolveCurrentPath()]
         );
 
         $noStart = ($page - 1) * $perPage + 1;
@@ -494,61 +494,55 @@ class BagiHasilController extends Controller
     }
 
     //Mengambil data petani untuk PDF dari Show()
-
     public function detailPdf($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
 
-        // Ambil semua detail petani
-        $petaniList = DetailKepemilikan::where('status_pengelolaan', 'ksm')
-            ->where('status_kepemilikan', 'aktif')
-            ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
-            ->whereHas(
-                'lahan',
-                fn($q) =>
-                $q->where('id_desa', $bulanan->id_desa)
-                    ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
-            )
-            ->with(['kepemilikan.petani', 'kepemilikan', 'lahan'])
-            ->get();
+        // Cari periode yang sesuai (sama seperti show)
+        $periode = BagiHasilPeriode::where('id_desa', $bulanan->id_desa)
+            ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+            ->where('bulan_akhir', $bulanan->bulan)
+            ->where('tahun', $bulanan->tahun)
+            ->first();
 
-        // Hitung total luas keseluruhan
-        $totalLuasHa = $petaniList->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
+        // Ambil data snapshot dari BagiHasilPetani
+        $petaniData = $periode
+            ? BagiHasilPetani::where('id_bagi_periode', $periode->id_bagi_periode)
+                ->select(
+                    'id_petani',
+                    'nama_petani_snapshot as nama_petani',
+                    'nik_petani_snapshot as nik_petani',
+                    'nomor_plasma_snapshot as no_plasma',
+                    'nomor_koperasi_snapshot as no_koperasi',
+                    'total_luas_ksm as luas_ha',
+                    'total_nominal as nominal'
+                )
+                ->get()
+                ->groupBy('id_petani')
+                ->map(function ($group) {
+                    return [
+                        'id_petani' => $group->first()->id_petani,
+                        'nama_petani' => $group->first()->nama_petani,
+                        'nik_petani' => $group->first()->nik_petani,
+                        'no_plasma' => $group->first()->no_plasma,
+                        'no_koperasi' => $group->first()->no_koperasi,
+                        'luas_ha' => $group->sum('luas_ha'),
+                        'nominal' => $group->sum('nominal'),
+                    ];
+                })
+                ->values()
+            : collect();
 
-        // Group per petani
-        $petaniGrouped = $petaniList->groupBy(fn($item) => $item->kepemilikan->id_petani);
-
-        // Data untuk PDF (harus format ARRAY)
-        $petaniData = collect();
-
-        foreach ($petaniGrouped as $items) {
-
-            $kepemilikan = $items->first()->kepemilikan;
-            $petani = $kepemilikan->petani;
-
-            $totalLuasPetani = $items->sum(fn($i) => ($i->lahan->luas_peta ?? 0) / 10000);
-
-            $nominal = $totalLuasHa > 0
-                ? ($bulanan->total_bagian / $totalLuasHa) * $totalLuasPetani
-                : 0;
-
-            $petaniData->push([
-                'nomor_anggota_plasma' => $petani->nomor_anggota_plasma ?? '-',
-                'nomor_anggota_koperasi' => $petani->nomor_anggota_koperasi ?? '-',
-                'nama_petani' => $petani->nama ?? '-',
-                'luas_ha' => $totalLuasPetani,
-                'nominal' => $nominal,
-            ]);
-        }
+        // Total luas snapshot
+        $totalLuasHa = $petaniData->sum('luas_ha');
 
         // Generate PDF
         $pdf = Pdf::loadView('bagihasil.pdf_detail', [
             'bulanan' => $bulanan,
-            'petaniData' => $petaniData, // COLLECTION tapi valuenya array
+            'petaniData' => $petaniData,
             'totalLuasHa' => $totalLuasHa,
         ]);
 
-        // Nama file otomatis
         $namaFile =
             'Bagi Hasil - ' .
             $bulanan->desa->desa . ' - ' .

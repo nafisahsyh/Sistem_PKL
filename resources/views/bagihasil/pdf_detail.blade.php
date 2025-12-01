@@ -206,8 +206,8 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $p['nama_petani'] }}</td>
-                    <td>{{ $p['nomor_anggota_plasma'] ?? '-' }}</td>
-                    <td>{{ $p['nomor_anggota_koperasi'] ?? '-' }}</td>
+                    <td>{{ $p['no_plasma'] ?? '-' }}</td>
+                    <td>{{ $p['no_koperasi'] ?? '-' }}</td>
                     <td>{{ number_format($p['luas_ha'], 2, ',', '.') }}</td>
                     <td>Rp {{ number_format($p['nominal'], 2, ',', '.') }}</td>
                 </tr>
@@ -221,4 +221,5 @@
         <strong>{{ Auth::user()->nama }}</strong>
     </div>
 </body>
+
 </html>
