@@ -920,7 +920,6 @@ input.form-control {
 
 /* Batasi tinggi dropdown Choices.js */
 .choices__list--dropdown {
-    max-height: 300px;
     /* tinggi dropdown */
     overflow-y: auto;
     /* scroll jika item lebih tinggi */

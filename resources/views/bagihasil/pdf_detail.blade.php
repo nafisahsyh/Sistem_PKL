@@ -220,7 +220,5 @@
         <p>Mengetahui,</p>
         <strong>{{ Auth::user()->nama }}</strong>
     </div>
-
 </body>
-
 </html>

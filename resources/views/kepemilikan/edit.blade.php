@@ -1027,9 +1027,7 @@
                                     <label class="form-label">Jumlah PBB</label>
                                     <input type="text" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                                 </div>
-                                <div class="mt-2 mb-2">
-                                    <h6 class="text-brown mb-3">Koordinat Lahan</h6>
-                                </div>
+                                
                             <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
