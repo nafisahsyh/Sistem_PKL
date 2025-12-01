@@ -96,8 +96,7 @@
                         <span class="input-group-text rp-addon">Rp</span>
                         <input type="text" name="total_bagian" id="total_bagian"
                             class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
-                            value="{{ old('total_bagian', $bulanan->total_bagian) }}" placeholder="Masukkan total bagian"
-                            required>
+                            value="{{ old('total_bagian', 0) }}" placeholder="Masukkan total bagian" required>
                         @error('total_bagian')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

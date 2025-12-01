@@ -95,7 +95,7 @@ class BagiHasilController extends Controller
     // Input bagi hasil per bulan
     public function storeBulanan(Request $request)
     {
-        //Konversi menghilangkan titik koma
+        // Konversi menghilangkan Rp, titik, spasi
         $request->merge([
             'total_bagian' => str_replace(['Rp', '.', ' '], '', $request->total_bagian)
         ]);
@@ -106,7 +106,7 @@ class BagiHasilController extends Controller
             'bulan' => 'required|integer|min:1|max:12',
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
-            'total_bagian' => 'required|numeric',
+            'total_bagian' => 'required|numeric|min:1',
         ]);
 
         DB::transaction(function () use ($data) {
@@ -116,22 +116,13 @@ class BagiHasilController extends Controller
 
             // Cari bulan sebelumnya
             $prevMonth = $data['bulan'] - 1;
+            $bulanSebelumnya = null;
             if ($prevMonth >= 1) {
                 $bulanSebelumnya = BagiHasilBulanan::where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
                     ->where('bulan', $prevMonth)
                     ->where('tahun', $data['tahun'])
                     ->first();
-            }
-
-            // Cek periode
-            if (!empty($bulanSebelumnya)) {
-                $periodeExist = BagiHasilPeriode::where('id_desa', $data['id_desa'])
-                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->where('bulan_awal', $prevMonth)
-                    ->where('bulan_akhir', $data['bulan'])
-                    ->where('tahun', $data['tahun'])
-                    ->exists();
             }
 
             // Total periode
@@ -148,7 +139,7 @@ class BagiHasilController extends Controller
                 'total_periode' => $totalPeriode,
             ]);
 
-            // Ambil petani aktif KSM melalui DetailKepemilikan
+            // Ambil petani aktif KSM saat ini
             $kelola = DetailKepemilikan::where('status_pengelolaan', 'ksm')
                 ->where('status_kepemilikan', 'aktif')
                 ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
@@ -161,8 +152,7 @@ class BagiHasilController extends Controller
                 ->with(['lahan', 'kepemilikan.petani'])
                 ->get();
 
-            // Hitung total luas lahan
-            // Hitung total luas lahan (dari m² ke Ha)
+            // Hitung total luas lahan (Ha)
             $totalLuasHa = $kelola->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
 
             if ($totalLuasHa == 0) {
@@ -170,23 +160,28 @@ class BagiHasilController extends Controller
             }
 
             foreach ($kelola as $kepemilikan) {
-                // Luas tiap petani dalam Ha
                 $luasHa = ($kepemilikan->lahan->luas_peta ?? 0) / 10000;
-
-                // Hitung nominal berdasarkan Ha
                 $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $luasHa;
 
-                $petaniId = $kepemilikan->kepemilikan->id_petani;
+                $petani = $kepemilikan->kepemilikan->petani;
 
+                // Simpan BagiHasilPetani dengan snapshot
                 BagiHasilPetani::create([
                     'id_bagi_periode' => $periode->id_bagi_periode,
-                    'id_petani' => $petaniId,
-                    'total_luas_ksm' => $luasHa, // simpan dalam Ha
+                    'id_petani' => $petani->id_petani,
+                    'total_luas_ksm' => $luasHa,
                     'total_nominal' => $nominalPetani,
+                    // SNAPSHOT PETANI
+                    'nama_petani_snapshot' => $petani->nama ?? null,
+                    'nik_petani_snapshot' => $petani->NIK ?? null,
+                    'alamat_petani_snapshot' => $petani->alamat ?? null,
+                    'nomor_plasma_snapshot' => $petani->nomor_anggota_plasma ?? null,
+                    'nomor_koperasi_snapshot' => $petani->nomor_anggota_koperasi ?? null,
                 ]);
 
+                // Update saldo
                 $saldo = Saldo::firstOrCreate([
-                    'id_petani' => $petaniId,
+                    'id_petani' => $petani->id_petani,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                 ]);
@@ -194,8 +189,9 @@ class BagiHasilController extends Controller
                 $saldo->saldo += $nominalPetani;
                 $saldo->save();
 
+                // Buat transaksi
                 Transaksi::create([
-                    'id_petani' => $petaniId,
+                    'id_petani' => $petani->id_petani,
                     'tipe' => 'credit_bagihasil',
                     'metode' => null,
                     'nominal' => $nominalPetani,
@@ -208,6 +204,7 @@ class BagiHasilController extends Controller
         return redirect()->route('bagi-hasil-bulanan.index')
             ->with('success', 'Data bulanan dan periode berhasil diproses.');
     }
+
 
     public function getTotalLuas(Request $request)
     {
@@ -270,7 +267,7 @@ class BagiHasilController extends Controller
             'bulan' => 'required|integer|min:1|max:12',
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
-            'total_bagian' => 'required|numeric',
+            'total_bagian' => 'required|numeric|min:1',
         ]);
 
 
@@ -417,73 +414,70 @@ class BagiHasilController extends Controller
         return redirect()->route('bagi-hasil-bulanan.index')->with('success', 'Data berhasil dihapus.');
     }
 
-
     public function show($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
 
-        // Ambil semua detail petani
-        $petaniList = DetailKepemilikan::where('status_pengelolaan', 'ksm')
-            ->where('status_kepemilikan', 'aktif')
-            ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
-            ->whereHas(
-                'lahan',
-                fn($q) =>
-                $q->where('id_desa', $bulanan->id_desa)
-                    ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+        // Cari periode yang sesuai
+        $periode = BagiHasilPeriode::where('id_desa', $bulanan->id_desa)
+            ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+            ->where('bulan_akhir', $bulanan->bulan)
+            ->where('tahun', $bulanan->tahun)
+            ->first();
+
+        // Ambil snapshot petani dan akumulasi per petani
+        $petaniData = $periode
+            ? BagiHasilPetani::where('id_bagi_periode', $periode->id_bagi_periode)
+            ->select(
+                'nama_petani_snapshot as nama_petani',
+                'nik_petani_snapshot as nik_petani',
+                'nomor_plasma_snapshot as no_plasma',
+                'nomor_koperasi_snapshot as no_koperasi',
+                'total_luas_ksm as luas_ha',
+                'total_nominal as nominal'
             )
-            ->with(['kepemilikan.petani', 'kepemilikan', 'lahan'])
-            ->get();
+            ->get()
+            ->groupBy('nik_petani') // gunakan 'nik_petani_snapshot' jika pakai kolom snapshot
+            ->map(function ($group) {
+                return [
+                    'nama_petani' => $group->first()->nama_petani,
+                    'nik_petani' => $group->first()->nik_petani,
+                    'no_plasma' => $group->first()->no_plasma,
+                    'no_koperasi' => $group->first()->no_koperasi,
+                    'luas_ha' => $group->sum('luas_ha'),       // akumulasi luas
+                    'nominal' => $group->sum('nominal'),       // akumulasi nominal
+                ];
+            })
+            ->values()
+            : collect();
 
         // Filter search jika ada
         $search = request('search');
         if ($search) {
-            $petaniList = $petaniList->filter(function ($item) use ($search) {
-                $p = $item->kepemilikan->petani;
-                return str_contains($p->nomor_anggota_plasma, $search)
-                    || str_contains($p->nomor_anggota_koperasi, $search)
-                    || str_contains(strtolower($p->nama), strtolower($search));
-            });
+            $petaniData = $petaniData->filter(function ($p) use ($search) {
+                return str_contains(strtolower($p['no_plasma'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($p['no_koperasi'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($p['nama_petani'] ?? ''), strtolower($search));
+            })->values();
         }
 
-        // Hitung total luas
-        $totalLuasHa = $petaniList->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
-
-        // Group per petani
-        $petaniGrouped = $petaniList->groupBy(fn($item) => $item->kepemilikan->id_petani);
-
-        $petaniData = collect();
-        foreach ($petaniGrouped as $kepemilikanId => $items) {
-            $kepemilikan = $items->first()->kepemilikan;
-            $petani = $kepemilikan->petani;
-
-            $totalLuasPetani = $items->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
-            $nominal = $totalLuasHa > 0 ? ($bulanan->total_bagian / $totalLuasHa) * $totalLuasPetani : 0;
-
-            $petaniData->push([
-                'no_plasma' => $petani->nomor_anggota_plasma ?? '-',
-                'no_koperasi' => $petani->nomor_anggota_koperasi ?? '-',
-                'nama_petani' => $petani->nama ?? '-',
-                'luas_ha' => $totalLuasPetani,
-                'nominal' => $nominal,
-            ]);
-        }
-
-        // --- Pagination manual ---
-        $perPage = 10; // bisa ganti 15
+        // Pagination manual
+        $perPage = 10;
         $page = request()->get('page', 1);
         $offset = ($page - 1) * $perPage;
 
-        $paginated = new LengthAwarePaginator(
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
             $petaniData->slice($offset, $perPage)->values(),
             $petaniData->count(),
             $perPage,
             $page,
-            ['path' => Paginator::resolveCurrentPath()]
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
         );
 
-        // Tambahkan nomor urut per halaman
         $noStart = ($page - 1) * $perPage + 1;
+
+        // Total luas lahan dari snapshot
+        $totalLuasHa = $petaniData->sum('luas_ha');
 
         return view('bagihasil.detail', [
             'bulanan' => $bulanan,
@@ -492,6 +486,8 @@ class BagiHasilController extends Controller
             'noStart' => $noStart
         ]);
     }
+
+
 
     //Mengambil data petani untuk PDF dari Show()
 
