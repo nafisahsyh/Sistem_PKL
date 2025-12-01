@@ -14,7 +14,9 @@
             margin: 25px;
         }
 
-        h2, h3, h4 {
+        h2,
+        h3,
+        h4 {
             text-align: center;
             margin: 0;
             padding: 0;
@@ -73,7 +75,8 @@
             text-align: left;
         }
 
-        .no-border td, .no-border th {
+        .no-border td,
+        .no-border th {
             border: none;
         }
 
@@ -88,6 +91,14 @@
         .signature {
             margin-top: 40px;
             text-align: right;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
         }
     </style>
 </head>
@@ -192,4 +203,5 @@
     </div>
 
 </body>
+
 </html>
