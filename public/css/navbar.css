@@ -963,14 +963,15 @@ input.form-control {
     transform: translateY(-50%);
     color: #888;
     font-size: 13px;
-    pointer-events: none; /* tidak mengganggu klik */
+    pointer-events: none;
+    /* tidak mengganggu klik */
     transition: 0.15s;
     opacity: 0.7;
 }
 
 /* Sembunyikan saat input ada value */
-.month-input:not(:placeholder-shown) + .month-label,
-.month-input[value]:not([value=""]) + .month-label {
+.month-input:not(:placeholder-shown)+.month-label,
+.month-input[value]:not([value=""])+.month-label {
     opacity: 0;
 }
 
@@ -978,4 +979,8 @@ input.form-control {
 .month-input::-webkit-calendar-picker-indicator {
     position: absolute;
     right: 3px;
+}
+
+.modal-wide {
+    max-width: 600px;
 }

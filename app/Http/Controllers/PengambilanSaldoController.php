@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Desa;
-use App\Models\Tahun_Tanam;
-use App\Models\BagiHasilBulanan;
-use App\Models\BagiHasilPetani;
 use App\Models\Saldo;
 use App\Models\Transaksi;
+use Nette\Utils\Paginator;
+use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
+use App\Models\BagiHasilPetani;
+use App\Models\BagiHasilBulanan;
 use Illuminate\Routing\Controller;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PengambilanSaldoController extends Controller
 {
@@ -21,6 +23,9 @@ class PengambilanSaldoController extends Controller
     {
         $query = BagiHasilBulanan::with(['desa', 'tahunTanam']);
 
+        // =========================
+        //  FILTER
+        // =========================
         if ($request->filled('id_desa')) {
             $query->where('id_desa', $request->id_desa);
         }
@@ -29,13 +34,30 @@ class PengambilanSaldoController extends Controller
             $query->where('id_tahun_tanam', $request->id_tahun_tanam);
         }
 
+        if ($request->filled('tahun')) {
+            $query->where('tahun', $request->tahun);
+        }
+
+        if ($request->filled('periode')) {
+            $periode = (int) $request->periode;
+
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $periode * 2;
+
+            $query->whereBetween('bulan', [$bulanAwal, $bulanAkhir]);
+        }
+
+        // --- Ambil data setelah filter ---
         $bulanan = $query->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'asc')
             ->get();
 
+        // =========================
+        // GROUPING PERIODE 2 BULAN
+        // =========================
         $periode = $bulanan->groupBy(function ($item) {
-            // Hitung periode 2 bulan
-            $periodeBulan = ceil($item->bulan / 2); // 1->1, 2->1, 3->2, 4->2, dst
+            $periodeBulan = ceil($item->bulan / 2);
+
             return $item->tahun . '-' . $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $periodeBulan;
         })->map(function ($group) {
             $bulanAwal = $group->min('bulan');
@@ -54,7 +76,6 @@ class PengambilanSaldoController extends Controller
             ];
         })->values();
 
-        // Pagination manual
         $perPage = 20;
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $perPage;
@@ -73,6 +94,7 @@ class PengambilanSaldoController extends Controller
             'tahunTanam' => Tahun_Tanam::all()
         ]);
     }
+
     public function show(Request $request)
     {
         $id_bulanan = $request->id_bulanan ?? [];
@@ -180,7 +202,7 @@ class PengambilanSaldoController extends Controller
 
         $today = Carbon::today();
 
-        $nextNumber = \DB::table('transaksi')
+        $nextNumber = DB::table('transaksi')
             ->where('tipe', 'debit_pengambilan')
             ->whereDate('created_at', $today)
             ->count() + 1;
@@ -209,7 +231,7 @@ class PengambilanSaldoController extends Controller
         }
 
         // Nomor urut berikutnya
-        $nextNumber = \DB::table('transaksi')
+        $nextNumber = DB::table('transaksi')
             ->where('tipe', 'debit_pengambilan')
             ->max('id_transaksi') + 1;
 

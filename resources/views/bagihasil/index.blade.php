@@ -30,12 +30,29 @@
                         <a href="{{ route('bagi-hasil-bulanan.create') }}" class="btn btn-success">
                             <i class="fas fa-plus"></i>
                         </a>
+                        @php
+                            $filters = [
+                                'id_desa' => request('id_desa'),
+                                'id_tahun_tanam' => request('id_tahun_tanam'),
+                            ];
 
-                        {{-- BUTTON FILTER --}}
-                        <button class="btn {{ $filterAktif ? 'btn-success text-white' : 'btn-outline-success' }}"
+                            // Hitung jumlah filter aktif
+                            $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
+                        @endphp
+
+                        <button
+                            class="btn d-flex align-items-center gap-2 
+        {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
                             data-bs-toggle="modal" data-bs-target="#filterModal">
                             <i class="fas fa-filter"></i> Filter
+
+                            @if ($jumlahFilterAktif > 0)
+                                <span class="badge bg-warning text-dark">
+                                    {{ $jumlahFilterAktif }}
+                                </span>
+                            @endif
                         </button>
+
                     </div>
 
                     <form action="{{ route('bagi-hasil-bulanan.index') }}" method="GET"

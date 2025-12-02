@@ -18,16 +18,29 @@
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     {{-- Tombol Filter di kiri --}}
                     @php
-                        $filterAktif =
-                            request()->filled('desa') ||
-                            request()->filled('tahun') ||
-                            request()->filled('status_petani') ||
-                            request()->filled('status_pengelolaan');
+                        $filters = [
+                            'desa' => request('desa'),
+                            'tahun' => request('tahun'),
+                            'status_petani' => request('status_petani'),
+                            'status_pengelolaan' => request('status_pengelolaan'),
+                        ];
+
+                        // Hitung jumlah filter aktif
+                        $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
                     @endphp
 
-                    <button class="btn {{ $filterAktif ? 'btn-success text-white' : 'btn-outline-success' }}"
+
+                    <button
+                        class="btn d-flex align-items-center gap-2 
+        {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
                         data-bs-toggle="modal" data-bs-target="#filterModal" title="Filter Data">
                         <i class="fas fa-filter"></i> Filter
+
+                        @if ($jumlahFilterAktif > 0)
+                            <span class="badge bg-warning text-dark">
+                                {{ $jumlahFilterAktif }}
+                            </span>
+                        @endif
                     </button>
 
 
