@@ -15,7 +15,6 @@
                         <label for="id_desa" class="form-label">Desa <span class="text-danger">*</span></label>
                         <select name="id_desa" id="id_desa"
                             class="form-select text-kecil @error('id_desa') is-invalid @enderror" required>
-                            <option value="">Pilih Desa</option>
                             @foreach ($desa as $d)
                                 <option value="{{ $d->id_desa }}" {{ old('id_desa') == $d->id_desa ? 'selected' : '' }}>
                                     {{ $d->desa }}
@@ -32,7 +31,6 @@
                                 class="text-danger">*</span></label>
                         <select name="id_tahun_tanam" id="id_tahun_tanam"
                             class="form-select text-kecil @error('id_tahun_tanam') is-invalid @enderror" required>
-                            <option value="">Pilih Tahun Tanam</option>
                             @foreach ($tahunTanam as $t)
                                 <option value="{{ $t->id_tahun_tanam }}"
                                     {{ old('id_tahun_tanam') == $t->id_tahun_tanam ? 'selected' : '' }}>
@@ -56,7 +54,6 @@
                         <label for="bulan" class="form-label">Bulan <span class="text-danger">*</span></label>
                         <select name="bulan" id="bulan"
                             class="form-select text-kecil @error('bulan') is-invalid @enderror" required>
-                            <option value="">Pilih Bulan</option>
                             @for ($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ old('bulan') == $i ? 'selected' : '' }}>
                                     {{ \Carbon\Carbon::create()->month($i)->format('F') }}

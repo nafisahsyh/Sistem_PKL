@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\KepemilikanController;
+use App\Http\Controllers\PengambilanSaldoController;
 
 
 Route::get('/', function () {
@@ -100,6 +101,12 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
 
     Route::resource('bagi-hasil-bulanan', BagiHasilController::class);
     Route::resource('bagi-periode', BagiHasilController::class);
+
+    Route::get('/pengambilan-saldo', [PengambilanSaldoController::class, 'index'])
+        ->name('pengambilan.index');
+
+    Route::get('/pengambilan-saldo/show', [PengambilanSaldoController::class, 'show'])
+        ->name('pengambilan.show');
 });
 
 // hanya super admin

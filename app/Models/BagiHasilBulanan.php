@@ -8,6 +8,8 @@ class BagiHasilBulanan extends Model
 {
     protected $table = 'bagi_hasil_bulanan';
     protected $primaryKey = 'id_bagi_bulanan';
+    public $incrementing = true;    // <-- tambahkan ini
+    protected $keyType = 'int';     // <-- tambahkan ini
 
     protected $fillable = [
         'id_desa',
@@ -26,9 +28,5 @@ class BagiHasilBulanan extends Model
     public function tahunTanam()
     {
         return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam');
-    }
-    public function periode()
-    {
-        return $this->hasOne(BagiHasilPeriode::class, 'id_bagi_bulanan', 'id_bagi_bulanan');
     }
 }

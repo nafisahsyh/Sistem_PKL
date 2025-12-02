@@ -10,8 +10,12 @@ return new class extends Migration
     {
         Schema::create('bagi_hasil_petani', function (Blueprint $table) {
             $table->bigIncrements('id_bagi_petani');
-            $table->unsignedBigInteger('id_bagi_periode');
             $table->unsignedBigInteger('id_petani');
+
+            // Tambahan untuk hubungkan ke lahan/desa/tahun tanam
+            $table->unsignedBigInteger('id_lahan');
+            $table->unsignedBigInteger('id_desa');
+            $table->unsignedBigInteger('id_tahun_tanam');
 
             $table->decimal('total_luas_ksm', 10, 2);
             $table->decimal('total_nominal', 15, 2);
@@ -25,8 +29,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('id_bagi_periode')->references('id_bagi_periode')->on('bagi_hasil_periode')->onDelete('cascade');
             $table->foreign('id_petani')->references('id_petani')->on('petani')->onDelete('cascade');
+            $table->foreign('id_lahan')->references('id_lahan')->on('lahan')->onDelete('cascade');
+            $table->foreign('id_desa')->references('id_desa')->on('desa')->onDelete('cascade');
+            $table->foreign('id_tahun_tanam')->references('id_tahun_tanam')->on('tahun_tanam')->onDelete('cascade');
         });
     }
 

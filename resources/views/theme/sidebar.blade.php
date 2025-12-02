@@ -79,7 +79,7 @@
                     </a>
 
                     <div class="collapse 
-    {{ request()->is('bagi-hasil-bulanan') || request()->is('penjualan') || request()->is('bagi-hasil') ? 'show' : '' }}"
+    {{ request()->is('bagi-hasil-bulanan') || request()->is('penjualan') || request()->is('pengambilan-saldo*') ? 'show' : '' }}"
                         id="collapseTransaksi">
                         <nav class="sb-sidenav-menu-nested nav">
 
@@ -94,10 +94,12 @@
                                 Kelola Mandiri
                             </a>
 
-                            <a class="nav-link {{ request()->is('bagi-hasil') ? 'active' : '' }}" href="/bagi-hasil">
+                            <a class="nav-link {{ request()->is('pengambilan-saldo*') ? 'active' : '' }}"
+                                href="{{ route('pengambilan.index') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-people-arrows"></i></div>
                                 Bagi Hasil
                             </a>
+
 
                         </nav>
                     </div>

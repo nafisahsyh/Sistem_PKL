@@ -10,8 +10,11 @@ class BagiHasilPetani extends Model
     protected $primaryKey = 'id_bagi_petani';
 
     protected $fillable = [
-        'id_bagi_periode',
+        'id_bagi_bulanan',
         'id_petani',
+        'id_lahan',
+        'id_desa',
+        'id_tahun_tanam',
         'total_luas_ksm',
         'total_nominal',
 
@@ -23,13 +26,29 @@ class BagiHasilPetani extends Model
         'nomor_koperasi_snapshot',
     ];
 
-    public function periode()
+
+    public function bulanan()
     {
-        return $this->belongsTo(BagiHasilPeriode::class, 'id_bagi_periode');
+        return $this->belongsTo(BagiHasilBulanan::class, 'id_bagi_bulanan');
     }
 
     public function petani()
     {
         return $this->belongsTo(Petani::class, 'id_petani');
+    }
+
+    public function lahan()
+    {
+        return $this->belongsTo(Lahan::class, 'id_lahan');
+    }
+
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class, 'id_desa');
+    }
+
+    public function tahunTanam()
+    {
+        return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam');
     }
 }
