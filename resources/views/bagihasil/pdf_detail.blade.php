@@ -218,6 +218,8 @@
     {{-- Tanda Tangan --}}
     <div class="signature">
         <p>Mengetahui,</p>
+        <br>
+        <br>
         <strong>{{ Auth::user()->nama }}</strong>
     </div>
 </body>

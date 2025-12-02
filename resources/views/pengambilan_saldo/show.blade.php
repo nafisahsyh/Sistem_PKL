@@ -67,7 +67,9 @@
                     {{-- Search --}}
                     {{-- Search Form --}}
                     <form action="{{ route('pengambilan.show') }}" method="GET" class="d-flex align-items-center">
-                        <input type="hidden" name="id_bulanan[]" value="{{ implode(',', (array) request('id_bulanan')) }}">
+                        @foreach (request('id_bulanan') as $id)
+                            <input type="hidden" name="id_bulanan[]" value="{{ $id }}">
+                        @endforeach
                         <input type="text" name="search" class="form-control me-2"
                             placeholder="Cari Nomor atau Nama Petani..." value="{{ request('search') }}"
                             style="width: 300px; height: 38px; font-size: 0.9rem;">
@@ -106,32 +108,172 @@
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2) }}</td>
                                 <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                        data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
-                                        <i class="fa fa-file-invoice-dollar"></i>
-                                    </button>
+                                    @php
+                                        // Ambil saldo sesuai petani dan desa/tahun tanam masing-masing
+                                        $saldoPetani =
+                                            \App\Models\Saldo::where('id_petani', $p['id_petani'])
+                                                ->where('id_desa', $p['id_desa'])
+                                                ->where('id_tahun_tanam', $p['id_tahun_tanam'])
+                                                ->value('saldo') ?? 0;
+                                    @endphp
 
-                                    {{-- Modal Ambil --}}
-                                    <div class="modal fade" id="modalAmbil_{{ $p['id_petani'] }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header bg-success text-white">
-                                                    <h5 class="modal-title">Ambil Saldo</h5>
-                                                    <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Ambil saldo untuk <strong>{{ $p['nama_petani'] }}</strong>?</p>
-                                                    <p>Total: <strong>Rp
-                                                            {{ number_format($p['nominal'], 0, ',', '.') }}</strong></p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button class="btn btn-primary" disabled>Ambil (belum dibuat)</button>
-                                                </div>
+                                    @if ($saldoPetani > 0)
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
+                                            <i class="fa fa-file-invoice-dollar"></i>
+                                        </button>
+                                    @else
+                                        <span class="badge bg-secondary">Sudah diambil</span>
+                                    @endif
+                                </td>
+
+                                {{-- Modal Ambil --}}
+                                <div class="modal fade" id="modalAmbil_{{ $p['id_petani'] }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">Ambil Saldo Petani</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
+
+                                            <form action="{{ route('ambil-saldo.store') }}" method="POST">
+                                                @csrf
+
+                                                <div class="modal-body" style="padding: 15px;">
+                                                    @php
+                                                        $bulanSingkat = [
+                                                            1 => 'Jan',
+                                                            2 => 'Feb',
+                                                            3 => 'Mar',
+                                                            4 => 'Apr',
+                                                            5 => 'Mei',
+                                                            6 => 'Jun',
+                                                            7 => 'Jul',
+                                                            8 => 'Agt',
+                                                            9 => 'Sep',
+                                                            10 => 'Okt',
+                                                            11 => 'Nov',
+                                                            12 => 'Des',
+                                                        ];
+                                                    @endphp
+
+                                                    @php
+                                                        $today = now()->format('d/m/Y');
+                                                    @endphp
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">No Tanda Terima</label>
+                                                            <input type="number" name="no_urut" class="form-control" min=0
+                                                                required>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">No Bukti</label>
+                                                            <input type="text" name="no_bukti" class="form-control"
+                                                                value="{{ $nextNumber . '.' . now()->format('d/m/Y') }}"
+                                                                readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Metode</label>
+                                                            <select name="metode" class="form-select" required>
+                                                                <option value="" disabled selected>-- Pilih
+                                                                    Metode --
+                                                                </option>
+                                                                <option value="cash">Cash</option>
+                                                                <option value="transfer">Transfer</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Nama Petani</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ $p['nama_petani'] }}" readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">No Plasma</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ $p['no_plasma'] ?? '-' }}" readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">No Koperasi</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ $p['no_koperasi'] }}" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Desa</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ $desa->desa }}" readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Tahun Tanam</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ $tahunTanam->tahun }}" readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Luas Lahan (Ha)</label>
+                                                            <input type="text" class="form-control"
+                                                                value="{{ number_format($p['luas_ha'], 2, ',', '.') }}"
+                                                                readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Bagian Saldo --}}
+                                                    <div class="row mb-3">
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">
+                                                                Saldo Bulan {{ $bulanSingkat[$bulan_awal] ?? '?' }}
+                                                            </label>
+                                                            <input type="text" class="form-control"
+                                                                value="Rp {{ number_format($p['nominal_bulan_1'] ?? 0, 0, ',', '.') }}"
+                                                                readonly>
+                                                        </div>
+
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">
+                                                                Saldo Bulan {{ $bulanSingkat[$bulan_akhir] ?? '?' }}
+                                                            </label>
+                                                            <input type="text" class="form-control"
+                                                                value="Rp {{ number_format($p['nominal_bulan_2'] ?? 0, 0, ',', '.') }}"
+                                                                readonly>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label fw-bold">Total Saldo</label>
+                                                            <input type="text" class="form-control"
+                                                                value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}"
+                                                                readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- HIDDEN --}}
+                                                    <input type="hidden" name="id_petani"
+                                                        value="{{ $p['id_petani'] }}">
+                                                    @foreach ($id_bulanan as $id)
+                                                        <input type="hidden" name="id_bulanan[]"
+                                                            value="{{ $id }}">
+                                                    @endforeach
+
+                                                </div> {{-- END BODY MODAL --}}
+
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Batal</button>
+                                                    <button class="btn btn-primary"
+                                                        onclick="return confirm('Apakah Anda yakin ingin mengambil saldo petani ini? Data akan diproses dan saldo akan menjadi 0.');">
+                                                        Ambil Saldo
+                                                    </button>
+                                                </div>
+
+                                            </form>
+
                                         </div>
                                     </div>
+                                </div>
                                 </td>
                             </tr>
                         @empty

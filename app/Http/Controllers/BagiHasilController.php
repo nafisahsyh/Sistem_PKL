@@ -428,12 +428,12 @@ class BagiHasilController extends Controller
         $page = request()->get('page', 1);
         $offset = ($page - 1) * $perPage;
 
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginated = new LengthAwarePaginator(
             $petaniData->slice($offset, $perPage)->values(),
             $petaniData->count(),
             $perPage,
             $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            ['path' => Paginator::resolveCurrentPath()]
         );
 
         $noStart = ($page - 1) * $perPage + 1;
@@ -448,14 +448,13 @@ class BagiHasilController extends Controller
         ]);
     }
 
-
     //Mengambil data petani untuk PDF dari Show()
     public function detailPdf($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
 
         // Ambil data snapshot dari BagiHasilPetani langsung dari bulan
-        $petaniData = BagiHasilPetani::where('id_bagi_bulanan', $bulanan->id)
+        $petaniData = BagiHasilPetani::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
             ->select(
                 'id_petani',
                 'nama_petani_snapshot as nama_petani',
