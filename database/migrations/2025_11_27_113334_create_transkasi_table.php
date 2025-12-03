@@ -17,6 +17,11 @@ return new class extends Migration
             $table->decimal('nominal', 15, 2);
             $table->date('tanggal');
             $table->string('keterangan', 255)->nullable();
+            $table->integer('no_urut')->nullable();
+            $table->string('no_bukti')->nullable();
+            $table->string('bulan_awal', 7)->nullable();
+            $table->string('bulan_akhir', 7)->nullable();
+
 
             $table->timestamps();
 

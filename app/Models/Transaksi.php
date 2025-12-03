@@ -16,6 +16,10 @@ class Transaksi extends Model
         'nominal',
         'tanggal',
         'keterangan',
+        'no_urut',
+        'no_bukti',
+        'bulan_awal',
+        'bulan_akhir',
     ];
 
     public function petani()

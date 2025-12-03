@@ -159,8 +159,13 @@
                                                     @endphp
 
                                                     @php
-                                                        $today = now()->format('d/m/Y');
+                                                        // Hitung nomor bukti yang reset setiap hari
+                                                        $nextToday =
+                                                            \App\Models\Transaksi::where('tipe', 'debit_pengambilan')
+                                                                ->whereDate('tanggal', now()->toDateString())
+                                                                ->count() + 1;
                                                     @endphp
+
 
                                                     <div class="row mb-3">
                                                         <div class="col-4">
@@ -168,10 +173,11 @@
                                                             <input type="number" name="no_urut" class="form-control" min=0
                                                                 required>
                                                         </div>
+
                                                         <div class="col-4">
                                                             <label class="form-label fw-bold">No Bukti</label>
                                                             <input type="text" name="no_bukti" class="form-control"
-                                                                value="{{ $nextNumber . '.' . now()->format('d/m/Y') }}"
+                                                                value="{{ $nextToday . '.' . now()->format('d/m/Y') }}"
                                                                 readonly>
                                                         </div>
                                                         <div class="col-4">
@@ -257,6 +263,12 @@
                                                         <input type="hidden" name="id_bulanan[]"
                                                             value="{{ $id }}">
                                                     @endforeach
+                                                    <input type="hidden" name="bulan_awal"
+                                                        value="{{ $tahun . '-' . str_pad($bulan_awal, 2, '0', STR_PAD_LEFT) }}">
+
+                                                    <input type="hidden" name="bulan_akhir"
+                                                        value="{{ $tahun . '-' . str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT) }}">
+
 
                                                 </div> {{-- END BODY MODAL --}}
 
