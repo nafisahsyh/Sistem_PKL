@@ -171,7 +171,7 @@
                                                         <div class="col-4">
                                                             <label class="form-label fw-bold">No Tanda Terima</label>
                                                             <input type="number" name="no_urut" class="form-control" min=0
-                                                                required>
+                                                                placeholder="Isi nomor urut" required>
                                                         </div>
 
                                                         <div class="col-4">

@@ -83,7 +83,7 @@
                                         <td class="text-normal-sm">{{ $item->petaniSebelum->nama ?? '-' }}</td>
                                         <td class="text-normal-sm">{{ $item->petaniSesudah->nama ?? '-' }}</td>
                                         <td class="text-center text-normal-sm">
-                                            {{ \Carbon\Carbon::parse($item->tanggal_ganti)->format('d-m-Y') }}
+                                            {{ $item->tanggal_ganti ? \Carbon\Carbon::parse($item->tanggal_ganti)->format('d-m-Y') : '-' }}
                                         </td>
                                         <td class="text-normal-sm">{{ $item->keterangan ?? '-' }}</td>
                                         <td class="text-center d-flex justify-content-center gap-1">

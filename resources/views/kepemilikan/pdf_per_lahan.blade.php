@@ -316,11 +316,6 @@
         @endphp
 
         @if ($riwayatList->isNotEmpty())
-            {{-- Jika ini LAHAN PERTAMA, riwayat selalu pindah ke halaman berikutnya --}}
-            @if ($loop->first)
-                <div class="page-break"></div>
-            @endif
-
             <div class="section-title">Riwayat Kepemilikan Lahan</div>
             <table>
                 <thead>
@@ -338,7 +333,7 @@
                             <td>{{ $rIndex + 1 }}</td>
                             <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
                             <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') }}</td>
+                            <td>{{ $riwayat->tanggal_ganti ? \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') : '-' }}</td>
                             <td>{{ $riwayat->keterangan ?? '-' }}</td>
                         </tr>
                     @endforeach

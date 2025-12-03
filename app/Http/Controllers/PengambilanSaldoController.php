@@ -281,16 +281,23 @@ class PengambilanSaldoController extends Controller
             'bulan_akhir' => $bulan_akhir,
         ]);
 
-        // Update saldo menjadi 0
-        Saldo::where('id_petani', $idPetani)->update([
-            'saldo' => 0
-        ]);
+        $bulanan = BagiHasilBulanan::whereIn('id_bagi_bulanan', $request->id_bulanan)->get();
 
+        $desaIds = $bulanan->pluck('id_desa')->unique();
+        $tahunTanamIds = $bulanan->pluck('id_tahun_tanam')->unique();
+
+        Saldo::where('id_petani', $idPetani)
+            ->whereIn('id_desa', $desaIds)
+            ->whereIn('id_tahun_tanam', $tahunTanamIds)
+            ->update(['saldo' => 0]);
+
+        // Redirect ke struk
         return redirect()->route('ambil-saldo.struk', [
             'id' => $transaksi->id_transaksi,
             'id_petani' => $idPetani,
             'id_bulanan' => $request->id_bulanan,
         ]);
+
     }
 
 
@@ -342,16 +349,17 @@ class PengambilanSaldoController extends Controller
             ->sum('total_luas_ksm');
 
         $p = [
-            'id_petani'  => $trx->id_petani,
+            'id_petani' => $trx->id_petani,
             'nama_petani' => $petaniCollection->first()->nama_petani_snapshot ?? '-',
-            'nik_petani'  => $petaniCollection->first()->nik_petani_snapshot ?? '-',
+            'nik_petani' => $petaniCollection->first()->nik_petani_snapshot ?? '-',
             'alamat_petani' => $petaniCollection->first()->alamat_petani_snapshot ?? '-',
-            'no_plasma'   => $petaniCollection->first()->nomor_plasma_snapshot ?? '-',
+            'no_plasma' => $petaniCollection->first()->nomor_plasma_snapshot ?? '-',
             'no_koperasi' => $petaniCollection->first()->nomor_koperasi_snapshot ?? '-',
+            'no_urut'        => $trx->no_urut ?? '-',
 
-            'luas_ha'     => $luasHa,
+            'luas_ha' => $luasHa,
 
-            'nominal'     => $petaniCollection->sum('total_nominal'),
+            'nominal' => $petaniCollection->sum('total_nominal'),
 
             'nominal_bulan_1' => $idBulananAwal
                 ? $petaniCollection->where('id_bagi_bulanan', $idBulananAwal)->sum('total_nominal')
