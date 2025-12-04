@@ -114,15 +114,21 @@
                             class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text rp-addon">Rp</span>
+
+                        @php
+                            $rawTotal = old('total_bagian', (int) $bulanan->total_bagian);
+                        @endphp
+
                         <input type="text" name="total_bagian" id="total_bagian"
                             class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
-                            value="{{ old('total_bagian', $bulanan->total_bagian) }}" placeholder="Masukkan total bagian"
-                            required>
+                            value="{{ $rawTotal }}" placeholder="Masukkan total bagian" required>
+
                         @error('total_bagian')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
+
 
                 <div class="text-start mt-3">
                     <button type="submit" class="btn btn-success me-2">Update</button>
@@ -148,20 +154,19 @@
                 maxItemVisible: 5
             });
 
-            // inputan sesuai Rp
             const totalBagian = document.getElementById('total_bagian');
 
-            totalBagian.addEventListener('input', function(e) {
-                // Hapus semua karakter selain angka
-                let value = this.value.replace(/\D/g, '');
+            // Format awal dari server → 6000000 jadi 6.000.000
+            if (totalBagian.value) {
+                let clean = totalBagian.value.replace(/\D/g, '');
+                totalBagian.value = clean ? new Intl.NumberFormat('id-ID').format(clean) : '';
+            }
 
-                // Jika ada angka, format ribuan sesuai locale Indonesia
-                if (value) {
-                    this.value = new Intl.NumberFormat('id-ID').format(value);
-                } else {
-                    this.value = '';
-                }
+            totalBagian.addEventListener('input', function() {
+                let clean = this.value.replace(/\./g, '').replace(/\D/g, '');
+                this.value = clean ? new Intl.NumberFormat('id-ID').format(clean) : '';
             });
+
 
             new Choices(desaSelect, choicesOptions("Pilih Desa", "Cari desa..."));
             new Choices(tahunSelect, choicesOptions("Pilih Tahun Tanam", "Cari tahun tanam..."));

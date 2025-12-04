@@ -220,19 +220,12 @@ class BagiHasilController extends Controller
         $desa = Desa::all();
         $tahunTanam = Tahun_Tanam::all();
 
-
-        $total_luas = DetailKepemilikan::whereHas('lahan', function ($q) use ($bulanan) {
-            $q->where('id_desa', $bulanan->id_desa)
-                ->where('id_tahun_tanam', $bulanan->id_tahun_tanam);
-        })
-            ->with('lahan')
-            ->get()
-            ->sum(fn($item) => $item->lahan->luas_peta ?? 0);
-
-        $total_luas /= 10000; // convert ke Ha
+        // Pakai snapshot — ini nilai paling akurat
+        $total_luas = $bulanan->luasan_total_snapshot;
 
         return view('bagihasil.edit', compact('bulanan', 'desa', 'tahunTanam', 'total_luas'));
     }
+
 
     public function update(Request $request, $id)
     {
@@ -253,12 +246,16 @@ class BagiHasilController extends Controller
         DB::transaction(function () use ($data, $id) {
 
             $bulan = BagiHasilBulanan::findOrFail($id);
+
+            // Ambil snapshot lama (luas awal, jangan dihitung ulang)
+            $totalLuasHa = $bulan->luasan_total_snapshot;
+
+            // Update data dasar
             $bulan->update($data);
 
             // Hapus distribusi sebelumnya
             $list = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
             foreach ($list as $d) {
-                // Turunkan saldo
                 $saldo = Saldo::where('id_petani', $d->id_petani)
                     ->where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
@@ -269,7 +266,6 @@ class BagiHasilController extends Controller
                     $saldo->save();
                 }
 
-                // Hapus transaksi
                 Transaksi::where('id_petani', $d->id_petani)
                     ->where('tipe', 'credit_bagihasil')
                     ->where('tanggal', $bulan->tanggal_bagi)
@@ -278,52 +274,59 @@ class BagiHasilController extends Controller
 
             BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
 
-            // Ambil petani aktif KSM
-            $kelola = DetailKepemilikan::where('status_pengelolaan', 'ksm')
-                ->where('status_kepemilikan', 'aktif')
-                ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
-                ->whereHas(
-                    'lahan',
-                    fn($q) =>
-                    $q->where('id_desa', $data['id_desa'])
-                        ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                )
-                ->with(['lahan', 'kepemilikan.petani'])
-                ->get();
+            // Ambil snapshot dulu SEBELUM delete
+            $kelola = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
 
-            $totalLuasHa = $kelola->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
+            // Hapus distribusi sebelumnya
+            foreach ($kelola as $d) {
 
-            if ($totalLuasHa == 0) {
-                throw new \Exception('Total luas lahan 0, bagi hasil tidak bisa diproses.');
+                // rollback saldo lama
+                $saldo = Saldo::where('id_petani', $d->id_petani)
+                    ->where('id_desa', $data['id_desa'])
+                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
+                    ->first();
+
+                if ($saldo) {
+                    $saldo->saldo -= $d->total_nominal;
+                    $saldo->save();
+                }
+
+                // hapus transaksi lama
+                Transaksi::where('id_petani', $d->id_petani)
+                    ->where('tipe', 'credit_bagihasil')
+                    ->where('tanggal', $bulan->tanggal_bagi)
+                    ->delete();
             }
 
-            $bulan->luasan_total_snapshot = $totalLuasHa;
-            $bulan->save();
+            // hapus data pembagian lama
+            BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
 
-            foreach ($kelola as $kepemilikan) {
-                $luasHa = ($kepemilikan->lahan->luas_peta ?? 0) / 10000;
+            // ====================================
+            // BUAT ULANG DISTRIBUSI MENGGUNAKAN SNAPSHOT ($kelola)
+            // ====================================
+            foreach ($kelola as $old) {
+
+                $luasHa = $old->total_luas_ksm; // luas snapshot per petani
+
                 $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $luasHa;
-
-                $petani = $kepemilikan->kepemilikan->petani;
 
                 BagiHasilPetani::create([
                     'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
-                    'id_petani' => $petani->id_petani,
-                    'id_lahan' => $kepemilikan->id_lahan,
+                    'id_petani' => $old->id_petani,
+                    'id_lahan' => $old->id_lahan,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                     'total_luas_ksm' => $luasHa,
                     'total_nominal' => $nominalPetani,
-                    'nama_petani_snapshot' => $petani->nama ?? null,
-                    'nik_petani_snapshot' => $petani->NIK ?? null,
-                    'alamat_petani_snapshot' => $petani->alamat ?? null,
-                    'nomor_plasma_snapshot' => $petani->nomor_anggota_plasma ?? null,
-                    'nomor_koperasi_snapshot' => $petani->nomor_anggota_koperasi ?? null,
+                    'nama_petani_snapshot' => $old->nama_petani_snapshot,
+                    'nik_petani_snapshot' => $old->nik_petani_snapshot,
+                    'alamat_petani_snapshot' => $old->alamat_petani_snapshot,
+                    'nomor_plasma_snapshot' => $old->nomor_plasma_snapshot,
+                    'nomor_koperasi_snapshot' => $old->nomor_koperasi_snapshot,
                 ]);
 
-                // Update saldo
                 $saldo = Saldo::firstOrCreate([
-                    'id_petani' => $petani->id_petani,
+                    'id_petani' => $old->id_petani,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                 ]);
@@ -331,9 +334,8 @@ class BagiHasilController extends Controller
                 $saldo->saldo += $nominalPetani;
                 $saldo->save();
 
-                // Buat transaksi
                 Transaksi::create([
-                    'id_petani' => $petani->id_petani,
+                    'id_petani' => $old->id_petani,
                     'tipe' => 'credit_bagihasil',
                     'metode' => null,
                     'nominal' => $nominalPetani,
@@ -342,6 +344,7 @@ class BagiHasilController extends Controller
                 ]);
             }
         });
+
 
         return redirect()->route('bagi-hasil-bulanan.index')
             ->with('success', 'Data berhasil diupdate.');
