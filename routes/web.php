@@ -108,8 +108,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('/pengambilan-saldo/show', [PengambilanSaldoController::class, 'show'])
         ->name('pengambilan.show');
     Route::post('/ambil-saldo', [PengambilanSaldoController::class, 'store'])->name('ambil-saldo.store');
-    Route::get('/ambil-saldo/struk/{id}', [PengambilanSaldoController::class, 'struk'])
-        ->name('ambil-saldo.struk');
+    Route::get('/ambil-saldo/struk/{id_transaksi}', [PengambilanSaldoController::class, 'struk'])->name('ambil-saldo.struk');
 });
 
 // hanya super admin

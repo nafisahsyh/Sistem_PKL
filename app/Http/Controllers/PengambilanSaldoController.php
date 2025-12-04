@@ -292,12 +292,8 @@ class PengambilanSaldoController extends Controller
             ->update(['saldo' => 0]);
 
         // Redirect ke struk
-        return redirect()->route('ambil-saldo.struk', [
-            'id' => $transaksi->id_transaksi,
-            'id_petani' => $idPetani,
-            'id_bulanan' => $request->id_bulanan,
-        ]);
-
+        return redirect()->route('ambil-saldo.struk', ['id_transaksi' => $transaksi->id_transaksi]);
+        
     }
 
 
@@ -356,9 +352,8 @@ class PengambilanSaldoController extends Controller
             'no_plasma' => $petaniCollection->first()->nomor_plasma_snapshot ?? '-',
             'no_koperasi' => $petaniCollection->first()->nomor_koperasi_snapshot ?? '-',
             'no_urut'        => $trx->no_urut ?? '-',
-
+            'desa' => $desa->desa ?? '-',
             'luas_ha' => $luasHa,
-
             'nominal' => $petaniCollection->sum('total_nominal'),
 
             'nominal_bulan_1' => $idBulananAwal

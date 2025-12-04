@@ -6,25 +6,23 @@
     <title>Nota Pengeluaran</title>
 
     <style>
+        @page {
+            size: auto;
+            margin: 0;
+            /* Hapus margin printer default */
+        }
+
         @media print {
             body {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
         }
 
         body {
             font-family: "Courier New", monospace;
-            font-size: 13px;
+            font-size: 12px;
             margin: 0;
-            padding: 20px;
-            width: 21cm;
-            height: 13.99cm;
         }
 
         table {
@@ -68,7 +66,7 @@
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             text-align: center;
             margin: 3px 0 5px;
@@ -112,8 +110,8 @@
 
             </td>
 
-            <td width="85%" style="text-align:center; transform: translateX(-45px);">
-                <div style="font-size:20px; font-weight:bold; font-family: Georgia, serif;">
+            <td width="85%" style="text-align:center; transform: translateX(-80px);">
+                <div style="font-size:18px; font-weight:bold; font-family: Georgia, serif;">
                     KOPERASI SAWIT MAKMUR
                 </div>
 
@@ -125,27 +123,32 @@
     </table>
     <div style="border-bottom: 2px solid #000; margin: 2px 0;"></div>
 
-    <div class="section-title">BUKTI PENGELUARAN</div>
+    <div class="section-title" style="font-family: Georgia, serif;">BUKTI PENGELUARAN</div>
 
 
     {{-- METODE --}}
     <table style="margin-bottom: 3px; font-size: 11px; width:100%;">
         <tr>
-            <td width="80%">
-                <div style="text-align: center; padding-left: 20px;">
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <span class="checkbox-box {{ $trx->metode == 'cash' ? 'checkbox-filled' : '' }}"></span>
-                            <span>KAS</span>
-                        </div>
+<td width="80%">
+    <div style="text-align: center; padding-left: 20px;">
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span class="checkbox-box">
+                    {{ $trx->metode == 'cash' ? '✔' : '' }}
+                </span>
+                <span>KAS</span>
+            </div>
 
-                        <div class="checkbox-item">
-                            <span class="checkbox-box {{ $trx->metode == 'transfer' ? 'checkbox-filled' : '' }}"></span>
-                            <span>BANK</span>
-                        </div>
-                    </div>
-                </div>
-            </td>
+            <div class="checkbox-item">
+                <span class="checkbox-box">
+                    {{ $trx->metode == 'transfer' ? '✔' : '' }}
+                </span>
+                <span>BANK</span>
+            </div>
+        </div>
+    </div>
+</td>
+
 
             <td width="20%" style="text-align:right; white-space:nowrap;">
                 NO. BUKTI: <strong>{{ $no_bukti }}</strong>
@@ -184,85 +187,179 @@
         <div class="line" style="margin-top: -5px;"></div>
     </div>
 
-    {{-- URAIAN --}}
-    <div style="margin:4px 0; font-weight:bold;">Pembayaran pendapatan petani</div>
+    <div style="font-size:12px; width:100%;">
 
-    <table>
-        <tr>
-            <td width="20%">Nama</td>
-            <td>: {{ $p['nama_petani'] }}</td>
-        </tr>
+        <table style="width:100%; border-collapse: collapse; margin-bottom:4px;">
+            <tr>
+                <!-- KIRI -->
+                <td width="30%" style="vertical-align:top; padding-right:10px;">
+                    <div style="font-weight:bold; margin-bottom:10px;">NO. REKENING</div>
 
-        <tr>
-            <td>No Plasma</td>
-            <td>: {{ $p['no_plasma'] ?? '-' }}</td>
-        </tr>
+                    <table style="width:46%; border-collapse: collapse; font-size:10px;">
 
-        <tr>
-            <td>No Koperasi</td>
-            <td>: {{ $p['no_koperasi'] }}</td>
-        </tr>
+                        <!-- No Tanda Terima -->
+                        <tr>
+                            <td
+                                style="border:1px solid #000; font-weight:bold; text-align:center; padding-left:1px; padding-right:1px; padding-top:8px; padding-bottom:8px">
+                                No. Tanda Terima
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                style="border:1px solid #000; border-top:none; text-align:center; padding:4px; font-size: 12px;">
+                                {{ $p['no_urut'] ?? '-' }}
+                            </td>
+                        </tr>
 
-        <tr>
-            <td>Luas Lahan</td>
-            <td>: {{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
-        </tr>
+                        <!-- No Anggota Koperasi -->
+                        <tr>
+                            <td
+                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:8px;">
+                                No. Anggota Koperasi
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                style="border:1px solid #000; border-top:none; text-align:center; padding:4px; font-size: 12px;">
+                                {{ $p['no_koperasi'] }}
+                            </td>
+                        </tr>
 
-        <tr>
-            <td>Tahun Tanam</td>
-            <td>: {{ $tahunTanam->tahun }}</td>
-        </tr>
-    </table>
+                        <!-- No Kartu Plasma -->
+                        <tr>
+                            <td
+                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:8px; ">
+                                No. Kartu Plasma
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                style="border:1px solid #000; border-top:none; text-align:center; padding:8px 4px; font-size:12px; height:20px;">
+                                {{ $p['no_plasma'] ?? '-' }}
+                            </td>
 
-    <br>
+                        </tr>
 
-    <div style="font-weight:bold;">
-        PERIODE
-        {{ strtoupper($bulanNama[$bulan_awal_bulan] . ' ' . $bulan_awal_tahun) }}
-        –
-        {{ strtoupper($bulanNama[$bulan_akhir_bulan] . ' ' . $bulan_akhir_tahun) }}
+                    </table>
+
+                </td>
+
+                <td width="45%" style="vertical-align:top; padding:0 10px;">
+                    <div style="width:100%; margin-left:-65px;"> <!-- geser ke kiri sedikit -->
+
+                        <div style="font-weight:bold; margin-bottom:10px;">URAIAN</div>
+                        <div style="margin-top:3px;">Pembayaran pendapatan petani</div>
+                        <!-- AN -->
+                        <div style="display:flex; margin-top:3px;">
+                            <div style="width:55px;">AN</div>
+                            <div style="font-size:13px;">{{ $p['nama_petani'] }}</div>
+                        </div>
+
+                        <!-- Desa -->
+                        <div style="display:flex;">
+                            <div style="width:55px;">Desa</div>
+                            <div style="font-size:13px;">{{ $p['desa'] ?? '-' }} {{ $tahunTanam->tahun }}</div>
+                        </div>
+
+                        <div style="margin-top:3px; font-size:14px;">
+                            PERIODE {{ strtoupper($bulanNama[$bulan_awal_bulan] . ' ' . $bulan_awal_tahun) }}–
+                            {{ strtoupper($bulanNama[$bulan_akhir_bulan] . ' ' . $bulan_akhir_tahun) }}
+                        </div>
+
+                        <div style="margin-top:3px;">
+                            <table style="width:100%; font-size:14px; border-collapse:collapse;">
+                                <tr>
+                                    <td style="text-align:left; padding-left:25px; text-decoration:underline;">
+                                        BULAN {{ $bulanNama[(int) $bulan1] }} {{ $tahun1 }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left; padding-left:25px; text-decoration:underline;">
+                                        BULAN {{ $bulanNama[(int) $bulan2] }} {{ $tahun2 }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </td>
+
+
+                <!-- KANAN -->
+                <td width="30%" style="vertical-align:top; padding-left:10px;">
+                    <div style="font-weight:bold; margin-bottom:70px ">JUMLAH</div>
+                    <div style="margin-top:3px;">
+                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                            <tr>
+                                <td style="padding-top:3px; font-size:14px;">
+                                    <div style="display:flex; justify-content:space-between;">
+                                        <span>Rp</span>
+                                        <span>{{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:3px; border-top:1px solid #000; font-size:14px;">
+                                    <div style="display:flex; justify-content:space-between;">
+                                        <span>Rp</span>
+                                        <span>{{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="font-weight:bold; border-top:1px solid #000; border-bottom:1.5px solid #000; padding-top:60px; font-size:17px;">
+                                    <div style="display:flex; justify-content:space-between;">
+                                        <span>Rp</span>
+                                        <span>{{ number_format($p['nominal'], 0, ',', '.') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 11px; margin-top:10px;">Terbilang</div>
     </div>
 
+    <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:11px; text-align:center;">
 
-    <table style="margin-top:6px;">
+        <!-- Judul Utama -->
         <tr>
-            <td>BULAN {{ $bulanNama[(int) $bulan1] }} {{ $tahun1 }}</td>
-            <td>: Rp {{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}</td>
+            <td colspan="2" style="border:1px solid #000; padding:4px; width:20%;"></td>
+            <td colspan="2" style="border:1px solid #000; padding:4px; width:30%;">DIBUKUKAN</td>
+            <td colspan="2" style="border:1px solid #000; padding:4px; width:50%;">TELAH DITERIMA JUMLAH TERSEBUT DI
+                ATAS</td>
         </tr>
 
+        <!-- Subjudul / kolom kedua -->
         <tr>
-            <td>BULAN {{ $bulanNama[(int) $bulan2] }} {{ $tahun2 }}</td>
-            <td>: Rp {{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}</td>
+            <!-- Dikeluarkan -->
+            <td style="border:1px solid #000; padding:4px; width:13%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:4px; width:12%;">DIKELUARKAN</td>
+
+            <!-- Dibukukan -->
+            <td style="border:1px solid #000; padding:4px; width:10%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:4px; width:20%;">PARAF</td>
+
+            <!-- Telah Diterima -->
+            <td style="border:1px solid #000; padding:4px; width:10%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:4px; width:25%;">TANDA TANGAN & NAMA PENERIMA</td>
         </tr>
 
-        <tr>
-            <td><strong>TOTAL</strong></td>
-            <td><strong>: Rp {{ number_format($p['nominal'], 0, ',', '.') }}</strong></td>
+        <!-- Baris kosong untuk diisi dengan titik-titik -->
+        <tr style="height:60px;">
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
         </tr>
     </table>
 
-    <div class="line" style="margin-top:10px;"></div>
-
-    {{-- TANDA TANGAN --}}
-    <table style="margin-top:15px;">
-        <tr>
-            <td width="33%" class="center">Dikeluarkan</td>
-            <td width="33%" class="center">Dibukukan</td>
-            <td width="33%" class="center">Telah Diterima</td>
-        </tr>
-
-        <tr style="height: 55px;">
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td class="center small">(____________________)</td>
-            <td class="center small">(____________________)</td>
-            <td class="center small">(____________________)</td>
-        </tr>
-    </table>
 
 </body>
 
