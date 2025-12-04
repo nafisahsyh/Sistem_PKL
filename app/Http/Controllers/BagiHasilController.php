@@ -92,10 +92,8 @@ class BagiHasilController extends Controller
     }
 
     // Input bagi hasil per bulan
-    // Input bagi hasil per bulan (versi bersih)
     public function storeBulanan(Request $request)
     {
-        // Hapus format Rp, titik, spasi
         $request->merge([
             'total_bagian' => str_replace(['Rp', '.', ' '], '', $request->total_bagian)
         ]);
@@ -107,14 +105,19 @@ class BagiHasilController extends Controller
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
             'total_bagian' => 'required|numeric|min:1',
+            'bulan_awal' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($data) {
+        // Tentukan periode 2 bulan
+        $bulanAwalPeriode = strtotime($data['bulan_awal']);
+        $bulanAkhirPeriode = strtotime("+1 month", $bulanAwalPeriode);
+        $bulanAkhirPeriodeStr = date('Y-m', $bulanAkhirPeriode);
+
+        DB::transaction(function () use ($data, $bulanAwalPeriode, $bulanAkhirPeriodeStr) {
 
             // Simpan data bulanan
             $bulan = BagiHasilBulanan::create($data);
 
-            // Ambil petani aktif KSM saat ini
             $kelola = DetailKepemilikan::where('status_pengelolaan', 'ksm')
                 ->where('status_kepemilikan', 'aktif')
                 ->whereHas('kepemilikan.petani', fn($q) => $q->where('status', 'aktif'))
@@ -127,9 +130,7 @@ class BagiHasilController extends Controller
                 ->with(['lahan', 'kepemilikan.petani'])
                 ->get();
 
-            // Hitung total luas lahan (Ha) dari lahan aktif bulan ini
             $totalLuasHa = $kelola->sum(fn($item) => ($item->lahan->luas_peta ?? 0) / 10000);
-
             if ($totalLuasHa == 0) {
                 throw new \Exception('Total luas lahan 0, bagi hasil tidak bisa diproses.');
             }
@@ -137,17 +138,16 @@ class BagiHasilController extends Controller
             $bulan->luasan_total_snapshot = $totalLuasHa;
             $bulan->save();
 
-            // Simpan data bagi hasil per petani & update saldo/transaksi
             foreach ($kelola as $kepemilikan) {
                 $luasHa = ($kepemilikan->lahan->luas_peta ?? 0) / 10000;
                 $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $luasHa;
-
                 $petani = $kepemilikan->kepemilikan->petani;
 
+                // Simpan bagi hasil petani
                 BagiHasilPetani::create([
                     'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                     'id_petani' => $petani->id_petani,
-                    'id_lahan' => $kepemilikan->id_lahan, // ini harus ada
+                    'id_lahan' => $kepemilikan->id_lahan,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                     'total_luas_ksm' => $luasHa,
@@ -159,25 +159,46 @@ class BagiHasilController extends Controller
                     'nomor_koperasi_snapshot' => $petani->nomor_anggota_koperasi ?? null,
                 ]);
 
+                // Ambil saldo terakhir
+                $saldoTerakhir = Saldo::where('id_petani', $petani->id_petani)
+                    ->where('id_desa', $data['id_desa'])
+                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
+                    ->latest('created_at')
+                    ->first();
 
-                // Update saldo
-                $saldo = Saldo::firstOrCreate([
-                    'id_petani' => $petani->id_petani,
-                    'id_desa' => $data['id_desa'],
-                    'id_tahun_tanam' => $data['id_tahun_tanam'],
-                ]);
+                if (!$saldoTerakhir || strtotime($saldoTerakhir->bulan_akhir) < $bulanAwalPeriode - 1) {
+                    // Buat saldo baru untuk periode 2 bulan
+                    $saldo = Saldo::create([
+                        'id_petani' => $petani->id_petani,
+                        'id_desa' => $data['id_desa'],
+                        'id_tahun_tanam' => $data['id_tahun_tanam'],
+                        'bulan_awal' => $data['bulan_awal'],
+                        'bulan_akhir' => $bulanAkhirPeriodeStr,
+                        'saldo' => $nominalPetani,
+                    ]);
+                } else {
+                    // Update saldo yang ada
+                    $saldoTerakhir->saldo += $nominalPetani;
+                    if (strtotime($data['bulan_awal']) > strtotime($saldoTerakhir->bulan_akhir)) {
+                        $saldoTerakhir->bulan_akhir = $data['bulan_awal'];
+                    }
+                    $saldoTerakhir->save();
+                    $saldo = $saldoTerakhir;
+                }
 
-                $saldo->saldo += $nominalPetani;
-                $saldo->save();
-
-                // Buat transaksi
+                // Transaksi
                 Transaksi::create([
                     'id_petani' => $petani->id_petani,
+                    'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
+                    'id_desa' => $data['id_desa'],
+                    'id_tahun_tanam' => $data['id_tahun_tanam'],
                     'tipe' => 'credit_bagihasil',
                     'metode' => null,
                     'nominal' => $nominalPetani,
                     'tanggal' => $data['tanggal_bagi'],
-                    'keterangan' => 'Bagi hasil bulan ' . $data['bulan'] . '/' . $data['tahun'],
+                    'bulan_awal' => $saldo->bulan_awal,
+                    'bulan_akhir' => $saldo->bulan_akhir,
+                    'keterangan' => 'Bagi hasil periode ' . $saldo->bulan_awal . ' - ' . $saldo->bulan_akhir,
                 ]);
             }
         });
@@ -185,7 +206,6 @@ class BagiHasilController extends Controller
         return redirect()->route('bagi-hasil-bulanan.index')
             ->with('success', 'Data bulanan berhasil diproses.');
     }
-
 
     public function getTotalLuas(Request $request)
     {
@@ -226,10 +246,8 @@ class BagiHasilController extends Controller
         return view('bagihasil.edit', compact('bulanan', 'desa', 'tahunTanam', 'total_luas'));
     }
 
-
     public function update(Request $request, $id)
     {
-        // Bersihkan input total_bagian
         $request->merge([
             'total_bagian' => str_replace(['Rp', '.', ' '], '', $request->total_bagian)
         ]);
@@ -241,82 +259,58 @@ class BagiHasilController extends Controller
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
             'total_bagian' => 'required|numeric|min:1',
+            'bulan_awal' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($data, $id) {
+        // Tentukan periode 2 bulan
+        $periodeAwal = $data['bulan_awal'];
+        $periodeAkhir = date('Y-m', strtotime($periodeAwal . ' +1 month'));
+
+        DB::transaction(function () use ($data, $id, $periodeAwal, $periodeAkhir) {
 
             $bulan = BagiHasilBulanan::findOrFail($id);
 
-            // Ambil snapshot lama (luas awal, jangan dihitung ulang)
-            $totalLuasHa = $bulan->luasan_total_snapshot;
+            // Ambil snapshot lama SEBELUM dihapus
+            $kelolaLama = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
 
-            // Update data dasar
+            // Turunkan saldo lama sesuai periode 2 bulan
+            foreach ($kelolaLama as $old) {
+                $saldo = Saldo::where('id_petani', $old->id_petani)
+                    ->where('id_desa', $bulan->id_desa)
+                    ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
+                    ->where('bulan_awal', $bulan->bulan_awal)
+                    ->where('bulan_akhir', $bulan->bulan_akhir)
+                    ->first();
+
+                if ($saldo) {
+                    $saldo->saldo -= $old->total_nominal;
+                    $saldo->save();
+                }
+            }
+
+            // Hapus transaksi lama
+            Transaksi::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
+
+            // Hapus pembagian lama
+            BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
+
+            // Update header bulanan
             $bulan->update($data);
 
-            // Hapus distribusi sebelumnya
-            $list = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
-            foreach ($list as $d) {
-                $saldo = Saldo::where('id_petani', $d->id_petani)
-                    ->where('id_desa', $data['id_desa'])
-                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->first();
+            $totalLuasHa = $bulan->luasan_total_snapshot;
 
-                if ($saldo) {
-                    $saldo->saldo -= $d->total_nominal;
-                    $saldo->save();
-                }
+            // Buat ulang pembagian & update saldo
+            foreach ($kelolaLama as $old) {
+                $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $old->total_luas_ksm;
 
-                Transaksi::where('id_petani', $d->id_petani)
-                    ->where('tipe', 'credit_bagihasil')
-                    ->where('tanggal', $bulan->tanggal_bagi)
-                    ->delete();
-            }
-
-            BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
-
-            // Ambil snapshot dulu SEBELUM delete
-            $kelola = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
-
-            // Hapus distribusi sebelumnya
-            foreach ($kelola as $d) {
-
-                // rollback saldo lama
-                $saldo = Saldo::where('id_petani', $d->id_petani)
-                    ->where('id_desa', $data['id_desa'])
-                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->first();
-
-                if ($saldo) {
-                    $saldo->saldo -= $d->total_nominal;
-                    $saldo->save();
-                }
-
-                // hapus transaksi lama
-                Transaksi::where('id_petani', $d->id_petani)
-                    ->where('tipe', 'credit_bagihasil')
-                    ->where('tanggal', $bulan->tanggal_bagi)
-                    ->delete();
-            }
-
-            // hapus data pembagian lama
-            BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
-
-            // ====================================
-            // BUAT ULANG DISTRIBUSI MENGGUNAKAN SNAPSHOT ($kelola)
-            // ====================================
-            foreach ($kelola as $old) {
-
-                $luasHa = $old->total_luas_ksm; // luas snapshot per petani
-
-                $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $luasHa;
-
+                // Simpan kembali BagiHasilPetani
                 BagiHasilPetani::create([
                     'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                     'id_petani' => $old->id_petani,
                     'id_lahan' => $old->id_lahan,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
-                    'total_luas_ksm' => $luasHa,
+                    'total_luas_ksm' => $old->total_luas_ksm,
                     'total_nominal' => $nominalPetani,
                     'nama_petani_snapshot' => $old->nama_petani_snapshot,
                     'nik_petani_snapshot' => $old->nik_petani_snapshot,
@@ -325,31 +319,50 @@ class BagiHasilController extends Controller
                     'nomor_koperasi_snapshot' => $old->nomor_koperasi_snapshot,
                 ]);
 
-                $saldo = Saldo::firstOrCreate([
+                // Update saldo (periode 2 bulan)
+                $saldoTerakhir = Saldo::where('id_petani', $old->id_petani)
+                    ->where('id_desa', $data['id_desa'])
+                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
+                    ->latest('created_at')
+                    ->first();
+
+                if (!$saldoTerakhir || strtotime($periodeAwal) > strtotime($saldoTerakhir->bulan_akhir . ' +1 month')) {
+                    // buat saldo baru
+                    $saldo = Saldo::create([
+                        'id_petani' => $old->id_petani,
+                        'id_desa' => $data['id_desa'],
+                        'id_tahun_tanam' => $data['id_tahun_tanam'],
+                        'bulan_awal' => $periodeAwal,
+                        'bulan_akhir' => $periodeAkhir,
+                        'saldo' => $nominalPetani,
+                    ]);
+                } else {
+                    // update saldo lama
+                    $saldoTerakhir->saldo += $nominalPetani;
+                    $saldoTerakhir->bulan_akhir = $periodeAkhir;
+                    $saldoTerakhir->save();
+                    $saldo = $saldoTerakhir;
+                }
+
+                // Simpan transaksi credit baru
+                Transaksi::create([
+                    'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                     'id_petani' => $old->id_petani,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
-                ]);
-
-                $saldo->saldo += $nominalPetani;
-                $saldo->save();
-
-                Transaksi::create([
-                    'id_petani' => $old->id_petani,
                     'tipe' => 'credit_bagihasil',
-                    'metode' => null,
                     'nominal' => $nominalPetani,
                     'tanggal' => $data['tanggal_bagi'],
-                    'keterangan' => 'Update bagi hasil bulan ' . $data['bulan'] . '/' . $data['tahun'],
+                    'bulan_awal' => $saldo->bulan_awal,
+                    'bulan_akhir' => $saldo->bulan_akhir,
+                    'keterangan' => 'Bagi hasil periode ' . $saldo->bulan_awal . ' - ' . $saldo->bulan_akhir,
                 ]);
             }
         });
 
-
         return redirect()->route('bagi-hasil-bulanan.index')
             ->with('success', 'Data berhasil diupdate.');
     }
-
 
     public function destroy($id)
     {
@@ -384,7 +397,6 @@ class BagiHasilController extends Controller
 
         return redirect()->route('bagi-hasil-bulanan.index')->with('success', 'Data berhasil dihapus.');
     }
-
 
     public function show($id)
     {

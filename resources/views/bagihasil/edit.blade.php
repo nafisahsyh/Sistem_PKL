@@ -8,6 +8,7 @@
 
         <div class="card p-4">
             <form action="{{ route('bagi-hasil-bulanan.update', $bulanan) }}" method="POST">
+                <input type="hidden" name="bulan_awal" value="{{ old('bulan', $bulanan->bulan) }}">
                 @csrf
                 @method('PUT')
 

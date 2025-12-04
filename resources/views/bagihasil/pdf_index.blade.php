@@ -147,25 +147,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-left">{{ $b->desa->desa }}</td>
                     <td>{{ $b->tahunTanam->tahun }}</td>
-
-                    <td>
-                        @php
-                            $totalLuasM2 = \App\Models\DetailKepemilikan::where('status_pengelolaan', 'ksm')
-                                ->where('status_kepemilikan', 'aktif')
-                                ->whereHas(
-                                    'lahan',
-                                    fn($q) => $q
-                                        ->where('id_desa', $b->id_desa)
-                                        ->where('id_tahun_tanam', $b->id_tahun_tanam),
-                                )
-                                ->with('lahan')
-                                ->get()
-                                ->sum(fn($item) => $item->lahan->luas_peta ?? 0);
-                        @endphp
-
-                        {{ number_format($totalLuasM2 / 10000, 2, ',', '.') }} Ha
-                    </td>
-
+                    <td>{{ number_format($b->luasan_total_snapshot, 2, ',', '.') }}</td>
                     <td>{{ $bulanIndonesia[$b->bulan] }}</td>
                     <td>{{ $b->tahun }}</td>
                     <td>{{ \Carbon\Carbon::parse($b->tanggal_bagi)->format('d-m-Y') }}</td>

@@ -100,6 +100,8 @@
                     </div>
                 </div>
 
+                <input type="hidden" name="bulan_awal" id="bulan_awal">
+
                 <div class="text-start mt-3">
                     <button type="submit" class="btn btn-success me-2">Simpan</button>
                     <a href="{{ route('bagi-hasil-bulanan.index') }}" class="btn btn-danger">Batal</a>
@@ -116,7 +118,19 @@
             const desaSelect = document.getElementById('id_desa');
             const tahunSelect = document.getElementById('id_tahun_tanam');
             const bulanSelect = document.getElementById('bulan');
+            const tahunInput = document.getElementsByName('tahun')[0];
+            const bulanAwal = document.getElementById('bulan_awal');
             const totalLuasInput = document.getElementById('total_luas');
+
+            function updatePeriode() {
+                if (bulanSelect.value && tahunInput.value) {
+                    const bulan1 = parseInt(bulanSelect.value);
+                    bulanAwal.value = tahunInput.value + "-" + String(bulan1).padStart(2, '0');
+                }
+            }
+
+            bulanSelect.addEventListener('change', updatePeriode);
+            tahunInput.addEventListener('input', updatePeriode);
 
             // Nama bulan Indonesia
             const namaBulan = [

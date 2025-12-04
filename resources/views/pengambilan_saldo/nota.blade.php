@@ -7,7 +7,7 @@
 
     <style>
         @page {
-            size: 21cm 13.99cm;
+            size: 21cm 13.99cm potrait;
             margin: 0;
             /* Hapus margin printer default */
         }
@@ -119,7 +119,7 @@
             </td>
 
             <td width="85%" style="text-align:center; transform: translateX(-50px);">
-                <div style="font-size:18px; font-weight:bold; font-family: 'Bookman Old Style', serif;">
+                <div style="font-size:20px; font-weight:bold; font-family: 'Bookman Old Style', serif;">
                     KOPERASI SAWIT MAKMUR
                 </div>
 
@@ -203,7 +203,7 @@
                 <td width="30%" style="vertical-align:top; padding-right:10px;">
                     <div style="margin-bottom:8px;">NO. REKENING</div>
 
-                    <table style="width:46%; border-collapse: collapse; font-size:10px;">
+                    <table style="width:50%; border-collapse: collapse; font-size:10px;">
 
                         <!-- No Tanda Terima -->
                         <tr>
@@ -252,7 +252,7 @@
 
                 </td>
 
-                <td width="45%" style="vertical-align:top; padding:0 10px;">
+                <td width="50%" style="vertical-align:top; padding:0 10px;">
                     <div style="width:100%; margin-left:-65px;"> <!-- geser ke kiri sedikit -->
 
                         <div style="margin-bottom:5px;">URAIAN</div>
@@ -294,7 +294,7 @@
 
 
                 <!-- KANAN -->
-                <td width="30%" style="vertical-align:top; padding-left:10px;">
+                <td width="20%" style="vertical-align:top; padding-left:10px;">
                     <div style="margin-bottom:65px ">JUMLAH</div>
                     <div style="margin-top:3px;">
                         <table style="width:100%; border-collapse:collapse; font-size:11px;">

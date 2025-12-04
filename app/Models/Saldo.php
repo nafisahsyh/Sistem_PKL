@@ -13,6 +13,8 @@ class Saldo extends Model
         'id_petani',
         'id_desa',
         'id_tahun_tanam',
+        'bulan_awal',
+        'bulan_akhir',
         'saldo',
     ];
 

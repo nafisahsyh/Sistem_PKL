@@ -12,6 +12,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_petani');
             $table->unsignedBigInteger('id_desa');
             $table->unsignedBigInteger('id_tahun_tanam');
+            $table->string('bulan_awal', 7)->nullable();
+            $table->string('bulan_akhir', 7)->nullable();
 
             $table->decimal('saldo', 15, 2)->default(0);
 

@@ -106,26 +106,50 @@
                                 <td>{{ $p['nama_petani'] }}</td>
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2) }}</td>
                                 <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
-                                <td class="text-center">
-                                    @php
-                                        $saldoPetani =
-                                            \App\Models\Saldo::where('id_petani', $p['id_petani'])
-                                                ->where('id_desa', $p['id_desa'])
-                                                ->where('id_tahun_tanam', $p['id_tahun_tanam'])
-                                                ->value('saldo') ?? 0;
-                                    @endphp
+                                @php
+                                    $periodeAwal = $tahun . '-' . str_pad($bulan_awal, 2, '0', STR_PAD_LEFT);
+                                    $periodeAkhir = $tahun . '-' . str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT);
 
-                                    @if ($saldoPetani > 0)
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                    // Ambil saldo untuk periode ini
+                                    $saldoPerPeriode = \App\Models\Saldo::where('id_petani', $p['id_petani'])
+                                        ->where('id_desa', $p['id_desa'])
+                                        ->where('id_tahun_tanam', $p['id_tahun_tanam'])
+                                        ->where('bulan_awal', '<=', $periodeAwal)
+                                        ->where('bulan_akhir', '>=', $periodeAwal)
+                                        ->first();
+
+                                    $saldoValue = $saldoPerPeriode->saldo ?? 0;
+
+                                    // Ambil transaksi terakhir untuk periode ini
+                                    $trxTerakhir = \App\Models\Transaksi::where('id_petani', $p['id_petani'])
+                                        ->where('tipe', 'debit_pengambilan')
+                                        ->where('id_desa', $p['id_desa'])
+                                        ->where('id_tahun_tanam', $p['id_tahun_tanam'])
+                                        ->where('bulan_awal', $saldoPerPeriode->bulan_awal ?? $periodeAwal)
+                                        ->where('bulan_akhir', $saldoPerPeriode->bulan_akhir ?? $periodeAkhir)
+                                        ->orderByDesc('id_transaksi')
+                                        ->first();
+                                @endphp
+                                
+                                <td class="text-center">
+                                    @if ($saldoValue > 0)
+                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
                                             <i class="fa fa-file-invoice-dollar"></i>
                                         </button>
                                     @else
                                         <span class="badge bg-secondary">Sudah diambil</span>
                                     @endif
+
+                                    @if ($trxTerakhir)
+                                        <a href="{{ route('ambil-saldo.struk', $trxTerakhir->id_transaksi) }}"
+                                            target="_blank" class="btn btn-primary btn-sm ms-1">
+                                            <i class="fa fa-print"></i>
+                                        </a>
+                                    @endif
                                 </td>
-                            </tr>
-                        @empty
+
+                            @empty
                             <tr>
                                 <td colspan="7" class="text-center py-5 text-muted">
                                     <i class="fas fa-folder-open fa-2x mb-2"></i>
@@ -153,7 +177,7 @@
                         <h5 class="modal-title">Ambil Saldo Petani</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-<form action="{{ route('ambil-saldo.store') }}" method="POST" target="_blank">
+                    <form action="{{ route('ambil-saldo.store') }}" method="POST" target="_blank" class="formAmbil">
                         @csrf
 
                         <div class="modal-body" style="padding: 15px;">
@@ -191,8 +215,8 @@
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label fw-bold">Metode</label>
-                                    <select name="metode" class="form-select" required>
-                                        <option value="" disabled selected>-- Pilih Metode --</option>
+                                    <select name="metode" class="form-select text-kecil choices-select" required>
+                                        <option value="">Pilih Metode</option>
                                         <option value="cash">Cash</option>
                                         <option value="transfer">Transfer</option>
                                     </select>
@@ -265,8 +289,7 @@
 
                         <div class="modal-footer">
                             <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button class="btn btn-primary"
-                                onclick="return confirm('Apakah Anda yakin ingin mengambil saldo petani ini? Data akan diproses dan saldo akan menjadi 0.');">
+                            <button type="button" class="btn btn-primary btnSubmitSaldo">
                                 Ambil Saldo
                             </button>
                         </div>
@@ -277,4 +300,60 @@
         </div>
     @endforeach
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.querySelectorAll('.choices-select').forEach(el => {
+            new Choices(el, {
+                searchEnabled: false,
+                shouldSort: false,
+                itemSelectText: '',
+                placeholderValue: 'Pilih Metode',
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.btnSubmitSaldo').forEach(btn => {
+            btn.addEventListener('click', function() {
+                let form = this.closest('form');
+                let no_urut = form.querySelector('input[name="no_urut"]').value;
+                let metode = form.querySelector('select[name="metode"]').value;
+
+                if (no_urut === '' || metode === '') {
+                    Swal.fire({
+                        title: "Data belum lengkap",
+                        text: "Nomor urut dan metode harus diisi.",
+                        icon: "warning",
+                        confirmButtonColor: '#198754',
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Ambil saldo petani?",
+                    text: "Saldo akan menjadi 0 dan nota akan diterbitkan.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Proses',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // langsung submit → buka tab nota
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("visibilitychange", function() {
+            // Jika user kembali ke tab ini
+            if (document.visibilityState === "visible") {
+                // Reload otomatis
+                window.location.reload();
+            }
+        });
+    </script>
 @endsection
