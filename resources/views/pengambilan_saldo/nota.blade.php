@@ -7,7 +7,7 @@
 
     <style>
         @page {
-            size: auto;
+            size: 21cm 13.99cm;
             margin: 0;
             /* Hapus margin printer default */
         }
@@ -19,9 +19,18 @@
             }
         }
 
+        .sheet {
+            width: 21cm;
+            height: 13.99cm;
+            margin: 0;
+            padding: 10mm;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+        }
+
         body {
             font-family: "Bookman Old Style", "Times New Roman", serif;
-            font-size: 12px;
+            font-size: 11px;
             margin: 0;
         }
 
@@ -40,7 +49,7 @@
         }
 
         .small {
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .checkbox-group {
@@ -68,7 +77,6 @@
         .section-title {
             font-size: 15px;
             font-weight: bold;
-            text-align: center;
             margin: 3px 0 5px;
         }
     </style>
@@ -101,7 +109,7 @@
 
 
 <body>
-
+    <div class="sheet">
     {{-- HEADER --}}
     <table>
         <tr>
@@ -110,12 +118,12 @@
 
             </td>
 
-            <td width="85%" style="text-align:center; transform: translateX(-80px);">
+            <td width="85%" style="text-align:center; transform: translateX(-50px);">
                 <div style="font-size:18px; font-weight:bold; font-family: 'Bookman Old Style', serif;">
                     KOPERASI SAWIT MAKMUR
                 </div>
 
-                <div class="small" style="margin-top:10px;">
+                <div class="small" style="margin-top:10px; font-size:10px">
                     Alamat: Jl. A. YANI RT 04 KELURAHAN SARANG HALANG, PELAIHARI
                 </div>
             </td>
@@ -123,11 +131,11 @@
     </table>
     <div style="border-bottom: 2px solid #000; margin: 2px 0;"></div>
 
-    <div class="section-title" style="font-family: 'Bookman Old Style', serif;">BUKTI PENGELUARAN</div>
+    <div class="section-title" style="font-family: 'Bookman Old Style', serif; text-align:center;">BUKTI PENGELUARAN</div>
 
 
     {{-- METODE --}}
-    <table style="margin-bottom: 3px; font-size: 11px; width:100%;">
+    <table style="margin-bottom: 2px; font-size: 10px; width:100%;">
         <tr>
             <td width="80%">
                 <div style="text-align: center; padding-left: 20px;">
@@ -150,7 +158,7 @@
             </td>
 
 
-            <td width="20%" style="text-align:right; white-space:nowrap;">
+            <td width="20%" style="text-align:right; white-space:nowrap; font-size: 10px;">
                 NO. BUKTI: <strong>{{ $no_bukti }}</strong>
             </td>
         </tr>
@@ -159,26 +167,26 @@
     <div class="line"></div>
 
     {{-- DATA PENERIMA --}}
-    <div style="font-size: 11px;">
-        <table style="width:100%; margin-bottom: 4px;"> {{-- Jarak bawah --}}
+    <div style="font-size: 10px;">
+        <table style="width:100%; margin-bottom: 2px;"> {{-- Jarak bawah --}}
             <tr>
                 {{-- KIRI --}}
-                <td width="50%" style="vertical-align:top; padding-bottom: 3px;">
+                <td width="50%" style="vertical-align:top; padding-bottom: 2px;">
                     <div>Penerima : {{ $p['nama_petani'] }}</div>
                     <div style="margin-top: 3px;">Alamat&nbsp;&nbsp;&nbsp;: {{ $p['alamat_petani'] }}</div>
                 </td>
 
                 {{-- TENGAH --}}
-                <td width="30%" style="vertical-align:top; padding-left: 40px; padding-bottom: 3px;">
+                <td width="30%" style="vertical-align:top; padding-left: 40px; padding-bottom: 2px;">
                     <div>DIBUAT OLEH:</div>
                     <div style="margin-top: 3px;">KOPERASI SAWIT MAKMUR</div>
                 </td>
 
                 {{-- KANAN --}}
-                <td width="20%" style="vertical-align:top; text-align:right; padding-bottom: 3px;">
+                <td width="20%" style="vertical-align:top; text-align:right; padding-bottom: 2px;">
                     <div style="display: inline-block; text-align: left;">
                         <div>TANGGAL:</div>
-                        <div style="font-size: 15px; margin-top: 3px;">{{ $tanggalIndonesia }}</div>
+                        <div style="font-size: 12px; margin-top: 3px;">{{ $tanggalIndonesia }}</div>
                     </div>
                 </td>
             </tr>
@@ -187,20 +195,20 @@
         <div class="line" style="margin-top: -5px;"></div>
     </div>
 
-    <div style="font-size:12px; width:100%;">
+    <div style="font-size:10px; width:100%;">
 
         <table style="width:100%; border-collapse: collapse; margin-bottom:4px;">
             <tr>
                 <!-- KIRI -->
                 <td width="30%" style="vertical-align:top; padding-right:10px;">
-                    <div style="font-weight:bold; margin-bottom:10px;">NO. REKENING</div>
+                    <div style="margin-bottom:8px;">NO. REKENING</div>
 
                     <table style="width:46%; border-collapse: collapse; font-size:10px;">
 
                         <!-- No Tanda Terima -->
                         <tr>
                             <td
-                                style="border:1px solid #000; font-weight:bold; text-align:center; padding-left:1px; padding-right:1px; padding-top:8px; padding-bottom:8px">
+                                style="border:1px solid #000; font-weight:bold; text-align:center; padding-left:1px; padding-right:1px; padding-top:4px; padding-bottom:4px">
                                 No. Tanda Terima
                             </td>
                         </tr>
@@ -214,7 +222,7 @@
                         <!-- No Anggota Koperasi -->
                         <tr>
                             <td
-                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:8px;">
+                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:4px;">
                                 No. Anggota Koperasi
                             </td>
                         </tr>
@@ -228,13 +236,13 @@
                         <!-- No Kartu Plasma -->
                         <tr>
                             <td
-                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:8px; ">
+                                style="border:1px solid #000; font-weight:bold; text-align:center; border-top:none; padding:4px; ">
                                 No. Kartu Plasma
                             </td>
                         </tr>
                         <tr>
                             <td
-                                style="border:1px solid #000; border-top:none; text-align:center; padding:8px 4px; font-size:12px; height:20px;">
+                                style="border:1px solid #000; border-top:none; text-align:center; padding:8px 4px; font-size:12px; height:15px;">
                                 {{ $p['no_plasma'] ?? '-' }}
                             </td>
 
@@ -247,7 +255,7 @@
                 <td width="45%" style="vertical-align:top; padding:0 10px;">
                     <div style="width:100%; margin-left:-65px;"> <!-- geser ke kiri sedikit -->
 
-                        <div style="font-weight:bold; margin-bottom:10px;">URAIAN</div>
+                        <div style="margin-bottom:5px;">URAIAN</div>
                         <div style="margin-top:3px;">Pembayaran pendapatan petani</div>
                         <!-- AN -->
                         <div style="display:flex; margin-top:3px;">
@@ -287,7 +295,7 @@
 
                 <!-- KANAN -->
                 <td width="30%" style="vertical-align:top; padding-left:10px;">
-                    <div style="font-weight:bold; margin-bottom:70px ">JUMLAH</div>
+                    <div style="margin-bottom:65px ">JUMLAH</div>
                     <div style="margin-top:3px;">
                         <table style="width:100%; border-collapse:collapse; font-size:11px;">
                             <tr>
@@ -308,7 +316,7 @@
                             </tr>
                             <tr>
                                 <td
-                                    style="font-weight:bold; border-top:1px solid #000; border-bottom:1.5px solid #000; padding-top:60px; font-size:17px;">
+                                    style="font-weight:bold; border-top:1px solid #000; border-bottom:1.5px solid #000; padding-top:40px; font-size:17px;">
                                     <div style="display:flex; justify-content:space-between;">
                                         <span>Rp</span>
                                         <span>{{ number_format($p['nominal'], 0, ',', '.') }}</span>
@@ -321,32 +329,32 @@
                 </td>
             </tr>
         </table>
-        <div style="font-size: 11px; margin-top:10px;">Terbilang</div>
+        <div style="font-size: 11px; margin-top:5px;">Terbilang :</div>
     </div>
 
-    <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:11px; text-align:center;">
+    <table style="width:100%; border-collapse:collapse; margin-top:5px; font-size:10px; text-align:center;">
 
         <!-- Judul Utama -->
         <tr>
-            <td colspan="2" style="border:1px solid #000; padding:4px; width:20%;"></td>
-            <td colspan="2" style="border:1px solid #000; padding:4px; width:30%;">DIBUKUKAN</td>
-            <td colspan="2" style="border:1px solid #000; padding:4px; width:50%;">TELAH DITERIMA JUMLAH TERSEBUT DI
+            <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;"></td>
+            <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;">DIBUKUKAN</td>
+            <td colspan="2" style="border:1px solid #000; padding:2px; width:50%;">TELAH DITERIMA JUMLAH TERSEBUT DI
                 ATAS</td>
         </tr>
 
         <!-- Subjudul / kolom kedua -->
         <tr>
             <!-- Dikeluarkan -->
-            <td style="border:1px solid #000; padding:4px; width:13%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:4px; width:12%;">DIKELUARKAN</td>
+            <td style="border:1px solid #000; padding:2px; width:13%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:2px; width:12%;">DIKELUARKAN</td>
 
             <!-- Dibukukan -->
-            <td style="border:1px solid #000; padding:4px; width:10%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:4px; width:20%;">PARAF</td>
+            <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:2px; width:20%;">PARAF</td>
 
             <!-- Telah Diterima -->
-            <td style="border:1px solid #000; padding:4px; width:10%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:4px; width:25%;">TANDA TANGAN & NAMA PENERIMA</td>
+            <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
+            <td style="border:1px solid #000; padding:2px; width:25%; font-size:8px;">TANDA TANGAN & NAMA PENERIMA</td>
         </tr>
 
         <!-- Baris kosong untuk diisi dengan titik-titik -->
@@ -360,7 +368,7 @@
         </tr>
     </table>
 
-
+    </div>
 </body>
 
 </html>
