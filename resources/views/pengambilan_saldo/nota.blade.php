@@ -20,7 +20,7 @@
         }
 
         body {
-            font-family: "Courier New", monospace;
+            font-family: "Bookman Old Style", "Times New Roman", serif;
             font-size: 12px;
             margin: 0;
         }
@@ -111,7 +111,7 @@
             </td>
 
             <td width="85%" style="text-align:center; transform: translateX(-80px);">
-                <div style="font-size:18px; font-weight:bold; font-family: Georgia, serif;">
+                <div style="font-size:18px; font-weight:bold; font-family: 'Bookman Old Style', serif;">
                     KOPERASI SAWIT MAKMUR
                 </div>
 
@@ -123,31 +123,31 @@
     </table>
     <div style="border-bottom: 2px solid #000; margin: 2px 0;"></div>
 
-    <div class="section-title" style="font-family: Georgia, serif;">BUKTI PENGELUARAN</div>
+    <div class="section-title" style="font-family: 'Bookman Old Style', serif;">BUKTI PENGELUARAN</div>
 
 
     {{-- METODE --}}
     <table style="margin-bottom: 3px; font-size: 11px; width:100%;">
         <tr>
-<td width="80%">
-    <div style="text-align: center; padding-left: 20px;">
-        <div class="checkbox-group">
-            <div class="checkbox-item">
-                <span class="checkbox-box">
-                    {{ $trx->metode == 'cash' ? '✔' : '' }}
-                </span>
-                <span>KAS</span>
-            </div>
+            <td width="80%">
+                <div style="text-align: center; padding-left: 20px;">
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox-box">
+                                {{ $trx->metode == 'cash' ? '✔' : '' }}
+                            </span>
+                            <span>KAS</span>
+                        </div>
 
-            <div class="checkbox-item">
-                <span class="checkbox-box">
-                    {{ $trx->metode == 'transfer' ? '✔' : '' }}
-                </span>
-                <span>BANK</span>
-            </div>
-        </div>
-    </div>
-</td>
+                        <div class="checkbox-item">
+                            <span class="checkbox-box">
+                                {{ $trx->metode == 'transfer' ? '✔' : '' }}
+                            </span>
+                            <span>BANK</span>
+                        </div>
+                    </div>
+                </div>
+            </td>
 
 
             <td width="20%" style="text-align:right; white-space:nowrap;">
