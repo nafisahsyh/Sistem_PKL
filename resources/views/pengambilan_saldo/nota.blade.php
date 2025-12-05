@@ -97,8 +97,8 @@
         12 => 'DESEMBER',
     ];
 
-    $today = now();
-    $tanggalIndonesia = $today->format('j') . ' ' . $bulanNama[intval($today->format('n'))] . ' ' . $today->format('Y');
+    $tanggal = \Carbon\Carbon::parse($trx->tanggal);
+    $tanggalIndonesia = $tanggal->format('j') . ' ' . $bulanNama[intval($tanggal->format('n'))] . ' ' . $tanggal->format('Y');
 @endphp
 
 @php
@@ -270,7 +270,7 @@
                         </div>
 
                         <div style="margin-top:3px; font-size:14px;">
-                            PERIODE {{ strtoupper($bulanNama[$bulan_awal_bulan] . ' ' . $bulan_awal_tahun) }}–
+                            PERIODE {{ strtoupper($bulanNama[$bulan_awal_bulan] . ' ' . $bulan_awal_tahun) }} –
                             {{ strtoupper($bulanNama[$bulan_akhir_bulan] . ' ' . $bulan_akhir_tahun) }}
                         </div>
 
