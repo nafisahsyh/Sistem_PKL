@@ -117,8 +117,8 @@
                         id="collapseLaporan">
                         <nav class="sb-sidenav-menu-nested nav">
 
-                            <a class="nav-link {{ request()->is('laporan_pembelian') ? 'active' : '' }}"
-                                href="/laporan_pembelian">
+                            <a class="nav-link {{ request()->is('buku-besar*') ? 'active' : '' }}"
+                                href="{{ route('buku-besar.index') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Buku Besar
                             </a>

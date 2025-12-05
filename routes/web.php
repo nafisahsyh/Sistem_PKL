@@ -12,6 +12,7 @@ use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\KepemilikanController;
 use App\Http\Controllers\PengambilanSaldoController;
+use App\Http\Controllers\BukuBesarController;
 
 
 Route::get('/', function () {
@@ -111,6 +112,10 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('/ambil-saldo/struk/{id_transaksi}', [PengambilanSaldoController::class, 'struk'])->name('ambil-saldo.struk');
     Route::get('/ambil-saldo', [PengambilanSaldoController::class, 'index'])->name('ambil-saldo.index');
 
+    Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku-besar.index');
+    Route::get('/buku-besar/{id_petani}/{bulan_awal}/{bulan_akhir}', [BukuBesarController::class, 'detail'])->name('buku-besar.detail');
+    Route::get('buku-besar/detail-bagi-petani/{id_petani}', [BukuBesarController::class, 'detailBagiPetani'])
+    ->name('buku-besar.detail-bagi-petani');
 });
 
 // hanya super admin

@@ -32,6 +32,11 @@ class Petani extends Model
         return $this->belongsTo(Desa::class, 'id_desa', 'id_desa');
     }
 
+    public function tahunTanam()
+    {
+        return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam');
+    }
+
     public function kepemilikan()
     {
         return $this->hasMany(Kepemilikan::class, 'id_petani', 'id_petani');
