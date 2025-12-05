@@ -130,7 +130,7 @@
                                         ->orderByDesc('id_transaksi')
                                         ->first();
                                 @endphp
-                                
+
                                 <td class="text-center">
                                     @if ($saldoValue > 0)
                                         <button class="btn btn-success btn-sm" data-bs-toggle="modal"
@@ -204,22 +204,23 @@
 
                             <div class="row mb-3">
                                 <div class="col-4">
-                                    <label class="form-label fw-bold">No Tanda Terima</label>
+                                    <label class="form-label fw-bold">No Tanda Terima<span
+                                            class="text-danger">*</span></label>
                                     <input type="number" name="no_urut" class="form-control" min=0
                                         placeholder="Isi nomor urut" required>
                                 </div>
                                 <div class="col-4">
-                                    <label class="form-label fw-bold">No Bukti</label>
-                                    <input type="text" name="no_bukti" class="form-control"
-                                        value="{{ $nextToday . '.' . now()->format('d/m/Y') }}" readonly>
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label fw-bold">Metode</label>
+                                    <label class="form-label fw-bold">Metode<span class="text-danger">*</span></label>
                                     <select name="metode" class="form-select text-kecil choices-select" required>
                                         <option value="">Pilih Metode</option>
                                         <option value="cash">Cash</option>
                                         <option value="transfer">Transfer</option>
                                     </select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label fw-bold">No Bukti</label>
+                                    <input type="text" name="no_bukti" class="form-control"
+                                        value="{{ $nextToday . '.' . now()->format('d/m/Y') }}" readonly>
                                 </div>
                             </div>
 
