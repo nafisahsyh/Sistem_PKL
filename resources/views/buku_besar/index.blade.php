@@ -127,7 +127,7 @@
                     <div class="modal-body px-4">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Filter Desa</label>
-                            <select name="id_desa" class="form-select">
+                            <select name="id_desa" id="filter_desa" class="form-select">
                                 <option value="">Semua Desa</option>
                                 @if ($desa && $desa->count() > 0)
                                     @foreach ($desa as $d)
@@ -142,7 +142,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Filter Tahun Tanam</label>
-                            <select name="id_tahun_tanam" class="form-select">
+                            <select name="id_tahun_tanam" id="filter_tahun_tanam" class="form-select">
                                 <option value="">Semua Tahun Tanam</option>
                                 @if ($tahunTanam && $tahunTanam->count() > 0)
                                     @foreach ($tahunTanam as $t)
@@ -157,7 +157,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Jenis Transaksi</label>
-                            <select name="tipe" class="form-select">
+                            <select name="tipe" id="filter_tipe" class="form-select">
                                 <option value="credit_bagihasil"
                                     {{ request('tipe') == 'credit_bagihasil' ? 'selected' : '' }}>Kredit</option>
                                 <option value="debit_pengambilan"
@@ -177,4 +177,43 @@
             </div>
         </div>
     </div>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const desaSelect = document.getElementById('filter_desa');
+            const tahunSelect = document.getElementById('filter_tahun_tanam');
+            const tipeSelect = document.getElementById('filter_tipe');
+
+            // Apply Choices
+            if (desaSelect) new Choices(desaSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari desa..."
+            });
+
+            if (tahunSelect) new Choices(tahunSelect, {
+                shouldSort: false,
+                searchPlaceholderValue: "Cari tahun tanam..."
+            });
+
+            if (tipeSelect) new Choices(tipeSelect, {
+                shouldSort: false,
+                searchEnabled: false,
+                itemSelectText: '' // supaya klik option lebih bersih
+            });
+
+            // Reset button
+            const btnReset = document.getElementById('resetFilter');
+            if (btnReset) {
+                btnReset.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = "{{ route('buku-besar.index') }}";
+                });
+            }
+        });
+    </script>
+
 @endsection
