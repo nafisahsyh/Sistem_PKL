@@ -38,16 +38,68 @@
         {{-- TABLE CARD --}}
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
-                <div class="mb-3">
-                    <button
-                        class="btn d-flex align-items-center gap-2
-                    {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
-                        data-bs-toggle="modal" data-bs-target="#filterModal">
-                        <i class="fas fa-filter"></i> Filter
-                        @if ($jumlahFilterAktif > 0)
-                            <span class="badge bg-warning text-dark">{{ $jumlahFilterAktif }}</span>
-                        @endif
-                    </button>
+                {{-- FILTER BUTTON + SEARCH --}}
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+                    <div class="d-flex gap-2">
+                        {{-- Tombol Filter --}}
+                        @php
+                            $filters = [
+                                'id_desa' => request('id_desa'),
+                                'id_tahun_tanam' => request('id_tahun_tanam'),
+                                'tipe' => request('tipe'),
+                                'bulan_awal' => request('bulan_awal'),
+                                'bulan_akhir' => request('bulan_akhir'),
+                            ];
+                            $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
+                        @endphp
+
+                        <button
+                            class="btn d-flex align-items-center gap-2 
+            {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
+                            data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <i class="fas fa-filter"></i> Filter
+                            @if ($jumlahFilterAktif > 0)
+                                <span class="badge bg-warning text-dark">{{ $jumlahFilterAktif }}</span>
+                            @endif
+                        </button>
+                    </div>
+
+                    {{-- FORM SEARCH --}}
+                    <form action="{{ route('buku-besar.index') }}" method="GET"
+                        class="d-flex align-items-start flex-wrap justify-content-end gap-2">
+
+                        {{-- Keep filter desa & tahun tanam & tipe --}}
+                        @foreach (['id_desa', 'id_tahun_tanam', 'tipe'] as $f)
+                            @if (request()->filled($f))
+                                <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
+                            @endif
+                        @endforeach
+
+                        {{-- Periode filter --}}
+                        <div class="month-wrap">
+                            <input type="month" name="bulan_awal"
+                                class="form-control form-control-sm auto-submit month-input"
+                                value="{{ request('bulan_awal') }}">
+                            <span class="month-label">Bulan Awal</span>
+                        </div>
+                        <div class="month-wrap">
+                            <input type="month" name="bulan_akhir"
+                                class="form-control form-control-sm auto-submit month-input"
+                                value="{{ request('bulan_akhir') }}">
+                            <span class="month-label">Bulan Akhir</span>
+                        </div>
+
+                        {{-- Search input --}}
+                        <input type="text" name="search" class="form-control form-control-search"
+                            placeholder="Cari No Plasma atau Nama Petani..." value="{{ request('search') }}"
+                            style="width: 250px;">
+
+                        <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+                        <a href="{{ route('buku-besar.index') }}" class="btn btn-primary" title="Reset">
+                            <i class="fas fa-sync-alt"></i>
+                        </a>
+                    </form>
                 </div>
 
                 <table class="table table-bordered table-striped align-middle table-custom">
@@ -61,7 +113,11 @@
                             <th>Luasan (Ha)</th>
                             <th>Periode</th>
                             <th>Nominal</th>
-                            <th>Aksi</th>
+                            @if (request('tipe', 'credit_bagihasil') == 'debit_pengambilan')
+                                <th>Metode</th>
+                            @else
+                                <th>Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -74,6 +130,7 @@
                                 $luasan = $trx->luasan ?? '-';
                                 $periode = $trx->periode_string ?? '-';
                                 $totalNominal = $trx->total_nominal ?? 0;
+                                $metode = $trx->metode ?? '-';
                             @endphp
                             <tr>
                                 <td class="text-center">
@@ -86,12 +143,17 @@
                                 <td class="text-center">{{ $luasan }}</td>
                                 <td>{{ $periode }}</td>
                                 <td class="text-end">Rp {{ number_format($totalNominal, 0, ',', '.') }}</td>
-                                <td class="text-center">
-                                    <a href="{{ route('buku-besar.detail', [$trx->id_petani, $trx->bulan_awal, $trx->bulan_akhir]) }}"
-                                        class="btn btn-sm btn-info {{ $trx->id_petani ? '' : 'disabled' }}">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
+                                {{-- KOLM TERAKHIR KONDISIONAL --}}
+                                @if (request('tipe') == 'debit_pengambilan')
+                                    <td class="text-center">{{ ucfirst($metode) }}</td>
+                                @else
+                                    <td class="text-center">
+                                        <a href="{{ route('buku-besar.detail', [$trx->id_petani, $trx->bulan_awal, $trx->bulan_akhir]) }}"
+                                            class="btn btn-sm btn-info {{ $trx->id_petani ? '' : 'disabled' }}">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>
@@ -159,9 +221,13 @@
                             <label class="form-label fw-bold">Jenis Transaksi</label>
                             <select name="tipe" id="filter_tipe" class="form-select">
                                 <option value="credit_bagihasil"
-                                    {{ request('tipe') == 'credit_bagihasil' ? 'selected' : '' }}>Kredit</option>
+                                    {{ request('tipe', 'credit_bagihasil') == 'credit_bagihasil' ? 'selected' : '' }}>
+                                    Kredit
+                                </option>
                                 <option value="debit_pengambilan"
-                                    {{ request('tipe') == 'debit_pengambilan' ? 'selected' : '' }}>Debit</option>
+                                    {{ request('tipe') == 'debit_pengambilan' ? 'selected' : '' }}>
+                                    Debit
+                                </option>
                             </select>
                         </div>
                     </div>
