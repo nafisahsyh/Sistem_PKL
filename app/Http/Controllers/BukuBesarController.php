@@ -209,4 +209,63 @@ class BukuBesarController extends Controller
             'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
+
+    public function detail(Request $request)
+    {
+
+        \Carbon\Carbon::setLocale('id');
+
+        $id_petani = $request->id;
+        $awal = $request->awal;   // yyyy-mm
+        $akhir = $request->akhir; // yyyy-mm
+
+        $periodeAwal = \Carbon\Carbon::parse($awal . '-01');
+        $periodeAkhir = \Carbon\Carbon::parse($akhir . '-01');
+
+        // Buat range bulan
+        $bulanRange = [];
+        $temp = $periodeAwal->copy();
+        while ($temp <= $periodeAkhir) {
+            $bulanRange[] = $temp->copy();
+            $temp->addMonth();
+        }
+
+        // Ambil semua record bagi hasil petani (sudah per lahan)
+        $bagiHasil = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
+            ->where('bhp.id_petani', $id_petani)
+            ->select(
+                'bhp.id_lahan',
+                'bhp.total_luas_ksm',
+                'bhp.total_nominal',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan,2,'0'), '-01') AS bulan_awal")
+            )
+            ->get();
+
+        $tabelData = [];
+        $noTabel = 1;
+        // Ambil semua lahan unik milik petani ini
+        $lahannya = $bagiHasil->groupBy('id_lahan');
+
+        foreach ($bulanRange as $bulanObj) {
+            $noLahan = 1; // reset nomor lahan per bulan
+            foreach ($lahannya as $id_lahan => $laH) {
+                $bh = $laH->firstWhere('bulan_awal', $bulanObj->format('Y-m-d'));
+                if (!$bh) continue;
+
+                $tabelData[] = [
+                    'no' => $noTabel,       // nomor urut tabel
+                    'lahan' => $noLahan,    // nomor lahan per petani
+                    'bulan' => $bulanObj->translatedFormat('F Y'),
+                    'luas' => $bh->total_luas_ksm,
+                    'nominal' => $bh->total_nominal,
+                ];
+                $noTabel++;
+                $noLahan++;
+            }
+        }
+
+
+        return view('buku_besar.detail', compact('tabelData'));
+    }
 }

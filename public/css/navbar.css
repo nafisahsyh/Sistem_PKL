@@ -984,3 +984,15 @@ input.form-control {
 .modal-wide {
     max-width: 600px;
 }
+
+#detailModal table {
+    width: 100%;
+    border-collapse: collapse; /* gabungkan border */
+}
+
+#detailModal .modal-body {
+    max-height: 60vh;
+    /* maksimal 60% tinggi viewport */
+    overflow-y: auto;
+    /* scroll vertikal jika konten melebihi max-height */
+}

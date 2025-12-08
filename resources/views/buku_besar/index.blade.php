@@ -148,10 +148,11 @@
                                     <td class="text-center">{{ ucfirst($metode) }}</td>
                                 @else
                                     <td class="text-center">
-                                        <a href="{{ route('buku-besar.detail', [$trx->id_petani, $trx->bulan_awal, $trx->bulan_akhir]) }}"
-                                            class="btn btn-sm btn-info {{ $trx->id_petani ? '' : 'disabled' }}">
+                                        <button class="btn btn-sm btn-info btn-detail" data-id="{{ $trx->id_petani }}"
+                                            data-awal="{{ $trx->bulan_awal }}" data-akhir="{{ $trx->bulan_akhir }}">
                                             <i class="fas fa-eye"></i>
-                                        </a>
+                                        </button>
+
                                     </td>
                                 @endif
                             </tr>
@@ -244,6 +245,39 @@
         </div>
     </div>
 
+    {{-- MODAL DETAIL --}}
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-sm border-0">
+
+                <!-- Header -->
+                <div class="modal-header bg-info rounded-top-4 border-0">
+                    <h5 class="modal-title text-dark fw-bold">
+                        <i class="fas fa-eye me-2"></i> Detail Transaksi Petani
+                    </h5>
+                    <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body" id="detailContent">
+                    <div class="text-center py-2 text-muted">
+                        <div class="spinner-border text-white" role="status" style="width: 3rem; height: 3rem;"></div>
+                        <p class="mt-3 fs-6 text-white">Memuat data...</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
@@ -281,5 +315,43 @@
             }
         });
     </script>
+
+    <script>
+        // ============================================================
+        // 🔥 DETAIL MODAL HANDLER
+        // ============================================================
+        document.querySelectorAll('.btn-detail').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const awal = this.dataset.awal;
+                const akhir = this.dataset.akhir;
+
+                const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                detailModal.show();
+
+                document.getElementById('detailContent').innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <div class="spinner-border text-info"></div>
+                <p class="mt-2">Memuat data...</p>
+            </div>
+        `;
+
+                fetch(`/buku-besar/detail?id=${id}&awal=${awal}&akhir=${akhir}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('detailContent').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('detailContent').innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-circle fa-2x"></i>
+                        <p class="mt-2">Gagal memuat data</p>
+                    </div>
+                `;
+                    });
+            });
+        });
+    </script>
+
 
 @endsection

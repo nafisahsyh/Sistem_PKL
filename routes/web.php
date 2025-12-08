@@ -115,7 +115,8 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('/buku-besar', [BukuBesarController::class, 'index'])->name('buku-besar.index');
     Route::get('/buku-besar/{id_petani}/{bulan_awal}/{bulan_akhir}', [BukuBesarController::class, 'detail'])->name('buku-besar.detail');
     Route::get('buku-besar/detail-bagi-petani/{id_petani}', [BukuBesarController::class, 'detailBagiPetani'])
-    ->name('buku-besar.detail-bagi-petani');
+        ->name('buku-besar.detail-bagi-petani');
+    Route::get('/buku-besar/detail', [BukuBesarController::class, 'detail'])->name('buku-besar.detail');
 });
 
 // hanya super admin
