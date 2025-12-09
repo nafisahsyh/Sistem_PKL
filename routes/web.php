@@ -121,7 +121,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('/buku-besar/pdf', [BukuBesarController::class, 'pdf'])->name('buku-besar.pdf');
 
     Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
-
+    Route::get('/saldo/pdf', [SaldoController::class, 'saldoPdf'])->name('saldo.pdf');
 });
 
 // hanya super admin

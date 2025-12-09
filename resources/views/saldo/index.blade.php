@@ -6,8 +6,13 @@
     <div class="container-fluid px-4 mt-5">
 
         {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-end mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="text-brown mb-0">Catatan Saldo</h3>
+
+            <a href="{{ route('saldo.pdf', request()->all()) }}" target="_blank"
+                class="btn btn-danger d-flex align-items-center gap-2">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
         </div>
 
         {{-- CARD --}}
@@ -15,7 +20,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
 
-                    {{-- Hitung jumlah filter aktif --}}
+                    {{-- MENGHITUNG JUMLAH FILTER YANG AKTIF --}}
                     @php
                         $filters = [
                             'id_desa' => request('id_desa'),
@@ -93,7 +98,7 @@
                             @endforeach
                         </div>
                     @endif
-                    
+
                     <button
                         class="btn d-flex align-items-center gap-2
         {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
@@ -108,13 +113,14 @@
                     <form action="{{ route('saldo.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end gap-2">
 
-                        {{-- Keep filter --}}
+                        {{-- MENJAGA FILTER TETAP AKTIF --}}
                         @foreach (['desa', 'tahun_tanam', 'periode', 'metode'] as $f)
                             @if (request()->filled($f))
                                 <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
                             @endif
                         @endforeach
 
+                        {{-- SEARCH BAR --}}
                         <input type="text" name="search" class="form-control form-control-search"
                             placeholder="Cari Nama/No Plasma..." value="{{ request('search') }}" style="width: 250px;">
 
@@ -122,6 +128,7 @@
                             <i class="fas fa-search"></i>
                         </button>
 
+                        {{-- BUTTON MENERAPKAN SEARCH --}}
                         <a href="{{ route('saldo.index') }}" class="btn btn-primary">
                             <i class="fas fa-sync-alt"></i>
                         </a>
@@ -249,21 +256,21 @@
 
                             {{-- Periode --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Periode</label>
+                                <label class="form-label fw-bold">Periode (2 Bulanan)</label>
                                 <select name="periode" id="filter_periode" class="form-select">
                                     <option value="">Semua Periode</option>
-                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari –
-                                        Februari</option>
-                                    <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret – April
+                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari-Februari
                                     </option>
-                                    <option value="3" {{ request('periode') == 3 ? 'selected' : '' }}>Mei – Juni
+                                    <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret-April
                                     </option>
-                                    <option value="4" {{ request('periode') == 4 ? 'selected' : '' }}>Juli – Agustus
+                                    <option value="3" {{ request('periode') == 3 ? 'selected' : '' }}>Mei-Juni
                                     </option>
-                                    <option value="5" {{ request('periode') == 5 ? 'selected' : '' }}>September –
-                                        Oktober</option>
-                                    <option value="6" {{ request('periode') == 6 ? 'selected' : '' }}>November –
-                                        Desember</option>
+                                    <option value="4" {{ request('periode') == 4 ? 'selected' : '' }}>Juli-Agustus
+                                    </option>
+                                    <option value="5" {{ request('periode') == 5 ? 'selected' : '' }}>
+                                        September-Oktober</option>
+                                    <option value="6" {{ request('periode') == 6 ? 'selected' : '' }}>
+                                        November-Desember</option>
                                 </select>
                             </div>
 

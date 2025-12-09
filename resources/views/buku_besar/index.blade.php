@@ -222,21 +222,21 @@
 
                             {{-- Periode --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Filter Periode</label>
+                                <label class="form-label fw-bold">Periode (2 Bulanan)</label>
                                 <select name="periode" id="filter_periode" class="form-select">
                                     <option value="">Pilih Periode</option>
-                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari -
-                                        Februari</option>
-                                    <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret - April
+                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari-Februari
                                     </option>
-                                    <option value="3" {{ request('periode') == 3 ? 'selected' : '' }}>Mei - Juni
+                                    <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret-April
                                     </option>
-                                    <option value="4" {{ request('periode') == 4 ? 'selected' : '' }}>Juli - Agustus
+                                    <option value="3" {{ request('periode') == 3 ? 'selected' : '' }}>Mei-Juni
                                     </option>
-                                    <option value="5" {{ request('periode') == 5 ? 'selected' : '' }}>September -
-                                        Oktober</option>
-                                    <option value="6" {{ request('periode') == 6 ? 'selected' : '' }}>November -
-                                        Desember</option>
+                                    <option value="4" {{ request('periode') == 4 ? 'selected' : '' }}>Juli-Agustus
+                                    </option>
+                                    <option value="5" {{ request('periode') == 5 ? 'selected' : '' }}>
+                                        September-Oktober</option>
+                                    <option value="6" {{ request('periode') == 6 ? 'selected' : '' }}>
+                                        November-Desember</option>
                                 </select>
                             </div>
 
