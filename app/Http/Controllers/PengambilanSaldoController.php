@@ -264,16 +264,14 @@ class PengambilanSaldoController extends Controller
         $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
         $transaksi = null;
 
-        DB::transaction(function () use ($request, $idPetani, $firstBulanan, $bulan_awal, $bulan_akhir, &$transaksi) {
+        $transaksi = DB::transaction(function () use ($request, $idPetani, $firstBulanan, $bulan_awal, $bulan_akhir) {
 
-            // Hitung total saldo yang akan diambil
+            // Hitung total saldo
             $totalSaldo = BagiHasilPetani::whereIn('id_bagi_bulanan', $request->id_bulanan)
                 ->where('id_petani', $idPetani)
                 ->sum('total_nominal');
 
-            // ==============================
-            // Update / buat saldo sesuai periode
-            // ==============================
+            // Update saldo
             $saldo = Saldo::firstOrCreate(
                 [
                     'id_petani' => $idPetani,
@@ -287,19 +285,15 @@ class PengambilanSaldoController extends Controller
                 ]
             );
 
-            // Pastikan bulan_akhir selalu mengikuti input terbaru
             if ($saldo->bulan_akhir != $bulan_akhir) {
                 $saldo->bulan_akhir = $bulan_akhir;
                 $saldo->save();
             }
 
-            // Kurangi saldo sesuai pengambilan
             $saldo->decrement('saldo', $totalSaldo);
 
-            // ==============================
-            // Simpan transaksi debit
-            // ==============================
-            $transaksi = Transaksi::create([
+            // === RETURN di sini ===
+            return Transaksi::create([
                 'id_petani' => $idPetani,
                 'id_desa' => $firstBulanan->id_desa,
                 'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
@@ -317,7 +311,6 @@ class PengambilanSaldoController extends Controller
 
         // Redirect ke struk
         return redirect()->route('ambil-saldo.struk', ['id_transaksi' => $transaksi->id_transaksi]);
-
     }
 
     public function struk($id_transaksi)

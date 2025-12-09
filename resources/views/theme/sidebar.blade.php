@@ -123,9 +123,9 @@
                                 Buku Besar
                             </a>
 
-                            <a class="nav-link {{ request()->is('laporan_penjualan') ? 'active' : '' }}"
-                                href="/laporan_penjualan">
-                                <div class="sb-nav-link-icon"><i class="fas fa-wallet"></i></div>
+                            <a class="nav-link {{ request()->is('saldo*') ? 'active' : '' }}"
+                                href="{{ route('saldo.index') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Catatan Saldo
                             </a>
 

@@ -5,14 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DesaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SaldoController;
 use App\Http\Controllers\PetaniController;
 use App\Http\Controllers\BagiHasilController;
+use App\Http\Controllers\BukuBesarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\KepemilikanController;
 use App\Http\Controllers\PengambilanSaldoController;
-use App\Http\Controllers\BukuBesarController;
 
 
 Route::get('/', function () {
@@ -117,6 +118,9 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('buku-besar/detail-bagi-petani/{id_petani}', [BukuBesarController::class, 'detailBagiPetani'])
         ->name('buku-besar.detail-bagi-petani');
     Route::get('/buku-besar/detail', [BukuBesarController::class, 'detail'])->name('buku-besar.detail');
+
+    Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
+
 });
 
 // hanya super admin
