@@ -33,7 +33,20 @@
         {{-- HEADER + FILTER BUTTON --}}
         <div class="d-flex justify-content-between align-items-end mb-3">
             <h3 class="text-brown mb-0">Buku Besar</h3>
+
+            <a href="{{ route('buku-besar.pdf') }}?
+        tipe={{ request('tipe') }}
+        &id_desa={{ request('id_desa') }}
+        &id_tahun_tanam={{ request('id_tahun_tanam') }}
+        &periode={{ request('periode') }}
+        &tahun={{ request('tahun') }}
+        &search={{ request('search') }}"
+                target="_blank" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
+
         </div>
+
 
         {{-- TABLE CARD --}}
         <div class="card shadow-sm rounded-3">

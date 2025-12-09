@@ -118,6 +118,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
     Route::get('buku-besar/detail-bagi-petani/{id_petani}', [BukuBesarController::class, 'detailBagiPetani'])
         ->name('buku-besar.detail-bagi-petani');
     Route::get('/buku-besar/detail', [BukuBesarController::class, 'detail'])->name('buku-besar.detail');
+    Route::get('/buku-besar/pdf', [BukuBesarController::class, 'pdf'])->name('buku-besar.pdf');
 
     Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
 
