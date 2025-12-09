@@ -48,8 +48,8 @@
                                 'id_desa' => request('id_desa'),
                                 'id_tahun_tanam' => request('id_tahun_tanam'),
                                 'tipe' => request('tipe'),
-                                'bulan_awal' => request('bulan_awal'),
-                                'bulan_akhir' => request('bulan_akhir'),
+                                'tahun' => request('tahun'), // 👈 tambah Tahun
+                                'periode' => request('periode'),
                             ];
                             $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
                         @endphp
@@ -75,20 +75,6 @@
                                 <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
                             @endif
                         @endforeach
-
-                        {{-- Periode filter --}}
-                        <div class="month-wrap">
-                            <input type="month" name="bulan_awal"
-                                class="form-control form-control-sm auto-submit month-input"
-                                value="{{ request('bulan_awal') }}">
-                            <span class="month-label">Bulan Awal</span>
-                        </div>
-                        <div class="month-wrap">
-                            <input type="month" name="bulan_akhir"
-                                class="form-control form-control-sm auto-submit month-input"
-                                value="{{ request('bulan_akhir') }}">
-                            <span class="month-label">Bulan Akhir</span>
-                        </div>
 
                         {{-- Search input --}}
                         <input type="text" name="search" class="form-control form-control-search"
@@ -177,61 +163,90 @@
 
     {{-- MODAL FILTER --}}
     <div class="modal fade" id="filterModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content rounded-4">
+
                 <div class="modal-header bg-success text-white rounded-top-4">
                     <h5 class="modal-title">
-                        <i class="fas fa-filter me-2"></i> Filter Data Kepemilikan
+                        <i class="fas fa-filter me-2"></i> Filter Buku Besar
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
                 <form action="{{ route('buku-besar.index') }}" method="GET">
                     <div class="modal-body px-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Filter Desa</label>
-                            <select name="id_desa" id="filter_desa" class="form-select">
-                                <option value="">Semua Desa</option>
-                                @if ($desa && $desa->count() > 0)
+                        <div class="row g-2">
+
+                            {{-- Desa --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Filter Desa</label>
+                                <select name="id_desa" id="filter_desa" class="form-select">
+                                    <option value="">Semua Desa</option>
                                     @foreach ($desa as $d)
                                         <option value="{{ $d->id_desa }}"
                                             {{ request('id_desa') == $d->id_desa ? 'selected' : '' }}>
                                             {{ $d->desa }}
                                         </option>
                                     @endforeach
-                                @endif
-                            </select>
-                        </div>
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Filter Tahun Tanam</label>
-                            <select name="id_tahun_tanam" id="filter_tahun_tanam" class="form-select">
-                                <option value="">Semua Tahun Tanam</option>
-                                @if ($tahunTanam && $tahunTanam->count() > 0)
+                            {{-- Tahun Tanam --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Filter Tahun Tanam</label>
+                                <select name="id_tahun_tanam" id="filter_tahun_tanam" class="form-select">
+                                    <option value="">Semua Tahun Tanam</option>
                                     @foreach ($tahunTanam as $t)
                                         <option value="{{ $t->id_tahun_tanam }}"
                                             {{ request('id_tahun_tanam') == $t->id_tahun_tanam ? 'selected' : '' }}>
                                             {{ $t->tahun }}
                                         </option>
                                     @endforeach
-                                @endif
-                            </select>
-                        </div>
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Jenis Transaksi</label>
-                            <select name="tipe" id="filter_tipe" class="form-select">
-                                <option value="credit_bagihasil"
-                                    {{ request('tipe', 'credit_bagihasil') == 'credit_bagihasil' ? 'selected' : '' }}>
-                                    Kredit
-                                </option>
-                                <option value="debit_pengambilan"
-                                    {{ request('tipe') == 'debit_pengambilan' ? 'selected' : '' }}>
-                                    Debit
-                                </option>
-                            </select>
+                            {{-- Periode --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Filter Periode</label>
+                                <select name="periode" id="filter_periode" class="form-select">
+                                    <option value="">Pilih Periode</option>
+                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari -
+                                        Februari</option>
+                                    <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret - April
+                                    </option>
+                                    <option value="3" {{ request('periode') == 3 ? 'selected' : '' }}>Mei - Juni
+                                    </option>
+                                    <option value="4" {{ request('periode') == 4 ? 'selected' : '' }}>Juli - Agustus
+                                    </option>
+                                    <option value="5" {{ request('periode') == 5 ? 'selected' : '' }}>September -
+                                        Oktober</option>
+                                    <option value="6" {{ request('periode') == 6 ? 'selected' : '' }}>November -
+                                        Desember</option>
+                                </select>
+                            </div>
+
+                            {{-- Tahun --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tahun</label>
+                                <input type="number" name="tahun" class="form-control" placeholder="Misal: 2025"
+                                    value="{{ request('tahun') }}" min="2000" max="3000">
+                            </div>
+
+                            {{-- Jenis Transaksi --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Jenis Transaksi</label>
+                                <select name="tipe" id="filter_tipe" class="form-select">
+                                    <option value="credit_bagihasil"
+                                        {{ request('tipe', 'credit_bagihasil') == 'credit_bagihasil' ? 'selected' : '' }}>
+                                        Kredit</option>
+                                    <option value="debit_pengambilan"
+                                        {{ request('tipe') == 'debit_pengambilan' ? 'selected' : '' }}>Debit</option>
+                                </select>
+                            </div>
+
                         </div>
                     </div>
+
                     <div class="modal-footer d-flex justify-content-between">
                         <a href="{{ route('buku-besar.index') }}" class="btn btn-secondary">
                             <i class="fas fa-sync-alt me-1"></i> Reset
@@ -241,6 +256,7 @@
                         </button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -287,6 +303,7 @@
             const desaSelect = document.getElementById('filter_desa');
             const tahunSelect = document.getElementById('filter_tahun_tanam');
             const tipeSelect = document.getElementById('filter_tipe');
+            const periodeSelect = document.getElementById('filter_periode');
 
             // Apply Choices
             if (desaSelect) new Choices(desaSelect, {
@@ -297,6 +314,15 @@
             if (tahunSelect) new Choices(tahunSelect, {
                 shouldSort: false,
                 searchPlaceholderValue: "Cari tahun tanam..."
+            });
+
+            if (periodeSelect) new Choices(periodeSelect, {
+                shouldSort: false,
+                placeholder: true,
+                placeholderValue: "Semua Periode",
+                searchPlaceholderValue: "Cari periode...",
+                itemSelectText: '',
+                removeItemButton: false
             });
 
             if (tipeSelect) new Choices(tipeSelect, {
@@ -352,6 +378,4 @@
             });
         });
     </script>
-
-
 @endsection

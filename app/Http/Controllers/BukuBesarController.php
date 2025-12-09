@@ -6,6 +6,7 @@ use App\Models\Desa;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BukuBesarController extends Controller
 {
@@ -26,72 +27,7 @@ class BukuBesarController extends Controller
             12 => 'Desember'
         ];
 
-        /**
-         * 1) Ambil total nominal per petani per periode 2-bulanan
-         */
-        $subNominal = DB::table('bagi_hasil_petani as bhp')
-            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
-            ->select(
-                'bhp.id_petani',
-                'bhb.id_desa',
-                'bhb.id_tahun_tanam',
-                DB::raw("
-                CONCAT(
-                    bhb.tahun, '-',
-                    LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0'),
-                    '-01'
-                ) AS bulan_awal
-            "),
-                DB::raw("
-                CONCAT(
-                    bhb.tahun, '-',
-                    LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0'),
-                    '-28'
-                ) AS bulan_akhir
-            "),
-                DB::raw('SUM(bhp.total_nominal) AS total_nominal')
-            )
-            ->when($request->filled('id_desa'), fn($q) => $q->where('bhb.id_desa', $request->id_desa))
-            ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('bhb.id_tahun_tanam', $request->id_tahun_tanam))
-            ->groupBy(
-                'bhp.id_petani',
-                'bhb.id_desa',
-                'bhb.id_tahun_tanam',
-                DB::raw("
-                CONCAT(
-                    bhb.tahun, '-',
-                    LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0'),
-                    '-01'
-                )
-            "),
-                DB::raw("
-                CONCAT(
-                    bhb.tahun, '-',
-                    LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0'),
-                    '-28'
-                )
-            ")
-            );
-
-        /**
-         * 2) Total luas unik per petani (Ha, rounded 2 decimal)
-         */
-        $subLuas = DB::table('detail_kepemilikan as dk')
-            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
-            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
-            ->select(
-                'k.id_petani',
-                'l.id_desa',
-                'l.id_tahun_tanam',
-                DB::raw('ROUND(SUM(l.luas_peta)/10000, 2) AS total_luas_ksm')
-            )
-            ->where('dk.status_pengelolaan', 'ksm')
-            ->where('dk.status_kepemilikan', 'aktif')
-            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam');
-
-        /**
-         * 3) Snapshot terakhir per petani
-         */
+        // Ambil snapshot terakhir per petani
         $subSnapshot = DB::table('bagi_hasil_petani as bh1')
             ->join(
                 DB::raw('(SELECT id_petani, MAX(id_bagi_petani) AS max_id FROM bagi_hasil_petani GROUP BY id_petani) bh2'),
@@ -108,72 +44,130 @@ class BukuBesarController extends Controller
                 'bh1.id_tahun_tanam'
             );
 
-        /**
-         * 4) Subquery transaksi per petani-desa-tahun-tanam-tipe
-         */
-        $subTransaksi = DB::table('transaksi as t')
+        // Ambil total luas per petani
+        $subLuas = DB::table('detail_kepemilikan as dk')
+            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
+            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
             ->select(
-                't.id_petani',
-                't.id_desa',
-                't.id_tahun_tanam',
-                't.tipe',
-                DB::raw('SUM(t.nominal) AS total_transaksi')
+                'k.id_petani',
+                'l.id_desa',
+                'l.id_tahun_tanam',
+                DB::raw('ROUND(SUM(l.luas_peta)/10000, 2) AS total_luas_ksm')
             )
-            ->groupBy('t.id_petani', 't.id_desa', 't.id_tahun_tanam', 't.tipe');
+            ->where('dk.status_pengelolaan', 'ksm')
+            ->where('dk.status_kepemilikan', 'aktif')
+            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam');
 
-        /**
-         * 5) Gabungkan snapshot + luas + nominal + transaksi
-         */
-        $query = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
+        // Ambil kredit (SUM per periode)
+        $subKredit = DB::table('transaksi')
+            ->select(
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                'bulan_awal',
+                'bulan_akhir',
+                DB::raw('SUM(nominal) AS total_nominal')
+            )
+            ->where('tipe', 'credit_bagihasil');
+
+        // Jika PERIODE & TAHUN diisi
+        if ($request->filled('periode') && $request->filled('tahun')) {
+            $periode = (int) $request->periode;
+            $tahun = $request->tahun;
+
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $periode * 2;
+
+            $bulanAwal = $tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $subKredit->where('bulan_awal', $bulanAwal)
+                ->where('bulan_akhir', $bulanAkhir);
+        }
+
+        // Jika PERIODE diisi tapi TAHUN tidak
+        if ($request->filled('periode') && !$request->filled('tahun')) {
+            $periode = (int) $request->periode;
+
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $periode * 2;
+
+            $bulanAwalStr = '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhirStr = '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $subKredit->where('bulan_awal', 'LIKE', "%$bulanAwalStr")
+                ->where('bulan_akhir', 'LIKE', "%$bulanAkhirStr");
+        }
+
+        // Jika hanya TAHUN diisi
+        if ($request->filled('tahun')) {
+            $subKredit->where(DB::raw("SUBSTRING(bulan_awal, 1, 4)"), $request->tahun);
+        }
+
+        $subKredit->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir');
+
+        // Ambil debit (per transaksi)
+        $subDebit = DB::table('transaksi')
+            ->select(
+                'id_transaksi',
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                'bulan_awal',
+                'bulan_akhir',
+                'nominal',
+                'metode'
+            )
+            ->where('tipe', 'debit_pengambilan');
+
+        if ($request->filled('periode') && $request->filled('tahun')) {
+            $periode = (int) $request->periode;
+            $tahun = $request->tahun;
+
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $periode * 2;
+
+            $bulanAwal = $tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $subDebit->where('bulan_awal', $bulanAwal)
+                ->where('bulan_akhir', $bulanAkhir);
+        }
+
+        if ($request->filled('periode') && !$request->filled('tahun')) {
+            $periode = (int) $request->periode;
+
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $periode * 2;
+
+            $bulanAwalStr = '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhirStr = '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $subDebit->where('bulan_awal', 'LIKE', "%$bulanAwalStr")
+                ->where('bulan_akhir', 'LIKE', "%$bulanAkhirStr");
+        }
+
+        if ($request->filled('tahun')) {
+            $subDebit->where('bulan_awal', 'LIKE', $request->tahun . '%');
+        }
+
+        // Gabungkan snapshot + luas + kredit
+        $kredit = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
             ->mergeBindings($subSnapshot)
             ->joinSub($subLuas, 'l', function ($join) {
                 $join->on('s.id_petani', '=', 'l.id_petani')
                     ->on('s.id_desa', '=', 'l.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
             })
-            ->joinSub($subNominal, 'n', function ($join) {
-                $join->on('s.id_petani', '=', 'n.id_petani')
-                    ->on('s.id_desa', '=', 'n.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 'n.id_tahun_tanam');
-            })
-            ->leftJoinSub($subTransaksi, 't', function ($join) {
-                $join->on('s.id_petani', '=', 't.id_petani')
-                    ->on('s.id_desa', '=', 't.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 't.id_tahun_tanam');
+            ->joinSub($subKredit, 'k', function ($join) {
+                $join->on('s.id_petani', '=', 'k.id_petani')
+                    ->on('s.id_desa', '=', 'k.id_desa')
+                    ->on('s.id_tahun_tanam', '=', 'k.id_tahun_tanam');
             })
             ->join('desa as d', 's.id_desa', '=', 'd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
             ->when($request->filled('id_desa'), fn($q) => $q->where('s.id_desa', $request->id_desa))
             ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('s.id_tahun_tanam', $request->id_tahun_tanam))
-            ->when($request->filled('bulan_awal') && $request->filled('bulan_akhir'), function ($q) use ($request) {
-                $q->whereBetween('n.bulan_awal', [
-                    $request->bulan_awal . '-01',
-                    $request->bulan_akhir . '-01'
-                ]);
-            })
-            ->when($request->filled('bulan_awal') && !$request->filled('bulan_akhir'), function ($q) use ($request) {
-                $q->where('n.bulan_awal', $request->bulan_awal . '-01');
-            })
-            ->when(true, function ($q) use ($request) {
-                if ($request->filled('tipe')) {
-                    if ($request->tipe == 'credit_bagihasil') {
-                        $q->whereIn('t.tipe', ['credit_bagihasil', 'credit_mandiri']);
-                    } elseif ($request->tipe == 'debit_pengambilan') {
-                        $q->where('t.tipe', 'debit_pengambilan');
-                    }
-                } else {
-                    // default ke tipe kredit kalau belum pilih tipe
-                    $q->whereIn('t.tipe', ['credit_bagihasil', 'credit_mandiri']);
-                }
-            })
-
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $search = $request->search;
-                $q->where(function ($q2) use ($search) {
-                    $q2->where('s.nama_petani_snapshot', 'like', "%{$search}%")
-                        ->orWhere('s.nomor_plasma_snapshot', 'like', "%{$search}%");
-                });
-            })
             ->select(
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
@@ -181,34 +175,115 @@ class BukuBesarController extends Controller
                 'l.total_luas_ksm AS luasan',
                 'd.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
-                'n.bulan_awal',
-                'n.bulan_akhir',
-                'n.total_nominal'
+                'k.bulan_awal',
+                'k.bulan_akhir',
+                'k.total_nominal'
             )
             ->orderBy('s.id_petani')
-            ->paginate(10)
-            ->appends($request->query());
+            ->get()
+            ->transform(function ($trx) use ($namaBulan) {
+                $bulanAwal = (int) substr($trx->bulan_awal, 5, 2);
+                $bulanAkhir = (int) substr($trx->bulan_akhir, 5, 2);
+                $tahun = substr($trx->bulan_akhir, 0, 4);
 
-        /**
-         * 6) Format periode
-         */
-        $query->getCollection()->transform(function ($trx) use ($namaBulan) {
-            $bulanAwal = (int) substr($trx->bulan_awal, 5, 2);
-            $bulanAkhir = (int) substr($trx->bulan_akhir, 5, 2);
-            $tahun = substr($trx->bulan_akhir, 0, 4);
+                $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
+                $trx->metode = '-'; // kredit
+                $trx->total_nominal = (float) $trx->total_nominal;
 
-            $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
-            $trx->total_nominal = (float) $trx->total_nominal;
+                return $trx;
+            });
 
-            return $trx;
-        });
+        // Debit
+        $debit = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
+            ->mergeBindings($subSnapshot)
+            ->joinSub($subLuas, 'l', function ($join) {
+                $join->on('s.id_petani', '=', 'l.id_petani')
+                    ->on('s.id_desa', '=', 'l.id_desa')
+                    ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
+            })
+            ->joinSub($subDebit, 'd', function ($join) {
+                $join->on('s.id_petani', '=', 'd.id_petani')
+                    ->on('s.id_desa', '=', 'd.id_desa')
+                    ->on('s.id_tahun_tanam', '=', 'd.id_tahun_tanam');
+            })
+            ->join('desa as desaTbl', 's.id_desa', '=', 'desaTbl.id_desa')
+            ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
+            ->when($request->filled('id_desa'), fn($q) => $q->where('s.id_desa', $request->id_desa))
+            ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('s.id_tahun_tanam', $request->id_tahun_tanam))
+            ->select(
+                's.id_petani',
+                's.nama_petani_snapshot AS nama_petani',
+                's.nomor_plasma_snapshot AS nomor_plasma',
+                'l.total_luas_ksm AS luasan',
+                'desaTbl.desa AS nama_desa',
+                'tt.tahun AS tahun_tanam',
+                'd.bulan_awal',
+                'd.bulan_akhir',
+                'd.nominal',
+                'd.metode'
+            )
+            ->orderBy('s.id_petani')
+            ->get()
+            ->transform(function ($trx) use ($namaBulan) {
+                $bulanAwal = (int) substr($trx->bulan_awal, 5, 2);
+                $bulanAkhir = (int) substr($trx->bulan_akhir, 5, 2);
+                $tahun = substr($trx->bulan_akhir, 0, 4);
+
+                $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
+                $trx->total_nominal = (float) $trx->nominal;
+
+                return $trx;
+            });
+
+        // Filter search berdasarkan nama_petani atau nomor_plasma
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+
+            $kredit = $kredit->filter(
+                fn($trx) =>
+                str_contains(strtolower($trx->nama_petani), $search) ||
+                str_contains(strtolower($trx->nomor_plasma), $search)
+            );
+
+            $debit = $debit->filter(
+                fn($trx) =>
+                str_contains(strtolower($trx->nama_petani), $search) ||
+                str_contains(strtolower($trx->nomor_plasma), $search)
+            );
+        }
+
+        // Pilih tipe transaksi sesuai filter
+        if ($request->tipe == 'debit_pengambilan') {
+            $dataTransaksi = $debit;
+        } else {
+            $dataTransaksi = $kredit;
+        }
+
+        // Optional sorting
+        $dataTransaksi = $dataTransaksi->sortBy('id_petani');
+
+        $page = request()->get('page', 1);
+        $perPage = 10;
+
+        // Buat paginator dari collection
+        $dataTransaksi = new LengthAwarePaginator(
+            $dataTransaksi->forPage($page, $perPage),
+            $dataTransaksi->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query()
+            ]
+        );
 
         return view('buku_besar.index', [
-            'dataTransaksi' => $query,
+            'dataTransaksi' => $dataTransaksi,
             'desa' => Desa::all(),
             'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
+
 
     public function detail(Request $request)
     {
@@ -251,7 +326,8 @@ class BukuBesarController extends Controller
             $noLahan = 1; // reset nomor lahan per bulan
             foreach ($lahannya as $id_lahan => $laH) {
                 $bh = $laH->firstWhere('bulan_awal', $bulanObj->format('Y-m-d'));
-                if (!$bh) continue;
+                if (!$bh)
+                    continue;
 
                 $tabelData[] = [
                     'no' => $noTabel,       // nomor urut tabel
