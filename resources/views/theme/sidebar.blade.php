@@ -113,7 +113,7 @@
                     </a>
 
                     <div class="collapse 
-    {{ request()->is('laporan_pembelian') || request()->is('laporan_penjualan') ? 'show' : '' }}"
+                        {{ request()->is('buku-besar*') || request()->is('saldo*') ? 'show' : '' }}"
                         id="collapseLaporan">
                         <nav class="sb-sidenav-menu-nested nav">
 
@@ -125,7 +125,7 @@
 
                             <a class="nav-link {{ request()->is('saldo*') ? 'active' : '' }}"
                                 href="{{ route('saldo.index') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                                <div class="sb-nav-link-icon"><i  class="fas fa-wallet"></i></div>
                                 Catatan Saldo
                             </a>
 

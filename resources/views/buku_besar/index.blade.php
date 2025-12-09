@@ -126,7 +126,9 @@
                                 <td>{{ $namaPetani }}</td>
                                 <td class="text-center">{{ $desaNama }}</td>
                                 <td class="text-center">{{ $tahun }}</td>
-                                <td class="text-center">{{ $luasan }}</td>
+                                <td class="text-center">
+                                    {{ number_format($luasan, 2, ',', '.') }}
+                                </td>
                                 <td>{{ $periode }}</td>
                                 <td class="text-end">Rp {{ number_format($totalNominal, 0, ',', '.') }}</td>
                                 {{-- KOLM TERAKHIR KONDISIONAL --}}

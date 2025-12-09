@@ -65,7 +65,7 @@
                         <tr style="background-color: #ffffff; color: #014C2D;">
                             <td>{{ $bulanan->desa->desa }}</td>
                             <td>{{ $bulanan->tahunTanam->tahun }}</td>
-                            <td>{{ number_format($totalLuasHa, 2) }}</td>
+                            <td>{{ number_format($totalLuasHa, 2, ',', '.') }}</td>
                             <td>{{ $namaBulan[$bulanan->bulan] ?? '-' }}</td>
                             <td>{{ $bulanan->tahun }}</td>
                             <td>
@@ -123,7 +123,7 @@
                                 <td class="text-center">{{ $p['no_plasma'] ?? '-'}}</td>
                                 <td class="text-center">{{ $p['no_koperasi'] ?? '-'}}</td>
                                 <td>{{ $p['nama_petani'] }}</td>
-                                <td class="text-center">{{ number_format($p['luas_ha'], 2) ?? '-' }}</td>
+                                <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') ?? '-' }}</td>
                                 <td class="text-right">Rp {{ number_format($p['nominal'], 0, ',', '.') ?? '-'}}</td>
                             </tr>
                         @empty

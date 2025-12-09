@@ -120,7 +120,7 @@
                                 <td>{{ $b->desa->desa }}</td>
                                 <td class="text-center">{{ $b->tahunTanam->tahun }}</td>
                                 <td class="text-center">
-                                    {{ number_format($b->luasan_total_snapshot, 2) }} Ha
+                                    {{ number_format($b->luasan_total_snapshot, 2 , ',', '.') }} Ha
                                 </td>
                                 <td class="text-center">
                                     @php

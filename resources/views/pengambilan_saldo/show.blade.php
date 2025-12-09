@@ -104,7 +104,7 @@
                                 <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
                                 <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
                                 <td>{{ $p['nama_petani'] }}</td>
-                                <td class="text-center">{{ number_format($p['luas_ha'], 2) }}</td>
+                                <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }}</td>
                                 <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
                                 @php
                                     $periodeAwal = $tahun . '-' . str_pad($bulan_awal, 2, '0', STR_PAD_LEFT);

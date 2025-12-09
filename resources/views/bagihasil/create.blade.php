@@ -204,7 +204,13 @@
                         .then(res => res.json())
                         .then(data => {
                             console.log(data);
-                            totalLuasInput.value = (data.total_luas ?? 0) + ' Ha';
+
+                            let luas = data.total_luas ?? 0;
+
+                            // Ganti titik menjadi koma untuk desimal
+                            let luasFormatted = luas.toString().replace('.', ',');
+
+                            totalLuasInput.value = luasFormatted + ' Ha';
                         })
                         .catch(err => {
                             console.error('Error fetch total luas:', err);
