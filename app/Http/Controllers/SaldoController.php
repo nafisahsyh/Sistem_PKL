@@ -129,20 +129,90 @@ class SaldoController extends Controller
                 'n.total_nominal',
                 'dpt.metode',
                 'dpt.nominal_debit'
-            )
-            ->orderBy('s.id_petani')
-            ->paginate(20);
+            );
+        // ---------------------- FILTER ----------------------
+// Desa
+        if ($request->filled('id_desa')) {
+            $query->where('s.id_desa', $request->id_desa);
+        }
 
-        $query->getCollection()->transform(function ($row) use ($namaBulan) {
+        // Tahun tanam
+        if ($request->filled('id_tahun_tanam')) {
+            $query->where('s.id_tahun_tanam', $request->id_tahun_tanam);
+        }
+
+        // Periode (1–6)
+        if ($request->filled('periode')) {
+            $periode = (int) $request->periode;
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $bulanAwal + 1;
+
+            $bulanAwal = str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $query->where(DB::raw("SUBSTR(n.bulan_awal, 6, 2)"), $bulanAwal)
+                ->where(DB::raw("SUBSTR(n.bulan_akhir, 6, 2)"), $bulanAkhir);
+        }
+
+        // Tahun
+        if ($request->filled('tahun')) {
+            $query->where(DB::raw("SUBSTR(n.bulan_awal, 1, 4)"), $request->tahun);
+        }
+
+        // Metode
+        if ($request->filled('metode')) {
+            if ($request->metode === 'belum') {
+                $query->whereNull('dpt.nominal_debit');
+            } else {
+                $query->where('dpt.metode', $request->metode);
+            }
+        }
+
+        // SEARCH (nama / nomor plasma)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('s.nama_petani_snapshot', 'LIKE', "%$search%")
+                    ->orWhere('s.nomor_plasma_snapshot', 'LIKE', "%$search%");
+            });
+        }
+
+        $results = $query->orderBy('s.id_petani')
+            ->paginate(15)
+            ->appends($request->query());
+
+        $stat = (clone $query)
+            ->selectRaw("
+        SUM(CASE WHEN dpt.nominal_debit IS NOT NULL THEN 1 ELSE 0 END) AS total_sudah,
+        SUM(CASE WHEN dpt.nominal_debit IS NULL THEN 1 ELSE 0 END) AS total_belum,
+        SUM(CASE WHEN dpt.metode = 'cash' THEN dpt.nominal_debit ELSE 0 END) AS total_cash,
+        SUM(CASE WHEN dpt.metode = 'transfer' THEN dpt.nominal_debit ELSE 0 END) AS total_transfer
+    ")
+            ->groupBy(
+                's.id_petani',
+                's.nama_petani_snapshot',
+                's.nomor_plasma_snapshot',
+                'l.total_luas_ksm',
+                'dd.desa',
+                'tt.tahun',
+                'n.bulan_awal',
+                'n.bulan_akhir',
+                'n.total_nominal',
+                'dpt.metode',
+                'dpt.nominal_debit'
+            )
+            ->first();
+
+        $results->getCollection()->transform(function ($row) use ($namaBulan) {
             $bulanAwal = (int) substr($row->bulan_awal, 5, 2);
             $bulanAkhir = (int) substr($row->bulan_akhir, 5, 2);
             $tahun = substr($row->bulan_awal, 0, 4);
 
             $row->periode = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
+
             $nominal = (float) $row->total_nominal;
             $debit = $row->nominal_debit !== null ? (float) $row->nominal_debit : 0.0;
-            $sisa = $nominal - $debit;
-            if ($sisa < 0) $sisa = 0;
+            $sisa = max($nominal - $debit, 0);
             $row->sisa = $sisa;
             $row->status_metode = $debit > 0 ? $row->metode : "Belum diambil";
 
@@ -150,7 +220,8 @@ class SaldoController extends Controller
         });
 
         return view('saldo.index', [
-            'dataSaldo' => $query,
+            'dataSaldo' => $results,
+            'stat' => $stat,
             'desa' => Desa::all(),
             'tahunTanam' => Tahun_Tanam::all(),
         ]);

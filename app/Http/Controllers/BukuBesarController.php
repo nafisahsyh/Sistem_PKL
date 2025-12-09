@@ -346,7 +346,6 @@ class BukuBesarController extends Controller
         return view('buku_besar.detail', compact('tabelData'));
     }
 
-
     public function pdf(Request $request)
     {
         $namaBulan = [
@@ -363,10 +362,6 @@ class BukuBesarController extends Controller
             11 => 'November',
             12 => 'Desember'
         ];
-
-        // -----------------------------
-        //  COPY–PASTE QUERY DARI INDEX
-        // -----------------------------
 
         // Snapshot
         $subSnapshot = DB::table('bagi_hasil_petani as bh1')
@@ -589,14 +584,10 @@ class BukuBesarController extends Controller
 
         $dataTransaksi = $dataTransaksi->sortBy('id_petani')->values();
 
-        // -----------------------------
-        //  RENDER KE PDF
-        // -----------------------------
-
         $pdf = Pdf::loadView('buku_besar.pdf', [
             'dataTransaksi' => $dataTransaksi,
             'request' => $request
-        ])->setPaper('A4', 'portrait');
+        ])->setPaper('A4', 'landscape');
 
         return $pdf->stream('buku-besar.pdf');
     }
