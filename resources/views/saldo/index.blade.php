@@ -1,5 +1,34 @@
 @extends('theme.default')
 
+<style>
+    .summary-card {
+        width: 150px;
+        height: 90px;
+        border-radius: 12px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        transition: 0.2s ease;
+    }
+
+    .summary-card small {
+        font-size: 12px;
+    }
+
+    .summary-card strong {
+        font-size: 18px;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+</style>
+
 @section('content')
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
@@ -8,100 +37,97 @@
         {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="text-brown mb-0">Catatan Saldo</h3>
-
             <a href="{{ route('saldo.pdf', request()->all()) }}" target="_blank"
                 class="btn btn-danger d-flex align-items-center gap-2">
                 <i class="fas fa-file-pdf"></i> Cetak PDF
             </a>
         </div>
+        @php
+            $filters = [
+                'id_desa' => request('id_desa'),
+                'id_tahun_tanam' => request('id_tahun_tanam'),
+                'periode' => request('periode'),
+                'tahun' => request('tahun'),
+                'metode' => request('metode'),
+            ];
 
+            $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
+
+            $totalPetani = $dataSaldo->count();
+            $sudahMengambil = $dataSaldo->where('status_metode', '!=', 'Belum diambil')->count();
+            $belumMengambil = $dataSaldo->where('status_metode', 'Belum diambil')->count();
+
+            $cash = $dataSaldo->where('status_metode', 'cash');
+            $transfer = $dataSaldo->where('status_metode', 'transfer');
+
+            $jumlahCash = $cash->count();
+            $nominalCash = $cash->sum('total_nominal');
+
+            $jumlahTransfer = $transfer->count();
+            $nominalTransfer = $transfer->sum('total_nominal');
+
+            $cards = [
+                [
+                    'title' => 'Total Petani',
+                    'count' => $totalPetani,
+                    'bg' => 'bg-primary',
+                    'text' => 'text-white',
+                ],
+                [
+                    'title' => 'Sudah Mengambil',
+                    'count' => $sudahMengambil,
+                    'bg' => 'bg-success',
+                    'text' => 'text-white',
+                ],
+                [
+                    'title' => 'Belum Mengambil',
+                    'count' => $belumMengambil,
+                    'bg' => 'bg-danger',
+                    'text' => 'text-white',
+                ],
+                [
+                    'title' => 'Cash',
+                    'count' => $jumlahCash . ' orang',
+                    'extra' => 'Rp ' . number_format($nominalCash, 0, ',', '.'),
+                    'bg' => 'bg-info',
+                    'text' => 'text-dark',
+                ],
+                [
+                    'title' => 'Transfer',
+                    'count' => $jumlahTransfer . ' orang',
+                    'extra' => 'Rp ' . number_format($nominalTransfer, 0, ',', '.'),
+                    'bg' => 'bg-warning',
+                    'text' => 'text-dark',
+                ],
+            ];
+        @endphp
+        {{-- ====== PEMINDAHAN SELESAI ====== --}}
+
+        @if ($jumlahFilterAktif > 0)
+            <div class="d-flex flex-wrap gap-2 mb-3 justify-content-end">
+
+                @foreach ($cards as $card)
+                    <div class="summary-card {{ $card['bg'] }} {{ $card['text'] }}">
+                        <small>{{ $card['title'] }}</small>
+                        <strong>{{ $card['count'] }}</strong>
+
+                        @isset($card['extra'])
+                            <small>{{ $card['extra'] }}</small>
+                        @endisset
+                    </div>
+                @endforeach
+            </div>
+        @endif
         {{-- CARD --}}
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
+
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
 
-                    {{-- MENGHITUNG JUMLAH FILTER YANG AKTIF --}}
-                    @php
-                        $filters = [
-                            'id_desa' => request('id_desa'),
-                            'id_tahun_tanam' => request('id_tahun_tanam'),
-                            'periode' => request('periode'),
-                            'tahun' => request('tahun'),
-                            'metode' => request('metode'),
-                        ];
-                        $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
-                    @endphp
-
-                    @if ($jumlahFilterAktif > 0)
-                        <div class="row mb-3 g-2">
-                            @php
-                                $totalPetani = $dataSaldo->count();
-                                $sudahMengambil = $dataSaldo->where('status_metode', '!=', 'Belum diambil')->count();
-                                $belumMengambil = $dataSaldo->where('status_metode', 'Belum diambil')->count();
-
-                                $cash = $dataSaldo->where('status_metode', 'cash');
-                                $transfer = $dataSaldo->where('status_metode', 'transfer');
-
-                                $jumlahCash = $cash->count();
-                                $nominalCash = $cash->sum('total_nominal');
-
-                                $jumlahTransfer = $transfer->count();
-                                $nominalTransfer = $transfer->sum('total_nominal');
-
-                                $cards = [
-                                    [
-                                        'title' => 'Total Petani',
-                                        'count' => $totalPetani,
-                                        'bg' => 'bg-primary',
-                                        'text' => 'text-white',
-                                    ],
-                                    [
-                                        'title' => 'Sudah Mengambil',
-                                        'count' => $sudahMengambil,
-                                        'bg' => 'bg-success',
-                                        'text' => 'text-white',
-                                    ],
-                                    [
-                                        'title' => 'Belum Mengambil',
-                                        'count' => $belumMengambil,
-                                        'bg' => 'bg-danger',
-                                        'text' => 'text-white',
-                                    ],
-                                    [
-                                        'title' => 'Cash',
-                                        'count' => $jumlahCash . ' orang',
-                                        'extra' => 'Rp ' . number_format($nominalCash, 0, ',', '.'),
-                                        'bg' => 'bg-info',
-                                        'text' => 'text-white',
-                                    ],
-                                    [
-                                        'title' => 'Transfer',
-                                        'count' => $jumlahTransfer . ' orang',
-                                        'extra' => 'Rp ' . number_format($nominalTransfer, 0, ',', '.'),
-                                        'bg' => 'bg-warning',
-                                        'text' => 'text-dark',
-                                    ],
-                                ];
-                            @endphp
-
-                            @foreach ($cards as $card)
-                                <div class="col-auto">
-                                    <div class="card {{ $card['bg'] }} {{ $card['text'] }} p-3 d-flex flex-column justify-content-center align-items-center"
-                                        style="width: 150px; height: 100px;">
-                                        <small>{{ $card['title'] }}</small>
-                                        <strong>{{ $card['count'] }}</strong>
-                                        @isset($card['extra'])
-                                            <small>{{ $card['extra'] }}</small>
-                                        @endisset
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
+                    {{-- BUTTON FILTER --}}
                     <button
                         class="btn d-flex align-items-center gap-2
-        {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
+                    {{ $jumlahFilterAktif > 0 ? 'btn-success text-white' : 'btn-outline-success' }}"
                         data-bs-toggle="modal" data-bs-target="#filterModal">
                         <i class="fas fa-filter"></i> Filter
                         @if ($jumlahFilterAktif > 0)
@@ -113,14 +139,12 @@
                     <form action="{{ route('saldo.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end gap-2">
 
-                        {{-- MENJAGA FILTER TETAP AKTIF --}}
                         @foreach (['desa', 'tahun_tanam', 'periode', 'metode'] as $f)
                             @if (request()->filled($f))
                                 <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
                             @endif
                         @endforeach
 
-                        {{-- SEARCH BAR --}}
                         <input type="text" name="search" class="form-control form-control-search"
                             placeholder="Cari Nama/No Plasma..." value="{{ request('search') }}" style="width: 250px;">
 
@@ -128,7 +152,6 @@
                             <i class="fas fa-search"></i>
                         </button>
 
-                        {{-- BUTTON MENERAPKAN SEARCH --}}
                         <a href="{{ route('saldo.index') }}" class="btn btn-primary">
                             <i class="fas fa-sync-alt"></i>
                         </a>
