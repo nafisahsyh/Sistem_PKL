@@ -599,9 +599,13 @@ class BukuBesarController extends Controller
 
         $dataTransaksi = $dataTransaksi->sortBy('id_petani')->values();
 
+        $tipe = trim($request->tipe ?? '');
+        $tipe = $tipe === 'debit_pengambilan' ? 'debit' : 'kredit';
+
         $pdf = Pdf::loadView('buku_besar.pdf', [
             'dataTransaksi' => $dataTransaksi,
-            'request' => $request
+            'request' => $request,
+            'tipe' => $tipe,
         ])->setPaper('A4', 'landscape');
 
         //Generate nama file

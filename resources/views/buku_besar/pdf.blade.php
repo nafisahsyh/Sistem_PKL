@@ -115,8 +115,12 @@
     </div>
 
     {{-- JUDUL --}}
+    @php
+        $judul = $tipe === 'kredit' ? 'LAPORAN BUKU BESAR KREDIT BAGI HASIL' : 'LAPORAN BUKU BESAR DEBIT PENGAMBILAN';
+    @endphp
+
     <h3 style="margin-top: 5px; margin-bottom: 15px;">
-        <strong>LAPORAN BUKU BESAR</strong>
+        <strong>{{ $judul }}</strong>
     </h3>
 
     <table>
