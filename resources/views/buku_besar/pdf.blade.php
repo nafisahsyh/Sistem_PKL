@@ -13,7 +13,9 @@
             color: #000;
         }
 
-        h2, h3, h4 {
+        h2,
+        h3,
+        h4 {
             text-align: center;
             margin: 0;
             padding: 0;
@@ -75,6 +77,12 @@
         .text-right {
             text-align: right !important;
         }
+
+        .signature {
+            width: 100%;
+            text-align: right;
+            margin-top: 40px;
+        }
     </style>
 </head>
 
@@ -123,7 +131,7 @@
                 <th>Periode</th>
                 <th>Nominal</th>
 
-                @if(request('tipe') == 'debit_pengambilan')
+                @if (request('tipe') == 'debit_pengambilan')
                     <th>Metode</th>
                 @endif
             </tr>
@@ -133,9 +141,18 @@
 
             @php
                 $bulanIndonesia = [
-                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+                    1 => 'Januari',
+                    2 => 'Februari',
+                    3 => 'Maret',
+                    4 => 'April',
+                    5 => 'Mei',
+                    6 => 'Juni',
+                    7 => 'Juli',
+                    8 => 'Agustus',
+                    9 => 'September',
+                    10 => 'Oktober',
+                    11 => 'November',
+                    12 => 'Desember',
                 ];
             @endphp
 
@@ -167,13 +184,13 @@
                     </td>
 
                     {{-- METODE (khusus debit) --}}
-                    @if(request('tipe') == 'debit_pengambilan')
+                    @if (request('tipe') == 'debit_pengambilan')
                         <td>{{ ucfirst($trx->metode) }}</td>
                     @endif
                 </tr>
             @endforeach
 
-            @if(count($dataTransaksi) == 0)
+            @if (count($dataTransaksi) == 0)
                 <tr>
                     <td colspan="{{ request('tipe') == 'debit_pengambilan' ? 9 : 8 }}">
                         Tidak ada data
@@ -182,7 +199,13 @@
             @endif
         </tbody>
     </table>
-
+    {{-- Tanda Tangan --}}
+    <div class="signature">
+        <p>Mengetahui,</p>
+        <br>
+        <br>
+        <strong>{{ Auth::user()->nama }}</strong>
+    </div>
 </body>
 
 </html>
