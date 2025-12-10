@@ -37,7 +37,15 @@
             $jumlahTransfer = $transfer->count();
             $nominalTransfer = $transfer->sum('total_nominal');
 
+            $totalNominalKeseluruhan = $dataSaldo->sum('total_nominal');
+
             $cards = [
+                [
+                    'title' => 'Total Nominal',
+                    'count' => 'Rp ' . number_format($totalNominalKeseluruhan, 0, ',', '.'),
+                    'bg' => 'bg-secondary',
+                    'text' => 'text-white',
+                ],
                 [
                     'title' => 'Total Petani',
                     'count' => $totalPetani,
@@ -136,7 +144,7 @@
                             <th>No Plasma</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
-                            <th>Luasan (Ha)</th>
+                            <th>Luasan Total (Ha)</th>
                             <th>Periode</th>
                             <th>Nominal</th>
                             <th>Sisa</th>

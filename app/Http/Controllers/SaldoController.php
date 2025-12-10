@@ -392,6 +392,7 @@ class SaldoController extends Controller
         });
 
         // --- HITUNG STAT CARD ---
+        $totalNominalKeseluruhan = $dataSaldo->sum('total_nominal');
         $totalPetani = $dataSaldo->count();
         $sudahMengambil = $dataSaldo->where('status_metode', '!=', 'Belum diambil')->count();
         $belumMengambil = $dataSaldo->where('status_metode', 'Belum diambil')->count();
@@ -413,6 +414,7 @@ class SaldoController extends Controller
             'nominal_cash' => $nominalCash,
             'jumlah_transfer' => $jumlahTransfer,
             'nominal_transfer' => $nominalTransfer,
+            'total_nominal' => $totalNominalKeseluruhan,
         ];
 
         $pdf = Pdf::loadView('saldo.pdf', [

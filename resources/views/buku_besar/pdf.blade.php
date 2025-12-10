@@ -7,7 +7,7 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 12px;
             margin: 25px;
             color: #000;
@@ -131,7 +131,7 @@
                 <th>Nama Petani</th>
                 <th>Desa</th>
                 <th>Tahun Tanam</th>
-                <th>Luasan (Ha)</th>
+                <th>Luasan Total (Ha)</th>
                 <th>Periode</th>
                 <th>Nominal</th>
 

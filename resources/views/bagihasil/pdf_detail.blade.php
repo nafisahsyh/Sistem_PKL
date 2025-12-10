@@ -26,7 +26,7 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 12px;
             color: #000;
             margin: 25px;

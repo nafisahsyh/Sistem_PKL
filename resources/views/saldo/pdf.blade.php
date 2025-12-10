@@ -26,7 +26,7 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 12px;
             color: #000;
             margin: 25px;
@@ -145,6 +145,7 @@
         style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
         <!-- Baris 1: Judul utama -->
         <tr style="font-weight: bold;">
+            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Nominal</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Petani</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Mengambil</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Mengambil</td>
@@ -159,6 +160,7 @@
 
         <!-- Baris 3: Jumlah orang -->
         <tr>
+            <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp {{ number_format($stat['total_nominal'] ?? 0, 0, ',', '.')}}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_petani'] ?? 0 }}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_sudah'] ?? 0 }}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_belum'] ?? 0 }}</td>
@@ -183,9 +185,9 @@
                 <th style="text-align: center">No Plasma</th>
                 <th style="text-align: center">Desa</th>
                 <th style="text-align: center">Tahun Tanam</th>
-                <th style="text-align: center">Luasan (Ha)</th>
+                <th style="text-align: center">Luasan Total (Ha)</th>
                 <th style="text-align: center">Periode</th>
-                <th style="text-align: center">Total Nominal</th>
+                <th style="text-align: center">Nominal</th>
                 <th style="text-align: center">Sisa</th>
                 <th style="text-align: center">Metode</th>
             </tr>

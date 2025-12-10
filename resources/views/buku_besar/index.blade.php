@@ -109,7 +109,7 @@
                             <th>Nama Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
-                            <th>Luasan (Ha)</th>
+                            <th>Luasan Total (Ha)</th>
                             <th>Periode</th>
                             <th>Nominal</th>
                             @if (request('tipe', 'credit_bagihasil') == 'debit_pengambilan')

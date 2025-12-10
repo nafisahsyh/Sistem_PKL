@@ -559,6 +559,6 @@ class BagiHasilController extends Controller
         $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->stream('laporan-bagi-hasil.pdf');
+        return $pdf->download('Laporan Bagi Hasil.pdf');
     }
 }
