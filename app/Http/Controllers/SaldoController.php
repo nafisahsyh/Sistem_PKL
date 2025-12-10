@@ -46,18 +46,25 @@ class SaldoController extends Controller
                 'bh1.id_tahun_tanam'
             );
 
-        $subLuas = DB::table('detail_kepemilikan as dk')
-            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
-            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
+        $subLuas = DB::table('bagi_hasil_petani')
             ->select(
-                'k.id_petani',
-                'l.id_desa',
-                'l.id_tahun_tanam',
-                DB::raw('ROUND(SUM(l.luas_peta)/10000, 2) AS total_luas_ksm')
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                DB::raw('SUM(luas_unik) as total_luas')
             )
-            ->where('dk.status_pengelolaan', 'ksm')
-            ->where('dk.status_kepemilikan', 'aktif')
-            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam');
+            ->fromSub(function ($q) {
+                $q->from('bagi_hasil_petani')
+                    ->select(
+                        'id_petani',
+                        'id_desa',
+                        'id_tahun_tanam',
+                        'id_lahan',
+                        DB::raw('MAX(total_luas_ksm) as luas_unik')
+                    )
+                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
+            }, 'lahan_unik')
+            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
 
         $subNominal = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
@@ -122,7 +129,7 @@ class SaldoController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'dd.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'n.bulan_awal',
@@ -193,7 +200,7 @@ class SaldoController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot',
                 's.nomor_plasma_snapshot',
-                'l.total_luas_ksm',
+                'l.total_luas',
                 'dd.desa',
                 'tt.tahun',
                 'n.bulan_awal',
@@ -321,7 +328,7 @@ class SaldoController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'dd.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'n.bulan_awal',

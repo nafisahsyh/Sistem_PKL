@@ -46,18 +46,26 @@ class BukuBesarController extends Controller
             );
 
         // Ambil total luas per petani
-        $subLuas = DB::table('detail_kepemilikan as dk')
-            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
-            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
+        $subLuas = DB::table('bagi_hasil_petani')
             ->select(
-                'k.id_petani',
-                'l.id_desa',
-                'l.id_tahun_tanam',
-                DB::raw('ROUND(SUM(l.luas_peta)/10000, 2) AS total_luas_ksm')
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                DB::raw('SUM(luas_unik) as total_luas')
             )
-            ->where('dk.status_pengelolaan', 'ksm')
-            ->where('dk.status_kepemilikan', 'aktif')
-            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam');
+            ->fromSub(function ($q) {
+                $q->from('bagi_hasil_petani')
+                    ->select(
+                        'id_petani',
+                        'id_desa',
+                        'id_tahun_tanam',
+                        'id_lahan',
+                        DB::raw('MAX(total_luas_ksm) as luas_unik')
+                    )
+                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
+            }, 'lahan_unik')
+            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
+
 
         // Ambil kredit (SUM per periode)
         $subKredit = DB::table('transaksi')
@@ -173,7 +181,7 @@ class BukuBesarController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'd.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'k.bulan_awal',
@@ -215,7 +223,7 @@ class BukuBesarController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'desaTbl.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'd.bulan_awal',
@@ -243,13 +251,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
@@ -408,7 +416,7 @@ class BukuBesarController extends Controller
 
         // Filter periode/tahun
         if ($request->filled('periode') && $request->filled('tahun')) {
-            $periode = (int)$request->periode;
+            $periode = (int) $request->periode;
             $tahun = $request->tahun;
 
             $awal = ($periode - 1) * 2 + 1;
@@ -421,7 +429,7 @@ class BukuBesarController extends Controller
         }
 
         if ($request->filled('periode') && !$request->filled('tahun')) {
-            $periode = (int)$request->periode;
+            $periode = (int) $request->periode;
             $awal = ($periode - 1) * 2 + 1;
             $akhir = $periode * 2;
 
@@ -454,7 +462,7 @@ class BukuBesarController extends Controller
 
         // Filter debit
         if ($request->filled('periode') && $request->filled('tahun')) {
-            $periode = (int)$request->periode;
+            $periode = (int) $request->periode;
             $tahun = $request->tahun;
 
             $awal = ($periode - 1) * 2 + 1;
@@ -467,7 +475,7 @@ class BukuBesarController extends Controller
         }
 
         if ($request->filled('periode') && !$request->filled('tahun')) {
-            $periode = (int)$request->periode;
+            $periode = (int) $request->periode;
 
             $awal = ($periode - 1) * 2 + 1;
             $akhir = $periode * 2;
@@ -511,8 +519,8 @@ class BukuBesarController extends Controller
             ->orderBy('s.id_petani')
             ->get()
             ->transform(function ($trx) use ($namaBulan) {
-                $bulanAwal = (int)substr($trx->bulan_awal, 5, 2);
-                $bulanAkhir = (int)substr($trx->bulan_akhir, 5, 2);
+                $bulanAwal = (int) substr($trx->bulan_awal, 5, 2);
+                $bulanAkhir = (int) substr($trx->bulan_akhir, 5, 2);
                 $tahun = substr($trx->bulan_akhir, 0, 4);
 
                 $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
@@ -552,8 +560,8 @@ class BukuBesarController extends Controller
             ->orderBy('s.id_petani')
             ->get()
             ->transform(function ($trx) use ($namaBulan) {
-                $bulanAwal = (int)substr($trx->bulan_awal, 5, 2);
-                $bulanAkhir = (int)substr($trx->bulan_akhir, 5, 2);
+                $bulanAwal = (int) substr($trx->bulan_awal, 5, 2);
+                $bulanAkhir = (int) substr($trx->bulan_akhir, 5, 2);
                 $tahun = substr($trx->bulan_akhir, 0, 4);
 
                 $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
@@ -567,13 +575,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 

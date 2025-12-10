@@ -72,8 +72,13 @@ class Petani extends Model
     {
 
         static::updated(function ($petani) {
-            if ($petani->isDirty('status') && $petani->status === 'berhenti') {
-                $petani->detailKepemilikan()->update(['status_kepemilikan' => 'nonaktif']);
+            if ($petani->isDirty('status')) {
+                if ($petani->status === 'berhenti') {
+                    $petani->detailKepemilikan()->update(['status_kepemilikan' => 'nonaktif']);
+                } elseif ($petani->status === 'aktif') {
+                    // Kembalikan lahan nonaktif menjadi aktif
+                    $petani->detailKepemilikan()->update(['status_kepemilikan' => 'aktif']);
+                }
             }
         });
 
