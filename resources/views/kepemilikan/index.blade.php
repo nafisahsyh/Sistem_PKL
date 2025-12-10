@@ -1,5 +1,16 @@
 @extends('theme.default')
 
+<style>
+/* Odd row */
+tr.odd-row td.striping {
+    background-color: #ebf8f2 !important;
+}
+
+/* Even row */
+tr.even-row td.striping {
+    background-color: #e8efeb !important;
+}
+</style>
 @section('content')
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
@@ -87,7 +98,7 @@
 
 
                 {{-- 🧾 Tabel Data --}}
-                <table class="table table-bordered table-striped align-middle table-custom">
+                <table class="table table-bordered align-middle table-custom">
                     <thead class="text-center" style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>No</th>
@@ -101,27 +112,31 @@
                             <th style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse ($kepemilikan as $index => $k)
-                            @php
-                                // Group detail berdasarkan desa dan tahun tanam
-                                $grouped = $k->detailKepemilikan->groupBy(
-                                    fn($d) => ($d->lahan->desa->desa ?? '-') .
-                                        '-' .
-                                        ($d->lahan->tahunTanam->tahun ?? '-'),
-                                );
+<tbody>
 
-                                $rowNumber =
-                                    $loop->iteration +
-                                    ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
-                                        ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
-                                        : 0);
-                            @endphp
+@php $rowIndex = 0; @endphp
 
-                            @php $firstRow = true; @endphp
-                            @foreach ($grouped as $group)
-                                @foreach ($group as $i => $detail)
-                                    <tr>
+@forelse ($kepemilikan as $index => $k)
+    @php
+        $grouped = $k->detailKepemilikan->groupBy(
+            fn($d) => ($d->lahan->desa->desa ?? '-') . '-' . ($d->lahan->tahunTanam->tahun ?? '-')
+        );
+
+        $rowNumber =
+            $loop->iteration +
+            ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
+                ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
+                : 0);
+    @endphp
+
+    @php $firstRow = true; @endphp
+
+    @foreach ($grouped as $group)
+        @foreach ($group as $i => $detail)
+
+            <tr class="{{ $rowIndex % 2 == 0 ? 'odd-row' : 'even-row' }}">
+                @php $rowIndex++; @endphp
+
                                         {{-- tampilkan kolom petani hanya di baris pertama --}}
                                         @if ($firstRow)
                                             <td class="text-center align-middle"
@@ -160,8 +175,8 @@
                                         @endif
 
                                         {{-- kolom kode lahan, tampil tiap baris --}}
-                                        <td class="align-middle text-center">{{ $detail->kode_lahan ?? '-' }}</td>
-                                        <td class="align-middle text-center">
+                                        <td class="align-middle text-center striping">{{ $detail->kode_lahan ?? '-' }}</td>
+                                        <td class="align-middle text-center striping">
                                             {{ $detail->status_pengelolaan ?? '-' }}
                                         </td>
 

@@ -80,10 +80,25 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="text-dark fw-semibold">Status Petani</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ ucfirst($petani->status ?? '-') }}
-                            </div>
+
+                            @php
+                                $status = strtolower($petani->status ?? '-');
+                                $label = ucwords(str_replace('_', ' ', $status));
+
+                                // Tentukan warna
+                                $color = match ($status) {
+                                    'aktif' => 'bg-success',
+                                    'tidak_aktif' => 'bg-secondary',
+                                    'berhenti' => 'bg-danger',
+                                };
+                            @endphp
+
+                            <span class="badge {{ $color }} px-3 py-2">
+                                {{ $label }}
+                            </span>
                         </div>
+
+
                     </div>
 
                     <hr class="my-3">
