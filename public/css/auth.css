@@ -285,3 +285,10 @@ body {
     cursor: pointer;
     color: #888;
 }
+
+.forgot a, .back-login a {
+    text-decoration: none !important;
+}
+.forgot a:hover, .back-login a:hover {
+    text-decoration: none !important;
+}
