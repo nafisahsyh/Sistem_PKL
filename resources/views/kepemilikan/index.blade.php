@@ -1,16 +1,5 @@
 @extends('theme.default')
 
-<style>
-/* Odd row */
-tr.odd-row td.striping {
-    background-color: #ebf8f2 !important;
-}
-
-/* Even row */
-tr.even-row td.striping {
-    background-color: #e8efeb !important;
-}
-</style>
 @section('content')
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
@@ -112,30 +101,31 @@ tr.even-row td.striping {
                             <th style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
-<tbody>
+                    <tbody>
 
-@php $rowIndex = 0; @endphp
+                        @php $rowIndex = 0; @endphp
 
-@forelse ($kepemilikan as $index => $k)
-    @php
-        $grouped = $k->detailKepemilikan->groupBy(
-            fn($d) => ($d->lahan->desa->desa ?? '-') . '-' . ($d->lahan->tahunTanam->tahun ?? '-')
-        );
+                        @forelse ($kepemilikan as $index => $k)
+                            @php
+                                $grouped = $k->detailKepemilikan->groupBy(
+                                    fn($d) => ($d->lahan->desa->desa ?? '-') .
+                                        '-' .
+                                        ($d->lahan->tahunTanam->tahun ?? '-'),
+                                );
 
-        $rowNumber =
-            $loop->iteration +
-            ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
-                ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
-                : 0);
-    @endphp
+                                $rowNumber =
+                                    $loop->iteration +
+                                    ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
+                                        ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
+                                        : 0);
+                            @endphp
 
-    @php $firstRow = true; @endphp
+                            @php $firstRow = true; @endphp
 
-    @foreach ($grouped as $group)
-        @foreach ($group as $i => $detail)
-
-            <tr class="{{ $rowIndex % 2 == 0 ? 'odd-row' : 'even-row' }}">
-                @php $rowIndex++; @endphp
+                            @foreach ($grouped as $group)
+                                @foreach ($group as $i => $detail)
+                                    <tr class="{{ $rowIndex % 2 == 0 ? 'odd-row' : 'even-row' }}">
+                                        @php $rowIndex++; @endphp
 
                                         {{-- tampilkan kolom petani hanya di baris pertama --}}
                                         @if ($firstRow)

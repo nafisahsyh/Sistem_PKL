@@ -1024,3 +1024,13 @@ input.form-control {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
+
+/* Odd row */
+tr.odd-row td.striping {
+    background-color: #ebf8f2 !important;
+}
+
+/* Even row */
+tr.even-row td.striping {
+    background-color: #e8efeb !important;
+}
