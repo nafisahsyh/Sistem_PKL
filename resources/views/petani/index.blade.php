@@ -38,7 +38,7 @@
                             <th>No Plasma</th>
                             <th>No Koperasi</th>
                             <th>NIK</th>
-                            <th>Nama</th>
+                            <th>Nama Petani</th>
                             <th>Telepon</th>
                             <th>Status</th>
                             <th>KTP</th>

@@ -1,34 +1,5 @@
 @extends('theme.default')
 
-<style>
-    .summary-card {
-        width: 150px;
-        height: 90px;
-        border-radius: 12px;
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        transition: 0.2s ease;
-    }
-
-    .summary-card small {
-        font-size: 12px;
-    }
-
-    .summary-card strong {
-        font-size: 18px;
-    }
-
-    .summary-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-    }
-</style>
-
 @section('content')
     <link href="{{ asset('css/navbar.css') }}" rel="stylesheet">
 
@@ -101,7 +72,6 @@
                 ],
             ];
         @endphp
-        {{-- ====== PEMINDAHAN SELESAI ====== --}}
 
         @if ($jumlahFilterAktif > 0)
             <div class="d-flex flex-wrap gap-2 mb-3 justify-content-end">
@@ -123,7 +93,6 @@
             <div class="card-body">
 
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-
                     {{-- BUTTON FILTER --}}
                     <button
                         class="btn d-flex align-items-center gap-2
