@@ -22,7 +22,8 @@
         {{-- CARD CARDS --}}
         @if (in_array(Auth::user()->role, ['admin', 'super_admin']))
             <div class="row mt-3 g-3 mb-2">
-                {{-- ROW 1 --}}
+
+                {{-- Jika Super Admin: Card Pengguna --}}
                 @if (Auth::user()->role == 'super_admin')
                     <div class="col-md-3 col-6 mb-3">
                         <div class="card bg-blue text-white">
@@ -41,7 +42,8 @@
                     </div>
                 @endif
 
-                <div class="col-md-3 col-6 mb-3">
+                {{-- Card Kecamatan --}}
+                <div class="{{ Auth::user()->role == 'super_admin' ? 'col-md-3' : 'col-md-4' }} col-6 mb-3">
                     <div class="card bg-green text-white">
                         <div class="card-body d-flex align-items-center gap-2">
                             <i class="fas fa-map-marker-alt fa-2x"></i>
@@ -57,7 +59,8 @@
                     </div>
                 </div>
 
-                <div class="col-md-3 col-6 mb-3">
+                {{-- Card Desa --}}
+                <div class="{{ Auth::user()->role == 'super_admin' ? 'col-md-3' : 'col-md-4' }} col-6 mb-3">
                     <div class="card bg-red text-white">
                         <div class="card-body d-flex align-items-center gap-2">
                             <i class="fas fa-map fa-2x"></i>
@@ -73,7 +76,8 @@
                     </div>
                 </div>
 
-                <div class="col-md-3 col-6 mb-3">
+                {{-- Card Lahan --}}
+                <div class="{{ Auth::user()->role == 'super_admin' ? 'col-md-3' : 'col-md-4' }} col-6 mb-3">
                     <div class="card bg-brown text-white">
                         <div class="card-body d-flex align-items-center gap-2">
                             <i class="fas fa-leaf fa-2x"></i>
@@ -88,6 +92,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             {{-- ROW 2 --}}
