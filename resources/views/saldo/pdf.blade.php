@@ -140,6 +140,7 @@
     <h2 style="margin-top: 10px; margin-bottom: 20px;"><strong>LAPORAN CATATAN SALDO</strong></h2>
 
     {{-- CARD SUMMARY --}}
+    <div class="section-title">RINGKASAN</div>
     <table cellpadding="5" cellspacing="0"
         style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
         <!-- Baris 1: Judul utama -->

@@ -389,18 +389,25 @@ class BukuBesarController extends Controller
             );
 
         // Luas KSM
-        $subLuas = DB::table('detail_kepemilikan as dk')
-            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
-            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
+        $subLuas = DB::table('bagi_hasil_petani')
             ->select(
-                'k.id_petani',
-                'l.id_desa',
-                'l.id_tahun_tanam',
-                DB::raw('ROUND(SUM(l.luas_peta)/10000, 2) AS total_luas_ksm')
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                DB::raw('SUM(luas_unik) as total_luas')
             )
-            ->where('dk.status_pengelolaan', 'ksm')
-            ->where('dk.status_kepemilikan', 'aktif')
-            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam');
+            ->fromSub(function ($q) {
+                $q->from('bagi_hasil_petani')
+                    ->select(
+                        'id_petani',
+                        'id_desa',
+                        'id_tahun_tanam',
+                        'id_lahan',
+                        DB::raw('MAX(total_luas_ksm) as luas_unik')
+                    )
+                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
+            }, 'lahan_unik')
+            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
 
         // Kredit
         $subKredit = DB::table('transaksi')
@@ -509,7 +516,7 @@ class BukuBesarController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'd.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'k.bulan_awal',
@@ -549,7 +556,7 @@ class BukuBesarController extends Controller
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas_ksm AS luasan',
+                'l.total_luas AS luasan',
                 'desaTbl.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'd.bulan_awal',
@@ -597,6 +604,47 @@ class BukuBesarController extends Controller
             'request' => $request
         ])->setPaper('A4', 'landscape');
 
-        return $pdf->stream('buku-besar.pdf');
+        //Generate nama file
+        $namaFile = "Buku Besar";
+
+        // Tipe transaksi
+        $namaFile .= $request->tipe == 'debit_pengambilan'
+            ? " Debit"
+            : " Kredit";
+
+        // Desa
+        if ($request->filled('id_desa')) {
+            $desa = Desa::find($request->id_desa)->desa ?? '';
+            $namaFile .= " " . $desa;
+        }
+
+        // Tahun Tanam
+        if ($request->filled('id_tahun_tanam')) {
+            $tahunTanam = Tahun_Tanam::find($request->id_tahun_tanam)->tahun ?? '';
+            $namaFile .= " " . $tahunTanam;
+        }
+
+        $periodeMap = [
+            1 => "Jan-Feb",
+            2 => "Mar-Apr",
+            3 => "Mei-Jun",
+            4 => "Jul-Agt",
+            5 => "Sep-Okt",
+            6 => "Nov-Des",
+        ];
+
+        if ($request->filled('periode')) {
+            $bulanPeriode = $periodeMap[$request->periode] ?? "Periode: " . $request->periode;
+            $namaFile .= " " . $bulanPeriode;
+        }
+
+        // Tahun (filter tahun)
+        if ($request->filled('tahun')) {
+            $namaFile .= " " . $request->tahun;
+        }
+
+        $namaFile .= ".pdf";
+
+        return $pdf->download($namaFile);
     }
 }

@@ -260,13 +260,25 @@ class SaldoController extends Controller
             })
             ->select('bh1.id_petani', 'bh1.nama_petani_snapshot', 'bh1.nomor_plasma_snapshot', 'bh1.id_desa', 'bh1.id_tahun_tanam');
 
-        $subLuas = DB::table('detail_kepemilikan as dk')
-            ->join('kepemilikan as k', 'dk.id_kepemilikan', '=', 'k.id_kepemilikan')
-            ->join('lahan as l', 'dk.id_lahan', '=', 'l.id_lahan')
-            ->where('dk.status_pengelolaan', 'ksm')
-            ->where('dk.status_kepemilikan', 'aktif')
-            ->groupBy('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam')
-            ->select('k.id_petani', 'l.id_desa', 'l.id_tahun_tanam', DB::raw('ROUND(SUM(l.luas_peta)/10000,2) AS total_luas_ksm'));
+        $subLuas = DB::table('bagi_hasil_petani')
+            ->select(
+                'id_petani',
+                'id_desa',
+                'id_tahun_tanam',
+                DB::raw('SUM(luas_unik) as total_luas')
+            )
+            ->fromSub(function ($q) {
+                $q->from('bagi_hasil_petani')
+                    ->select(
+                        'id_petani',
+                        'id_desa',
+                        'id_tahun_tanam',
+                        'id_lahan',
+                        DB::raw('MAX(total_luas_ksm) as luas_unik')
+                    )
+                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
+            }, 'lahan_unik')
+            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
 
         $subNominal = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
