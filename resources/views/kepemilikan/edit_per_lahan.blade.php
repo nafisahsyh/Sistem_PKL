@@ -47,25 +47,43 @@
             <input type="hidden" name="id_petani" value="{{ $kepemilikan->id_petani }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
-            {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
                 <h5 class="text-green-custom mb-3">Data Petani</h5>
 
                 <div class="p-4 bg-light rounded-3 border">
                     <div class="row mb-3">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">Status Petani</div>
+
+                            @php
+                                $status2 = strtolower($kepemilikan->petani->status ?? '-');
+                                $label2 = ucwords(str_replace('_', ' ', $status2));
+
+                                $color2 = match ($status2) {
+                                    'aktif' => 'bg-success',
+                                    'tidak_aktif' => 'bg-secondary',
+                                    'berhenti' => 'bg-danger',
+                                    default => 'bg-dark',
+                                };
+                            @endphp
+
+                            <span class="badge {{ $color2 }} px-3 py-2">
+                                {{ $label2 }}
+                            </span>
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Nomor Plasma</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Nomor Koperasi</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">NIK</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->NIK ?? '-' }}
@@ -74,36 +92,29 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Nama Petani</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->nama ?? '-' }}
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Nomor Telepon</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->no_telepon ?? '-' }}
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="text-dark fw-semibold">Alamat</div>
                             <div class="fs-6 fw-medium text-dark">
                                 {{ $kepemilikan->petani->alamat ?? '-' }}
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Status Petani</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ ucfirst($kepemilikan->petani->status ?? '-') }}
-                            </div>
-                        </div>
                     </div>
+                    <div class="my-3" style="height: 1px; background: #e5e5e5;"></div>
 
-                    <hr class="my-3">
-
-                    <div class="row align-items-center">
-                        <div class="col-md-4 mb-2">
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Scan KTP</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_ktp ?? false)
@@ -116,7 +127,7 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Scan KK</div>
                             <div>
                                 @if ($kepemilikan->petani->pdf_scan_kk ?? false)
@@ -132,7 +143,6 @@
                     </div>
                 </div>
             </div>
-
             {{-- ===================== DATA LAHAN ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">

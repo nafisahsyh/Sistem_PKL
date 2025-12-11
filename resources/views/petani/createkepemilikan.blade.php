@@ -39,46 +39,7 @@
 
                 <div class="p-4 bg-light rounded-3 border">
                     <div class="row mb-3">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Nomor Plasma</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->nomor_anggota_plasma ?? '-' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Nomor Koperasi</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->nomor_anggota_koperasi ?? '-' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">NIK</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->NIK ?? '-' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Nama Petani</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->nama ?? '-' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Nomor Telepon</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->no_telepon ?? '-' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-dark fw-semibold">Alamat</div>
-                            <div class="fs-6 fw-medium text-dark">
-                                {{ $petani->alamat ?? '-' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Status Petani</div>
 
                             @php
@@ -97,14 +58,49 @@
                                 {{ $label }}
                             </span>
                         </div>
-
-
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Plasma</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nomor_anggota_plasma ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Koperasi</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nomor_anggota_koperasi ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">NIK</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->NIK ?? '-' }}
+                            </div>
+                        </div>
                     </div>
 
-                    <hr class="my-3">
-
-                    <div class="row align-items-center">
-                        <div class="col-md-4 mb-2">
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">Nama Petani</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->nama ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-dark fw-semibold">Nomor Telepon</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->no_telepon ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="text-dark fw-semibold">Alamat</div>
+                            <div class="fs-6 fw-medium text-dark">
+                                {{ $petani->alamat ?? '-' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-3" style="height: 1px; background: #e5e5e5;"></div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Scan KTP</div>
                             <div>
                                 @if ($petani->pdf_scan_ktp)
@@ -118,7 +114,7 @@
 
                             </div>
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-3">
                             <div class="text-dark fw-semibold">Scan KK</div>
                             <div>
                                 @if ($petani->pdf_scan_kk)
