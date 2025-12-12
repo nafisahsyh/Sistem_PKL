@@ -120,7 +120,7 @@
                                 <td>{{ $b->desa->desa }}</td>
                                 <td class="text-center">{{ $b->tahunTanam->tahun }}</td>
                                 <td class="text-center">
-                                    {{ number_format($b->luasan_total_snapshot, 2 , ',', '.') }} Ha
+                                    {{ number_format($b->luasan_total_snapshot, 2, ',', '.') }} Ha
                                 </td>
                                 <td class="text-center">
                                     @php
@@ -155,7 +155,15 @@
                                 <td class="text-center">
 
                                     {{-- DETAIL --}}
-                                    <a href="{{ route('bagi-hasil-bulanan.show', $b->id_bagi_bulanan) }}"
+                                    <a href="{{ route('bagi-hasil-bulanan.show', [
+                                        'bagi_hasil_bulanan' => $b->id_bagi_bulanan,
+                                        'page' => request('page'),
+                                        'search' => request('search'),
+                                        'id_desa' => request('id_desa'),
+                                        'id_tahun_tanam' => request('id_tahun_tanam'),
+                                        'bulan_start' => request('bulan_start'),
+                                        'bulan_end' => request('bulan_end'),
+                                    ]) }}"
                                         class="btn btn-sm btn-info me-1" title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>

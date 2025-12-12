@@ -90,7 +90,13 @@
 
                                 <td class="text-end">Rp {{ number_format($p['total_periode'] ?? 0, 0, ',', '.') }}</td>
                                 <td class="text-center">
-                                    <a href="{{ route('pengambilan.show', ['id_bulanan' => $p['id_bulanan']]) }}"
+                                    <a href="{{ route('pengambilan.show', [
+                                        'id_bulanan' => $p['id_bulanan'],
+                                        'id_desa' => request('id_desa'),
+                                        'id_tahun_tanam' => request('id_tahun_tanam'),
+                                        'periode' => request('periode'),
+                                        'tahun' => request('tahun'),
+                                    ]) }}"
                                         class="btn btn-sm btn-info me-1" title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>

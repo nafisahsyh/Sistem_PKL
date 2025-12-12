@@ -82,8 +82,8 @@
                     <form action="{{ route('buku-besar.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end gap-2">
 
-                        {{-- Keep filter desa & tahun tanam & tipe --}}
-                        @foreach (['id_desa', 'id_tahun_tanam', 'tipe'] as $f)
+                        {{-- Keep ALL filters --}}
+                        @foreach (['id_desa', 'id_tahun_tanam', 'tipe', 'periode', 'tahun'] as $f)
                             @if (request()->filled($f))
                                 <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
                             @endif
@@ -95,7 +95,16 @@
                             style="width: 250px;">
 
                         <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
-                        <a href="{{ route('buku-besar.index') }}" class="btn btn-primary" title="Reset">
+
+                        {{-- Reset but keep filters --}}
+                        <a href="{{ route('buku-besar.index', [
+                            'id_desa' => request('id_desa'),
+                            'id_tahun_tanam' => request('id_tahun_tanam'),
+                            'tipe' => request('tipe'),
+                            'periode' => request('periode'),
+                            'tahun' => request('tahun'),
+                        ]) }}"
+                            class="btn btn-primary" title="Reset Search">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>

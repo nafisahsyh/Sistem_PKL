@@ -12,6 +12,8 @@
                 'search' => request('search'),
                 'id_desa' => request('id_desa'),
                 'id_tahun_tanam' => request('id_tahun_tanam'),
+                'bulan_start' => request('bulan_start'),
+                'bulan_end' => request('bulan_end'),
             ]) }}"
                 class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
@@ -120,11 +122,11 @@
                                 <td class="text-center">
                                     {{ $noStart + $loop->index }}
                                 </td>
-                                <td class="text-center">{{ $p['no_plasma'] ?? '-'}}</td>
-                                <td class="text-center">{{ $p['no_koperasi'] ?? '-'}}</td>
+                                <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
+                                <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
                                 <td>{{ $p['nama_petani'] }}</td>
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') ?? '-' }}</td>
-                                <td class="text-right">Rp {{ number_format($p['nominal'], 0, ',', '.') ?? '-'}}</td>
+                                <td class="text-right">Rp {{ number_format($p['nominal'], 0, ',', '.') ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>

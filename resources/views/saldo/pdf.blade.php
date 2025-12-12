@@ -183,8 +183,8 @@
         <thead>
             <tr class="text-center">
                 <th style="text-align: center">No</th>
-                <th style="text-align: center">Nama Petani</th>
                 <th style="text-align: center">No Plasma</th>
+                <th style="text-align: center">Nama Petani</th>
                 <th style="text-align: center">Desa</th>
                 <th style="text-align: center">Tahun Tanam</th>
                 <th style="text-align: center">Luasan Total (Ha)</th>
@@ -198,8 +198,8 @@
             @foreach ($dataSaldo as $i => $row)
                 <tr>
                     <td class="text-center">{{ $i + 1 }}</td>
-                    <td>{{ $row->nama_petani }}</td>
                     <td class="text-center">{{ $row->nomor_plasma }}</td>
+                    <td>{{ $row->nama_petani }}</td>
                     <td class="text-center">{{ $row->nama_desa }}</td>
                     <td class="text-center">{{ $row->tahun_tanam }}</td>
                     <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }}</td>

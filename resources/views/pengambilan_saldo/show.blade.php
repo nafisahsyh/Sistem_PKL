@@ -6,7 +6,13 @@
 
         {{-- Header --}}
         <div class="d-flex align-items-center mb-4 gap-2">
-            <a href="{{ route('pengambilan.index') }}" class="btn btn-success p-2">
+            <a href="{{ route('pengambilan.index', [
+                'id_desa' => request('id_desa'),
+                'id_tahun_tanam' => request('id_tahun_tanam'),
+                'periode' => request('periode'),
+                'tahun' => request('tahun'),
+            ]) }}"
+                class="btn btn-success p-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
             <h4 class="text-brown mb-0">Detail Pengambilan Saldo</h4>

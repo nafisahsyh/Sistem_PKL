@@ -96,6 +96,7 @@
                 @endforeach
             </div>
         @endif
+        
         {{-- CARD --}}
         <div class="card shadow-sm rounded-3">
             <div class="card-body">
@@ -116,7 +117,8 @@
                     <form action="{{ route('saldo.index') }}" method="GET"
                         class="d-flex align-items-start flex-wrap justify-content-end gap-2">
 
-                        @foreach (['desa', 'tahun_tanam', 'periode', 'metode'] as $f)
+                        {{-- Keep ALL active filters --}}
+                        @foreach (['id_desa', 'id_tahun_tanam', 'periode', 'tahun', 'metode'] as $f)
                             @if (request()->filled($f))
                                 <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
                             @endif
@@ -129,7 +131,15 @@
                             <i class="fas fa-search"></i>
                         </button>
 
-                        <a href="{{ route('saldo.index') }}" class="btn btn-primary">
+                        {{-- Reset search only, but keep filters --}}
+                        <a href="{{ route('saldo.index', [
+                            'id_desa' => request('id_desa'),
+                            'id_tahun_tanam' => request('id_tahun_tanam'),
+                            'periode' => request('periode'),
+                            'tahun' => request('tahun'),
+                            'metode' => request('metode'),
+                        ]) }}"
+                            class="btn btn-primary">
                             <i class="fas fa-sync-alt"></i>
                         </a>
                     </form>
@@ -140,8 +150,8 @@
                     <thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
                         <tr>
                             <th>No</th>
-                            <th>Nama Petani</th>
                             <th>No Plasma</th>
+                            <th>Nama Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
                             <th>Luasan Total (Ha)</th>
@@ -159,9 +169,9 @@
                                     {{ $dataSaldo->firstItem() + $i }}
                                 </td>
 
-                                <td>{{ $row->nama_petani }}</td>
-
                                 <td class="text-center">{{ $row->nomor_plasma }}</td>
+
+                                <td>{{ $row->nama_petani }}</td>
 
                                 <td class="text-center">{{ $row->nama_desa }}</td>
 
