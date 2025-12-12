@@ -45,27 +45,23 @@ class BukuBesarController extends Controller
                 'bh1.id_tahun_tanam'
             );
 
-        // Ambil total luas per petani
-        $subLuas = DB::table('bagi_hasil_petani')
+        // Ambil id_bulanan sesuai filter periode (seperti di SHOW)
+        $subLuas = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                DB::raw('SUM(luas_unik) as total_luas')
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan, 2, '0')) as bulan_formatted"),
+                DB::raw('SUM(bhp.total_luas_ksm) as total_luas')
             )
-            ->fromSub(function ($q) {
-                $q->from('bagi_hasil_petani')
-                    ->select(
-                        'id_petani',
-                        'id_desa',
-                        'id_tahun_tanam',
-                        'id_lahan',
-                        DB::raw('MAX(total_luas_ksm) as luas_unik')
-                    )
-                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
-            }, 'lahan_unik')
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
-
+            ->groupBy(
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                'bhb.tahun',
+                'bhb.bulan'
+            );
 
         // Ambil kredit (SUM per periode)
         $subKredit = DB::table('transaksi')
@@ -171,7 +167,8 @@ class BukuBesarController extends Controller
             ->joinSub($subKredit, 'k', function ($join) {
                 $join->on('s.id_petani', '=', 'k.id_petani')
                     ->on('s.id_desa', '=', 'k.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 'k.id_tahun_tanam');
+                    ->on('s.id_tahun_tanam', '=', 'k.id_tahun_tanam')
+                    ->on('l.bulan_formatted', '=', 'k.bulan_awal');
             })
             ->join('desa as d', 's.id_desa', '=', 'd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
@@ -205,25 +202,35 @@ class BukuBesarController extends Controller
         // Debit
         $debit = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
             ->mergeBindings($subSnapshot)
+
+            // join subLuas dulu (mengandung bulan_formatted)
             ->joinSub($subLuas, 'l', function ($join) {
                 $join->on('s.id_petani', '=', 'l.id_petani')
                     ->on('s.id_desa', '=', 'l.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
             })
+
+            // join subDebit (transaksi) — sambungkan juga periode transaksi ke subLuas
             ->joinSub($subDebit, 'd', function ($join) {
                 $join->on('s.id_petani', '=', 'd.id_petani')
                     ->on('s.id_desa', '=', 'd.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'd.id_tahun_tanam');
+
+                // paling penting — hubungkan bulan periode debit ke bulan_formatted di subLuas
+                $join->on('l.bulan_formatted', '=', 'd.bulan_awal');
             })
+
             ->join('desa as desaTbl', 's.id_desa', '=', 'desaTbl.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
+
             ->when($request->filled('id_desa'), fn($q) => $q->where('s.id_desa', $request->id_desa))
             ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('s.id_tahun_tanam', $request->id_tahun_tanam))
+
             ->select(
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas AS luasan',
+                'l.total_luas AS luasan',         // <-- sesuai periode transaksi!
                 'desaTbl.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'd.bulan_awal',
@@ -292,7 +299,6 @@ class BukuBesarController extends Controller
             'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
-
 
     public function detail(Request $request)
     {
@@ -389,25 +395,22 @@ class BukuBesarController extends Controller
             );
 
         // Luas KSM
-        $subLuas = DB::table('bagi_hasil_petani')
+        $subLuas = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                DB::raw('SUM(luas_unik) as total_luas')
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan, 2, '0')) as bulan_formatted"),
+                DB::raw('SUM(bhp.total_luas_ksm) as total_luas')
             )
-            ->fromSub(function ($q) {
-                $q->from('bagi_hasil_petani')
-                    ->select(
-                        'id_petani',
-                        'id_desa',
-                        'id_tahun_tanam',
-                        'id_lahan',
-                        DB::raw('MAX(total_luas_ksm) as luas_unik')
-                    )
-                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
-            }, 'lahan_unik')
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
+            ->groupBy(
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                'bhb.tahun',
+                'bhb.bulan'
+            );
 
         // Kredit
         $subKredit = DB::table('transaksi')
@@ -506,7 +509,8 @@ class BukuBesarController extends Controller
             ->joinSub($subKredit, 'k', function ($join) {
                 $join->on('s.id_petani', '=', 'k.id_petani')
                     ->on('s.id_desa', '=', 'k.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 'k.id_tahun_tanam');
+                    ->on('s.id_tahun_tanam', '=', 'k.id_tahun_tanam')
+                    ->on('l.bulan_formatted', '=', 'k.bulan_awal');
             })
             ->join('desa as d', 's.id_desa', '=', 'd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
@@ -538,30 +542,40 @@ class BukuBesarController extends Controller
         // Debit gabungan
         $debit = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
             ->mergeBindings($subSnapshot)
+
+            // join subLuas dulu (mengandung bulan_formatted)
             ->joinSub($subLuas, 'l', function ($join) {
                 $join->on('s.id_petani', '=', 'l.id_petani')
                     ->on('s.id_desa', '=', 'l.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
             })
+
+            // join subDebit (transaksi) — sambungkan juga periode transaksi ke subLuas
             ->joinSub($subDebit, 'd', function ($join) {
                 $join->on('s.id_petani', '=', 'd.id_petani')
                     ->on('s.id_desa', '=', 'd.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'd.id_tahun_tanam');
+
+                // paling penting — hubungkan bulan periode debit ke bulan_formatted di subLuas
+                $join->on('l.bulan_formatted', '=', 'd.bulan_awal');
             })
+
             ->join('desa as desaTbl', 's.id_desa', '=', 'desaTbl.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
+
             ->when($request->filled('id_desa'), fn($q) => $q->where('s.id_desa', $request->id_desa))
             ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('s.id_tahun_tanam', $request->id_tahun_tanam))
+
             ->select(
                 's.id_petani',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas AS luasan',
+                'l.total_luas AS luasan',         // <-- sesuai periode transaksi!
                 'desaTbl.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'd.bulan_awal',
                 'd.bulan_akhir',
-                'd.nominal AS total_nominal',
+                'd.nominal',
                 'd.metode'
             )
             ->orderBy('s.id_petani')
@@ -572,6 +586,8 @@ class BukuBesarController extends Controller
                 $tahun = substr($trx->bulan_akhir, 0, 4);
 
                 $trx->periode_string = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
+                $trx->total_nominal = (float) $trx->nominal;
+
                 return $trx;
             });
 

@@ -140,6 +140,7 @@
     <h2 style="margin-top: 10px; margin-bottom: 20px;"><strong>LAPORAN CATATAN SALDO</strong></h2>
 
     {{-- CARD SUMMARY --}}
+    @if(!empty($stat) && ($request->filled('periode') || $request->filled('tahun') || $request->filled('id_desa')))
     <div class="section-title">RINGKASAN</div>
     <table cellpadding="5" cellspacing="0"
         style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
@@ -174,6 +175,7 @@
             <td style="border: 1px solid #000; text-align: right;">Rp {{ number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.') }}</td>
         </tr>
     </table>
+    @endif
 
     {{-- Tabel Saldo per Petani --}}
     <div class="section-title">Data Saldo per Petani</div>

@@ -46,25 +46,22 @@ class SaldoController extends Controller
                 'bh1.id_tahun_tanam'
             );
 
-        $subLuas = DB::table('bagi_hasil_petani')
+        $subLuas = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                DB::raw('SUM(luas_unik) as total_luas')
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan, 2, '0')) as bulan_formatted"),
+                DB::raw('SUM(bhp.total_luas_ksm) as total_luas')
             )
-            ->fromSub(function ($q) {
-                $q->from('bagi_hasil_petani')
-                    ->select(
-                        'id_petani',
-                        'id_desa',
-                        'id_tahun_tanam',
-                        'id_lahan',
-                        DB::raw('MAX(total_luas_ksm) as luas_unik')
-                    )
-                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
-            }, 'lahan_unik')
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
+            ->groupBy(
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                'bhb.tahun',
+                'bhb.bulan'
+            );
 
         $subNominal = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
@@ -105,15 +102,18 @@ class SaldoController extends Controller
         // ------------------ QUERY UTAMA (join pake short fields) ------------------
         $query = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
             ->mergeBindings($subSnapshot)
-            ->joinSub($subLuas, 'l', function ($join) {
-                $join->on('s.id_petani', '=', 'l.id_petani')
-                    ->on('s.id_desa', '=', 'l.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
-            })
+            // JOIN subNominal
             ->joinSub($subNominal, 'n', function ($join) {
                 $join->on('s.id_petani', '=', 'n.id_petani')
                     ->on('s.id_desa', '=', 'n.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'n.id_tahun_tanam');
+            })
+            // Baru JOIN subLuas yang pakai bulan_awal_short
+            ->joinSub($subLuas, 'l', function ($join) {
+                $join->on('s.id_petani', '=', 'l.id_petani')
+                    ->on('s.id_desa', '=', 'l.id_desa')
+                    ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam')
+                    ->on('l.bulan_formatted', '=', 'n.bulan_awal_short');
             })
             // left join sekarang berdasarkan bulan_awal_short / bulan_akhir_short -> cocok dengan transaksi 'YYYY-MM'
             ->leftJoinSub($subDebit, 'dpt', function ($join) {
@@ -234,6 +234,7 @@ class SaldoController extends Controller
             'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
+
     public function saldoPdf(Request $request)
     {
         $namaBulan = [
@@ -260,25 +261,22 @@ class SaldoController extends Controller
             })
             ->select('bh1.id_petani', 'bh1.nama_petani_snapshot', 'bh1.nomor_plasma_snapshot', 'bh1.id_desa', 'bh1.id_tahun_tanam');
 
-        $subLuas = DB::table('bagi_hasil_petani')
+        $subLuas = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                DB::raw('SUM(luas_unik) as total_luas')
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan, 2, '0')) as bulan_formatted"),
+                DB::raw('SUM(bhp.total_luas_ksm) as total_luas')
             )
-            ->fromSub(function ($q) {
-                $q->from('bagi_hasil_petani')
-                    ->select(
-                        'id_petani',
-                        'id_desa',
-                        'id_tahun_tanam',
-                        'id_lahan',
-                        DB::raw('MAX(total_luas_ksm) as luas_unik')
-                    )
-                    ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'id_lahan');
-            }, 'lahan_unik')
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam');
+            ->groupBy(
+                'bhp.id_petani',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
+                'bhb.tahun',
+                'bhb.bulan'
+            );
 
         $subNominal = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
@@ -317,15 +315,18 @@ class SaldoController extends Controller
 
         $query = DB::table(DB::raw("({$subSnapshot->toSql()}) as s"))
             ->mergeBindings($subSnapshot)
-            ->joinSub($subLuas, 'l', function ($join) {
-                $join->on('s.id_petani', '=', 'l.id_petani')
-                    ->on('s.id_desa', '=', 'l.id_desa')
-                    ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam');
-            })
+            // JOIN subNominal
             ->joinSub($subNominal, 'n', function ($join) {
                 $join->on('s.id_petani', '=', 'n.id_petani')
                     ->on('s.id_desa', '=', 'n.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'n.id_tahun_tanam');
+            })
+            // Baru JOIN subLuas yang pakai bulan_awal_short
+            ->joinSub($subLuas, 'l', function ($join) {
+                $join->on('s.id_petani', '=', 'l.id_petani')
+                    ->on('s.id_desa', '=', 'l.id_desa')
+                    ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam')
+                    ->on('l.bulan_formatted', '=', 'n.bulan_awal_short');
             })
             ->leftJoinSub($subDebit, 'dpt', function ($join) {
                 $join->on('s.id_petani', '=', 'dpt.id_petani')
@@ -420,7 +421,8 @@ class SaldoController extends Controller
         $pdf = Pdf::loadView('saldo.pdf', [
             'dataSaldo' => $dataSaldo,
             'stat' => $stat,
-            'namaBulan' => $namaBulan
+            'namaBulan' => $namaBulan,
+            'request' => $request
         ]);
 
         $pdf->setPaper('A4', 'landscape');
