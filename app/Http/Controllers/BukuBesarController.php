@@ -279,7 +279,7 @@ class BukuBesarController extends Controller
         $dataTransaksi = $dataTransaksi->sortBy('id_petani');
 
         $page = request()->get('page', 1);
-        $perPage = 10;
+        $perPage = 20;
 
         // Buat paginator dari collection
         $dataTransaksi = new LengthAwarePaginator(
