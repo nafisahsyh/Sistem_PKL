@@ -88,12 +88,6 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
                                 Kelola KSM
                             </a>
-
-                            <a class="nav-link {{ request()->is('penjualan') ? 'active' : '' }}" href="/penjualan">
-                                <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                                Kelola Mandiri
-                            </a>
-
                             <a class="nav-link {{ request()->is('pengambilan-saldo*') ? 'active' : '' }}"
                                 href="{{ route('pengambilan.index') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-people-arrows"></i></div>
