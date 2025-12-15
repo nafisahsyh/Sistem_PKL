@@ -298,8 +298,8 @@
                     const form = this.closest('.delete-form');
 
                     Swal.fire({
-                        title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;color:#000;'>Yakin ingin menghapus?</h3>",
-                        html: "<p style='font-size:14px;margin:0;color:#000;'>Data yang dihapus tidak dapat dikembalikan!</p>",
+                        title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;'>Yakin ingin menghapus?</h3>",
+                        html: "<p style='font-size:14px;margin:0;'>Data yang dihapus tidak dapat dikembalikan!</p>",
                         icon: 'warning',
                         iconColor: '#dc3545',
                         showCancelButton: true,
@@ -322,7 +322,7 @@
         <script>
             Swal.fire({
                 icon: 'success',
-                title: "<h3 style='font-size:15px;margin-bottom:0;color:#000;'>Berhasil</h3>",
+                title: "<h3 style='font-size:15px;margin-bottom:0;'>Berhasil</h3>",
                 text: "{{ session('success') }}",
                 confirmButtonColor: '#198754',
                 timer: 1800,

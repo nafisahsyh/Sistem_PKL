@@ -86,8 +86,8 @@
                             const form = this.closest('.delete-form');
 
                             Swal.fire({
-                                title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;color:#000;'>Yakin ingin menghapus?</h3>",
-                                html: "<p style='font-size:14px;margin:0;color:#000;'>Data yang dihapus tidak dapat dikembalikan!</p>",
+                                title: "<h3 style='font-size:15px;margin-bottom:2px;line-height:0.5;]'>Yakin ingin menghapus?</h3>",
+                                html: "<p style='font-size:14px;margin:0;'>Data yang dihapus tidak dapat dikembalikan!</p>",
                                 icon: 'warning',
                                 iconColor: '#dc3545',
                                 showCancelButton: true,

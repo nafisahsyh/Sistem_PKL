@@ -333,6 +333,7 @@
                         title: "Data belum lengkap",
                         text: "Nomor urut dan metode harus diisi.",
                         icon: "warning",
+                        iconColor: '#dc3545',
                         confirmButtonColor: '#198754',
                     });
                     return;
@@ -342,6 +343,7 @@
                     title: "Ambil saldo petani?",
                     text: "Saldo akan menjadi 0 dan nota akan diterbitkan.",
                     icon: "warning",
+                    iconColor: '#dc3545',
                     showCancelButton: true,
                     confirmButtonColor: '#198754',
                     cancelButtonColor: '#dc3545',

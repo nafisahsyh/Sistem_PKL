@@ -37,8 +37,8 @@
                             <th>No</th>
                             <th>No Plasma</th>
                             <th>No Koperasi</th>
-                            <th>NIK</th>
                             <th>Nama Petani</th>
+                            <th>NIK</th>
                             <th>Telepon</th>
                             <th>Status</th>
                             <th>KTP</th>
@@ -53,8 +53,8 @@
                                     {{ ($petani->currentPage() - 1) * $petani->perPage() + $loop->iteration }}</td>
                                 <td class="text-center">{{ $p->nomor_anggota_plasma ?? '—' }}</td>
                                 <td class="text-center">{{ $p->nomor_anggota_koperasi ?: '—' }}</td>
-                                <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td>{{ $p->nama ?? '—' }}</td>
+                                <td class="text-center">{{ $p->NIK ?: '—' }}</td>
                                 <td class="text-center">
                                     @if ($p->no_telepon)
                                         @php
@@ -174,6 +174,7 @@
                         title: "Yakin ingin menghapus?",
                         text: "Data yang dihapus tidak dapat dikembalikan!",
                         icon: 'warning',
+                        iconColor: '#dc3545',
                         showCancelButton: true,
                         confirmButtonColor: '#198754',
                         cancelButtonColor: '#dc3545',

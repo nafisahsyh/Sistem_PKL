@@ -176,7 +176,7 @@
                                 <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                <label class="form-label">Luas Sesuai Lapangan (M²)<span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" name="lahan[0][luas_peta]"
                                     class="form-control text-kecil" min="0" required>
                             </div>
@@ -433,7 +433,7 @@
                                 <input type="text" name="lahan[${lahanIndex}][nama_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Luas Sesuai Lapangan (M²)</label>
+                                <label class="form-label">Luas Sesuai Lapangan (M²)<span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" min="0" name="lahan[${lahanIndex}][luas_peta]" class="form-control text-kecil" required>
                             </div>
                         </div>

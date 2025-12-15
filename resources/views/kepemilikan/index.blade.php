@@ -133,7 +133,7 @@
                                                 rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $rowNumber }}
                                             </td>
-                                            <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
+                                            <td class="text-center align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $k->petani->nomor_anggota_plasma ?? '-' }}
                                             </td>
                                             <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
