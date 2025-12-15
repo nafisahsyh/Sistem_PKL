@@ -239,7 +239,8 @@
                                         class="form-control text-kecil" value="{{ $detail->nama_SHM }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Luas Sesuai Lapangan (M²)<span class="text-danger">*</span></label>
+                                    <label class="form-label">Luas Sesuai Lapangan (M²)<span
+                                            class="text-danger">*</span></label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
                                         class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}" required>
                                 </div>
@@ -1182,16 +1183,24 @@
                     });
                 }
 
-                // === HAPUS FILE SHM ===
-                if (e.target.closest('.btn-hapus-shm')) {
-                    const btn = e.target.closest('.btn-hapus-shm');
-                    const container = btn.closest('.file-shm-container');
-                    const inputHidden = container.parentElement.querySelector('.hapus_shm');
+                document.addEventListener('click', function(e) {
+                    const shmBtn = e.target.closest('.btn-hapus-shm');
+                    const petaBtn = e.target.closest('.btn-hapus-peta');
+
+                    if (!shmBtn && !petaBtn) return;
+
+                    const isShm = !!shmBtn;
+                    const btn = shmBtn || petaBtn;
+                    const container = btn.closest(isShm ? '.file-shm-container' : '.file-peta-container');
+                    const inputHidden = container.parentElement.querySelector(
+                        isShm ? '.hapus_shm' : '.hapus_peta'
+                    );
 
                     Swal.fire({
-                        title: "Yakin ingin menghapus file SHM?",
+                        title: `Yakin ingin menghapus file ${isShm ? 'SHM' : 'Peta'}?`,
                         text: "File ini akan dihapus permanen dari sistem.",
                         icon: "warning",
+                        iconColor: "#dc3545",
                         showCancelButton: true,
                         confirmButtonColor: "#198754",
                         cancelButtonColor: "#dc3545",
@@ -1201,46 +1210,18 @@
                         if (result.isConfirmed) {
                             inputHidden.value = 1;
                             container.remove();
+
                             Swal.fire({
                                 title: "Berhasil!",
-                                text: "File SHM berhasil untuk dihapus.",
+                                text: `File ${isShm ? 'SHM' : 'Peta'} berhasil dihapus.`,
                                 icon: "success",
                                 timer: 1500,
                                 showConfirmButton: false
                             });
                         }
                     });
-                }
+                });
 
-                // === HAPUS FILE PETA ===
-                if (e.target.closest('.btn-hapus-peta')) {
-                    const btn = e.target.closest('.btn-hapus-peta');
-                    const container = btn.closest('.file-peta-container');
-                    const inputHidden = container.parentElement.querySelector('.hapus_peta');
-
-                    Swal.fire({
-                        title: "Yakin ingin menghapus file Peta?",
-                        text: "File ini akan dihapus permanen dari sistem.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#198754",
-                        cancelButtonColor: "#dc3545",
-                        confirmButtonText: "Ya, hapus",
-                        cancelButtonText: "Batal"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            inputHidden.value = 1;
-                            container.remove();
-                            Swal.fire({
-                                title: "Berhasil!",
-                                text: "File Peta berhasil untuk dihapus.",
-                                icon: "success",
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        }
-                    });
-                }
 
                 // ================== TOGGLE PETANI LAMA / BARU ==================
                 const modeSelect = document.getElementById('modeSelect');
