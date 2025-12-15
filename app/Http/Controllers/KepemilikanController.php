@@ -680,7 +680,7 @@ class KepemilikanController extends Controller
             'lahan.*.koordinat_y' => 'nullable|numeric|between:-90,90',
             'lahan.*.posisi surat' => 'nullable|in:Notaris,PTP,Koperasi,Petani',
             'lahan.*.status_penyerahan' => 'nullable|string|max:100',
-            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:10240',
+            'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:30720',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
             'lahan.*.status_kepemilikan' => 'required|in:aktif,nonaktif',
             'lahan.*.tanggal_mulai' => 'nullable|date',

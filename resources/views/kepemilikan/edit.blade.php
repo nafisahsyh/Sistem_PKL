@@ -376,7 +376,7 @@
                                     <input type="hidden" name="lahan[{{ $index }}][hapus_shm]" class="hapus_shm"
                                         value="0">
 
-                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
+                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>
 
                                     @if ($detail->pdf_scan_shm)
                                         <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
@@ -1103,7 +1103,7 @@
                                     <input type="hidden" name="lahan[${lahanIndex}][hapus_shm]" 
                                         class="hapus_shm" value="0">
 
-                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>      
+                                    <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>      
                                                         
                                     <!-- Container file SHM -->
                                     <div class="file-shm-container mt-1 d-flex align-items-center gap-2">

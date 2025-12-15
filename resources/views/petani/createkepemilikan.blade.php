@@ -269,7 +269,7 @@
                                 <label class="form-label">Scan SHM</label>
                                 <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
                                     accept="application/pdf">
-                                <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
+                                <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan Peta</label>
@@ -526,7 +526,7 @@
                                 <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
                                     class="form-control"
                                     accept="application/pdf">
-                                <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>                                    
+                                <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>                                    
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan Peta</label>
