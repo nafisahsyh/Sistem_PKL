@@ -185,31 +185,56 @@ class SaldoController extends Controller
             });
         }
 
+        $queryStat = clone $query;
+
         $results = $query->orderBy('s.id_petani')
             ->paginate(15)
             ->appends($request->query());
 
-        $stat = (clone $query)
-            ->selectRaw("
-        SUM(CASE WHEN dpt.nominal_debit IS NOT NULL THEN 1 ELSE 0 END) AS total_sudah,
-        SUM(CASE WHEN dpt.nominal_debit IS NULL THEN 1 ELSE 0 END) AS total_belum,
-        SUM(CASE WHEN dpt.metode = 'cash' THEN dpt.nominal_debit ELSE 0 END) AS total_cash,
-        SUM(CASE WHEN dpt.metode = 'transfer' THEN dpt.nominal_debit ELSE 0 END) AS total_transfer
-    ")
-            ->groupBy(
-                's.id_petani',
-                's.nama_petani_snapshot',
-                's.nomor_plasma_snapshot',
-                'l.total_luas',
-                'dd.desa',
-                'tt.tahun',
-                'n.bulan_awal',
-                'n.bulan_akhir',
-                'n.total_nominal',
-                'dpt.metode',
-                'dpt.nominal_debit'
-            )
-            ->first();
+        $dataAll = $queryStat->get();
+
+        $totalPetani = $dataAll->count();
+
+        $totalSudah = $dataAll->whereNotNull('nominal_debit')->count();
+        $totalBelum = $dataAll->whereNull('nominal_debit')->count();
+
+        // ================= CASH =================
+        $cash = $dataAll
+            ->where('metode', 'cash')
+            ->whereNotNull('nominal_debit');
+
+        $jumlahCash = $cash->count();
+        $nominalCash = $cash->sum('nominal_debit');
+
+        // ================= TRANSFER =================
+        $transfer = $dataAll
+            ->where('metode', 'transfer')
+            ->whereNotNull('nominal_debit');
+
+        $jumlahTransfer = $transfer->count();
+        $nominalTransfer = $transfer->sum('nominal_debit');
+
+        $totalNominal = $dataAll->sum('total_nominal');
+
+        $totalSisa = $dataAll->sum(function ($row) {
+            return max(
+                ($row->total_nominal ?? 0) - ($row->nominal_debit ?? 0),
+                0
+            );
+        });
+
+        $stat = [
+            'total_petani' => $totalPetani,
+            'total_sudah' => $totalSudah,
+            'total_belum' => $totalBelum,
+            'jumlah_cash' => $jumlahCash,
+            'nominal_cash' => $nominalCash,
+            'jumlah_transfer' => $jumlahTransfer,
+            'nominal_transfer' => $nominalTransfer,
+            'total_nominal' => $totalNominal,
+            'sisa' => $totalSisa,
+        ];
+
 
         $results->getCollection()->transform(function ($row) use ($namaBulan) {
             $bulanAwal = (int) substr($row->bulan_awal, 5, 2);
@@ -406,6 +431,7 @@ class SaldoController extends Controller
 
         $jumlahTransfer = $transfer->count();
         $nominalTransfer = $transfer->sum('total_nominal');
+        $totalSisaSaldo = $dataSaldo->sum('sisa');
 
         $stat = [
             'total_petani' => $totalPetani,
@@ -416,6 +442,7 @@ class SaldoController extends Controller
             'jumlah_transfer' => $jumlahTransfer,
             'nominal_transfer' => $nominalTransfer,
             'total_nominal' => $totalNominalKeseluruhan,
+            'sisa' => $totalSisaSaldo,
         ];
 
         $pdf = Pdf::loadView('saldo.pdf', [

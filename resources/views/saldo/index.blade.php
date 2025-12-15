@@ -24,61 +24,53 @@
 
             $jumlahFilterAktif = collect($filters)->filter(fn($v) => filled($v))->count();
 
-            $totalPetani = $dataSaldo->count();
-            $sudahMengambil = $dataSaldo->where('status_metode', '!=', 'Belum diambil')->count();
-            $belumMengambil = $dataSaldo->where('status_metode', 'Belum diambil')->count();
-
-            $cash = $dataSaldo->where('status_metode', 'cash');
-            $transfer = $dataSaldo->where('status_metode', 'transfer');
-
-            $jumlahCash = $cash->count();
-            $nominalCash = $cash->sum('total_nominal');
-
-            $jumlahTransfer = $transfer->count();
-            $nominalTransfer = $transfer->sum('total_nominal');
-
-            $totalNominalKeseluruhan = $dataSaldo->sum('total_nominal');
-
             $cards = [
                 [
                     'title' => 'Total Nominal',
-                    'count' => 'Rp ' . number_format($totalNominalKeseluruhan, 0, ',', '.'),
+                    'count' => 'Rp ' . number_format($stat['total_nominal'] ?? 0, 0, ',', '.'),
                     'bg' => 'bg-secondary',
                     'text' => 'text-white',
                 ],
                 [
+                    'title' => 'Total Sisa Saldo',
+                    'count' => 'Rp ' . number_format($stat['sisa'] ?? 0, 0, ',', '.'),
+                    'bg' => 'bg-dark',
+                    'text' => 'text-white',
+                ],
+                [
                     'title' => 'Total Petani',
-                    'count' => $totalPetani,
+                    'count' => $stat['total_petani'] ?? 0,
                     'bg' => 'bg-primary',
                     'text' => 'text-white',
                 ],
                 [
                     'title' => 'Sudah Mengambil',
-                    'count' => $sudahMengambil,
+                    'count' => $stat['total_sudah'] ?? 0,
                     'bg' => 'bg-success',
                     'text' => 'text-white',
                 ],
                 [
                     'title' => 'Belum Mengambil',
-                    'count' => $belumMengambil,
+                    'count' => $stat['total_belum'] ?? 0,
                     'bg' => 'bg-danger',
                     'text' => 'text-white',
                 ],
                 [
                     'title' => 'Cash',
-                    'count' => $jumlahCash . ' orang',
-                    'extra' => 'Rp ' . number_format($nominalCash, 0, ',', '.'),
+                    'count' => ($stat['jumlah_cash'] ?? 0) . ' orang',
+                    'extra' => 'Rp ' . number_format($stat['nominal_cash'] ?? 0, 0, ',', '.'),
                     'bg' => 'bg-info',
                     'text' => 'text-dark',
                 ],
                 [
                     'title' => 'Transfer',
-                    'count' => $jumlahTransfer . ' orang',
-                    'extra' => 'Rp ' . number_format($nominalTransfer, 0, ',', '.'),
+                    'count' => ($stat['jumlah_transfer'] ?? 0) . ' orang',
+                    'extra' => 'Rp ' . number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.'),
                     'bg' => 'bg-warning',
                     'text' => 'text-dark',
                 ],
             ];
+
         @endphp
 
         @if ($jumlahFilterAktif > 0)
@@ -96,7 +88,7 @@
                 @endforeach
             </div>
         @endif
-        
+
         {{-- CARD --}}
         <div class="card shadow-sm rounded-3">
             <div class="card-body">

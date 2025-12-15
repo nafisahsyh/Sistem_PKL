@@ -147,6 +147,7 @@
         <!-- Baris 1: Judul utama -->
         <tr style="font-weight: bold;">
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Nominal</td>
+            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sisa Saldo</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Petani</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Mengambil</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Mengambil</td>
@@ -162,6 +163,7 @@
         <!-- Baris 3: Jumlah orang -->
         <tr>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp {{ number_format($stat['total_nominal'] ?? 0, 0, ',', '.')}}</td>
+            <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp {{ number_format($stat['sisa'] ?? 0, 0, ',', '.')}}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_petani'] ?? 0 }}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_sudah'] ?? 0 }}</td>
             <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_belum'] ?? 0 }}</td>

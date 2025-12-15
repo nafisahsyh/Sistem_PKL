@@ -175,26 +175,24 @@
 
                         {{-- PETANI SEBELUM --}}
                         @if (!in_array('riwayat', $exclude))
-                            <td style="text-align: left;">
-                                @php
-                                    // Ambil nama petani sebelumnya urut dari yang paling awal
-                                    $riwayat = $detail->lahan->riwayatKepemilikan
-                                        ->sortBy('id') // pastikan urut dari petani pertama
-                                        ->pluck('petaniSebelum.nama')
-                                        ->filter()
-                                        ->values(); // reset index
+                            @php
+                                $riwayat = $detail->lahan->riwayatKepemilikan
+                                    ->sortBy('id')
+                                    ->pluck('petaniSebelum.nama')
+                                    ->filter()
+                                    ->values();
 
-                                    if ($riwayat->isEmpty()) {
-                                        echo '-';
-                                    } else {
-                                        // Format menjadi list bernomor
-                                        $output = '';
-                                        foreach ($riwayat as $index => $nama) {
-                                            $output .= $index + 1 . '. ' . $nama . '<br>';
-                                        }
-                                        echo $output;
-                                    }
-                                @endphp
+                                $isKosong = $riwayat->isEmpty();
+                            @endphp
+
+                            <td style="text-align: {{ $isKosong ? 'center' : 'left' }};">
+                                @if ($isKosong)
+                                    -
+                                @else
+                                    @foreach ($riwayat as $index => $nama)
+                                        {{ $index + 1 }}. {{ $nama }}<br>
+                                    @endforeach
+                                @endif
                             </td>
                         @endif
 
