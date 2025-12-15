@@ -457,7 +457,7 @@ class SaldoController extends Controller
         //Mengambil nama desa
         $desa = $request->filled('id_desa')
             ? DB::table('desa')->where('id_desa', $request->id_desa)->value('desa')
-            : 'Tidak Diketahui';
+            : 'Semua Desa';
 
         //Mengambil tahun tanam
         $tahunTanam = $request->filled('id_tahun_tanam')
@@ -471,7 +471,7 @@ class SaldoController extends Controller
             $bulanAkhir = ($p - 1) * 2 + 2; // periode 2 -> bulan 4
             $periodeNama = "{$namaBulan[$bulanAwal]}-{$namaBulan[$bulanAkhir]}";
         } else {
-            $periodeNama = 'Periode Tidak Diketahui';
+            $periodeNama = 'Semua Periode';
         }
 
         // Tahun untuk file (ambil dari request atau default tahun sekarang)

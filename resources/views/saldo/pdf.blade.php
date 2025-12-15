@@ -25,11 +25,18 @@
     <title>Laporan Catatan Saldo</title>
 
     <style>
+        @page {
+            margin-top: 20px;
+            margin-bottom: 5px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 12px;
             color: #000;
-            margin: 25px;
+            margin: 20px;
         }
 
         h2,
@@ -140,43 +147,50 @@
     <h2 style="margin-top: 10px; margin-bottom: 20px;"><strong>LAPORAN CATATAN SALDO</strong></h2>
 
     {{-- CARD SUMMARY --}}
-    @if(!empty($stat) && ($request->filled('periode') || $request->filled('tahun') || $request->filled('id_desa')))
-    <div class="section-title">RINGKASAN</div>
-    <table cellpadding="5" cellspacing="0"
-        style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
-        <!-- Baris 1: Judul utama -->
-        <tr style="font-weight: bold;">
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Nominal</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sisa Saldo</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Petani</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Mengambil</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Mengambil</td>
-            <td colspan="2" style="border: 1px solid #000; text-align: center;">Metode</td>
-        </tr>
+    @if (!empty($stat) && ($request->filled('periode') || $request->filled('tahun') || $request->filled('id_desa')))
+        <div class="section-title">RINGKASAN</div>
+        <table cellpadding="5" cellspacing="0"
+            style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
+            <!-- Baris 1: Judul utama -->
+            <tr style="font-weight: bold;">
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Nominal</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sisa Saldo</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Petani</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Mengambil</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Mengambil</td>
+                <td colspan="2" style="border: 1px solid #000; text-align: center;">Metode</td>
+            </tr>
 
-        <!-- Baris 2: Subheader metode -->
-        <tr style="font-weight: bold;">
-            <td style="border: 1px solid #000; text-align: center;">Cash</td>
-            <td style="border: 1px solid #000; text-align: center;">Transfer</td>
-        </tr>
+            <!-- Baris 2: Subheader metode -->
+            <tr style="font-weight: bold;">
+                <td style="border: 1px solid #000; text-align: center;">Cash</td>
+                <td style="border: 1px solid #000; text-align: center;">Transfer</td>
+            </tr>
 
-        <!-- Baris 3: Jumlah orang -->
-        <tr>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp {{ number_format($stat['total_nominal'] ?? 0, 0, ',', '.')}}</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp {{ number_format($stat['sisa'] ?? 0, 0, ',', '.')}}</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_petani'] ?? 0 }}</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_sudah'] ?? 0 }}</td>
-            <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_belum'] ?? 0 }}</td>
-            <td style="border: 1px solid #000; text-align: center;">{{ $stat['jumlah_cash'] ?? 0 }}</td>
-            <td style="border: 1px solid #000; text-align: center;">{{ $stat['jumlah_transfer'] ?? 0 }}</td>
-        </tr>
+            <!-- Baris 3: Jumlah orang -->
+            <tr>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp
+                    {{ number_format($stat['total_nominal'] ?? 0, 0, ',', '.') }}</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp
+                    {{ number_format($stat['sisa'] ?? 0, 0, ',', '.') }}</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_petani'] ?? 0 }}
+                </td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_sudah'] ?? 0 }}
+                </td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_belum'] ?? 0 }}
+                </td>
+                <td style="border: 1px solid #000; text-align: center;">{{ $stat['jumlah_cash'] ?? 0 }}</td>
+                <td style="border: 1px solid #000; text-align: center;">{{ $stat['jumlah_transfer'] ?? 0 }}</td>
+            </tr>
 
-        <!-- Baris 4: Nominal -->
-        <tr>
-            <td style="border: 1px solid #000; text-align: right;">Rp {{ number_format($stat['nominal_cash'] ?? 0, 0, ',', '.') }}</td>
-            <td style="border: 1px solid #000; text-align: right;">Rp {{ number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.') }}</td>
-        </tr>
-    </table>
+            <!-- Baris 4: Nominal -->
+            <tr>
+                <td style="border: 1px solid #000; text-align: right;">Rp
+                    {{ number_format($stat['nominal_cash'] ?? 0, 0, ',', '.') }}</td>
+                <td style="border: 1px solid #000; text-align: right;">Rp
+                    {{ number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.') }}</td>
+            </tr>
+        </table>
     @endif
 
     {{-- Tabel Saldo per Petani --}}

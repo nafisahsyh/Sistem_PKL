@@ -74,7 +74,10 @@ class PengambilanSaldoController extends Controller
                 'tanggal_bagi' => $group->first()->tanggal_bagi,
                 'total_periode' => $totalPeriode,
             ];
-        })->values();
+        })
+            ->sortByDesc(function ($item) {
+                return $item['tahun'] . str_pad($item['bulan_akhir'], 2, '0', STR_PAD_LEFT);
+            })->values();
 
         $perPage = 20;
         $page = $request->get('page', 1);
