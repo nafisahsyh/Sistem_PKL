@@ -187,7 +187,9 @@ class SaldoController extends Controller
 
         $queryStat = clone $query;
 
-        $results = $query->orderBy('s.id_petani')
+        $results = $query
+            ->orderBy('n.bulan_awal', 'desc')
+            ->orderBy('s.id_petani')
             ->paginate(20)
             ->appends($request->query());
 

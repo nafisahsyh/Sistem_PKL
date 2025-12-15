@@ -276,7 +276,13 @@ class BukuBesarController extends Controller
         }
 
         // Optional sorting
-        $dataTransaksi = $dataTransaksi->sortBy('id_petani');
+        $dataTransaksi = $dataTransaksi
+            ->sortByDesc(function ($row) {
+                return $row->bulan_awal; // YYYY-MM → otomatis urut waktu
+            })
+            ->sortBy(function ($row) {
+                return $row->id_petani;
+            });
 
         $page = request()->get('page', 1);
         $perPage = 20;
