@@ -305,6 +305,7 @@ class PengambilanSaldoController extends Controller
 
             // === RETURN di sini ===
             return Transaksi::create([
+                'id_bagi_bulanan' => null,
                 'id_petani' => $idPetani,
                 'id_desa' => $firstBulanan->id_desa,
                 'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,

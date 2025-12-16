@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->bigIncrements('id_transaksi');
+            $table->unsignedBigInteger('id_bagi_bulanan')->nullable();
             $table->unsignedBigInteger('id_petani');
             $table->unsignedBigInteger('id_desa');
             $table->unsignedBigInteger('id_tahun_tanam');
@@ -26,6 +27,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
+            $table->foreign('id_bagi_bulanan')->references('id_bagi_bulanan')->on('bagi_hasil_bulanan')->onDelete('cascade');
             $table->foreign('id_petani')->references('id_petani')->on('petani')->onDelete('cascade');
             $table->foreign('id_desa')->references('id_desa')->on('desa')->onDelete('cascade');
             $table->foreign('id_tahun_tanam')->references('id_tahun_tanam')->on('tahun_tanam')->onDelete('cascade');

@@ -7,8 +7,12 @@
         <h4 class="mt-4 text-brown">Edit Bagi Hasil Per Bulan</h4>
 
         <div class="card p-4">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    {{ $errors->first() }}
+                </div>
+            @endif
             <form action="{{ route('bagi-hasil-bulanan.update', $bulanan) }}" method="POST">
-                <input type="hidden" name="bulan_awal" value="{{ old('bulan', $bulanan->bulan) }}">
                 @csrf
                 @method('PUT')
 
