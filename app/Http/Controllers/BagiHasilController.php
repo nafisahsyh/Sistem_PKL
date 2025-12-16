@@ -3,23 +3,24 @@
 namespace App\Http\Controllers;
 
 // Model yang terikat
+use DateTime;
+use Carbon\Carbon;
 use App\Models\Desa;
 use App\Models\Saldo;
 use App\Models\Transaksi;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use App\Models\BagiHasilPetani;
-use App\Models\BagiHasilBulanan;
-use App\Models\DetailKepemilikan;
 
 // Database dan Pagination
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\BagiHasilBulanan;
+use App\Models\DetailKepemilikan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
-use DateTime;
 
 //Import PDF
-use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class BagiHasilController extends Controller
@@ -67,6 +68,24 @@ class BagiHasilController extends Controller
             ->orderBy('bulan', 'desc')
             ->paginate(20)
             ->withQueryString();
+
+$bulanan->getCollection()->transform(function ($b) {
+
+    $bulanIni = sprintf('%04d-%02d', $b->tahun, $b->bulan);
+
+    $b->sudah_diambil = Transaksi::where('tipe', 'debit_pengambilan')
+        ->where('id_desa', $b->id_desa)
+        ->where('id_tahun_tanam', $b->id_tahun_tanam)
+
+        // 🔑 BULAN INI ADA DI DALAM PERIODE TRANSAKSI
+        ->where('bulan_awal', '<=', $bulanIni)
+        ->where('bulan_akhir', '>=', $bulanIni)
+
+        ->exists();
+
+    return $b;
+});
+
 
         return view('bagihasil.index', [
             'bulanan' => $bulanan,

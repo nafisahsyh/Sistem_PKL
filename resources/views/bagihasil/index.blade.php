@@ -151,10 +151,9 @@
                                 <td class="text-center">
                                     Rp {{ number_format($b->total_bagian, 0, ',', '.') }}
                                 </td>
-
                                 <td class="text-center">
 
-                                    {{-- DETAIL --}}
+                                    {{-- DETAIL (SELALU ADA) --}}
                                     <a href="{{ route('bagi-hasil-bulanan.show', [
                                         'bagi_hasil_bulanan' => $b->id_bagi_bulanan,
                                         'page' => request('page'),
@@ -168,18 +167,26 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
 
-                                    {{-- EDIT --}}
-                                    <a href="{{ route('bagi-hasil-bulanan.edit', $b->id_bagi_bulanan) }}"
-                                        class="btn btn-sm btn-warning me-1" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    @if (!$b->sudah_diambil)
+                                        {{-- EDIT --}}
+                                        <a href="{{ route('bagi-hasil-bulanan.edit', $b->id_bagi_bulanan) }}"
+                                            class="btn btn-sm btn-warning me-1" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-                                    <form action="{{ route('bagi-hasil-bulanan.destroy', $b) }}" method="POST"
-                                        class="d-inline delete-form"> @csrf @method('DELETE') <button type="button"
-                                            class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash"></i></button>
-                                    </form>
+                                        {{-- HAPUS --}}
+                                        <form action="{{ route('bagi-hasil-bulanan.destroy', $b) }}" method="POST"
+                                            class="d-inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
 
                                 </td>
+
 
                             </tr>
                         @empty
