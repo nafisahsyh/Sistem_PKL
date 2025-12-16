@@ -30,11 +30,15 @@ class SaldoController extends Controller
 
         $subSnapshot = DB::table('bagi_hasil_petani as bh1')
             ->join(
-                DB::raw("(SELECT id_petani, MAX(id_bagi_petani) AS max_id 
-                        FROM bagi_hasil_petani 
-                        GROUP BY id_petani) bh2"),
+                DB::raw("(
+            SELECT id_petani, id_desa, id_tahun_tanam, MAX(id_bagi_petani) AS max_id
+            FROM bagi_hasil_petani
+            GROUP BY id_petani, id_desa, id_tahun_tanam
+        ) bh2"),
                 function ($join) {
                     $join->on('bh1.id_petani', '=', 'bh2.id_petani')
+                        ->on('bh1.id_desa', '=', 'bh2.id_desa')
+                        ->on('bh1.id_tahun_tanam', '=', 'bh2.id_tahun_tanam')
                         ->on('bh1.id_bagi_petani', '=', 'bh2.max_id');
                 }
             )
@@ -45,6 +49,7 @@ class SaldoController extends Controller
                 'bh1.id_desa',
                 'bh1.id_tahun_tanam'
             );
+
 
         $subLuas = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
@@ -139,7 +144,7 @@ class SaldoController extends Controller
                 'dpt.nominal_debit'
             );
         // ---------------------- FILTER ----------------------
-// Desa
+        // Desa
         if ($request->filled('id_desa')) {
             $query->where('s.id_desa', $request->id_desa);
         }
