@@ -64,16 +64,24 @@ class BukuBesarController extends Controller
             );
 
         // Ambil kredit (SUM per periode)
-        $subKredit = DB::table('transaksi')
+        $subKredit = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir',
-                DB::raw('SUM(nominal) AS total_nominal')
+                'bhp.id_petani',
+                'bhb.id_desa',
+                'bhb.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0')) AS bulan_awal"),
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0')) AS bulan_akhir"),
+                DB::raw('SUM(bhp.total_nominal) AS total_nominal')
             )
-            ->where('tipe', 'credit_bagihasil');
+            ->groupBy(
+                'bhp.id_petani',
+                'bhb.id_desa',
+                'bhb.id_tahun_tanam',
+                'bulan_awal',
+                'bulan_akhir'
+            );
+
 
         // Jika PERIODE & TAHUN diisi
         if ($request->filled('periode') && $request->filled('tahun')) {
@@ -258,13 +266,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
@@ -604,13 +612,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
