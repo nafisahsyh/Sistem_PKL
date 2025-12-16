@@ -59,25 +59,33 @@ class PengambilanSaldoController extends Controller
             $periodeBulan = ceil($item->bulan / 2);
 
             return $item->tahun . '-' . $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $periodeBulan;
-        })->map(function ($group) {
-            $bulanAwal = $group->min('bulan');
-            $bulanAkhir = $group->max('bulan');
-            $totalPeriode = $group->sum('total_bagian');
-
-            return [
-                'id_bulanan' => $group->pluck('id_bagi_bulanan')->toArray(),
-                'desa' => $group->first()->desa,
-                'tahunTanam' => $group->first()->tahunTanam,
-                'bulan_awal' => $bulanAwal,
-                'bulan_akhir' => $bulanAkhir,
-                'tahun' => $group->first()->tahun,
-                'tanggal_bagi' => $group->first()->tanggal_bagi,
-                'total_periode' => $totalPeriode,
-            ];
         })
+
+            ->filter(function ($group) {
+                // 🔒 HANYA TAMPIL JIKA SUDAH ADA 2 BULAN
+                return $group->count() === 2;
+            })
+
+            ->map(function ($group) {
+                $bulanAwal = $group->min('bulan');
+                $bulanAkhir = $group->max('bulan');
+                $totalPeriode = $group->sum('total_bagian');
+
+                return [
+                    'id_bulanan' => $group->pluck('id_bagi_bulanan')->toArray(),
+                    'desa' => $group->first()->desa,
+                    'tahunTanam' => $group->first()->tahunTanam,
+                    'bulan_awal' => $bulanAwal,
+                    'bulan_akhir' => $bulanAkhir,
+                    'tahun' => $group->first()->tahun,
+                    'tanggal_bagi' => $group->first()->tanggal_bagi,
+                    'total_periode' => $totalPeriode,
+                ];
+            })
             ->sortByDesc(function ($item) {
                 return $item['tahun'] . str_pad($item['bulan_akhir'], 2, '0', STR_PAD_LEFT);
-            })->values();
+            })
+            ->values();
 
         $perPage = 20;
         $page = $request->get('page', 1);
