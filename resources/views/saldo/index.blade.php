@@ -28,56 +28,63 @@
                 [
                     'title' => 'Total Nominal',
                     'count' => 'Rp ' . number_format($stat['total_nominal'] ?? 0, 0, ',', '.'),
-                    'bg' => 'bg-secondary',
-                    'text' => 'text-white',
+                    'bg' => '#F4F6F5', // abu hijau sangat lembut
+                    'text' => '#2F4F4F', // hijau gelap keabu
                 ],
                 [
                     'title' => 'Total Sisa Saldo',
                     'count' => 'Rp ' . number_format($stat['sisa'] ?? 0, 0, ',', '.'),
-                    'bg' => 'bg-dark',
-                    'text' => 'text-white',
+                    'bg' => '#E3F2EC', // hijau pastel
+                    'text' => '#0B4F3F', // hijau sawit
                 ],
                 [
                     'title' => 'Total Petani',
                     'count' => $stat['total_petani'] ?? 0,
-                    'bg' => 'bg-primary',
-                    'text' => 'text-white',
+                    'bg' => '#E8EFEA', // hijau abu
+                    'text' => '#1E4620', // hijau tua
                 ],
                 [
                     'title' => 'Sudah Mengambil',
                     'count' => $stat['total_sudah'] ?? 0,
-                    'bg' => 'bg-success',
-                    'text' => 'text-white',
+                    'bg' => '#D1E7DD', // hijau sukses lembut
+                    'text' => '#0F5132',
                 ],
                 [
                     'title' => 'Belum Mengambil',
                     'count' => $stat['total_belum'] ?? 0,
-                    'bg' => 'bg-danger',
-                    'text' => 'text-white',
+                    'bg' => '#F3E8D8', // coklat krem
+                    'text' => '#6B4F1D', // coklat tanah
                 ],
                 [
                     'title' => 'Cash',
                     'count' => ($stat['jumlah_cash'] ?? 0) . ' orang',
                     'extra' => 'Rp ' . number_format($stat['nominal_cash'] ?? 0, 0, ',', '.'),
-                    'bg' => 'bg-info',
-                    'text' => 'text-dark',
+                    'bg' => '#E6F0EB', // hijau muda
+                    'text' => '#145A32',
                 ],
                 [
                     'title' => 'Transfer',
                     'count' => ($stat['jumlah_transfer'] ?? 0) . ' orang',
                     'extra' => 'Rp ' . number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.'),
-                    'bg' => 'bg-warning',
-                    'text' => 'text-dark',
+                    'bg' => '#EFEFEF', // abu natural
+                    'text' => '#343A40',
                 ],
             ];
-
         @endphp
 
-        @if ($jumlahFilterAktif > 0)
-            <div class="d-flex flex-wrap gap-2 mb-3 justify-content-end">
+        @php
+            $hanyaFilterTahun =
+                filled(request('tahun')) &&
+                blank(request('id_desa')) &&
+                blank(request('id_tahun_tanam')) &&
+                blank(request('periode')) &&
+                blank(request('metode'));
+        @endphp
 
+        @if ($jumlahFilterAktif > 0 && !$hanyaFilterTahun)
+            <div class="d-flex flex-wrap gap-2 mb-3 justify-content-end">
                 @foreach ($cards as $card)
-                    <div class="summary-card {{ $card['bg'] }} {{ $card['text'] }}">
+                    <div class="summary-card" style="background-color: {{ $card['bg'] }}; color: {{ $card['text'] }};">
                         <small>{{ $card['title'] }}</small>
                         <strong>{{ $card['count'] }}</strong>
 
@@ -87,6 +94,50 @@
                     </div>
                 @endforeach
             </div>
+        @endif
+
+        @if ($hanyaFilterTahun)
+        {{-- ================= REKAP TAHUN TANAM ================= --}}
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Rekap Bagi Hasil per Tahun Tanam
+                <span class="badge bg-secondary ms-2">
+                    Akumulasi seluruh desa
+                </span>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    @forelse ($rekapTahunan as $item)
+                        <div class="col-md-3 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-bold fs-5">
+                                    {{ $item->tahun_tanam }}
+                                </div>
+
+                                <div class="small text-muted mt-2">
+                                    Total Nominal
+                                </div>
+                                <div class="fw-semibold">
+                                    Rp {{ number_format($item->total_nominal, 0, ',', '.') }}
+                                </div>
+
+                                <div class="small text-muted mt-2">
+                                    Sisa
+                                </div>
+                                <div class="fw-semibold text-danger">
+                                    Rp {{ number_format($item->sisa, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-muted">
+                            Tidak ada data rekap.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
         @endif
 
         {{-- CARD --}}
@@ -261,7 +312,8 @@
                                 <label class="form-label fw-bold">Periode (2 Bulanan)</label>
                                 <select name="periode" id="filter_periode" class="form-select">
                                     <option value="">Semua Periode</option>
-                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>Januari-Februari
+                                    <option value="1" {{ request('periode') == 1 ? 'selected' : '' }}>
+                                        Januari-Februari
                                     </option>
                                     <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>Maret-April
                                     </option>

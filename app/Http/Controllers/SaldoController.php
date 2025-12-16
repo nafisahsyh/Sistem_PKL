@@ -242,6 +242,54 @@ class SaldoController extends Controller
             'sisa' => $totalSisa,
         ];
 
+        $subTransaksiTahunan = DB::table('transaksi')
+            ->where('tipe', 'debit_pengambilan')
+            ->select(
+                'id_tahun_tanam',
+                DB::raw('SUM(nominal) as total_diambil')
+            )
+            ->groupBy('id_tahun_tanam');
+
+        $rekapTahunan = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
+            ->join('tahun_tanam as tt', 'bhb.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
+
+            ->leftJoinSub($subTransaksiTahunan, 'tr', function ($join) {
+                $join->on('bhb.id_tahun_tanam', '=', 'tr.id_tahun_tanam');
+            })
+
+            ->select(
+                'tt.tahun as tahun_tanam',
+                DB::raw('SUM(bhp.total_nominal) as total_nominal'),
+                DB::raw('COALESCE(MAX(tr.total_diambil), 0) as total_diambil')
+            )
+            ->groupBy('tt.tahun'); // ✅ CUKUP INI
+
+        // filter TAHUN (misalnya 2025)
+        if ($request->filled('tahun')) {
+            $rekapTahunan->where('bhb.tahun', $request->tahun);
+        }
+
+        // filter PERIODE (2 bulanan)
+        if ($request->filled('periode')) {
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $bulanAwal + 1;
+
+            $rekapTahunan
+                ->whereBetween('bhb.bulan', [$bulanAwal, $bulanAkhir]);
+        }
+
+        $rekapTahunan = $rekapTahunan
+            ->orderBy('tt.tahun')
+            ->get()
+            ->map(function ($row) {
+                $row->sisa = max(
+                    ($row->total_nominal ?? 0) - ($row->total_diambil ?? 0),
+                    0
+                );
+                return $row;
+            });
 
         $results->getCollection()->transform(function ($row) use ($namaBulan) {
             $bulanAwal = (int) substr($row->bulan_awal, 5, 2);
@@ -259,11 +307,20 @@ class SaldoController extends Controller
             return $row;
         });
 
+        $hanyaFilterTahun =
+            $request->filled('tahun')
+            && !$request->filled('id_desa')
+            && !$request->filled('id_tahun_tanam')
+            && !$request->filled('periode')
+            && !$request->filled('metode');
+
         return view('saldo.index', [
             'dataSaldo' => $results,
             'stat' => $stat,
+            'rekapTahunan' => $rekapTahunan,
             'desa' => Desa::all(),
             'tahunTanam' => Tahun_Tanam::all(),
+            'hanyaFilterTahun' => $hanyaFilterTahun,
         ]);
     }
 
