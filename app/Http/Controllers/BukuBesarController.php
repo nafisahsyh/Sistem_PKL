@@ -31,9 +31,15 @@ class BukuBesarController extends Controller
         // Ambil snapshot terakhir per petani
         $subSnapshot = DB::table('bagi_hasil_petani as bh1')
             ->join(
-                DB::raw('(SELECT id_petani, MAX(id_bagi_petani) AS max_id FROM bagi_hasil_petani GROUP BY id_petani) bh2'),
+                DB::raw('(
+            SELECT id_petani, id_desa, id_tahun_tanam, MAX(id_bagi_petani) AS max_id
+            FROM bagi_hasil_petani
+            GROUP BY id_petani, id_desa, id_tahun_tanam
+        ) bh2'),
                 function ($join) {
                     $join->on('bh1.id_petani', '=', 'bh2.id_petani')
+                        ->on('bh1.id_desa', '=', 'bh2.id_desa')
+                        ->on('bh1.id_tahun_tanam', '=', 'bh2.id_tahun_tanam')
                         ->on('bh1.id_bagi_petani', '=', 'bh2.max_id');
                 }
             )
@@ -44,6 +50,7 @@ class BukuBesarController extends Controller
                 'bh1.id_desa',
                 'bh1.id_tahun_tanam'
             );
+
 
         // Ambil id_bulanan sesuai filter periode (seperti di SHOW)
         $subLuas = DB::table('bagi_hasil_petani as bhp')
@@ -64,16 +71,24 @@ class BukuBesarController extends Controller
             );
 
         // Ambil kredit (SUM per periode)
-        $subKredit = DB::table('transaksi')
+        $subKredit = DB::table('bagi_hasil_petani as bhp')
+            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir',
-                DB::raw('SUM(nominal) AS total_nominal')
+                'bhp.id_petani',
+                'bhb.id_desa',
+                'bhb.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0')) AS bulan_awal"),
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0')) AS bulan_akhir"),
+                DB::raw('SUM(bhp.total_nominal) AS total_nominal')
             )
-            ->where('tipe', 'credit_bagihasil');
+            ->groupBy(
+                'bhp.id_petani',
+                'bhb.id_desa',
+                'bhb.id_tahun_tanam',
+                'bulan_awal',
+                'bulan_akhir'
+            );
+
 
         // Jika PERIODE & TAHUN diisi
         if ($request->filled('periode') && $request->filled('tahun')) {
