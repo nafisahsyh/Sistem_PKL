@@ -13,6 +13,31 @@ class SaldoController extends Controller
 {
     public function index(Request $request)
     {
+
+        // ================= AUTO FILTER DEFAULT (HANYA PERTAMA KALI) =================
+        if (empty($request->query())) {
+
+            $default = DB::table('bagi_hasil_bulanan')
+                ->select(
+                    'tahun',
+                    DB::raw('CEIL(bulan / 2) as periode'),
+                    'id_desa',
+                    'id_tahun_tanam'
+                )
+                ->orderByDesc('tahun')
+                ->orderByDesc('bulan')
+                ->first();
+
+            if ($default) {
+                $request->merge([
+                    'tahun' => $default->tahun,
+                    'periode' => $default->periode,
+                    'id_desa' => $default->id_desa,
+                    'id_tahun_tanam' => $default->id_tahun_tanam,
+                ]);
+            }
+        }
+
         $namaBulan = [
             1 => 'Januari',
             2 => 'Februari',

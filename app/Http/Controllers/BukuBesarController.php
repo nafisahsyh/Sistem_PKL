@@ -14,6 +14,30 @@ class BukuBesarController extends Controller
 {
     public function index(Request $request)
     {
+        //===== FILTER AUTO ON =======//
+        if (empty($request->query())) {
+
+            $default = DB::table('bagi_hasil_bulanan')
+                ->select(
+                    'tahun',
+                    DB::raw('CEIL(bulan / 2) as periode'),
+                    'id_desa',
+                    'id_tahun_tanam'
+                )
+                ->orderByDesc('tahun')
+                ->orderByDesc('bulan')
+                ->first();
+
+            if ($default) {
+                $request->merge([
+                    'tahun' => $default->tahun,
+                    'periode' => $default->periode,
+                    'id_desa' => $default->id_desa,
+                    'id_tahun_tanam' => $default->id_tahun_tanam,
+                ]);
+            }
+        }
+
         $namaBulan = [
             1 => 'Januari',
             2 => 'Februari',
@@ -101,9 +125,6 @@ class BukuBesarController extends Controller
 
             $bulanAwal = $tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
             $bulanAkhir = $tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
-
-            $subKredit->where('bulan_awal', $bulanAwal)
-                ->where('bulan_akhir', $bulanAkhir);
         }
 
         // Jika PERIODE diisi tapi TAHUN tidak
@@ -116,13 +137,10 @@ class BukuBesarController extends Controller
             $bulanAwalStr = '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
             $bulanAkhirStr = '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
 
-            $subKredit->where('bulan_awal', 'LIKE', "%$bulanAwalStr")
-                ->where('bulan_akhir', 'LIKE', "%$bulanAkhirStr");
         }
 
         // Jika hanya TAHUN diisi
         if ($request->filled('tahun')) {
-            $subKredit->where(DB::raw("SUBSTRING(bulan_awal, 1, 4)"), $request->tahun);
         }
 
         $subKredit->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir');
@@ -246,7 +264,7 @@ class BukuBesarController extends Controller
 
             ->select(
                 's.id_petani',
-                's.id_desa',             
+                's.id_desa',
                 's.id_tahun_tanam',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
@@ -278,13 +296,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
@@ -354,8 +372,8 @@ class BukuBesarController extends Controller
         $bagiHasil = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->where('bhp.id_petani', $id_petani)
-            ->where('bhp.id_desa', $id_desa)               
-            ->where('bhp.id_tahun_tanam', $id_tahun_tanam) 
+            ->where('bhp.id_desa', $id_desa)
+            ->where('bhp.id_tahun_tanam', $id_tahun_tanam)
             ->whereBetween(
                 DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan,2,'0'))"),
                 [$awal, $akhir]
@@ -651,13 +669,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                    str_contains(strtolower($trx->nomor_plasma), $search)
+                str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
