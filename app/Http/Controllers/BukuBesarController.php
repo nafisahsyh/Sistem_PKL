@@ -86,14 +86,27 @@ class BukuBesarController extends Controller
                 'bhp.id_tahun_tanam',
                 DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan, 2, '0')) as bulan_formatted"),
                 DB::raw('SUM(bhp.total_luas_ksm) as total_luas')
-            )
-            ->groupBy(
-                'bhp.id_petani',
-                'bhp.id_desa',
-                'bhp.id_tahun_tanam',
-                'bhb.tahun',
-                'bhb.bulan'
             );
+
+        if ($request->filled('tahun')) {
+            $subLuas->where('bhb.tahun', $request->tahun);
+        }
+
+        if ($request->filled('periode')) {
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
+
+            $subLuas->whereBetween('bhb.bulan', [$bulanAwal, $bulanAkhir]);
+        }
+
+        $subLuas->groupBy(
+            'bhp.id_petani',
+            'bhp.id_desa',
+            'bhp.id_tahun_tanam',
+            'bhb.tahun',
+            'bhb.bulan'
+        );
 
         // Ambil kredit (SUM per periode)
         $subKredit = DB::table('bagi_hasil_petani as bhp')
@@ -105,15 +118,28 @@ class BukuBesarController extends Controller
                 DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0')) AS bulan_awal"),
                 DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0')) AS bulan_akhir"),
                 DB::raw('SUM(bhp.total_nominal) AS total_nominal')
-            )
-            ->groupBy(
-                'bhp.id_petani',
-                'bhb.id_desa',
-                'bhb.id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir'
             );
 
+        if ($request->filled('tahun')) {
+            $subKredit->where('bhb.tahun', $request->tahun);
+        }
+
+        // FILTER PERIODE (2 bulanan)
+        if ($request->filled('periode')) {
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
+
+            $subKredit->whereBetween('bhb.bulan', [$bulanAwal, $bulanAkhir]);
+        }
+
+        $subKredit->groupBy(
+            'bhp.id_petani',
+            'bhb.id_desa',
+            'bhb.id_tahun_tanam',
+            'bulan_awal',
+            'bulan_akhir'
+        );
 
         // Jika PERIODE & TAHUN diisi
         if ($request->filled('periode') && $request->filled('tahun')) {
