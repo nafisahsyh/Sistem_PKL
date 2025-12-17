@@ -159,9 +159,11 @@
                                 @else
                                     <td class="text-center">
                                         <button class="btn btn-sm btn-info btn-detail" data-id="{{ $trx->id_petani }}"
+                                            data-desa="{{ $trx->id_desa }}" data-tahun="{{ $trx->id_tahun_tanam }}"
                                             data-awal="{{ $trx->bulan_awal }}" data-akhir="{{ $trx->bulan_akhir }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
+
 
                                     </td>
                                 @endif
@@ -367,16 +369,28 @@
     </script>
 
     <script>
-        // ============================================================
-        // 🔥 DETAIL MODAL HANDLER
-        // ============================================================
         document.querySelectorAll('.btn-detail').forEach(btn => {
             btn.addEventListener('click', function() {
+
                 const id = this.dataset.id;
+                const idDesa = this.dataset.desa;
+                const idTahun = this.dataset.tahun;
                 const awal = this.dataset.awal;
                 const akhir = this.dataset.akhir;
 
-                const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                if (!idDesa || !idTahun) {
+                    document.getElementById('detailContent').innerHTML = `
+                <div class="text-center py-4 text-danger">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    <p class="mt-2">Konteks desa / tahun tanam tidak lengkap</p>
+                </div>
+            `;
+                    return;
+                }
+
+                const detailModal = new bootstrap.Modal(
+                    document.getElementById('detailModal')
+                );
                 detailModal.show();
 
                 document.getElementById('detailContent').innerHTML = `
@@ -386,8 +400,19 @@
             </div>
         `;
 
-                fetch(`/buku-besar/detail?id=${id}&awal=${awal}&akhir=${akhir}`)
-                    .then(res => res.text())
+                const url =
+                    `/buku-besar/detail` +
+                    `?id=${id}` +
+                    `&id_desa=${idDesa}` +
+                    `&id_tahun_tanam=${idTahun}` +
+                    `&awal=${awal}` +
+                    `&akhir=${akhir}`;
+
+                fetch(url)
+                    .then(res => {
+                        if (!res.ok) throw new Error('HTTP Error');
+                        return res.text();
+                    })
                     .then(html => {
                         document.getElementById('detailContent').innerHTML = html;
                     })
@@ -395,7 +420,7 @@
                         document.getElementById('detailContent').innerHTML = `
                     <div class="text-center py-4 text-danger">
                         <i class="fas fa-exclamation-circle fa-2x"></i>
-                        <p class="mt-2">Gagal memuat data</p>
+                        <p class="mt-2">Gagal memuat data detail</p>
                     </div>
                 `;
                     });

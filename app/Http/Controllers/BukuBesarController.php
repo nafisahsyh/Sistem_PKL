@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Desa;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class BukuBesarController extends Controller
@@ -191,6 +192,8 @@ class BukuBesarController extends Controller
             ->when($request->filled('id_tahun_tanam'), fn($q) => $q->where('s.id_tahun_tanam', $request->id_tahun_tanam))
             ->select(
                 's.id_petani',
+                's.id_desa',
+                's.id_tahun_tanam',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
                 'l.total_luas AS luasan',
@@ -243,6 +246,8 @@ class BukuBesarController extends Controller
 
             ->select(
                 's.id_petani',
+                's.id_desa',             
+                's.id_tahun_tanam',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
                 'l.total_luas AS luasan',         // <-- sesuai periode transaksi!
@@ -273,13 +278,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 
@@ -323,17 +328,22 @@ class BukuBesarController extends Controller
 
     public function detail(Request $request)
     {
-
-        \Carbon\Carbon::setLocale('id');
+        Carbon::setLocale('id');
 
         $id_petani = $request->id;
+        $id_desa = $request->id_desa;
+        $id_tahun_tanam = $request->id_tahun_tanam;
         $awal = $request->awal;   // yyyy-mm
         $akhir = $request->akhir; // yyyy-mm
 
-        $periodeAwal = \Carbon\Carbon::parse($awal . '-01');
-        $periodeAkhir = \Carbon\Carbon::parse($akhir . '-01');
+        if (!$id_desa || !$id_tahun_tanam) {
+            abort(404, 'Konteks buku besar tidak lengkap');
+        }
 
-        // Buat range bulan
+        $periodeAwal = Carbon::parse($awal . '-01');
+        $periodeAkhir = Carbon::parse($akhir . '-01');
+
+        // Range bulan
         $bulanRange = [];
         $temp = $periodeAwal->copy();
         while ($temp <= $periodeAkhir) {
@@ -341,45 +351,67 @@ class BukuBesarController extends Controller
             $temp->addMonth();
         }
 
-        // Ambil semua record bagi hasil petani (sudah per lahan)
         $bagiHasil = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->where('bhp.id_petani', $id_petani)
+            ->where('bhp.id_desa', $id_desa)               
+            ->where('bhp.id_tahun_tanam', $id_tahun_tanam) 
+            ->whereBetween(
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan,2,'0'))"),
+                [$awal, $akhir]
+            )
             ->select(
                 'bhp.id_lahan',
+                'bhp.id_desa',
+                'bhp.id_tahun_tanam',
                 'bhp.total_luas_ksm',
                 'bhp.total_nominal',
                 DB::raw("CONCAT(bhb.tahun, '-', LPAD(bhb.bulan,2,'0'), '-01') AS bulan_awal")
             )
+            ->orderBy('bulan_awal')
             ->get();
+
+        // 🔑 Group aman (snapshot identity)
+        $groupLahan = $bagiHasil->groupBy(function ($item) {
+            return implode('|', [
+                $item->id_lahan,
+                $item->id_desa,
+                $item->id_tahun_tanam,
+            ]);
+        });
 
         $tabelData = [];
         $noTabel = 1;
-        // Ambil semua lahan unik milik petani ini
-        $lahannya = $bagiHasil->groupBy('id_lahan');
 
         foreach ($bulanRange as $bulanObj) {
-            $noLahan = 1; // reset nomor lahan per bulan
-            foreach ($lahannya as $id_lahan => $laH) {
-                $bh = $laH->firstWhere('bulan_awal', $bulanObj->format('Y-m-d'));
-                if (!$bh)
+            $noLahan = 1;
+
+            foreach ($groupLahan as $items) {
+                $bh = $items->firstWhere(
+                    'bulan_awal',
+                    $bulanObj->format('Y-m-d')
+                );
+
+                if (!$bh) {
                     continue;
+                }
 
                 $tabelData[] = [
-                    'no' => $noTabel,       // nomor urut tabel
-                    'lahan' => $noLahan,    // nomor lahan per petani
+                    'no' => $noTabel,
+                    'lahan' => $noLahan,
                     'bulan' => $bulanObj->translatedFormat('F Y'),
                     'luas' => $bh->total_luas_ksm,
                     'nominal' => $bh->total_nominal,
                 ];
+
                 $noTabel++;
                 $noLahan++;
             }
         }
 
-
         return view('buku_besar.detail', compact('tabelData'));
     }
+
 
     public function pdf(Request $request)
     {
@@ -619,13 +651,13 @@ class BukuBesarController extends Controller
             $kredit = $kredit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
 
             $debit = $debit->filter(
                 fn($trx) =>
                 str_contains(strtolower($trx->nama_petani), $search) ||
-                str_contains(strtolower($trx->nomor_plasma), $search)
+                    str_contains(strtolower($trx->nomor_plasma), $search)
             );
         }
 

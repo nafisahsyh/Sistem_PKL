@@ -167,10 +167,12 @@ class BagiHasilController extends Controller
                     'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                     'id_petani' => $petani->id_petani,
                     'id_lahan' => $kepemilikan->id_lahan,
-                    'id_desa' => $data['id_desa'],
+                    'id_desa' => $kepemilikan->lahan->id_desa,
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                     'total_luas_ksm' => $luasHa,
                     'total_nominal' => $nominalPetani,
+                    'id_petani_snapshot' => $petani->id_petani ?? null,
+                    'id_desa_snapshot' => $kepemilikan->lahan->id_desa,
                     'nama_petani_snapshot' => $petani->nama ?? null,
                     'nik_petani_snapshot' => $petani->NIK ?? null,
                     'alamat_petani_snapshot' => $petani->alamat ?? null,
@@ -343,10 +345,12 @@ class BagiHasilController extends Controller
                         'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                         'id_petani' => $old->id_petani,
                         'id_lahan' => $old->id_lahan,
-                        'id_desa' => $data['id_desa'],
-                        'id_tahun_tanam' => $data['id_tahun_tanam'],
+                        'id_desa' => $old->id_desa,
+                        'id_tahun_tanam' => $old->id_tahun_tanam,
                         'total_luas_ksm' => $old->total_luas_ksm,
                         'total_nominal' => $nominalBaru,
+                        'id_petani_snapshot' => $old->id_petani_snapshot,
+                        'id_desa_snapshot' => $old->id_desa_snapshot,
                         'nama_petani_snapshot' => $old->nama_petani_snapshot,
                         'nik_petani_snapshot' => $old->nik_petani_snapshot,
                         'alamat_petani_snapshot' => $old->alamat_petani_snapshot,
@@ -391,7 +395,6 @@ class BagiHasilController extends Controller
                     ]);
                 }
             });
-
         } catch (\Throwable $e) {
             return back()->withErrors($e->getMessage());
         }

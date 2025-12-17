@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('bagi_hasil_petani', function (Blueprint $table) {
             $table->bigIncrements('id_bagi_petani');
             $table->unsignedBigInteger('id_petani');
+            $table->unsignedBigInteger('id_bagi_bulanan')->nullable();
 
             // Tambahan untuk hubungkan ke lahan/desa/tahun tanam
             $table->unsignedBigInteger('id_lahan');
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->decimal('total_nominal', 15, 2);
 
             // SNAPSHOT DATA PETANI (untuk histori tidak berubah)
+            $table->unsignedBigInteger('id_petani_snapshot');
+            $table->unsignedBigInteger('id_desa_snapshot');
             $table->string('nama_petani_snapshot')->nullable();
             $table->string('nik_petani_snapshot')->nullable();
             $table->string('alamat_petani_snapshot')->nullable();

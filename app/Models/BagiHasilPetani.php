@@ -19,6 +19,8 @@ class BagiHasilPetani extends Model
         'total_nominal',
 
         // snapshot fields
+        'id_petani_snapshot',
+        'id_desa_snapshot',
         'nama_petani_snapshot',
         'nik_petani_snapshot',
         'alamat_petani_snapshot',
