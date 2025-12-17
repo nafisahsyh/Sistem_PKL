@@ -75,7 +75,7 @@
                                 <td>{{ $p['desa']['desa'] ?? '-' }}</td>
                                 <td class="text-center">{{ $p['tahunTanam']['tahun'] ?? '-' }}</td>
 
-                                <td class="text-center">
+                                <td>
                                     @php
                                         $bulanAwalTampil = $p['bulan_awal'] ?? 1;
                                         $bulanAkhirTampil = $p['bulan_akhir'] ?? $bulanAwalTampil;

@@ -197,7 +197,7 @@
                             <th>Nama Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
-                            <th>Luasan Total (Ha)</th>
+                            <th>Luas Lahan</th>
                             <th>Periode</th>
                             <th>Nominal</th>
                             <th>Sisa</th>
@@ -221,10 +221,10 @@
                                 <td class="text-center">{{ $row->tahun_tanam }}</td>
 
                                 <td class="text-center">
-                                    {{ number_format($row->luasan, 2, ',', '.') }}
+                                    {{ number_format($row->luasan, 2, ',', '.') }} Ha
                                 </td>
 
-                                <td class="text-center">{{ $row->periode }}</td>
+                                <td>{{ $row->periode }}</td>
 
                                 <td class="text-end">
                                     Rp {{ number_format($row->total_nominal, 0, ',', '.') }}

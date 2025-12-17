@@ -197,8 +197,8 @@
                 <th>Nama Petani</th>
                 <th>No Plasma</th>
                 <th>No Koperasi</th>
-                <th>Luasan (Ha)</th>
-                <th>Bagian Diterima</th>
+                <th>Luas Lahan</th>
+                <th>Nominal</th>
             </tr>
         </thead>
         <tbody>
@@ -208,7 +208,7 @@
                     <td>{{ $p['nama_petani'] }}</td>
                     <td>{{ $p['no_plasma'] ?? '-' }}</td>
                     <td>{{ $p['no_koperasi'] ?? '-' }}</td>
-                    <td>{{ number_format($p['luas_ha'], 2, ',', '.') }}</td>
+                    <td>{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
                     <td>Rp {{ number_format($p['nominal'], 2, ',', '.') }}</td>
                 </tr>
             @endforeach

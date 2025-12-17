@@ -64,7 +64,6 @@
                         <label for="bulan" class="form-label">Bulan <span class="text-danger">*</span></label>
                         <select name="bulan" id="bulan"
                             class="form-select text-kecil @error('bulan') is-invalid @enderror" required>
-                            <option value="">Pilih Bulan</option>
                             @php
                                 $namaBulan = [
                                     'Januari',
@@ -136,7 +135,7 @@
 
 
                 <div class="text-start mt-3">
-                    <button type="submit" class="btn btn-success me-2">Update</button>
+                    <button type="submit" class="btn btn-success me-2">Perbarui</button>
                     <a href="{{ route('bagi-hasil-bulanan.index') }}" class="btn btn-danger">Batal</a>
                 </div>
             </form>

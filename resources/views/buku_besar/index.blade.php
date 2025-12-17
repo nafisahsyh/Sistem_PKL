@@ -118,7 +118,7 @@
                             <th>Nama Petani</th>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
-                            <th>Luasan Total (Ha)</th>
+                            <th>Luas Lahan</th>
                             <th>Periode</th>
                             <th>Nominal</th>
                             @if (request('tipe', 'credit_bagihasil') == 'debit_pengambilan')
@@ -149,7 +149,7 @@
                                 <td class="text-center">{{ $desaNama }}</td>
                                 <td class="text-center">{{ $tahun }}</td>
                                 <td class="text-center">
-                                    {{ number_format($luasan, 2, ',', '.') }}
+                                    {{ number_format($luasan, 2, ',', '.') }} Ha
                                 </td>
                                 <td>{{ $periode }}</td>
                                 <td class="text-end">Rp {{ number_format($totalNominal, 0, ',', '.') }}</td>

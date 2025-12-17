@@ -203,7 +203,7 @@
                 <th style="text-align: center">Nama Petani</th>
                 <th style="text-align: center">Desa</th>
                 <th style="text-align: center">Tahun Tanam</th>
-                <th style="text-align: center">Luasan Total (Ha)</th>
+                <th style="text-align: center">Luas Lahan</th>
                 <th style="text-align: center">Periode</th>
                 <th style="text-align: center">Nominal</th>
                 <th style="text-align: center">Sisa</th>
@@ -218,8 +218,8 @@
                     <td>{{ $row->nama_petani }}</td>
                     <td class="text-center">{{ $row->nama_desa }}</td>
                     <td class="text-center">{{ $row->tahun_tanam }}</td>
-                    <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }}</td>
-                    <td class="text-center">{{ $row->periode }}</td>
+                    <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }} Ha</td>
+                    <td>{{ $row->periode }}</td>
                     <td class="text-end">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</td>
                     <td class="text-end">Rp {{ number_format($row->sisa, 0, ',', '.') }}</td>
                     <td class="text-center">{{ ucfirst($row->status_metode) }}</td>

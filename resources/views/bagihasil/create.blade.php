@@ -138,17 +138,22 @@
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
 
-            // Ganti opsi bulan dengan bahasa Indonesia
             if (bulanSelect) {
-                bulanSelect.innerHTML = '<option value="">Pilih Bulan</option>';
+                bulanSelect.innerHTML = '';
+
                 namaBulan.forEach((bulan, index) => {
                     const option = document.createElement('option');
                     option.value = index + 1;
                     option.text = bulan;
-                    if (@json(old('bulan', 0)) == index + 1) option.selected = true;
+
+                    if (@json(old('bulan')) == index + 1) {
+                        option.selected = true;
+                    }
+
                     bulanSelect.appendChild(option);
                 });
             }
+
 
             // inputan sesuai Rp
             const totalBagian = document.getElementById('total_bagian');

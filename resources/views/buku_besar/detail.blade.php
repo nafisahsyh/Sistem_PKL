@@ -4,8 +4,8 @@
             <th>No</th>
             <th>Lahan</th>
             <th>Bulan</th>
-            <th>Luas (Ha)</th>
-            <th>Nominal (Rp)</th>
+            <th>Luas Lahan</th>
+            <th>Nominal</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
                 <td class="text-center">{{ $row['no'] }}</td>
                 <td class="text-center">{{ $row['lahan'] }}</td>
                 <td class="text-center">{{ $row['bulan'] }}</td>
-                <td class="text-center">{{ number_format($row['luas'], 2,',', '.') }}</td>
+                <td class="text-center">{{ number_format($row['luas'], 2,',', '.') }} Ha</td>
                 <td class="text-end">Rp {{ number_format($row['nominal'], 2, ',', '.') }}</td>
             </tr>
         @endforeach
