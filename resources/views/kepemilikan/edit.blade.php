@@ -18,7 +18,6 @@
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 
-            {{-- Judul Halaman --}}
             <h4 class="text-brown mb-0 ms-2">Edit Data Kepemilikan</h4>
         </div>
 
@@ -294,75 +293,72 @@
                                         class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
                                 </div>
                             </div>
-                                {{-- Status & Tanggal --}}
-                                <div class="row mt-2">
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Status Kepemilikan</label>
-                                        <select name="lahan[{{ $index }}][status_kepemilikan]"
-                                            class="form-select text-kecil choices-select">
-                                            <option value="aktif"
-                                                {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
-                                            </option>
-                                            <option value="nonaktif"
-                                                {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak
-                                                Aktif
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Tanggal Mulai</label>
-                                        <input type="date" name="lahan[{{ $index }}][tanggal_mulai]"
-                                            class="form-control text-kecil"
-                                            value="{{ $detail->tanggal_mulai ? date('Y-m-d', strtotime($detail->tanggal_mulai)) : '' }}">
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Tanggal Selesai</label>
-                                        <input type="date" name="lahan[{{ $index }}][tanggal_selesai]"
-                                            class="form-control text-kecil"
-                                            value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
-                                    </div>
+                            {{-- Status & Tanggal --}}
+                            <div class="row mt-2">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Status Kepemilikan</label>
+                                    <select name="lahan[{{ $index }}][status_kepemilikan]"
+                                        class="form-select text-kecil choices-select">
+                                        <option value="aktif"
+                                            {{ $detail->status_kepemilikan == 'aktif' ? 'selected' : '' }}>Aktif
+                                        </option>
+                                        <option value="nonaktif"
+                                            {{ $detail->status_kepemilikan == 'nonaktif' ? 'selected' : '' }}>Tidak
+                                            Aktif
+                                        </option>
+                                    </select>
                                 </div>
-                                <div class="row mt-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Posisi Surat</label>
-                                        <select name="lahan[{{ $index }}][posisi_surat]"
-                                            class="form-select text-kecil choices-select">
-                                            <option value="">Pilih Posisi Surat</option>
-                                            <option value="Koperasi"
-                                                {{ $detail->posisi_surat == 'Koperasi' ? 'selected' : '' }}>Koperasi
-                                            </option>
-                                            <option value="Notaris"
-                                                {{ $detail->posisi_surat == 'Notaris' ? 'selected' : '' }}>Notaris</option>
-                                            <option value="PTP" {{ $detail->posisi_surat == 'PTP' ? 'selected' : '' }}>
-                                                PTP</option>
-                                            <option value="Petani"
-                                                {{ $detail->posisi_surat == 'Petani' ? 'selected' : '' }}>
-                                                Petani</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Status Penyerahan Surat</label>
-                                        <input type="text" name="lahan[{{ $index }}][status_penyerahan]"
-                                            class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
-                                    </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tanggal Mulai</label>
+                                    <input type="date" name="lahan[{{ $index }}][tanggal_mulai]"
+                                        class="form-control text-kecil"
+                                        value="{{ $detail->tanggal_mulai ? date('Y-m-d', strtotime($detail->tanggal_mulai)) : '' }}">
                                 </div>
-                                <div class="row mt-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Koordinat X</label>
-                                        <input type="number" step="0.00000001"
-                                            name="lahan[{{ $index }}][koordinat_x]"
-                                            class="form-control text-kecil" value="{{ $detail->koordinat_x }}"
-                                            placeholder="Contoh: 114.12345678">
-                                    </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tanggal Selesai</label>
+                                    <input type="date" name="lahan[{{ $index }}][tanggal_selesai]"
+                                        class="form-control text-kecil"
+                                        value="{{ $detail->tanggal_selesai ? date('Y-m-d', strtotime($detail->tanggal_selesai)) : '' }}">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Posisi Surat</label>
+                                    <select name="lahan[{{ $index }}][posisi_surat]"
+                                        class="form-select text-kecil choices-select">
+                                        <option value="">Pilih Posisi Surat</option>
+                                        <option value="Koperasi"
+                                            {{ $detail->posisi_surat == 'Koperasi' ? 'selected' : '' }}>Koperasi
+                                        </option>
+                                        <option value="Notaris"
+                                            {{ $detail->posisi_surat == 'Notaris' ? 'selected' : '' }}>Notaris</option>
+                                        <option value="PTP" {{ $detail->posisi_surat == 'PTP' ? 'selected' : '' }}>
+                                            PTP</option>
+                                        <option value="Petani" {{ $detail->posisi_surat == 'Petani' ? 'selected' : '' }}>
+                                            Petani</option>
+                                    </select>
+                                </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Koordinat Y</label>
-                                        <input type="number" step="0.00000001"
-                                            name="lahan[{{ $index }}][koordinat_y]"
-                                            class="form-control text-kecil" value="{{ $detail->koordinat_y }}"
-                                            placeholder="Contoh: -3.12345678">
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Status Penyerahan Surat</label>
+                                    <input type="text" name="lahan[{{ $index }}][status_penyerahan]"
+                                        class="form-control text-kecil" value="{{ $detail->status_penyerahan }}">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Koordinat X</label>
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_x]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_x }}" placeholder="Contoh: 114.12345678">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Koordinat Y</label>
+                                    <input type="number" step="0.00000001"
+                                        name="lahan[{{ $index }}][koordinat_y]" class="form-control text-kecil"
+                                        value="{{ $detail->koordinat_y }}" placeholder="Contoh: -3.12345678">
+                                </div>
                             </div>
                             {{-- Upload file --}}
                             <div class="row mt-2">
@@ -615,7 +611,7 @@
                                 </select>
                             </div>
 
-                            {{-- MODE PETANI BARU (STRUKTUR SAMA PERSIS DENGAN MODAL PERTAMA) --}}
+                            {{-- MODE PETANI BARU --}}
                             <div id="petaniBaruSemua" style="display: none;">
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
@@ -723,7 +719,7 @@
                 });
             }
 
-            //-- === === === === === === TOGGLE MODE UNTUK MODAL SATUAN === === === === === ===//
+            //TOGGLE MODE UNTUK MODAL SATUAN//
             document.addEventListener('DOMContentLoaded', function() {
                 const modeSelect = document.getElementById('modeSelect');
                 const petaniLama = document.getElementById('petaniLama');
@@ -824,7 +820,7 @@
                                 searchPlaceholderValue: select.dataset.searchPlaceholder || ''
                             });
 
-                            select.choicesInstance = instance; // <--- tambahkan baris ini
+                            select.choicesInstance = instance;
                             select.classList.add('choices-main-initialized');
                         }
                     });
@@ -832,7 +828,6 @@
                 initChoices(document);
 
                 function syncStatusHandlers(context = document) {
-                    // 🔹 Sinkron dari Status Pengelolaan → Kepemilikan
                     context.querySelectorAll('select[name^="lahan"][name$="[status_pengelolaan]"]').forEach(
                         pengelolaanSelect => {
                             pengelolaanSelect.addEventListener('change', function() {
@@ -843,7 +838,7 @@
                                 if (!kepemilikanSelect) return;
 
                                 if (this.value === 'Perusahaan') {
-                                    // Perusahaan → otomatis nonaktif
+                                    // Perusahaan -> otomatis nonaktif
                                     kepemilikanSelect.value = 'nonaktif';
                                     if (kepemilikanSelect.choicesInstance) {
                                         kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');

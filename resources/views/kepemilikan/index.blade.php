@@ -133,7 +133,8 @@
                                                 rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $rowNumber }}
                                             </td>
-                                            <td class="text-center align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
+                                            <td class="text-center align-middle"
+                                                rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $k->petani->nomor_anggota_plasma ?? '-' }}
                                             </td>
                                             <td class="align-middle" rowspan="{{ $k->detailKepemilikan->count() }}">
@@ -260,7 +261,7 @@
                                                         'search' => $search,
                                                         'desa' => $desa,
                                                         'tahun' => $tahun,
-                                                        'status_petani' => request('status_petani'), // ← ini yang kurang
+                                                        'status_petani' => request('status_petani'),
                                                         'status_pengelolaan' => $status_pengelolaan,
                                                     ]) }}"
                                                         class="btn btn-info btn-sm">

@@ -354,7 +354,8 @@
                             <td>{{ $rIndex + 1 }}</td>
                             <td>{{ $riwayat->petaniSebelum->nama ?? '-' }}</td>
                             <td>{{ $riwayat->petaniSesudah->nama ?? '-' }}</td>
-                            <td>{{ $riwayat->tanggal_ganti ? \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') : '-' }}</td>
+                            <td>{{ $riwayat->tanggal_ganti ? \Carbon\Carbon::parse($riwayat->tanggal_ganti)->format('d-m-Y') : '-' }}
+                            </td>
                             <td>{{ $riwayat->keterangan ?? '-' }}</td>
                         </tr>
                     @endforeach

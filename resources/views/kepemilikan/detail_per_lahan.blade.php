@@ -243,7 +243,7 @@
                                                     {{ ucfirst($p->status) }}
                                                 </span>
 
-                                                {{-- ✅ Tambahkan tombol "Lunas" jika status belum lunas --}}
+                                                {{-- Tambahkan tombol "Lunas" jika status belum lunas --}}
                                                 @if ($p->status == 'belum')
                                                     <form action="{{ route('pbb.lunas', $p->id_pbb) }}" method="POST"
                                                         class="d-inline">

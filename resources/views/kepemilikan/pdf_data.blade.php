@@ -155,25 +155,19 @@
                     @endphp
 
                     <tr>
-                        {{-- NO --}}
                         <td>{{ $i === 0 ? $noGlobal++ : '' }}</td>
-
-                        {{-- NOMOR PLASMA --}}
                         @if (!in_array('nomor_plasma', $exclude))
                             <td>{{ $i === 0 ? $k->petani->nomor_anggota_plasma ?? '-' : '' }}</td>
                         @endif
 
-                        {{-- NOMOR KOPERASI --}}
                         @if (!in_array('nomor_koperasi', $exclude))
                             <td>{{ $i === 0 ? $k->petani->nomor_anggota_koperasi ?? '-' : '' }}</td>
                         @endif
 
-                        {{-- NAMA PETANI SEKARANG --}}
                         @if (!in_array('nama', $exclude))
                             <td>{{ $i === 0 ? $k->petani->nama ?? '-' : '' }}</td>
                         @endif
 
-                        {{-- PETANI SEBELUM --}}
                         @if (!in_array('riwayat', $exclude))
                             @php
                                 $riwayat = $detail->lahan->riwayatKepemilikan
@@ -196,47 +190,38 @@
                             </td>
                         @endif
 
-                        {{-- DESA --}}
                         @if (!in_array('desa', $exclude))
                             <td>{{ $desaNama }}</td>
                         @endif
 
-                        {{-- TAHUN --}}
                         @if (!in_array('tahun', $exclude))
                             <td>{{ $tahunNama }}</td>
                         @endif
 
-                        {{-- KODE --}}
                         @if (!in_array('kode', $exclude))
                             <td>{{ $detail->kode_lahan ?? '-' }}</td>
                         @endif
 
-                        {{-- KAVLING --}}
                         @if (!in_array('kavling', $exclude))
                             <td>{{ $detail->nomor_kavling ?? '-' }}</td>
                         @endif
 
-                        {{-- LUAS ETA --}}
                         @if (!in_array('luas_peta', $exclude))
                             <td>{{ $lahan->luas_peta ? $luasPeta : '-' }}</td>
                         @endif
 
-                        {{-- LUAS SURAT --}}
                         @if (!in_array('luas_surat', $exclude))
                             <td>{{ $detail->luas_surat ? $luasSurat : '-' }}</td>
                         @endif
 
-                        {{-- SHM --}}
                         @if (!in_array('shm', $exclude))
                             <td>{{ $detail->nomor_SHM ?? '-' }}</td>
                         @endif
 
-                        {{-- SPORADIK --}}
                         @if (!in_array('sporadik', $exclude))
                             <td>{{ $detail->nomor_sporadik ?? '-' }}</td>
                         @endif
 
-                        {{-- STATUS PENGELOLAAN --}}
                         @if (!in_array('status_pengelolaan', $exclude))
                             <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
                         @endif

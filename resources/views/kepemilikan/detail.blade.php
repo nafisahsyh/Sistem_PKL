@@ -168,7 +168,6 @@
                 @foreach ($details->skip(1) as $index => $detail)
                     <div class="card mb-3 shadow-sm">
                         <div class="card-header bg-light text-success d-flex justify-content-between align-items-center">
-                            {{-- Nomor lahan sudah benar: 1 untuk lahan pertama, sisanya index+2 --}}
                             <strong>Lahan {{ $index + 1 }}</strong>
 
                             <a href="{{ route('kepemilikan.riwayatLahan', [

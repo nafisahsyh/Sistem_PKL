@@ -238,7 +238,8 @@
                                         class="form-control text-kecil" value="{{ $detail->nama_SHM }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Luas Sesuai Lapangan (M²)<span class="text-danger">*</span></label>
+                                    <label class="form-label">Luas Sesuai Lapangan (M²)<span
+                                            class="text-danger">*</span></label>
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][luas_peta]"
                                         class="form-control text-kecil" value="{{ $detail->lahan->luas_peta }}" required>
                                 </div>
