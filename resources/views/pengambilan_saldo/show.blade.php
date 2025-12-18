@@ -209,13 +209,13 @@
                             @endphp
 
                             <div class="row mb-3">
-                                <div class="col-4">
+                                <div class="col-6">
                                     <label class="form-label fw-bold">No Tanda Terima<span
                                             class="text-danger">*</span></label>
                                     <input type="number" name="no_urut" class="form-control" min=0
                                         placeholder="Isi nomor urut" required>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-6">
                                     <label class="form-label fw-bold">Metode<span class="text-danger">*</span></label>
                                     <select name="metode" class="form-select text-kecil choices-select" required>
                                         <option value="">Pilih Metode</option>
@@ -223,10 +223,19 @@
                                         <option value="transfer">Transfer</option>
                                     </select>
                                 </div>
-                                <div class="col-4">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Tanggal Bukti</label>
+                                    <input type="date" name="tanggal" class="form-control tanggalTransaksi"
+                                        value="{{ now()->format('Y-m-d') }}">
+                                </div>
+                                <div class="col-6">
                                     <label class="form-label fw-bold">No Bukti</label>
-                                    <input type="text" name="no_bukti" class="form-control"
+                                    <input type="text" name="no_bukti" class="form-control noBukti"
+                                        data-next="{{ $nextToday }}"
                                         value="{{ $nextToday . '.' . now()->format('d/m/Y') }}" readonly>
+
                                 </div>
                             </div>
 
@@ -363,6 +372,28 @@
                 // Reload otomatis
                 window.location.reload();
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('input', function(e) {
+
+            if (!e.target.classList.contains('tanggalTransaksi')) return;
+
+            const modal = e.target.closest('.modal');
+            const noBuktiInput = modal.querySelector('.noBukti');
+
+            const urut = noBuktiInput.dataset.next;
+            const tanggal = e.target.value; // yyyy-mm-dd
+
+            if (!tanggal) return;
+
+            const d = new Date(tanggal);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+
+            noBuktiInput.value = `${urut}.${day}/${month}/${year}`;
         });
     </script>
 @endsection

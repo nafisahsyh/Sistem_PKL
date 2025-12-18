@@ -257,73 +257,95 @@ class PengambilanSaldoController extends Controller
             'bulan_akhir' => $request->bulan_akhir,
         ]);
     }
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_petani' => 'required',
-            'id_bulanan' => 'required|array',
-            'metode' => 'required',
-            'no_urut' => 'required',
-            'no_bukti' => 'required',
-        ]);
+    
+public function store(Request $request)
+{
+    // ================= VALIDASI =================
+    $request->validate([
+        'id_petani'   => 'required',
+        'id_bulanan'  => 'required|array',
+        'metode'      => 'required',
+        'no_urut'     => 'required',
+        'no_bukti'    => 'required',
+        'tanggal'     => 'nullable|date', // ⬅️ tanggal dari form
+    ]);
 
-        $idPetani = $request->id_petani;
-        $bulan_awal = $request->bulan_awal;
-        $bulan_akhir = $request->bulan_akhir;
+    // ================= DATA DASAR =================
+    $idPetani    = $request->id_petani;
+    $bulan_awal  = $request->bulan_awal;
+    $bulan_akhir = $request->bulan_akhir;
 
-        // Ambil bulanan pertama (untuk dapat id_desa & id_tahun_tanam)
-        $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
-        $transaksi = null;
+    // ================= TENTUKAN TANGGAL =================
+    // Kalau user pilih tanggal → pakai itu
+    // Kalau tidak → default hari ini
+    $tanggalTransaksi = $request->tanggal
+        ? Carbon::parse($request->tanggal)
+        : now();
 
-        $transaksi = DB::transaction(function () use ($request, $idPetani, $firstBulanan, $bulan_awal, $bulan_akhir) {
+    // ================= BULANAN PERTAMA =================
+    $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
 
-            // Hitung total saldo
-            $totalSaldo = BagiHasilPetani::whereIn('id_bagi_bulanan', $request->id_bulanan)
-                ->where('id_petani', $idPetani)
-                ->sum('total_nominal');
+    // ================= TRANSACTION =================
+    $transaksi = DB::transaction(function () use (
+        $request,
+        $idPetani,
+        $firstBulanan,
+        $bulan_awal,
+        $bulan_akhir,
+        $tanggalTransaksi
+    ) {
 
-            // Update saldo
-            $saldo = Saldo::firstOrCreate(
-                [
-                    'id_petani' => $idPetani,
-                    'id_desa' => $firstBulanan->id_desa,
-                    'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                    'bulan_awal' => $bulan_awal,
-                ],
-                [
-                    'bulan_akhir' => $bulan_akhir,
-                    'saldo' => 0,
-                ]
-            );
+        // ===== HITUNG TOTAL SALDO =====
+        $totalSaldo = BagiHasilPetani::whereIn('id_bagi_bulanan', $request->id_bulanan)
+            ->where('id_petani', $idPetani)
+            ->sum('total_nominal');
 
-            if ($saldo->bulan_akhir != $bulan_akhir) {
-                $saldo->bulan_akhir = $bulan_akhir;
-                $saldo->save();
-            }
-
-            $saldo->decrement('saldo', $totalSaldo);
-
-            // === RETURN di sini ===
-            return Transaksi::create([
-                'id_bagi_bulanan' => null,
-                'id_petani' => $idPetani,
-                'id_desa' => $firstBulanan->id_desa,
+        // ===== AMBIL / BUAT SALDO =====
+        $saldo = Saldo::firstOrCreate(
+            [
+                'id_petani'      => $idPetani,
+                'id_desa'        => $firstBulanan->id_desa,
                 'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                'tipe' => 'debit_pengambilan',
-                'metode' => $request->metode,
-                'nominal' => $totalSaldo,
-                'tanggal' => now(),
-                'keterangan' => 'Pengambilan saldo periode bulanan',
-                'no_bukti' => $request->no_bukti,
-                'no_urut' => $request->no_urut,
-                'bulan_awal' => $bulan_awal,
+                'bulan_awal'     => $bulan_awal,
+            ],
+            [
                 'bulan_akhir' => $bulan_akhir,
-            ]);
-        });
+                'saldo'       => 0,
+            ]
+        );
 
-        // Redirect ke struk
-        return redirect()->route('ambil-saldo.struk', ['id_transaksi' => $transaksi->id_transaksi]);
-    }
+        // ===== UPDATE BULAN AKHIR JIKA BERUBAH =====
+        if ($saldo->bulan_akhir != $bulan_akhir) {
+            $saldo->bulan_akhir = $bulan_akhir;
+            $saldo->save();
+        }
+
+        // ===== KURANGI SALDO =====
+        $saldo->decrement('saldo', $totalSaldo);
+
+        // ===== SIMPAN TRANSAKSI =====
+        return Transaksi::create([
+            'id_bagi_bulanan' => null,
+            'id_petani'      => $idPetani,
+            'id_desa'        => $firstBulanan->id_desa,
+            'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
+            'tipe'           => 'debit_pengambilan',
+            'metode'         => $request->metode,
+            'nominal'        => $totalSaldo,
+            'tanggal'        => $tanggalTransaksi, // ✅ IKUT INPUT
+            'keterangan'     => 'Pengambilan saldo periode bulanan',
+            'no_bukti'       => $request->no_bukti, // ✅ dari JS
+            'no_urut'        => $request->no_urut,
+            'bulan_awal'     => $bulan_awal,
+            'bulan_akhir'    => $bulan_akhir,
+        ]);
+    });
+
+    // ================= REDIRECT STRUK =================
+    return redirect()->route('ambil-saldo.struk', [
+        'id_transaksi' => $transaksi->id_transaksi
+    ]);
+}
 
     public function struk($id_transaksi)
     {
