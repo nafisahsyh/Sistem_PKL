@@ -293,7 +293,7 @@
                                     <input type="number" step="0.01" name="lahan[{{ $index }}][jumlah_pbb]"
                                         class="form-control text-kecil" value="{{ $detail->jumlah_pbb }}">
                                 </div>
-
+                            </div>
                                 {{-- Status & Tanggal --}}
                                 <div class="row mt-2">
                                     <div class="col-md-4 mb-3">
@@ -363,7 +363,6 @@
                                             class="form-control text-kecil" value="{{ $detail->koordinat_y }}"
                                             placeholder="Contoh: -3.12345678">
                                     </div>
-                                </div>
                             </div>
                             {{-- Upload file --}}
                             <div class="row mt-2">
@@ -1040,7 +1039,7 @@
                                     <label class="form-label">Jumlah PBB</label>
                                     <input type="text" name="lahan[${lahanIndex}][jumlah_pbb]" class="form-control text-kecil">
                                 </div>
-                                
+                            </div>    
                             <div class="row mt-2">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Status Kepemilikan</label>
@@ -1105,7 +1104,6 @@
                                         class="hapus_shm" value="0">
 
                                     <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>      
-                                                        
                                     <!-- Container file SHM -->
                                     <div class="file-shm-container mt-1 d-flex align-items-center gap-2">
                                         <small class="text-muted">Belum ada file SHM yang diunggah.</small>
@@ -1127,7 +1125,6 @@
                                         class="hapus_peta" value="0">
                                         
                                         <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>                                    
-
                                     <!-- Container file Peta -->
                                     <div class="file-peta-container mt-1 d-flex align-items-center gap-2">
                                         <small class="text-muted">Belum ada file Peta yang diunggah.</small>
