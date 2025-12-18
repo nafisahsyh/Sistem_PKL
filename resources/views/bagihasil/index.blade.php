@@ -107,6 +107,7 @@
                             <th>Tahun</th>
                             <th>Tanggal Bagi</th>
                             <th>Total Bagian (20%)</th>
+                            <th>Saldo Periode Lalu</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -150,6 +151,9 @@
 
                                 <td class="text-center">
                                     Rp {{ number_format($b->total_bagian, 0, ',', '.') }}
+                                </td>
+                                <td class="text-center">
+                                    Rp {{ number_format($b->sisa_saldo_snapshot, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
 

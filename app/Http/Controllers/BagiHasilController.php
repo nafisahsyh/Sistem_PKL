@@ -154,7 +154,20 @@ class BagiHasilController extends Controller
                 throw new \Exception('Total luas lahan 0, bagi hasil tidak bisa diproses.');
             }
 
+            $bulanAwalValid = in_array((int) $data['bulan'], [1, 3, 5, 7, 9, 11]);
+
+            $sisaSaldo = 0;
+
+            if ($bulanAwalValid) {
+                $sisaSaldo = Saldo::where('id_desa', $data['id_desa'])
+                    ->where('id_tahun_tanam', $data['id_tahun_tanam'])
+                    ->where('bulan_akhir', '<', $data['bulan_awal'])
+                    ->where('saldo', '>', 0)
+                    ->sum('saldo');
+            }
+
             $bulan->luasan_total_snapshot = $totalLuasHa;
+            $bulan->sisa_saldo_snapshot = $sisaSaldo;
             $bulan->save();
 
             foreach ($kelola as $kepemilikan) {
@@ -227,6 +240,28 @@ class BagiHasilController extends Controller
         return redirect()->route('bagi-hasil-bulanan.index')
             ->with('success', 'Data bulanan berhasil diproses.');
     }
+
+    public function getSisaSaldo(Request $request)
+    {
+        if (
+            !$request->id_desa ||
+            !$request->id_tahun_tanam ||
+            !$request->bulan_awal
+        ) {
+            return response()->json(['sisa_saldo' => 0]);
+        }
+
+        $sisaSaldo = Saldo::where('id_desa', $request->id_desa)
+            ->where('id_tahun_tanam', $request->id_tahun_tanam)
+            ->where('bulan_akhir', '<', $request->bulan_awal)
+            ->where('saldo', '>', 0)
+            ->sum('saldo');
+
+        return response()->json([
+            'sisa_saldo' => $sisaSaldo
+        ]);
+    }
+
 
     public function getTotalLuas(Request $request)
     {
@@ -469,6 +504,8 @@ class BagiHasilController extends Controller
     public function show($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
+        $bulanAwalSekarang = sprintf('%04d-%02d', $bulanan->tahun, $bulanan->bulan);
+        $isBulanAwal = $bulanan->bulan % 2 === 1;
 
         // Ambil snapshot petani langsung dari bulan
         $petaniData = BagiHasilPetani::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
@@ -483,15 +520,40 @@ class BagiHasilController extends Controller
             )
             ->get()
             ->groupBy('id_petani')   // gabungkan per petani
-            ->map(function ($group) {
+            ->map(function ($group) use ($bulanan, $bulanAwalSekarang, $isBulanAwal) {
+                $idPetani = $group->first()->id_petani;
+
+                // Nominal bulan berjalan
+                $nominalBulanIni = $group->sum('nominal');
+
+                // Default
+                $sisaSaldo = 0;
+                $totalHak = $nominalBulanIni;
+
+                // 🔥 HANYA JIKA BULAN AWAL PERIODE
+                if ($isBulanAwal) {
+                    $sisaSaldo = Saldo::where('id_petani', $idPetani)
+                        ->where('id_desa', $bulanan->id_desa)
+                        ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+                        ->where('bulan_akhir', '<', $bulanAwalSekarang)
+                        ->where('saldo', '>', 0)
+                        ->sum('saldo');
+
+                    $totalHak = $nominalBulanIni + $sisaSaldo;
+                }
+
                 return [
-                    'id_petani' => $group->first()->id_petani,
+                    'id_petani' => $idPetani,
                     'nama_petani' => $group->first()->nama_petani,
                     'nik_petani' => $group->first()->nik_petani,
                     'no_plasma' => $group->first()->no_plasma,
                     'no_koperasi' => $group->first()->no_koperasi,
                     'luas_ha' => $group->sum('luas_ha'),
-                    'nominal' => $group->sum('nominal'),
+
+                    // 👇 nilai tampilan
+                    'nominal_bulan_ini' => $nominalBulanIni,
+                    'sisa_saldo' => $sisaSaldo,        // 0 kalau bulan akhir
+                    'total_hak' => $totalHak,           // = nominal_bulan_ini kalau bulan akhir
                 ];
             })
             ->values();
@@ -536,6 +598,9 @@ class BagiHasilController extends Controller
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
 
+        $bulanAwalSekarang = sprintf('%04d-%02d', $bulanan->tahun, $bulanan->bulan);
+        $isBulanAwal = $bulanan->bulan % 2 === 1;
+
         // Ambil data snapshot dari BagiHasilPetani langsung dari bulan
         $petaniData = BagiHasilPetani::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
             ->select(
@@ -549,15 +614,40 @@ class BagiHasilController extends Controller
             )
             ->get()
             ->groupBy('id_petani')  // gabungkan per petani
-            ->map(function ($group) {
+            ->map(function ($group) use ($bulanan, $bulanAwalSekarang, $isBulanAwal) {
+                $idPetani = $group->first()->id_petani;
+
+                // Nominal bulan berjalan
+                $nominalBulanIni = $group->sum('nominal');
+
+                // Default
+                $sisaSaldo = 0;
+                $totalHak = $nominalBulanIni;
+
+                // 🔥 HANYA JIKA BULAN AWAL PERIODE
+                if ($isBulanAwal) {
+                    $sisaSaldo = Saldo::where('id_petani', $idPetani)
+                        ->where('id_desa', $bulanan->id_desa)
+                        ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
+                        ->where('bulan_akhir', '<', $bulanAwalSekarang)
+                        ->where('saldo', '>', 0)
+                        ->sum('saldo');
+
+                    $totalHak = $nominalBulanIni + $sisaSaldo;
+                }
+
                 return [
-                    'id_petani' => $group->first()->id_petani,
+                    'id_petani' => $idPetani,
                     'nama_petani' => $group->first()->nama_petani,
                     'nik_petani' => $group->first()->nik_petani,
                     'no_plasma' => $group->first()->no_plasma,
                     'no_koperasi' => $group->first()->no_koperasi,
                     'luas_ha' => $group->sum('luas_ha'),
-                    'nominal' => $group->sum('nominal'),
+
+                    // 👇 nilai tampilan
+                    'nominal_bulan_ini' => $nominalBulanIni,
+                    'sisa_saldo' => $sisaSaldo,        // 0 kalau bulan akhir
+                    'total_hak' => $totalHak,           // = nominal_bulan_ini kalau bulan akhir
                 ];
             })
             ->values();

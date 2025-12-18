@@ -121,6 +121,7 @@
                 <th>Tahun</th>
                 <th>Tanggal Bagi</th>
                 <th>Total Bagian (20%)</th>
+                <th>Saldo Periode Lalu</th>
             </tr>
         </thead>
 
@@ -152,6 +153,7 @@
                     <td>{{ $b->tahun }}</td>
                     <td>{{ \Carbon\Carbon::parse($b->tanggal_bagi)->format('d-m-Y') }}</td>
                     <td>Rp {{ number_format($b->total_bagian, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($b->sisa_saldo_snapshot, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>

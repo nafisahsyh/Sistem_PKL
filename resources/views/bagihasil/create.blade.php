@@ -76,6 +76,16 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
+                        <label class="form-label">Sisa Saldo Periode Sebelumnya</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" id="sisa_saldo" class="form-control text-kecil" value="0" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
                         <label for="tanggal_bagi" class="form-label">Tanggal Bagi <span class="text-danger">*</span></label>
                         <input type="date" name="tanggal_bagi"
                             class="form-control text-kecil @error('tanggal_bagi') is-invalid @enderror"
@@ -84,19 +94,19 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="total_bagian" class="form-label">Total Bagian (20%) <span
-                            class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text rp-addon">Rp</span>
-                        <input type="text" name="total_bagian" id="total_bagian"
-                            class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
-                            value="{{ old('total_bagian', 0) }}" placeholder="Masukkan total bagian" required>
-                        @error('total_bagian')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="col-md-4 mb-3">
+                        <label for="total_bagian" class="form-label">Total Bagian (20%) <span
+                                class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rp-addon">Rp</span>
+                            <input type="text" name="total_bagian" id="total_bagian"
+                                class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
+                                value="{{ old('total_bagian', 0) }}" placeholder="Masukkan total bagian" required>
+                            @error('total_bagian')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
@@ -228,6 +238,59 @@
 
             desaSelect.addEventListener('change', fetchTotalLuas);
             tahunSelect.addEventListener('change', fetchTotalLuas);
+
+            const sisaSaldoInput = document.getElementById('sisa_saldo');
+
+            function isBulanAwalPeriode(bulan) {
+                return [1, 3, 5, 7, 9, 11].includes(parseInt(bulan));
+            }
+
+            function fetchSisaSaldo() {
+                // validasi dasar
+                if (!desaSelect.value || !tahunSelect.value || !bulanAwal.value) {
+                    sisaSaldoInput.value = '0';
+                    return;
+                }
+
+                const bulanDipilih = bulanSelect.value;
+
+                if (!isBulanAwalPeriode(bulanDipilih)) {
+                    // bukan bulan awal → saldo TIDAK BOLEH muncul
+                    sisaSaldoInput.value = '0';
+                    return;
+                }
+
+                fetch(
+                        `{{ route('bagi-hasil.sisa-saldo') }}?id_desa=${desaSelect.value}&id_tahun_tanam=${tahunSelect.value}&bulan_awal=${bulanAwal.value}`
+                    )
+                    .then(res => res.json())
+                    .then(data => {
+                        sisaSaldoInput.value =
+                            new Intl.NumberFormat('id-ID').format(data.sisa_saldo ?? 0);
+                    });
+            }
+
+
+            desaSelect.addEventListener('change', () => {
+                fetchTotalLuas();
+                fetchSisaSaldo();
+            });
+
+            tahunSelect.addEventListener('change', () => {
+                fetchTotalLuas();
+                fetchSisaSaldo();
+            });
+
+            bulanSelect.addEventListener('change', () => {
+                updatePeriode();
+                fetchSisaSaldo();
+            });
+
+            tahunInput.addEventListener('input', () => {
+                updatePeriode();
+                fetchSisaSaldo();
+            });
+
         });
     </script>
 @endsection

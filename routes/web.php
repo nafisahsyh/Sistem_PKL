@@ -93,6 +93,9 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('riwayat.update');
     Route::delete('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'deleteRiwayat'])
         ->name('riwayat.destroy');
+        
+    Route::get('/bagi-hasil-bulanan/sisa-saldo', [BagiHasilController::class, 'getSisaSaldo'])
+        ->name('bagi-hasil.sisa-saldo');
     Route::get('bagi-hasil-bulanan/total-luas', [BagiHasilController::class, 'getTotalLuas'])->name('bagi-hasil.total-luas');
     Route::post('bagi-hasil-bulanan/store-bulanan', [BagiHasilController::class, 'storeBulanan'])
         ->name('bagi-hasil-bulanan.store-bulanan');

@@ -18,6 +18,8 @@ class BagiHasilBulanan extends Model
         'tahun',
         'tanggal_bagi',
         'total_bagian',
+        'luasan_total_snapshot',
+        'sisa_saldo_snapshot',
     ];
 
     public function desa()

@@ -45,6 +45,7 @@
                             <th>Tahun</th>
                             <th>Tanggal Bagi</th>
                             <th>Total Bagian (20%)</th>
+                            <th>Saldo Periode Lalu</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,6 +75,7 @@
                                 {{ $bulanan->tanggal_bagi ? \Carbon\Carbon::parse($bulanan->tanggal_bagi)->format('d-m-Y') : '-' }}
                             </td>
                             <td>Rp {{ number_format($bulanan->total_bagian, 0, ',', '.') }}</td>
+                             <td>Rp {{ number_format($bulanan->sisa_saldo_snapshot, 0, ',', '.') }}</td>
 
                         </tr>
                     </tbody>
@@ -113,7 +115,9 @@
                             <th>No Koperasi</th>
                             <th>Nama Petani</th>
                             <th>Luas Lahan</th>
-                            <th>Nominal</th>
+                            <th>Nominal Bulan Ini</th>
+                            <th>Saldo Periode Lalu</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,7 +130,18 @@
                                 <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
                                 <td>{{ $p['nama_petani'] }}</td>
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') ?? '-' }} Ha</td>
-                                <td class="text-right">Rp {{ number_format($p['nominal'], 0, ',', '.') ?? '-' }}</td>
+                                <td class="text-right">
+                                    Rp {{ number_format($p['nominal_bulan_ini'], 0, ',', '.') }}
+                                </td>
+
+                                <td class="text-right">
+                                    Rp {{ number_format($p['sisa_saldo'], 0, ',', '.') }}
+                                </td>
+
+                                <td class="text-right">
+                                    Rp {{ number_format($p['total_hak'], 0, ',', '.') }}
+                                </td>
+
                             </tr>
                         @empty
                             <tr>

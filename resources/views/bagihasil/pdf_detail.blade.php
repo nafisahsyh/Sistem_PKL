@@ -76,21 +76,22 @@
         }
 
         .petani th {
-            border: 1px solid #000;
-            padding: 6px 8px;
+            border: 0.5px solid #000;
+            padding: 4px 6px;
             text-align: center;
+            font-size: 11px;
         }
 
         th {
-            border: 1px solid #000;
+            border: 0.5px solid #000;
             padding: 6px 8px;
             text-align: left;
         }
 
         td {
-            border: 1px solid #000;
-            padding: 6px 8px;
-            text-align: left;
+            border: 0.5px solid #000;
+            padding: 4px 6px;
+            font-size: 11px;
         }
 
         .no-border td,
@@ -166,6 +167,10 @@
             <td>: {{ $bulanan->tahunTanam->tahun ?? '-' }}</td>
         </tr>
         <tr>
+            <th>Total Luas Ha</th>
+            <td>: {{ number_format($totalLuasHa, 2, ',', '.') }} Ha</td>
+        </tr>
+        <tr>
             <th>Bulan</th>
             <td>: {{ $bulanIndo[$bulanan->bulan] ?? '-' }}</td>
         </tr>
@@ -183,14 +188,25 @@
             <td>: Rp {{ number_format($bulanan->total_bagian, 2, ',', '.') }}</td>
         </tr>
         <tr>
-            <th>Total Luas Ha</th>
-            <td>: {{ number_format($totalLuasHa, 2, ',', '.') }} Ha</td>
+            <th>Saldo Periode Lalu</th>
+            <td>: Rp {{ number_format($bulanan->sisa_saldo_snapshot, 2, ',', '.') }}</td>
         </tr>
     </table>
 
     {{-- Tabel Petani --}}
     <div class="section-title">Data Pembagian per Petani</div>
     <table>
+        <colgroup>
+            <col style="width: 4%"> <!-- No -->
+            <col style="width: 20%"> <!-- Nama Petani -->
+            <col style="width: 9%"> <!-- No Plasma -->
+            <col style="width: 7%"> <!-- No Koperasi -->
+            <col style="width: 10%"> <!-- Luas Lahan -->
+            <col style="width: 15%"> <!-- Nominal Bulan Ini -->
+            <col style="width: 10%"> <!-- Saldo Periode Lalu -->
+            <col style="width: 15%"> <!-- Total -->
+        </colgroup>
+
         <thead class="petani">
             <tr style="text-align: center">
                 <th>No</th>
@@ -198,18 +214,30 @@
                 <th>No Plasma</th>
                 <th>No Koperasi</th>
                 <th>Luas Lahan</th>
-                <th>Nominal</th>
+                <th>Nominal Bulan Ini</th>
+                <th>Saldo Periode Lalu</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($petaniData as $i => $p)
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td>{{ $p['nama_petani'] }}</td>
-                    <td>{{ $p['no_plasma'] ?? '-' }}</td>
-                    <td>{{ $p['no_koperasi'] ?? '-' }}</td>
-                    <td>{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
-                    <td>Rp {{ number_format($p['nominal'], 2, ',', '.') }}</td>
+                    <td style="text-align:left">{{ $p['nama_petani'] }}</td>
+                    <td style="text-align:center">{{ $p['no_plasma'] ?? '-' }}</td>
+                    <td style="text-align:center">{{ $p['no_koperasi'] ?? '-' }}</td>
+                    <td style="text-align:center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
+                    <td style="text-align: right">
+                        Rp {{ number_format($p['nominal_bulan_ini'], 0, ',', '.') }}
+                    </td>
+
+                    <td style="text-align: right">
+                        Rp {{ number_format($p['sisa_saldo'], 0, ',', '.') }}
+                    </td>
+
+                    <td style="text-align: right">
+                        Rp {{ number_format($p['total_hak'], 0, ',', '.') }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
