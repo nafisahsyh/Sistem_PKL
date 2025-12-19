@@ -65,6 +65,7 @@
                             <th>Periode</th>
                             <th>Tanggal Bagi</th>
                             <th>Total Nominal</th>
+                            <th>Saldo Periode Lalu</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -76,19 +77,21 @@
                                 <td class="text-center">{{ $p['tahunTanam']['tahun'] ?? '-' }}</td>
 
                                 <td>
-                                    @php
-                                        $bulanAwalTampil = $p['bulan_awal'] ?? 1;
-                                        $bulanAkhirTampil = $p['bulan_akhir'] ?? $bulanAwalTampil;
-                                    @endphp
-                                    {{ $namaBulan[$bulanAwalTampil] ?? $bulanAwalTampil }} -
-                                    {{ $namaBulan[$bulanAkhirTampil] ?? $bulanAkhirTampil }} {{ $p['tahun'] ?? '-' }}
+                                    {{ $namaBulan[$p['bulan_awal']] ?? $p['bulan_awal'] }} -
+                                    {{ $namaBulan[$p['bulan_akhir']] ?? $p['bulan_akhir'] }} {{ $p['tahun'] }}
                                 </td>
 
                                 <td class="text-center">
-                                    {{ isset($p['tanggal_bagi']) ? \Carbon\Carbon::parse($p['tanggal_bagi'])->format('d-m-Y') : '-' }}
+                                    {{ \Carbon\Carbon::parse($p['tanggal_bagi'])->format('d-m-Y') }}
                                 </td>
 
-                                <td class="text-end">Rp {{ number_format($p['total_periode'] ?? 0, 0, ',', '.') }}</td>
+                                <td class="text-end">
+                                    Rp {{ number_format($p['total_periode'], 0, ',', '.') }}
+                                </td>
+
+                                <td class="text-end">
+                                    Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}
+                                </td>
                                 <td class="text-center">
                                     <a href="{{ route('pengambilan.show', [
                                         'id_bulanan' => $p['id_bulanan'],

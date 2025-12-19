@@ -40,36 +40,41 @@ class PengambilanSaldoController extends Controller
 
         if ($request->filled('periode')) {
             $periode = (int) $request->periode;
-
             $bulanAwal = ($periode - 1) * 2 + 1;
             $bulanAkhir = $periode * 2;
 
             $query->whereBetween('bulan', [$bulanAwal, $bulanAkhir]);
         }
 
-        // --- Ambil data setelah filter ---
-        $bulanan = $query->orderBy('tahun', 'desc')
+        // =========================
+        // AMBIL DATA BULANAN
+        // =========================
+        $bulanan = $query
+            ->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'asc')
             ->get();
 
         // =========================
         // GROUPING PERIODE 2 BULAN
         // =========================
-        $periode = $bulanan->groupBy(function ($item) {
-            $periodeBulan = ceil($item->bulan / 2);
-
-            return $item->tahun . '-' . $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $periodeBulan;
-        })
-
-            ->filter(function ($group) {
-                // 🔒 HANYA TAMPIL JIKA SUDAH ADA 2 BULAN
-                return $group->count() === 2;
+        $periode = $bulanan
+            ->groupBy(function ($item) {
+                $periodeBulan = ceil($item->bulan / 2);
+                return $item->tahun . '-' . $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $periodeBulan;
             })
 
+            // 🔒 hanya tampil jika lengkap 2 bulan
+            ->filter(fn($group) => $group->count() === 2)
+
             ->map(function ($group) {
-                $bulanAwal = $group->min('bulan');
+
+                // ===== BULAN GANJIL (KUNCI SALDO) =====
+                $bulanAwal = $group->min('bulan'); // pasti ganjil
                 $bulanAkhir = $group->max('bulan');
-                $totalPeriode = $group->sum('total_bagian');
+
+                $bulanGanjil = $group->firstWhere('bulan', $bulanAwal);
+
+                $saldoPeriodeLalu = $bulanGanjil->sisa_saldo_snapshot ?? 0;
 
                 return [
                     'id_bulanan' => $group->pluck('id_bagi_bulanan')->toArray(),
@@ -78,15 +83,21 @@ class PengambilanSaldoController extends Controller
                     'bulan_awal' => $bulanAwal,
                     'bulan_akhir' => $bulanAkhir,
                     'tahun' => $group->first()->tahun,
-                    'tanggal_bagi' => $group->first()->tanggal_bagi,
-                    'total_periode' => $totalPeriode,
+                    'tanggal_bagi' => $bulanGanjil->tanggal_bagi,
+                    'total_periode' => $group->sum('total_bagian'),
+                    'saldo_periode_lalu' => $saldoPeriodeLalu,
                 ];
             })
-            ->sortByDesc(function ($item) {
-                return $item['tahun'] . str_pad($item['bulan_akhir'], 2, '0', STR_PAD_LEFT);
-            })
+
+            ->sortByDesc(
+                fn($item) =>
+                $item['tahun'] . str_pad($item['bulan_akhir'], 2, '0', STR_PAD_LEFT)
+            )
             ->values();
 
+        // =========================
+        // PAGINATION MANUAL
+        // =========================
         $perPage = 20;
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $perPage;
@@ -96,16 +107,17 @@ class PengambilanSaldoController extends Controller
             $periode->count(),
             $perPage,
             $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            ['path' => request()->url(), 'query' => request()->query()]
+
         );
 
         return view('pengambilan_saldo.index', [
             'periode' => $paginated,
             'desa' => Desa::all(),
-            'tahunTanam' => Tahun_Tanam::all()
+            'tahunTanam' => Tahun_Tanam::all(),
         ]);
     }
-
+    
     public function show(Request $request)
     {
         $id_bulanan = $request->id_bulanan ?? [];
