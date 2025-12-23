@@ -11,6 +11,7 @@ use App\Models\Transaksi;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use App\Models\BagiHasilPetani;
+use App\Models\SaldoLalu;
 
 // Database dan Pagination
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -199,6 +200,22 @@ class BagiHasilController extends Controller
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
                     ->latest('created_at')
                     ->first();
+
+                $saldoAwalPeriode = $saldoTerakhir?->saldo ?? 0;
+
+                if ($bulanAwalValid) {
+                    SaldoLalu::firstOrCreate(
+                        [
+                            'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
+                            'id_petani' => $petani->id_petani,
+                        ],
+                        [
+                            'id_desa' => $data['id_desa'],
+                            'id_tahun_tanam' => $data['id_tahun_tanam'],
+                            'saldo_lalu' => $saldoAwalPeriode,
+                        ]
+                    );
+                }
 
                 if (!$saldoTerakhir || strtotime($saldoTerakhir->bulan_akhir) < $bulanAwalPeriode - 1) {
                     // Buat saldo baru untuk periode 2 bulan
@@ -438,7 +455,6 @@ class BagiHasilController extends Controller
             ->with('success', 'Data berhasil diupdate');
     }
 
-
     public function destroy($id)
     {
         DB::transaction(function () use ($id) {
@@ -500,7 +516,6 @@ class BagiHasilController extends Controller
             ->with('success', 'Bagi hasil bulan ini berhasil dihapus dan saldo diperbarui.');
     }
 
-
     public function show($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
@@ -520,27 +535,16 @@ class BagiHasilController extends Controller
             )
             ->get()
             ->groupBy('id_petani')   // gabungkan per petani
-            ->map(function ($group) use ($bulanan, $bulanAwalSekarang, $isBulanAwal) {
+            ->map(function ($group) use ($bulanan) {
                 $idPetani = $group->first()->id_petani;
 
                 // Nominal bulan berjalan
                 $nominalBulanIni = $group->sum('nominal');
 
-                // Default
-                $sisaSaldo = 0;
-                $totalHak = $nominalBulanIni;
-
-                // 🔥 HANYA JIKA BULAN AWAL PERIODE
-                if ($isBulanAwal) {
-                    $sisaSaldo = Saldo::where('id_petani', $idPetani)
-                        ->where('id_desa', $bulanan->id_desa)
-                        ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
-                        ->where('bulan_akhir', '<', $bulanAwalSekarang)
-                        ->where('saldo', '>', 0)
-                        ->sum('saldo');
-
-                    $totalHak = $nominalBulanIni + $sisaSaldo;
-                }
+                // Ambil Snapshoot lalu
+                $sisaSaldo = SaldoLalu::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
+                    ->where('id_petani', $idPetani)
+                    ->value('saldo_lalu') ?? 0;
 
                 return [
                     'id_petani' => $idPetani,
@@ -550,10 +554,10 @@ class BagiHasilController extends Controller
                     'no_koperasi' => $group->first()->no_koperasi,
                     'luas_ha' => $group->sum('luas_ha'),
 
-                    // 👇 nilai tampilan
+                    // nilai tampilan
                     'nominal_bulan_ini' => $nominalBulanIni,
-                    'sisa_saldo' => $sisaSaldo,        // 0 kalau bulan akhir
-                    'total_hak' => $totalHak,           // = nominal_bulan_ini kalau bulan akhir
+                    'sisa_saldo' => $sisaSaldo,
+                    'total_hak' => $nominalBulanIni + $sisaSaldo,
                 ];
             })
             ->values();

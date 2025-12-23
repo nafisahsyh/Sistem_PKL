@@ -930,21 +930,12 @@ class KepemilikanController extends Controller
 
         // Tambahkan SHM & PETA
         foreach ($kepemilikan->detailKepemilikan as $detail) {
-            // hapus duplikasi path
-            $pathShm = storage_path('app/public/' . $detail->pdf_scan_shm);
             $pathPeta = storage_path('app/public/' . $detail->pdf_scan_peta);
-
-
-            if ($detail->pdf_scan_shm && file_exists(filename: $pathShm)) {
-                $lampiranFiles[] = $pathShm;
-            }
-
 
             if ($detail->pdf_scan_peta && file_exists($pathPeta)) {
                 $lampiranFiles[] = $pathPeta;
             }
         }
-
         // Merge semua PDF
         $pdfMerger = new Fpdi();
 
@@ -987,7 +978,6 @@ class KepemilikanController extends Controller
 
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
     {
-
         // Ambil detail yang diklik
         $selectedDetail = DetailKepemilikan::with([
             'lahan.desa.kecamatan',
@@ -1030,7 +1020,6 @@ class KepemilikanController extends Controller
             }
         }
 
-
         // Refresh relasi pbb
         $groupDetails->load('pbb');
 
@@ -1055,9 +1044,6 @@ class KepemilikanController extends Controller
             $lampiranFiles[] = storage_path('app/public/ktp_pdf/' . $petani->pdf_scan_kk);
         }
         foreach ($groupDetails as $detail) {
-            if ($detail->pdf_scan_shm && file_exists(storage_path('app/public/' . $detail->pdf_scan_shm))) {
-                $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_shm);
-            }
             if ($detail->pdf_scan_peta && file_exists(storage_path('app/public/' . $detail->pdf_scan_peta))) {
                 $lampiranFiles[] = storage_path('app/public/' . $detail->pdf_scan_peta);
             }
@@ -1091,12 +1077,11 @@ class KepemilikanController extends Controller
         return response()->download(
             $finalPath,
             'Data Kepemilikan Lahan '
-                . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
-                . ' - ' . $desaTarget
-                . ' (' . $tahunTarget . ').pdf'
+            . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
+            . ' - ' . $desaTarget
+            . ' (' . $tahunTarget . ').pdf'
         );
     }
-
 
     public function cetakSemuaPDF(Request $request)
     {
