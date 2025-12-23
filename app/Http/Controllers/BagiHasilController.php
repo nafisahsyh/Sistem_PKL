@@ -197,8 +197,7 @@ class BagiHasilController extends Controller
                 $saldoTerakhir = Saldo::where('id_petani', $petani->id_petani)
                     ->where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->where('bulan_awal', $data['bulan_awal'])
-                    ->where('bulan_akhir', $bulanAkhirPeriodeStr)
+                    ->latest('created_at')
                     ->first();
 
                 if ($bulanAwalValid) {
