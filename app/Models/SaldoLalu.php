@@ -57,4 +57,10 @@ class SaldoLalu extends Model
             'id_tahun_tanam'
         );
     }
+
+    public function bagiHasilBulanan()
+{
+    return $this->belongsTo(BagiHasilBulanan::class, 'id_bagi_bulanan');
+}
+
 }

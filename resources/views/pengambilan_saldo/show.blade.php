@@ -92,78 +92,65 @@
                 </div>
 
                 <table class="table table-bordered table-striped table-custom align-middle">
-                    <thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
-                        <tr>
-                            <th>No</th>
-                            <th>No Plasma</th>
-                            <th>No Koperasi</th>
-                            <th>Nama Petani</th>
-                            <th>Luas Lahan</th>
-                            <th>Nominal</th>
-                            <th>Aksi Ambil</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($petaniData as $i => $p)
-                            <tr>
-                                <td class="text-center">{{ $noStart + $i }}</td>
-                                <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
-                                <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
-                                <td>{{ $p['nama_petani'] }}</td>
-                                <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
-                                <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
-                                @php
-                                    $periodeAwal = $tahun . '-' . str_pad($bulan_awal, 2, '0', STR_PAD_LEFT);
-                                    $periodeAkhir = $tahun . '-' . str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT);
+<thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
+    <tr>
+        <th>No</th>
+        <th>No Plasma</th>
+        <th>No Koperasi</th>
+        <th>Nama Petani</th>
+        <th>Luas Lahan</th>
+        <th>Nominal</th>
+        <th>Saldo Periode Lalu</th> {{-- kolom baru --}}
+        <th>Total Hak</th> {{-- kolom baru --}}
+        <th>Aksi Ambil</th>
+    </tr>
+</thead>
+<tbody>
+    @forelse($petaniData as $i => $p)
+        <tr>
+            <td class="text-center">{{ $noStart + $i }}</td>
+            <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
+            <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
+            <td>{{ $p['nama_petani'] }}</td>
+            <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
+            <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
+            <td class="text-end">Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}</td> {{-- saldo periode lalu --}}
+            <td class="text-end">Rp {{ number_format($p['total_hak'], 0, ',', '.') }}</td> {{-- total hak --}}
+            <td class="text-center">
+                @if ($p['total_hak'] > 0)
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
+                        <i class="fa fa-file-invoice-dollar"></i>
+                    </button>
+                @else
+                    <span class="badge bg-secondary">Sudah diambil</span>
+                @endif
 
-                                    // Ambil saldo untuk periode ini
-                                    $saldoPerPeriode = \App\Models\Saldo::where('id_petani', $p['id_petani'])
-                                        ->where('id_desa', $p['id_desa'])
-                                        ->where('id_tahun_tanam', $p['id_tahun_tanam'])
-                                        ->where('bulan_awal', '<=', $periodeAwal)
-                                        ->where('bulan_akhir', '>=', $periodeAwal)
-                                        ->first();
+                @php
+                    $trxTerakhir = \App\Models\Transaksi::where('id_petani', $p['id_petani'])
+                        ->where('tipe', 'debit_pengambilan')
+                        ->orderByDesc('id_transaksi')
+                        ->first();
+                @endphp
 
-                                    $saldoValue = $saldoPerPeriode->saldo ?? 0;
+                @if ($trxTerakhir)
+                    <a href="{{ route('ambil-saldo.struk', $trxTerakhir->id_transaksi) }}"
+                        target="_blank" class="btn btn-primary btn-sm ms-1">
+                        <i class="fa fa-print"></i>
+                    </a>
+                @endif
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="9" class="text-center py-5 text-muted">
+                <i class="fas fa-folder-open fa-2x mb-2"></i>
+                <div>Belum ada data petani</div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
 
-                                    // Ambil transaksi terakhir untuk periode ini
-                                    $trxTerakhir = \App\Models\Transaksi::where('id_petani', $p['id_petani'])
-                                        ->where('tipe', 'debit_pengambilan')
-                                        ->where('id_desa', $p['id_desa'])
-                                        ->where('id_tahun_tanam', $p['id_tahun_tanam'])
-                                        ->where('bulan_awal', $saldoPerPeriode->bulan_awal ?? $periodeAwal)
-                                        ->where('bulan_akhir', $saldoPerPeriode->bulan_akhir ?? $periodeAkhir)
-                                        ->orderByDesc('id_transaksi')
-                                        ->first();
-                                @endphp
-
-                                <td class="text-center">
-                                    @if ($saldoValue > 0)
-                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
-                                            <i class="fa fa-file-invoice-dollar"></i>
-                                        </button>
-                                    @else
-                                        <span class="badge bg-secondary">Sudah diambil</span>
-                                    @endif
-
-                                    @if ($trxTerakhir)
-                                        <a href="{{ route('ambil-saldo.struk', $trxTerakhir->id_transaksi) }}"
-                                            target="_blank" class="btn btn-primary btn-sm ms-1">
-                                            <i class="fa fa-print"></i>
-                                        </a>
-                                    @endif
-                                </td>
-
-                            @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
-                                    <div>Belum ada data petani</div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
                 </table>
 
                 <div class="d-flex justify-content-end mt-3">
