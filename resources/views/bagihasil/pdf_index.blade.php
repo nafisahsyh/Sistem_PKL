@@ -52,26 +52,33 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             margin-bottom: 15px;
         }
 
         th {
-            border: 1px solid #000;
-            padding: 6px 8px;
-            background: #f3f3f3;
+            border: 0.5px solid #000;
+            padding: 4px 6px;
+            font-size: 11px;
             text-align: center;
-            font-weight: bold;
         }
 
         td {
-            border: 1px solid #000;
-            padding: 6px 8px;
+            border: 0.5px solid #000;
+            padding: 4px 6px;
+            font-size: 11px;
             text-align: center;
         }
 
         .text-left {
             text-align: left !important;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        thead {
+            display: table-header-group;
         }
     </style>
 </head>
@@ -111,6 +118,19 @@
     </h3>
 
     <table>
+        <colgroup>
+            <col style="width: 4%"> <!-- No -->
+            <col style="width: 12%"> <!-- Desa -->
+            <col style="width: 8%"> <!-- Tahun Tanam -->
+            <col style="width: 10%"> <!-- Luasan -->
+            <col style="width: 8%"> <!-- Bulan -->
+            <col style="width: 6%"> <!-- Tahun -->
+            <col style="width: 10%"> <!-- Tgl Bagi -->
+            <col style="width: 14%"> <!-- Total Bagian -->
+            <col style="width: 14%"> <!-- Saldo Lalu -->
+            <col style="width: 14%"> <!-- Total -->
+        </colgroup>
+
         <thead style="display: table-header-group;">
             <tr>
                 <th>No</th>
@@ -122,6 +142,7 @@
                 <th>Tanggal Bagi</th>
                 <th>Total Bagian (20%)</th>
                 <th>Saldo Periode Lalu</th>
+                <th>Saldo Total</th>
             </tr>
         </thead>
 
@@ -154,6 +175,9 @@
                     <td>{{ \Carbon\Carbon::parse($b->tanggal_bagi)->format('d-m-Y') }}</td>
                     <td>Rp {{ number_format($b->total_bagian, 0, ',', '.') }}</td>
                     <td>Rp {{ number_format($b->sisa_saldo_snapshot, 0, ',', '.') }}</td>
+                    <td>
+                        Rp {{ number_format($b->total_bagian + $b->sisa_saldo_snapshot, 0, ',', '.') }}
+                    </td>
                 </tr>
             @empty
                 <tr>

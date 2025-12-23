@@ -194,16 +194,21 @@ class BagiHasilController extends Controller
                     'nomor_koperasi_snapshot' => $petani->nomor_anggota_koperasi ?? null,
                 ]);
 
-                // Ambil saldo terakhir
                 $saldoTerakhir = Saldo::where('id_petani', $petani->id_petani)
                     ->where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->latest('created_at')
+                    ->where('bulan_awal', $data['bulan_awal'])
+                    ->where('bulan_akhir', $bulanAkhirPeriodeStr)
                     ->first();
 
-                $saldoAwalPeriode = $saldoTerakhir?->saldo ?? 0;
-
                 if ($bulanAwalValid) {
+                    $totalSaldoLalu = Saldo::where('id_petani', $petani->id_petani)
+                        ->where('id_desa', $data['id_desa'])
+                        ->where('id_tahun_tanam', $data['id_tahun_tanam'])
+                        ->where('saldo', '>', 0)
+                        ->where('bulan_akhir', '<', $data['bulan_awal'])
+                        ->sum('saldo');
+
                     SaldoLalu::firstOrCreate(
                         [
                             'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
@@ -212,7 +217,7 @@ class BagiHasilController extends Controller
                         [
                             'id_desa' => $data['id_desa'],
                             'id_tahun_tanam' => $data['id_tahun_tanam'],
-                            'saldo_lalu' => $saldoAwalPeriode,
+                            'saldo_lalu' => $totalSaldoLalu,
                         ]
                     );
                 }
@@ -519,8 +524,6 @@ class BagiHasilController extends Controller
     public function show($id)
     {
         $bulanan = BagiHasilBulanan::with(['desa', 'tahunTanam'])->findOrFail($id);
-        $bulanAwalSekarang = sprintf('%04d-%02d', $bulanan->tahun, $bulanan->bulan);
-        $isBulanAwal = $bulanan->bulan % 2 === 1;
 
         // Ambil snapshot petani langsung dari bulan
         $petaniData = BagiHasilPetani::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
@@ -618,27 +621,16 @@ class BagiHasilController extends Controller
             )
             ->get()
             ->groupBy('id_petani')  // gabungkan per petani
-            ->map(function ($group) use ($bulanan, $bulanAwalSekarang, $isBulanAwal) {
+            ->map(function ($group) use ($bulanan) {
                 $idPetani = $group->first()->id_petani;
 
                 // Nominal bulan berjalan
                 $nominalBulanIni = $group->sum('nominal');
 
-                // Default
-                $sisaSaldo = 0;
-                $totalHak = $nominalBulanIni;
-
-                // 🔥 HANYA JIKA BULAN AWAL PERIODE
-                if ($isBulanAwal) {
-                    $sisaSaldo = Saldo::where('id_petani', $idPetani)
-                        ->where('id_desa', $bulanan->id_desa)
-                        ->where('id_tahun_tanam', $bulanan->id_tahun_tanam)
-                        ->where('bulan_akhir', '<', $bulanAwalSekarang)
-                        ->where('saldo', '>', 0)
-                        ->sum('saldo');
-
-                    $totalHak = $nominalBulanIni + $sisaSaldo;
-                }
+                // Ambil Snapshoot lalu
+                $sisaSaldo = SaldoLalu::where('id_bagi_bulanan', $bulanan->id_bagi_bulanan)
+                    ->where('id_petani', $idPetani)
+                    ->value('saldo_lalu') ?? 0;
 
                 return [
                     'id_petani' => $idPetani,
@@ -648,10 +640,10 @@ class BagiHasilController extends Controller
                     'no_koperasi' => $group->first()->no_koperasi,
                     'luas_ha' => $group->sum('luas_ha'),
 
-                    // 👇 nilai tampilan
+                    // nilai tampilan
                     'nominal_bulan_ini' => $nominalBulanIni,
-                    'sisa_saldo' => $sisaSaldo,        // 0 kalau bulan akhir
-                    'total_hak' => $totalHak,           // = nominal_bulan_ini kalau bulan akhir
+                    'sisa_saldo' => $sisaSaldo,
+                    'total_hak' => $nominalBulanIni + $sisaSaldo,
                 ];
             })
             ->values();
@@ -665,11 +657,16 @@ class BagiHasilController extends Controller
             'totalLuasHa' => $totalLuasHa,
         ]);
 
+        $namaBulan = Carbon::create()
+            ->month($bulanan->bulan)
+            ->locale('id')
+            ->translatedFormat('F');
+
         $namaFile =
             'Bagi Hasil - ' .
             $bulanan->desa->desa . ' - ' .
             $bulanan->tahunTanam->tahun . ' - ' .
-            DateTime::createFromFormat('!m', $bulanan->bulan)->format('F') . ' ' .
+            $namaBulan . ' ' .
             $bulanan->tahun . '.pdf';
 
         return $pdf->download($namaFile);
@@ -718,9 +715,53 @@ class BagiHasilController extends Controller
             ->orderBy('bulan', 'desc')
             ->get();
 
-        $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
-            ->setPaper('a4', 'portrait');
+        $bulanIndo = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
 
-        return $pdf->download('Laporan Bagi Hasil.pdf');
+        $judul = 'Laporan Bagi Hasil';
+
+        // Desa
+        if ($request->filled('id_desa') && $bulanan->first()) {
+            $judul .= ' - ' . $bulanan->first()->desa->desa;
+        } else {
+            $judul .= ' - Semua Desa';
+        }
+
+        // Tahun Tanam
+        if ($request->filled('id_tahun_tanam') && $bulanan->first()) {
+            $judul .= ' - TT ' . $bulanan->first()->tahunTanam->tahun;
+        }
+
+        // Periode
+        if ($request->filled('bulan_start')) {
+            [$y, $m] = explode('-', $request->bulan_start);
+            $judul .= ' - ' . $bulanIndo[(int) $m] . ' ' . $y;
+        }
+
+        if ($request->filled('bulan_end')) {
+            [$y, $m] = explode('-', $request->bulan_end);
+            $judul .= ' s.d ' . $bulanIndo[(int) $m] . ' ' . $y;
+        }
+
+        $judul .= '.pdf';
+
+        // ============================
+
+        $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download($judul);
     }
 }
