@@ -131,15 +131,21 @@
                                 <td class="text-end">Rp {{ number_format($p['total_hak'], 0, ',', '.') }}</td>
                                 {{-- total hak --}}
                                 <td class="text-center">
-                                    @if (!$p['sudah_diambil'] && $p['total_hak'] > 0)
+                                    {{-- Aksi Ambil / Status --}}
+                                    @if ($p['sudah_diambil'])
+                                        <span class="badge bg-secondary">Sudah diambil</span>
+                                    @elseif ($p['periode_berlanjut'])
+                                        <span class="badge bg-warning text-dark">Periode Berlanjut</span>
+                                    @elseif ($p['total_hak'] > 0)
                                         <button class="btn btn-success btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
                                             <i class="fa fa-file-invoice-dollar"></i>
                                         </button>
                                     @else
-                                        <span class="badge bg-secondary">Sudah diambil</span>
+                                        <span class="badge bg-secondary">-</span>
                                     @endif
 
+                                    {{-- Print Nota (TIDAK BOLEH KETUTUP) --}}
                                     @if ($p['sudah_diambil'] && !empty($p['trx_terakhir']))
                                         <a href="{{ route('ambil-saldo.struk', $p['trx_terakhir']->id_transaksi) }}"
                                             target="_blank" class="btn btn-primary btn-sm ms-1">
@@ -268,23 +274,64 @@
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-4">
-                                    <label class="form-label fw-bold">Saldo Bulan
-                                        {{ $bulanSingkat[$bulan_awal] ?? '?' }}</label>
-                                    <input type="text" class="form-control"
-                                        value="Rp {{ number_format($p['nominal_bulan_1'] ?? 0, 0, ',', '.') }}" readonly>
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label fw-bold">Saldo Bulan
-                                        {{ $bulanSingkat[$bulan_akhir] ?? '?' }}</label>
-                                    <input type="text" class="form-control"
-                                        value="Rp {{ number_format($p['nominal_bulan_2'] ?? 0, 0, ',', '.') }}" readonly>
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label fw-bold">Total Saldo</label>
-                                    <input type="text" class="form-control"
-                                        value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}" readonly>
-                                </div>
+                                @if (!$p['pakai_mode_periode'])
+                                    {{-- MODE NORMAL (PER BULAN) --}}
+                                    <div class="row mb-3">
+                                        <div class="col-4">
+                                            <label class="form-label fw-bold">
+                                                Saldo Bulan {{ $bulanSingkat[$bulan_awal] }}
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}"
+                                                readonly>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <label class="form-label fw-bold">
+                                                Saldo Bulan {{ $bulanSingkat[$bulan_akhir] }}
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}"
+                                                readonly>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <label class="form-label fw-bold">Total Saldo</label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}" readonly>
+                                        </div>
+                                    </div>
+                                @else
+                                    {{-- MODE AKUMULASI PER PERIODE (FIELD RAPi) --}}
+                                    <div class="row mb-3">
+
+                                        @php
+                                            \Carbon\Carbon::setLocale('id');
+                                        @endphp
+
+                                        @foreach ($p['saldo_periode_list'] as $index => $sp)
+                                            <div class="col-4 mb-3">
+                                                <label class="form-label fw-bold">
+                                                    {{ \Carbon\Carbon::createFromFormat('Y-m', substr($sp['periode'], 0, 7))->translatedFormat('M Y') }}
+                                                    -
+                                                    {{ \Carbon\Carbon::createFromFormat('Y-m', substr($sp['periode'], 10, 7))->translatedFormat('M Y') }}
+                                                </label>
+
+                                                <input type="text" class="form-control"
+                                                    value="Rp {{ number_format($sp['saldo'], 0, ',', '.') }}" readonly>
+                                            </div>
+                                        @endforeach
+
+                                        {{-- TOTAL --}}
+                                        <div class="col-4 mb-3">
+                                            <label class="form-label fw-bold">Total Saldo</label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($p['total_saldo_akumulasi'], 0, ',', '.') }}"
+                                                readonly>
+                                        </div>
+
+                                    </div>
+                                @endif
                             </div>
 
                             <input type="hidden" name="id_petani" value="{{ $p['id_petani'] }}">

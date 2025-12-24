@@ -205,24 +205,50 @@ class PengambilanSaldoController extends Controller
                     ->sum();
 
                 // ================== SALDO PERIODE LALU ==================
-                $saldoPeriodeLalu = \App\Models\SaldoLalu::where('id_petani', $id_petani)
+                $saldoPeriodeLalu = SaldoLalu::where('id_petani', $id_petani)
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
                     ->where('id_bagi_bulanan', $bulanMap[$bulan_awal] ?? 0)
                     ->sum('saldo_lalu');
 
+                $periodeAwal = sprintf('%04d-%02d', $tahun, $bulan_awal);
+
+                $saldoPeriodeList = Saldo::where('id_petani', $id_petani)
+                    ->where('id_desa', $id_desa)
+                    ->where('id_tahun_tanam', $id_tahun_tanam)
+                    ->where('bulan_awal', '<=', $periodeAwal)
+                    ->where('saldo', '>', 0) // ⬅️ KUNCI UTAMA
+                    ->orderBy('bulan_awal')
+                    ->get()
+                    ->map(function ($s) {
+                        return [
+                            'periode' => $s->bulan_awal . ' - ' . $s->bulan_akhir,
+                            'saldo' => $s->saldo,
+                        ];
+                    });
+
+                $pakaiModePeriode = $saldoPeriodeLalu > 0;
+
+                $totalSaldoAkumulasi = $saldoPeriodeList->sum('saldo');
+
+                $periodeBerlanjut = Saldo::where('id_petani', $id_petani)
+                    ->where('id_desa', $id_desa)
+                    ->where('id_tahun_tanam', $id_tahun_tanam)
+                    ->where('bulan_awal', '>', $periodeAwal)
+                    ->exists();
+
                 // ================== STATUS ==================
-                $sudahDiambil = \App\Models\Transaksi::where('id_petani', $id_petani)
+                $sudahDiambil = Transaksi::where('id_petani', $id_petani)
                     ->where('tipe', 'debit_pengambilan')
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
                     ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
-                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
-                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
-                    })
+                    $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                        ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                })
                     ->exists();
 
-                $trxTerakhir = \App\Models\Transaksi::where('id_petani', $id_petani)
+                $trxTerakhir = Transaksi::where('id_petani', $id_petani)
                     ->where('tipe', 'debit_pengambilan')
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
@@ -239,12 +265,17 @@ class PengambilanSaldoController extends Controller
                     'nominal_bulan_1' => $nominalBulan1,
                     'nominal_bulan_2' => $nominalBulan2,
                     'nominal' => $nominalPeriode,
+                    'total_saldo_berjalan' => $totalSaldoBerjalan ?? $nominalPeriode,
                     'saldo_periode_lalu' => $saldoPeriodeLalu,
                     'total_hak' => $nominalPeriode + $saldoPeriodeLalu,
+                    'saldo_periode_list' => $saldoPeriodeList,
+                    'total_saldo_akumulasi' => $totalSaldoAkumulasi,
+                    'pakai_mode_periode' => $pakaiModePeriode,
                     'id_desa' => $id_desa,
                     'id_tahun_tanam' => $id_tahun_tanam,
                     'sudah_diambil' => $sudahDiambil,
                     'trx_terakhir' => $trxTerakhir,
+                    'periode_berlanjut' => $periodeBerlanjut,
                 ];
             })
             ->values();
@@ -288,7 +319,6 @@ class PengambilanSaldoController extends Controller
         ]);
     }
 
-
     public function create(Request $request)
     {
         $id_bulanan = $request->id_bulanan ?? [];
@@ -317,16 +347,16 @@ class PengambilanSaldoController extends Controller
     {
         // ================= VALIDASI =================
         $request->validate([
-            'id_petani'   => 'required',
-            'id_bulanan'  => 'required|array', // pastikan cuma bulan periode ini
-            'metode'      => 'required',
-            'no_urut'     => 'required',
-            'no_bukti'    => 'required',
-            'tanggal'     => 'nullable|date',
+            'id_petani' => 'required',
+            'id_bulanan' => 'required|array', // pastikan cuma bulan periode ini
+            'metode' => 'required',
+            'no_urut' => 'required',
+            'no_bukti' => 'required',
+            'tanggal' => 'nullable|date',
         ]);
 
-        $idPetani    = $request->id_petani;
-        $bulan_awal  = $request->bulan_awal;  // periode ini
+        $idPetani = $request->id_petani;
+        $bulan_awal = $request->bulan_awal;  // periode ini
         $bulan_akhir = $request->bulan_akhir;
 
         // ================= TENTUKAN TANGGAL =================
@@ -338,61 +368,55 @@ class PengambilanSaldoController extends Controller
         $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
 
         // ================= TRANSACTION =================
-        $transaksi = DB::transaction(function () use (
-            $request,
-            $idPetani,
-            $firstBulanan,
-            $bulan_awal,
-            $bulan_akhir,
-            $tanggalTransaksi
-        ) {
+        $transaksi = DB::transaction(function () use ($request, $idPetani, $firstBulanan, $bulan_awal, $bulan_akhir, $tanggalTransaksi) {
 
-            // ===== HITUNG TOTAL SALDO HANYA PERIODE INI =====
-            $totalSaldo = BagiHasilPetani::whereIn('id_bagi_bulanan', $request->id_bulanan)
-                ->where('id_petani', $idPetani)
-                ->sum('total_nominal');
+            $saldoAktif = Saldo::where('id_petani', $idPetani)
+                ->where('id_desa', $firstBulanan->id_desa)
+                ->where('id_tahun_tanam', $firstBulanan->id_tahun_tanam)
+                ->where('saldo', '>', 0)
+                ->where('bulan_awal', '<=', $bulan_awal) // sampai periode ini
+                ->orderBy('bulan_awal')
+                ->get();
 
-            // ===== AMBIL ATAU BUAT SALDO PERIODE INI =====
-            $saldo = Saldo::firstOrCreate(
-                [
-                    'id_petani'      => $idPetani,
-                    'id_desa'        => $firstBulanan->id_desa,
-                    'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                    'bulan_awal'     => $bulan_awal, // hanya periode ini
-                ],
-                [
-                    'bulan_akhir' => $bulan_akhir,
-                    'saldo'       => 0, // kalau baru dibuat, saldo awal = 0
-                ]
-            );
-
-            // ===== UPDATE BULAN AKHIR JIKA BERUBAH =====
-            if ($saldo->bulan_akhir != $bulan_akhir) {
-                $saldo->bulan_akhir = $bulan_akhir;
-                $saldo->save();
+            if ($saldoAktif->isEmpty()) {
+                abort(400, 'Tidak ada saldo yang bisa diambil');
             }
 
-            // ===== KURANGI SALDO PERIODE INI =====
-            // Hanya mengurangi saldo untuk periode ini, tidak memengaruhi periode sebelumnya
-            if ($totalSaldo > 0) {
-                $saldo->decrement('saldo', $totalSaldo);
+            if ($saldoAktif->count() > 1) {
+                // ADA SALDO DARI PERIODE SEBELUMNYA
+                $bulanAwalTransaksi = $saldoAktif->first()->bulan_awal;
+            } else {
+                // CUMA PERIODE INI
+                $bulanAwalTransaksi = $bulan_awal;
+            }
+
+            $bulanAkhirTransaksi = $bulan_akhir;
+
+            // ===== HITUNG TOTAL SALDO HANYA PERIODE INI =====
+            $totalSaldo = $saldoAktif->sum('saldo');
+
+            // ===== AMBIL ATAU BUAT SALDO PERIODE INI =====
+            foreach ($saldoAktif as $s) {
+                $s->update([
+                    'saldo' => 0
+                ]);
             }
 
             // ===== SIMPAN TRANSAKSI =====
             return Transaksi::create([
                 'id_bagi_bulanan' => null,
-                'id_petani'      => $idPetani,
-                'id_desa'        => $firstBulanan->id_desa,
+                'id_petani' => $idPetani,
+                'id_desa' => $firstBulanan->id_desa,
                 'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                'tipe'           => 'debit_pengambilan',
-                'metode'         => $request->metode,
-                'nominal'        => $totalSaldo,
-                'tanggal'        => $tanggalTransaksi,
-                'keterangan'     => 'Pengambilan saldo periode bulanan',
-                'no_bukti'       => $request->no_bukti,
-                'no_urut'        => $request->no_urut,
-                'bulan_awal'     => $bulan_awal,
-                'bulan_akhir'    => $bulan_akhir,
+                'tipe' => 'debit_pengambilan',
+                'metode' => $request->metode,
+                'nominal' => $totalSaldo,
+                'tanggal' => $tanggalTransaksi,
+                'keterangan' => 'Pengambilan saldo periode',
+                'no_bukti' => $request->no_bukti,
+                'no_urut' => $request->no_urut,
+                'bulan_awal' => $bulanAwalTransaksi,
+                'bulan_akhir' => $bulanAkhirTransaksi,
             ]);
         });
 
