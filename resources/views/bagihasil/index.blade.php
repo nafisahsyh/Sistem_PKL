@@ -199,7 +199,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center py-4 text-muted">
+                                <td colspan="11" class="text-center py-4 text-muted">
                                     <i class="fas fa-folder-open fa-2x mb-2"></i><br>
                                     Belum ada data bulanan
                                 </td>

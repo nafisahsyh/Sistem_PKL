@@ -113,7 +113,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
+                                <td colspan="9" class="text-center py-4 text-muted">
                                     <i class="fas fa-folder-open fa-2x mb-2"></i><br>
                                     Belum ada data periode
                                 </td>
