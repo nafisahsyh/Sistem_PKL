@@ -138,6 +138,16 @@ class PengambilanSaldoController extends Controller
         $bulan_akhir = $bulananCollection->max('bulan') ?? 0;
         $total_periode = $bulananCollection->sum('total_bagian');
 
+        // ================== SALDO PERIODE LALU (HEADER) ==================
+        $bulanGanjil = $bulananCollection
+            ->where('bulan', $bulan_awal)
+            ->first();
+
+        $saldo_periode_lalu = $bulanGanjil->sisa_saldo_snapshot ?? 0;
+
+        $total_saldo_periode = $total_periode + $saldo_periode_lalu;
+
+
         // Ambil semua petani gabungan periode ini
         $petaniQuery = BagiHasilPetani::whereIn('id_bagi_bulanan', $id_bulanan);
 
@@ -169,46 +179,67 @@ class PengambilanSaldoController extends Controller
 
         $petaniData = $petaniCollection
             ->groupBy('id_petani')
-            ->map(function ($group) use ($bulan_awal, $bulan_akhir, $bulanMap) {
+            ->map(function ($group) use ($bulan_awal, $bulan_akhir, $bulanMap, $tahun) {
 
-                $id_petani = $group->first()->id_petani;
-                $id_desa = $group->first()->id_desa;
-                $id_tahun_tanam = $group->first()->id_tahun_tanam;
+                $p = $group->first();
+                $id_petani = $p->id_petani;
+                $id_desa = $p->id_desa;
+                $id_tahun_tanam = $p->id_tahun_tanam;
 
-                // Total luas
-                $totalLuas = $group
-                    ->groupBy(fn($item) => $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $item->id_lahan)
-                    ->map(fn($subgroup) => $subgroup->first()->total_luas_ksm)
-                    ->sum();
-
-                // Nominal bulan periode ini
-                $nominalPeriode = $group
-                    ->whereIn('id_bagi_bulanan', $bulanMap->values()->toArray())
+                // ================== SALDO PER BULAN ==================
+                $nominalBulan1 = $group
+                    ->where('id_bagi_bulanan', $bulanMap[$bulan_awal] ?? null)
                     ->sum('total_nominal');
 
-                // Ambil saldo periode lalu dari tabel saldo_lalu
+                $nominalBulan2 = $group
+                    ->where('id_bagi_bulanan', $bulanMap[$bulan_akhir] ?? null)
+                    ->sum('total_nominal');
+
+                // ================== TOTAL PERIODE ==================
+                $nominalPeriode = $nominalBulan1 + $nominalBulan2;
+
+                // ================== LUAS ==================
+                $totalLuas = $group
+                    ->groupBy(fn($item) => $item->id_desa . '-' . $item->id_tahun_tanam . '-' . $item->id_lahan)
+                    ->map(fn($sub) => $sub->first()->total_luas_ksm)
+                    ->sum();
+
+                // ================== SALDO PERIODE LALU ==================
                 $saldoPeriodeLalu = \App\Models\SaldoLalu::where('id_petani', $id_petani)
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
-                    ->where('id_bagi_bulanan', $bulanMap[$bulan_awal] ?? 0) // bulan ganjil awal periode
-                    ->sum('saldo_lalu'); // ini sudah saldo tersisa, bukan total nominal
+                    ->where('id_bagi_bulanan', $bulanMap[$bulan_awal] ?? 0)
+                    ->sum('saldo_lalu');
+
+                // ================== STATUS ==================
+                $sudahDiambil = \App\Models\Transaksi::where('id_petani', $id_petani)
+                    ->where('tipe', 'debit_pengambilan')
+                    ->where('id_desa', $id_desa)
+                    ->where('id_tahun_tanam', $id_tahun_tanam)
+                    ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
+                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                    })
+                    ->exists();
 
                 return [
                     'id_petani' => $id_petani,
-                    'nama_petani' => $group->first()->nama_petani_snapshot,
-                    'nik_petani' => $group->first()->nik_petani_snapshot,
-                    'no_plasma' => $group->first()->nomor_plasma_snapshot,
-                    'no_koperasi' => $group->first()->nomor_koperasi_snapshot,
+                    'nama_petani' => $p->nama_petani_snapshot,
+                    'nik_petani' => $p->nik_petani_snapshot,
+                    'no_plasma' => $p->nomor_plasma_snapshot,
+                    'no_koperasi' => $p->nomor_koperasi_snapshot,
                     'luas_ha' => $totalLuas,
+                    'nominal_bulan_1' => $nominalBulan1,
+                    'nominal_bulan_2' => $nominalBulan2,
                     'nominal' => $nominalPeriode,
                     'saldo_periode_lalu' => $saldoPeriodeLalu,
                     'total_hak' => $nominalPeriode + $saldoPeriodeLalu,
                     'id_desa' => $id_desa,
                     'id_tahun_tanam' => $id_tahun_tanam,
+                    'sudah_diambil' => $sudahDiambil,
                 ];
             })
             ->values();
-
 
         // Pagination manual
         $perPage = 10;
@@ -239,6 +270,8 @@ class PengambilanSaldoController extends Controller
             'bulan_awal' => $bulan_awal,
             'bulan_akhir' => $bulan_akhir,
             'total_periode' => $total_periode,
+            'saldo_periode_lalu' => $saldo_periode_lalu,
+            'total_saldo_periode' => $total_saldo_periode,
             'petaniData' => $paginated,
             'noStart' => $noStart,
             'totalLuasHa' => $totalLuasHa,
@@ -277,26 +310,23 @@ class PengambilanSaldoController extends Controller
         // ================= VALIDASI =================
         $request->validate([
             'id_petani'   => 'required',
-            'id_bulanan'  => 'required|array',
+            'id_bulanan'  => 'required|array', // pastikan cuma bulan periode ini
             'metode'      => 'required',
             'no_urut'     => 'required',
             'no_bukti'    => 'required',
-            'tanggal'     => 'nullable|date', // ⬅️ tanggal dari form
+            'tanggal'     => 'nullable|date',
         ]);
 
-        // ================= DATA DASAR =================
         $idPetani    = $request->id_petani;
-        $bulan_awal  = $request->bulan_awal;
+        $bulan_awal  = $request->bulan_awal;  // periode ini
         $bulan_akhir = $request->bulan_akhir;
 
         // ================= TENTUKAN TANGGAL =================
-        // Kalau user pilih tanggal → pakai itu
-        // Kalau tidak → default hari ini
         $tanggalTransaksi = $request->tanggal
             ? Carbon::parse($request->tanggal)
             : now();
 
-        // ================= BULANAN PERTAMA =================
+        // ================= AMBIL DATA BULANAN PERTAMA =================
         $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
 
         // ================= TRANSACTION =================
@@ -309,22 +339,22 @@ class PengambilanSaldoController extends Controller
             $tanggalTransaksi
         ) {
 
-            // ===== HITUNG TOTAL SALDO =====
+            // ===== HITUNG TOTAL SALDO HANYA PERIODE INI =====
             $totalSaldo = BagiHasilPetani::whereIn('id_bagi_bulanan', $request->id_bulanan)
                 ->where('id_petani', $idPetani)
                 ->sum('total_nominal');
 
-            // ===== AMBIL / BUAT SALDO =====
+            // ===== AMBIL ATAU BUAT SALDO PERIODE INI =====
             $saldo = Saldo::firstOrCreate(
                 [
                     'id_petani'      => $idPetani,
                     'id_desa'        => $firstBulanan->id_desa,
                     'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                    'bulan_awal'     => $bulan_awal,
+                    'bulan_awal'     => $bulan_awal, // hanya periode ini
                 ],
                 [
                     'bulan_akhir' => $bulan_akhir,
-                    'saldo'       => 0,
+                    'saldo'       => 0, // kalau baru dibuat, saldo awal = 0
                 ]
             );
 
@@ -334,8 +364,11 @@ class PengambilanSaldoController extends Controller
                 $saldo->save();
             }
 
-            // ===== KURANGI SALDO =====
-            $saldo->decrement('saldo', $totalSaldo);
+            // ===== KURANGI SALDO PERIODE INI =====
+            // Hanya mengurangi saldo untuk periode ini, tidak memengaruhi periode sebelumnya
+            if ($totalSaldo > 0) {
+                $saldo->decrement('saldo', $totalSaldo);
+            }
 
             // ===== SIMPAN TRANSAKSI =====
             return Transaksi::create([
@@ -346,16 +379,16 @@ class PengambilanSaldoController extends Controller
                 'tipe'           => 'debit_pengambilan',
                 'metode'         => $request->metode,
                 'nominal'        => $totalSaldo,
-                'tanggal'        => $tanggalTransaksi, // ✅ IKUT INPUT
+                'tanggal'        => $tanggalTransaksi,
                 'keterangan'     => 'Pengambilan saldo periode bulanan',
-                'no_bukti'       => $request->no_bukti, // ✅ dari JS
+                'no_bukti'       => $request->no_bukti,
                 'no_urut'        => $request->no_urut,
                 'bulan_awal'     => $bulan_awal,
                 'bulan_akhir'    => $bulan_akhir,
             ]);
         });
 
-        // ================= REDIRECT STRUK =================
+        // ================= REDIRECT KE STRUK =================
         return redirect()->route('ambil-saldo.struk', [
             'id_transaksi' => $transaksi->id_transaksi
         ]);

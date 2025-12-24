@@ -38,14 +38,17 @@
                         12 => 'Desember',
                     ];
                 @endphp
-                <table class="table table-bordered table-custom align-middle mb-0 text-center">
+                <table class="table table-bordered table-custom align-middle mb-3 text-center">
                     <thead style="background-color: #cce1d7; color: #014C2D;">
                         <tr>
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
                             <th>Periode</th>
                             <th>Total Nominal</th>
+                            <th>Saldo Periode Lalu</th>
+                            <th>Total Saldo</th>
                         </tr>
+
                     </thead>
                     <tbody>
                         <tr style="background-color: #ffffff; color: #014C2D;">
@@ -58,8 +61,17 @@
                                 @endif
                                 {{ $tahun }}
                             </td>
-                            <td>Rp {{ number_format($total_periode, 0, ',', '.') }}</td>
+                            <td class="text-end">
+                                Rp {{ number_format($total_periode, 0, ',', '.') }}
+                            </td>
+                            <td class="text-end">
+                                Rp {{ number_format($saldo_periode_lalu, 0, ',', '.') }}
+                            </td>
+                            <td class="text-end">
+                                Rp {{ number_format($total_saldo_periode, 0, ',', '.') }}
+                            </td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -92,64 +104,60 @@
                 </div>
 
                 <table class="table table-bordered table-striped table-custom align-middle">
-<thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
-    <tr>
-        <th>No</th>
-        <th>No Plasma</th>
-        <th>No Koperasi</th>
-        <th>Nama Petani</th>
-        <th>Luas Lahan</th>
-        <th>Nominal</th>
-        <th>Saldo Periode Lalu</th> {{-- kolom baru --}}
-        <th>Total Hak</th> {{-- kolom baru --}}
-        <th>Aksi Ambil</th>
-    </tr>
-</thead>
-<tbody>
-    @forelse($petaniData as $i => $p)
-        <tr>
-            <td class="text-center">{{ $noStart + $i }}</td>
-            <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
-            <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
-            <td>{{ $p['nama_petani'] }}</td>
-            <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
-            <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
-            <td class="text-end">Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}</td> {{-- saldo periode lalu --}}
-            <td class="text-end">Rp {{ number_format($p['total_hak'], 0, ',', '.') }}</td> {{-- total hak --}}
-            <td class="text-center">
-                @if ($p['total_hak'] > 0)
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
-                        <i class="fa fa-file-invoice-dollar"></i>
-                    </button>
-                @else
-                    <span class="badge bg-secondary">Sudah diambil</span>
-                @endif
+                    <thead class="text-center" style="background-color:#cce1d7; color:#014C2D;">
+                        <tr>
+                            <th>No</th>
+                            <th>No Plasma</th>
+                            <th>No Koperasi</th>
+                            <th>Nama Petani</th>
+                            <th>Luas Lahan</th>
+                            <th>Nominal</th>
+                            <th>Saldo Periode Lalu</th> {{-- kolom baru --}}
+                            <th>Total Hak</th> {{-- kolom baru --}}
+                            <th>Aksi Ambil</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($petaniData as $i => $p)
+                            <tr>
+                                <td class="text-center">{{ $noStart + $i }}</td>
+                                <td class="text-center">{{ $p['no_plasma'] ?? '-' }}</td>
+                                <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
+                                <td>{{ $p['nama_petani'] }}</td>
+                                <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
+                                <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}</td>
+                                {{-- saldo periode lalu --}}
+                                <td class="text-end">Rp {{ number_format($p['total_hak'], 0, ',', '.') }}</td>
+                                {{-- total hak --}}
+                                <td class="text-center">
+                                    @if (!$p['sudah_diambil'] && $p['total_hak'] > 0)
+                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modalAmbil_{{ $p['id_petani'] }}">
+                                            <i class="fa fa-file-invoice-dollar"></i>
+                                        </button>
+                                    @else
+                                        <span class="badge bg-secondary">Sudah diambil</span>
+                                    @endif
 
-                @php
-                    $trxTerakhir = \App\Models\Transaksi::where('id_petani', $p['id_petani'])
-                        ->where('tipe', 'debit_pengambilan')
-                        ->orderByDesc('id_transaksi')
-                        ->first();
-                @endphp
+                                    @if ($p['sudah_diambil'] && !empty($p['trx_terakhir']))
+                                        <a href="{{ route('ambil-saldo.struk', $p['trx_terakhir']->id_transaksi) }}"
+                                            target="_blank" class="btn btn-primary btn-sm ms-1">
+                                            <i class="fa fa-print"></i>
+                                        </a>
+                                    @endif
+                                </td>
 
-                @if ($trxTerakhir)
-                    <a href="{{ route('ambil-saldo.struk', $trxTerakhir->id_transaksi) }}"
-                        target="_blank" class="btn btn-primary btn-sm ms-1">
-                        <i class="fa fa-print"></i>
-                    </a>
-                @endif
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="9" class="text-center py-5 text-muted">
-                <i class="fas fa-folder-open fa-2x mb-2"></i>
-                <div>Belum ada data petani</div>
-            </td>
-        </tr>
-    @endforelse
-</tbody>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <div>Belum ada data petani</div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
 
                 </table>
 

@@ -66,6 +66,7 @@
                             <th>Tanggal Bagi</th>
                             <th>Total Nominal</th>
                             <th>Saldo Periode Lalu</th>
+                            <th>Total Saldo</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -92,6 +93,11 @@
                                 <td class="text-end">
                                     Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}
                                 </td>
+
+                                <td class="text-end">
+                                    Rp {{ number_format($p['total_saldo'], 0, ',', '.') }}
+                                </td>
+
                                 <td class="text-center">
                                     <a href="{{ route('pengambilan.show', [
                                         'id_bulanan' => $p['id_bulanan'],
