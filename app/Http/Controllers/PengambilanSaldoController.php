@@ -222,6 +222,13 @@ class PengambilanSaldoController extends Controller
                     })
                     ->exists();
 
+                $trxTerakhir = \App\Models\Transaksi::where('id_petani', $id_petani)
+                    ->where('tipe', 'debit_pengambilan')
+                    ->where('id_desa', $id_desa)
+                    ->where('id_tahun_tanam', $id_tahun_tanam)
+                    ->orderByDesc('tanggal')
+                    ->first();
+
                 return [
                     'id_petani' => $id_petani,
                     'nama_petani' => $p->nama_petani_snapshot,
@@ -237,6 +244,7 @@ class PengambilanSaldoController extends Controller
                     'id_desa' => $id_desa,
                     'id_tahun_tanam' => $id_tahun_tanam,
                     'sudah_diambil' => $sudahDiambil,
+                    'trx_terakhir' => $trxTerakhir,
                 ];
             })
             ->values();
