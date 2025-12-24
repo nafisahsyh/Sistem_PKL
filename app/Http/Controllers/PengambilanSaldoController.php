@@ -426,122 +426,219 @@ class PengambilanSaldoController extends Controller
         ]);
     }
 
-    public function struk($id_transaksi)
+public function struk($id_transaksi)
     {
         $trx = Transaksi::findOrFail($id_transaksi);
 
-        // =============================
-        // Ambil bulan awal & akhir (raw)
-        // =============================
-        $bulan_awal = $trx->bulan_awal;
-        $bulan_akhir = $trx->bulan_akhir;
+        $idPetani = $trx->id_petani;
+        $idDesa = $trx->id_desa;
+        $idTahunTanam = $trx->id_tahun_tanam;
 
-        // =============================
-        // Parse bulan dan tahun
-        // =============================
-        $bulan_awal_bulan = intval(substr($bulan_awal, 5, 2));
-        $bulan_awal_tahun = intval(substr($bulan_awal, 0, 4));
+        // ===============================
+        // Fungsi nama bulan (LOCAL DI CONTROLLER)
+        // ===============================
+        $bulanIndonesia = function ($bulan) {
+            return [
+                1 => 'Januari',
+                2 => 'Februari',
+                3 => 'Maret',
+                4 => 'April',
+                5 => 'Mei',
+                6 => 'Juni',
+                7 => 'Juli',
+                8 => 'Agustus',
+                9 => 'September',
+                10 => 'Oktober',
+                11 => 'November',
+                12 => 'Desember',
+            ][$bulan] ?? '-';
+        };
 
-        $bulan_akhir_bulan = intval(substr($bulan_akhir, 5, 2));
-        $bulan_akhir_tahun = intval(substr($bulan_akhir, 0, 4));
+        // ===============================
+        // Periode transaksi awal
+        // ===============================
+        [$tahunAwal, $bulanAwal] = explode('-', $trx->bulan_awal);
+        [$tahunAkhir, $bulanAkhir] = explode('-', $trx->bulan_akhir);
 
-        $bulananCollection = BagiHasilBulanan::with(['desa', 'tahunTanam'])
-            ->where('tahun', $bulan_awal_tahun)
-            ->whereBetween('bulan', [$bulan_awal_bulan, $bulan_akhir_bulan])
-            ->get();
+        $bulanAwal  = (int)$bulanAwal;
+        $bulanAkhir = (int)$bulanAkhir;
+        $tahunAwal  = (int)$tahunAwal;
+        $tahunAkhir = (int)$tahunAkhir;
+
+        // ===============================
+        // Ambil desa & tahun tanam
+        // ===============================
+        $desa = Desa::find($idDesa);
+        $tahunTanam = Tahun_Tanam::find($idTahunTanam);
+
+        // ===============================
+        // LOOP MUNDUR PERIODE
+        // ===============================
+        $periodeList = [];
+        $grandTotal = 0;
+
+        $currentBulanAkhir = $bulanAkhir;
+        $currentTahunAkhir = $tahunAkhir;
+
+        while (true) {
+
+            // Hitung 2 bulanan
+            $currentBulanAwal = $currentBulanAkhir - 1;
+            $currentTahunAwal = $currentTahunAkhir;
+
+            if ($currentBulanAwal < 1) {
+                $currentBulanAwal += 12;
+                $currentTahunAwal--;
+            }
+
+            // ===============================
+            // STOP kalau sudah pernah diambil
+            // (kecuali periode pertama)
+            // ===============================
+            $sudahDiambil = Transaksi::where('id_petani', $idPetani)
+                ->where('tipe', 'debit_pengambilan')
+                ->where('bulan_awal', sprintf('%04d-%02d', $currentTahunAwal, $currentBulanAwal))
+                ->exists();
+
+            if ($sudahDiambil && count($periodeList) > 0) {
+                break;
+            }
+
+            // ===============================
+            // Ambil data bulanan
+            // ===============================
+            $bulanan = BagiHasilBulanan::where('id_desa', $idDesa)
+                ->where('id_tahun_tanam', $idTahunTanam)
+                ->where('tahun', $currentTahunAwal)
+                ->whereIn('bulan', [$currentBulanAwal, $currentBulanAkhir])
+                ->get();
+
+            if ($bulanan->count() < 2) break;
+
+            $bulanMap = $bulanan->pluck('id_bagi_bulanan', 'bulan');
+
+            // ===============================
+            // Hitung nominal petani
+            // ===============================
+            $petani = BagiHasilPetani::where('id_petani', $idPetani)
+                ->whereIn('id_bagi_bulanan', $bulanMap->values())
+                ->get();
+
+            $totalPeriode = $petani->sum('total_nominal');
+
+            if ($totalPeriode <= 0 && count($periodeList) > 0) break;
+
+            // ===============================
+            // DETAIL BULAN (hanya periode terakhir)
+            // ===============================
+            $detailBulan = [];
+
+            if (count($periodeList) === 0) {
+                foreach ($bulanMap as $bulan => $idBulanan) {
+                    $detailBulan[] = [
+                        'label' => $bulanIndonesia($bulan) . ' ' . $currentTahunAwal,
+                        'nominal' => $petani
+                            ->where('id_bagi_bulanan', $idBulanan)
+                            ->sum('total_nominal')
+                    ];
+                }
+            }
+
+            // ===============================
+            // Label periode (auto lintas tahun)
+            // ===============================
+            $labelPeriode =
+                'Periode ' .
+                $bulanIndonesia($currentBulanAwal) . ' ' . $currentTahunAwal .
+                ' - ' .
+                $bulanIndonesia($currentBulanAkhir) . ' ' . $currentTahunAkhir;
+
+            $periodeList[] = [
+                'label' => $labelPeriode,
+                'total' => $totalPeriode,
+                'detail' => count($periodeList) === 0,
+                'bulan' => $detailBulan
+            ];
+
+            $grandTotal += $totalPeriode;
+
+            // Mundur periode
+            $currentBulanAkhir = $currentBulanAwal - 1;
+            if ($currentBulanAkhir < 1) {
+                $currentBulanAkhir += 12;
+                $currentTahunAkhir--;
+            }
+        }
+
+        $periodeList = array_reverse($periodeList);
+        $punyaSaldoLalu = count($periodeList) > 1;
+
+        // ===============================
+        // PERIODE GABUNGAN UNTUK JUDUL
+        // ===============================
+        $first = $periodeList[0];
+        $last  = $periodeList[count($periodeList) - 1];
+
+        // Ambil bulan & tahun awal
+        preg_match('/Periode (.+?) (\d{4})/', $first['label'], $m1);
+        $bulanAwalLabel = $m1[1];
+        $tahunAwalLabel = $m1[2];
+
+        // Ambil bulan & tahun akhir
+        preg_match('/- (.+?) (\d{4})$/', $last['label'], $m2);
+        $bulanAkhirLabel = $m2[1];
+        $tahunAkhirLabel = $m2[2];
+
+        // Kalau tahun sama → ringkas
+        if ($tahunAwalLabel === $tahunAkhirLabel) {
+            $periodeGabungan = "PERIODE {$bulanAwalLabel} – {$bulanAkhirLabel} {$tahunAwalLabel}";
+        } else {
+            $periodeGabungan = "PERIODE {$bulanAwalLabel} {$tahunAwalLabel} – {$bulanAkhirLabel} {$tahunAkhirLabel}";
+        }
 
 
-        $desa = $bulananCollection->first()->desa ?? null;
-        $tahunTanam = $bulananCollection->first()->tahunTanam ?? null;
-
-        // Map bulan (angka 1–12) ke id_bagi_bulanan
-        $bulanMap = $bulananCollection->pluck('id_bagi_bulanan', 'bulan');
-
-        // Ambil ID berdasarkan bulan angka
-        $idBulananAwal = $bulanMap[$bulan_awal_bulan] ?? null;
-        $idBulananAkhir = $bulanMap[$bulan_akhir_bulan] ?? null;
-
-
-        // =============================
-        // Ambil data petani untuk 2 bulan itu
-        // =============================
-        $petaniCollection = BagiHasilPetani::with('bulanan')
-            ->where('id_petani', $trx->id_petani)
-            ->whereHas('bulanan', function ($q) use ($bulan_awal_bulan, $bulan_akhir_bulan, $bulan_awal_tahun) {
-                $q->where('tahun', $bulan_awal_tahun)
-                    ->whereBetween('bulan', [$bulan_awal_bulan, $bulan_akhir_bulan]);
-            })
-            ->get();
-
-        $luasHa = $petaniCollection->sum('total_luas_ksm');
-
-        $nominalBulan1 = $petaniCollection->filter(function ($item) use ($bulan_awal_bulan) {
-            return $item->bulanan->bulan == $bulan_awal_bulan;
-        })->sum('total_nominal');
-
-        $nominalBulan2 = $petaniCollection->filter(function ($item) use ($bulan_akhir_bulan) {
-            return $item->bulanan->bulan == $bulan_akhir_bulan;
-        })->sum('total_nominal');
+        $petaniSnapshot = BagiHasilPetani::where('id_petani', $idPetani)->first();
 
         $p = [
-            'id_petani' => $trx->id_petani,
-            'nama_petani' => $petaniCollection->first()->nama_petani_snapshot ?? '-',
-            'nik_petani' => $petaniCollection->first()->nik_petani_snapshot ?? '-',
-            'alamat_petani' => $petaniCollection->first()->alamat_petani_snapshot ?? '-',
-            'no_plasma' => $petaniCollection->first()->nomor_plasma_snapshot ?? '-',
-            'no_koperasi' => $petaniCollection->first()->nomor_koperasi_snapshot ?? '-',
+            'nama_petani' => $petaniSnapshot->nama_petani_snapshot ?? '-',
+            'alamat_petani' => $petaniSnapshot->alamat_petani_snapshot ?? '-',
+            'no_plasma' => $petaniSnapshot->nomor_plasma_snapshot ?? '-',
+            'no_koperasi' => $petaniSnapshot->nomor_koperasi_snapshot ?? '-',
             'no_urut' => $trx->no_urut ?? '-',
             'desa' => $desa->desa ?? '-',
-            'luas_ha' => $luasHa,
-            'nominal' => $petaniCollection->sum('total_nominal'),
 
-            'nominal_bulan_1' => $petaniCollection->filter(
-                fn($i) =>
-                $i->bulanan && $i->bulanan->bulan == $bulan_awal_bulan
-            )->sum('total_nominal'),
+            // total keseluruhan
+            'nominal' => $grandTotal,
 
-            'nominal_bulan_2' => $petaniCollection->filter(
-                fn($i) =>
-                $i->bulanan && $i->bulanan->bulan == $bulan_akhir_bulan
-            )->sum('total_nominal'),
+            // khusus tampilan lama (2 baris bulan)
+            'nominal_bulan_1' => $periodeList[count($periodeList) - 1]['bulan'][0]['nominal'] ?? 0,
+            'nominal_bulan_2' => $periodeList[count($periodeList) - 1]['bulan'][1]['nominal'] ?? 0,
         ];
 
-        // =============================
-        // Nama bulan
-        // =============================
-        $bulanNama = [
-            1 => 'Januari',
-            2 => 'Februari',
-            3 => 'Maret',
-            4 => 'April',
-            5 => 'Mei',
-            6 => 'Juni',
-            7 => 'Juli',
-            8 => 'Agustus',
-            9 => 'September',
-            10 => 'Oktober',
-            11 => 'November',
-            12 => 'Desember'
-        ];
 
         return view('pengambilan_saldo.nota', [
-            'p' => $p,
+            'trx' => $trx,
             'desa' => $desa,
             'tahunTanam' => $tahunTanam,
+
+            // ⬇️ PENTING (biar Blade lama tetap jalan)
+            'bulan_awal' => $trx->bulan_awal,
+            'bulan_akhir' => $trx->bulan_akhir,
+
+            // parsed (kalau Blade pakai)
+            'bulan_awal_bulan' => $bulanAwal,
+            'bulan_awal_tahun' => $tahunAwal,
+            'bulan_akhir_bulan' => $bulanAkhir,
+            'bulan_akhir_tahun' => $tahunAkhir,
+            'periodeGabungan' => $periodeGabungan,
+
+            // logic baru
+            'periodeList' => $periodeList,
+            'grandTotal' => $grandTotal,
+
             'no_bukti' => $trx->no_bukti,
-            'trx' => $trx,
-
-            // raw
-            'bulan_awal' => $bulan_awal,
-            'bulan_akhir' => $bulan_akhir,
-
-            // parsed
-            'bulan_awal_bulan' => $bulan_awal_bulan,
-            'bulan_awal_tahun' => $bulan_awal_tahun,
-            'bulan_akhir_bulan' => $bulan_akhir_bulan,
-            'bulan_akhir_tahun' => $bulan_akhir_tahun,
-
-            'bulanNama' => $bulanNama,
+            'p' => $p,
+            'punyaSaldoLalu' => $punyaSaldoLalu
         ]);
     }
 }
