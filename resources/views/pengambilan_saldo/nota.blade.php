@@ -103,12 +103,6 @@
 @endphp
 
 @php
-    // Ambil bulan & tahun dari input
-    [$tahun1, $bulan1] = explode('-', $bulan_awal);
-    [$tahun2, $bulan2] = explode('-', $bulan_akhir);
-@endphp
-
-@php
     $periodeAktif = collect($periodeList)->last();
 @endphp
 
@@ -274,141 +268,106 @@
                                 <div style="font-size:13px;">{{ $p['desa'] ?? '-' }} {{ $tahunTanam->tahun }}</div>
                             </div>
 
-                            {{-- JIKA TIDAK ADA SALDO LALU → TAMPIL PER BULAN --}}
-                            @if (!$punyaSaldoLalu)
+                            @php
+                                $count = count($periodeList);
+                                $fontSize = 14; // default
 
-                                <div style="margin-top:3px; font-size:14px;">
-                                    PERIODE {{ strtoupper($bulanNama[$bulan_awal_bulan] . ' ' . $bulan_awal_tahun) }}
-                                    – {{ strtoupper($bulanNama[$bulan_akhir_bulan] . ' ' . $bulan_akhir_tahun) }}
-                                </div>
+                                if ($count > 2 && $count <= 5) {
+                                    $fontSize = 13;
+                                } elseif ($count > 5 && $count <= 8) {
+                                    $fontSize = 12;
+                                } elseif ($count > 8 && $count <= 10) {
+                                    $fontSize = 11;
+                                } elseif ($count > 10 && $count <= 12) {
+                                    $fontSize = 10;
+                                } elseif ($count > 12) {
+                                    $fontSize = 9;
+                                }
+                            @endphp
 
-                                <div style="margin-top:3px;">
-                                    <table style="width:100%; font-size:14px;">
-                                        <tr>
-                                            <td style="padding-left:25px; text-decoration:underline;">
-                                                BULAN {{ $bulanNama[$bulan_awal_bulan] }} {{ $bulan_awal_tahun }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding-left:25px; text-decoration:underline;">
-                                                BULAN {{ $bulanNama[$bulan_akhir_bulan] }} {{ $bulan_akhir_tahun }}
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
 
-                                {{-- JIKA ADA SALDO LALU → TAMPIL PER PERIODE --}}
-                            @else
-                                <div style="margin-top:3px; font-size:14px;">
-                                    {{ strtoupper($periodeGabungan) }}
-                                </div>
+                            <div style="margin-top:3px; font-size:{{ $fontSize }}px;">
+                                {{ strtoupper($periodeGabungan) }}
+                            </div>
 
-                                <div style="margin-top:3px;">
-                                    <table style="width:100%; font-size:13px;">
-                                        @foreach ($periodeList as $periode)
-                                            <tr>
-                                                <td style="padding-left:25px;">
-                                                    {{ strtoupper($periode['label']) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </table>
-                                </div>
-                            @endif
-
+                            <table style="width:100%; font-size:{{ $fontSize }}px;">
+                                @foreach ($periodeList as $periode)
+                                    <tr>
+                                        <td style="padding-left:25px; text-decoration:underline;">
+                                            {{ strtoupper($periode['label']) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
 
                         </div>
                     </td>
 
                     <td width="20%" style="vertical-align:top; padding-left:10px;">
                         <div style="margin-bottom:65px">JUMLAH</div>
-
-                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
-
-                            {{-- JIKA TIDAK ADA SALDO LALU → PER BULAN --}}
-                            @if (!$punyaSaldoLalu)
-                                @foreach ($periodeList[0]['bulan'] as $b)
-                                    <tr>
-                                        <td style="padding-top:3px;">
-                                            <div style="display:flex; justify-content:space-between;">
-                                                <span>Rp</span>
-                                                <span>{{ number_format($b['nominal'], 0, ',', '.') }}</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-
-                                {{-- JIKA ADA SALDO LALU → PER PERIODE --}}
-                            @else
-                                @foreach ($periodeList as $periode)
-                                    <tr>
-                                        <td style="padding-top:3px;">
-                                            <div style="display:flex; justify-content:space-between;">
-                                                <span>Rp</span>
-                                                <span>{{ number_format($periode['total'], 0, ',', '.') }}</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-
-                            {{-- TOTAL --}}
+                        <table style="width:100%; border-collapse:collapse; font-size:{{ $fontSize }}px;">
+                            @foreach ($periodeList as $periode)
+                                <tr>
+                                    <td>
+                                        <div
+                                            style="display:flex; justify-content:space-between; border-bottom:1px solid #000;">
+                                            <span>Rp</span>
+                                            <span>{{ number_format($periode['nominal'], 0, ',', '.') }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
                             <tr>
-                                <td style="font-weight:bold; border-top:1px solid #000; padding-top:6px;">
+                                <td style="font-weight:bold; padding-top:35px; font-size:16px;">
                                     <div style="display:flex; justify-content:space-between;">
                                         <span>Rp</span>
                                         <span>{{ number_format($grandTotal, 0, ',', '.') }}</span>
                                     </div>
                                 </td>
                             </tr>
-
                         </table>
+
                     </td>
-
+            </table>
+            <div style="font-size: 11px; margin-top:5px;">Terbilang :</div>
         </div>
-        </td>
-        </tr>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:5px; font-size:10px; text-align:center;">
+
+            <!-- Judul Utama -->
+            <tr>
+                <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;"></td>
+                <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;">DIBUKUKAN</td>
+                <td colspan="2" style="border:1px solid #000; padding:2px; width:50%;">TELAH DITERIMA JUMLAH TERSEBUT
+                    DI ATAS</td>
+            </tr>
+
+            <!-- Subjudul / kolom kedua -->
+            <tr>
+                <!-- Dikeluarkan -->
+                <td style="border:1px solid #000; padding:2px; width:13%;">TANGGAL</td>
+                <td style="border:1px solid #000; padding:2px; width:12%;">DIKELUARKAN</td>
+
+                <!-- Dibukukan -->
+                <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
+                <td style="border:1px solid #000; padding:2px; width:20%;">PARAF</td>
+
+                <!-- Telah Diterima -->
+                <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
+                <td style="border:1px solid #000; padding:2px; width:25%; font-size:8px;">TANDA TANGAN & NAMA PENERIMA
+                </td>
+            </tr>
+
+            <!-- Baris kosong untuk diisi dengan titik-titik -->
+            <tr style="height:60px;">
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+                <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
+            </tr>
         </table>
-        <div style="font-size: 11px; margin-top:5px;">Terbilang :</div>
-    </div>
-
-    <table style="width:100%; border-collapse:collapse; margin-top:5px; font-size:10px; text-align:center;">
-
-        <!-- Judul Utama -->
-        <tr>
-            <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;"></td>
-            <td colspan="2" style="border:1px solid #000; padding:2px; width:20%;">DIBUKUKAN</td>
-            <td colspan="2" style="border:1px solid #000; padding:2px; width:50%;">TELAH DITERIMA JUMLAH TERSEBUT
-                DI
-                ATAS</td>
-        </tr>
-
-        <!-- Subjudul / kolom kedua -->
-        <tr>
-            <!-- Dikeluarkan -->
-            <td style="border:1px solid #000; padding:2px; width:13%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:2px; width:12%;">DIKELUARKAN</td>
-
-            <!-- Dibukukan -->
-            <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:2px; width:20%;">PARAF</td>
-
-            <!-- Telah Diterima -->
-            <td style="border:1px solid #000; padding:2px; width:10%;">TANGGAL</td>
-            <td style="border:1px solid #000; padding:2px; width:25%; font-size:8px;">TANDA TANGAN & NAMA PENERIMA
-            </td>
-        </tr>
-
-        <!-- Baris kosong untuk diisi dengan titik-titik -->
-        <tr style="height:60px;">
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-            <td style="border:1px solid #000; border-top:none; vertical-align:bottom;">.......</td>
-        </tr>
-    </table>
 
     </div>
 </body>
