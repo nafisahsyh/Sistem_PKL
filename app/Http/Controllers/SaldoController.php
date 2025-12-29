@@ -115,19 +115,19 @@ class SaldoController extends Controller
                 DB::raw("bulan_akhir_short")
             );
 
-        $subDebit = DB::table('transaksi')
-            ->where('tipe', 'debit_pengambilan')
+        $subDebit = DB::table('transaksi_detail as td')
+            ->join('transaksi as t', 'td.id_transaksi', '=', 't.id_transaksi')
+            ->where('t.tipe', 'debit_pengambilan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',   // diasumsikan format 'YYYY-MM' seperti yang kamu tunjukkan
-                'bulan_akhir',
-                DB::raw('SUM(nominal) AS nominal_debit'),
-                // ambil metode; jika ada beberapa metode dalam periode, MAX dipakai sebagai contoh.
-                DB::raw('MAX(metode) AS metode')
+                't.id_petani',
+                't.id_desa',
+                't.id_tahun_tanam',
+                DB::raw("LEFT(td.periode_awal, 7) as periode_awal_short"),
+                DB::raw("LEFT(td.periode_akhir, 7) as periode_akhir_short"),
+                DB::raw('SUM(td.nominal) AS nominal_debit'),
+                DB::raw('MAX(t.metode) AS metode')
             )
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir');
+            ->groupBy('t.id_petani', 't.id_desa', 't.id_tahun_tanam', 'periode_awal_short', 'periode_akhir_short');
 
         // ------------------ QUERY UTAMA (join pake short fields) ------------------
         $query = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
@@ -145,14 +145,14 @@ class SaldoController extends Controller
                     ->on('s.id_tahun_tanam', '=', 'l.id_tahun_tanam')
                     ->on('l.bulan_formatted', '=', 'n.bulan_awal_short');
             })
-            // left join sekarang berdasarkan bulan_awal_short / bulan_akhir_short -> cocok dengan transaksi 'YYYY-MM'
             ->leftJoinSub($subDebit, 'dpt', function ($join) {
                 $join->on('s.id_petani', '=', 'dpt.id_petani')
                     ->on('s.id_desa', '=', 'dpt.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'dpt.id_tahun_tanam')
-                    ->on('n.bulan_awal_short', '=', 'dpt.bulan_awal')
-                    ->on('n.bulan_akhir_short', '=', 'dpt.bulan_akhir');
+                    ->on('n.bulan_awal_short', '=', 'dpt.periode_awal_short')
+                    ->on('n.bulan_akhir_short', '=', 'dpt.periode_akhir_short');
             })
+
             ->join('desa as dd', 's.id_desa', '=', 'dd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
             ->select(
