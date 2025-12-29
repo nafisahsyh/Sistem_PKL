@@ -460,104 +460,35 @@ class PengambilanSaldoController extends Controller
             'akhir' => $d->periode_akhir,
             'nominal' => $d->nominal
         ])->sortBy('awal')->values()->all();
+        
 
         $periodeList = [];
         $grandTotal = 0;
-        $countPeriods = count($periods);
 
-        if ($countPeriods === 1) {
-            // ===== 1 periode → pecah per bulan =====
-            $period = $periods[0];
-            $awalBulan = (int)substr($period['awal'], 5, 2);
-            $akhirBulan = (int)substr($period['akhir'], 5, 2);
-            $tahun = (int)substr($period['awal'], 0, 4);
-            $bulanCount = $akhirBulan - $awalBulan + 1;
-            $nominalPerBulan = round($period['nominal'] / $bulanCount, 2);
+        $splitYears = [];
+        foreach ($periods as $p) {
+            $year = (int)substr($p['awal'], 0, 4);
+            $splitYears[$year][] = $p;
+        }
+        ksort($splitYears);
 
-            for ($b = $awalBulan; $b <= $akhirBulan; $b++) {
-                $periodeList[] = [
-                    'label' => 'BULAN ' . $bulanIndo($b) . ' ' . $tahun,
-                    'nominal' => $nominalPerBulan
-                ];
-                $grandTotal += $nominalPerBulan;
+        $years = array_keys($splitYears);
+        $firstYear = $years[0];
+
+        foreach ($splitYears as $year => $yearPeriods) {
+            if ($year === $firstYear && count($years) > 1) {
+                // Tahun pertama tapi ada tahun berikutnya → gabung semua jadi 1 blok
+                $chunks = [$yearPeriods];
+            } else {
+                // Tahun berikutnya → maksimal 3 blok
+                $chunks = $this->makeChunks($yearPeriods);
             }
-        } elseif ($countPeriods <= 3) {
-            // ===== 2–3 periode → tetap per periode =====
-            foreach ($periods as $period) {
-                $awalBulan = (int)substr($period['awal'], 5, 2);
-                $akhirBulan = (int)substr($period['akhir'], 5, 2);
-                $tahun = (int)substr($period['awal'], 0, 4);
 
-                $label = "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$tahun}";
-                $periodeList[] = [
-                    'label' => $label,
-                    'nominal' => $period['nominal']
-                ];
-                $grandTotal += $period['nominal'];
-            }
-        } else {
-            // ===== ≥4 periode → gabung blok khusus =====
-            $i = 0;
-            while ($i < $countPeriods) {
-                $remaining = $countPeriods - $i;
-                $block = [];
-
-                if ($remaining >= 6) {
-                    // gabung blok 12 bulan pertama per tahun
-                    $tahunAwal = (int)substr($periods[$i]['awal'], 0, 4);
-                    $j = $i;
-                    while ($j < $countPeriods && (int)substr($periods[$j]['awal'], 0, 4) === $tahunAwal) {
-                        $block[] = $periods[$j];
-                        $j++;
-                    }
-                } elseif ($remaining === 4) {
-                    // 4 periode → 2 blok: 2+2
-                    $block[] = $periods[$i];
-                    $block[] = $periods[$i + 1];
-                    $j = $i + 2;
-                } elseif ($remaining === 5) {
-                    // 5 periode → 3 blok: 2+2+1
-                    if (!isset($block[0])) $block = [];
-                    // blok 1
-                    $block1 = [$periods[$i], $periods[$i + 1]];
-                    $label1 = $this->makeLabel($block1, $bulanIndo);
-                    $total1 = array_sum(array_column($block1, 'nominal'));
-                    $periodeList[] = ['label' => $label1, 'nominal' => $total1];
-                    $grandTotal += $total1;
-
-                    // blok 2
-                    $block2 = [$periods[$i + 2], $periods[$i + 3]];
-                    $label2 = $this->makeLabel($block2, $bulanIndo);
-                    $total2 = array_sum(array_column($block2, 'nominal'));
-                    $periodeList[] = ['label' => $label2, 'nominal' => $total2];
-                    $grandTotal += $total2;
-
-                    // blok 3 (sisa 1 periode)
-                    $block3 = [$periods[$i + 4]];
-                    $label3 = $this->makeLabel($block3, $bulanIndo);
-                    $total3 = array_sum(array_column($block3, 'nominal'));
-                    $periodeList[] = ['label' => $label3, 'nominal' => $total3];
-                    $grandTotal += $total3;
-
-                    break; // semua periode sudah ditangani
-
-                } else {
-                    // sisanya 2–3 periode → tetap per periode
-                    $block[] = $periods[$i];
-                    $j = $i + 1;
-                }
-
-                if (!empty($block)) {
-                    $label = $this->makeLabel($block, $bulanIndo);
-                    $totalNominal = array_sum(array_column($block, 'nominal'));
-                    $periodeList[] = [
-                        'label' => $label,
-                        'nominal' => $totalNominal
-                    ];
-                    $grandTotal += $totalNominal;
-                }
-
-                $i = $j ?? ($i + 1);
+            foreach ($chunks as $chunk) {
+                $label = $this->makeLabel($chunk, $bulanIndo);
+                $total = array_sum(array_column($chunk, 'nominal'));
+                $periodeList[] = ['label' => $label, 'nominal' => $total];
+                $grandTotal += $total;
             }
         }
 
@@ -570,15 +501,15 @@ class PengambilanSaldoController extends Controller
         $lastTahun  = (int)substr($lastDetail->periode_akhir, 0, 4);
 
         $judulGabungan = ($firstTahun === $lastTahun)
-            ? "PERIODE " . $bulanIndo($firstBulan) . " - " . $bulanIndo($lastBulan) . " " . $firstTahun
-            : "PERIODE " . $bulanIndo($firstBulan) . " " . $firstTahun . " - " . $bulanIndo($lastBulan) . " " . $lastTahun;
+            ? "PERIODE {$bulanIndo($firstBulan)} - {$bulanIndo($lastBulan)} {$firstTahun}"
+            : "PERIODE {$bulanIndo($firstBulan)} {$firstTahun} - {$bulanIndo($lastBulan)} {$lastTahun}";
 
         return view('pengambilan_saldo.nota', [
             'trx' => $trx,
             'periodeList' => $periodeList,
             'periodeGabungan' => $judulGabungan,
             'grandTotal' => $grandTotal,
-            'punyaSaldoLalu' => $countPeriods > 1,
+            'punyaSaldoLalu' => count($periods) > 1,
             'desa' => $desa,
             'tahunTanam' => Tahun_Tanam::find($trx->id_tahun_tanam),
             'no_bukti' => $trx->no_bukti,
@@ -593,6 +524,28 @@ class PengambilanSaldoController extends Controller
                 'no_urut' => $trx->no_urut,
             ]
         ]);
+    }
+
+    // ===== Helper function untuk buat blok maksimal 3 =====
+    private function makeChunks(array $yearPeriods)
+    {
+        $total = count($yearPeriods);
+        if ($total >= 6) {
+            return array_chunk($yearPeriods, ceil($total / 3));
+        } elseif ($total == 5) {
+            return [
+                array_slice($yearPeriods, 0, 2),
+                array_slice($yearPeriods, 2, 2),
+                array_slice($yearPeriods, 4, 1)
+            ];
+        } elseif ($total == 4) {
+            return [
+                array_slice($yearPeriods, 0, 2),
+                array_slice($yearPeriods, 2, 2)
+            ];
+        } else {
+            return array_map(fn($p) => [$p], $yearPeriods);
+        }
     }
 
     // ===== Helper function untuk buat label blok =====

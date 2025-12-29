@@ -272,19 +272,18 @@
                                 $count = count($periodeList);
                                 $fontSize = 14; // default
 
-                                if ($count > 2 && $count <= 5) {
+                                if ($count > 2 && $count <= 3) {
                                     $fontSize = 13;
-                                } elseif ($count > 5 && $count <= 8) {
+                                } elseif ($count > 3 && $count <= 4) {
                                     $fontSize = 12;
-                                } elseif ($count > 8 && $count <= 10) {
+                                } elseif ($count > 4 && $count <= 6) {
                                     $fontSize = 11;
-                                } elseif ($count > 10 && $count <= 12) {
+                                } elseif ($count > 6 && $count <= 8) {
                                     $fontSize = 10;
-                                } elseif ($count > 12) {
+                                } elseif ($count > 8) {
                                     $fontSize = 9;
                                 }
                             @endphp
-
 
                             <div style="margin-top:3px; font-size:{{ $fontSize }}px;">
                                 {{ strtoupper($periodeGabungan) }}
@@ -318,7 +317,7 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <td style="font-weight:bold; padding-top:35px; font-size:16px;">
+                                <td style="font-weight:bold; padding-top:30px; font-size:16px;">
                                     <div style="display:flex; justify-content:space-between;">
                                         <span>Rp</span>
                                         <span>{{ number_format($grandTotal, 0, ',', '.') }}</span>
