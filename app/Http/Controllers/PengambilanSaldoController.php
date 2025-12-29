@@ -223,7 +223,8 @@ class PengambilanSaldoController extends Controller
                     ->get()
                     ->map(function ($s) {
                         return [
-                            'periode' => $s->bulan_awal . ' - ' . $s->bulan_akhir,
+                            'bulan_awal' => $s->bulan_awal,   // 2025-01
+                            'bulan_akhir' => $s->bulan_akhir,  // 2025-02
                             'saldo' => $s->saldo,
                         ];
                     });
@@ -244,9 +245,9 @@ class PengambilanSaldoController extends Controller
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
                     ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
-                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
-                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
-                    })
+                    $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                        ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                })
                     ->exists();
 
                 $trxTerakhir = Transaksi::where('id_petani', $id_petani)
@@ -394,27 +395,27 @@ class PengambilanSaldoController extends Controller
             // === BUAT TRANSAKSI UTAMA ===
             $transaksi = Transaksi::create([
                 'id_bagi_bulanan' => null,
-                'id_petani'       => $idPetani,
-                'id_desa'         => $firstBulanan->id_desa,
-                'id_tahun_tanam'  => $firstBulanan->id_tahun_tanam,
-                'tipe'            => 'debit_pengambilan',
-                'metode'          => request('metode'),
-                'nominal'         => $totalSaldo,
-                'tanggal'         => $tanggalTransaksi,
-                'keterangan'      => 'Pengambilan saldo periode',
-                'no_bukti'        => request('no_bukti'),
-                'no_urut'         => request('no_urut'),
-                'bulan_awal'      => $bulanAwalTransaksi,
-                'bulan_akhir'     => $bulanAkhirTransaksi,
+                'id_petani' => $idPetani,
+                'id_desa' => $firstBulanan->id_desa,
+                'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
+                'tipe' => 'debit_pengambilan',
+                'metode' => request('metode'),
+                'nominal' => $totalSaldo,
+                'tanggal' => $tanggalTransaksi,
+                'keterangan' => 'Pengambilan saldo periode',
+                'no_bukti' => request('no_bukti'),
+                'no_urut' => request('no_urut'),
+                'bulan_awal' => $bulanAwalTransaksi,
+                'bulan_akhir' => $bulanAkhirTransaksi,
             ]);
 
             // === SIMPAN DETAIL PER PERIODE ===
             foreach ($saldoAktif as $saldo) {
                 TransaksiDetail::create([
-                    'id_transaksi'  => $transaksi->id_transaksi,
-                    'periode_awal'  => $saldo->bulan_awal,
+                    'id_transaksi' => $transaksi->id_transaksi,
+                    'periode_awal' => $saldo->bulan_awal,
                     'periode_akhir' => $saldo->bulan_akhir,
-                    'nominal'       => $saldo->saldo,
+                    'nominal' => $saldo->saldo,
                 ]);
             }
 
@@ -468,9 +469,9 @@ class PengambilanSaldoController extends Controller
         if ($countPeriods === 1) {
             // ===== 1 periode → pecah per bulan =====
             $period = $periods[0];
-            $awalBulan = (int)substr($period['awal'], 5, 2);
-            $akhirBulan = (int)substr($period['akhir'], 5, 2);
-            $tahun = (int)substr($period['awal'], 0, 4);
+            $awalBulan = (int) substr($period['awal'], 5, 2);
+            $akhirBulan = (int) substr($period['akhir'], 5, 2);
+            $tahun = (int) substr($period['awal'], 0, 4);
             $bulanCount = $akhirBulan - $awalBulan + 1;
             $nominalPerBulan = round($period['nominal'] / $bulanCount, 2);
 
@@ -484,9 +485,9 @@ class PengambilanSaldoController extends Controller
         } elseif ($countPeriods <= 3) {
             // ===== 2–3 periode → tetap per periode =====
             foreach ($periods as $period) {
-                $awalBulan = (int)substr($period['awal'], 5, 2);
-                $akhirBulan = (int)substr($period['akhir'], 5, 2);
-                $tahun = (int)substr($period['awal'], 0, 4);
+                $awalBulan = (int) substr($period['awal'], 5, 2);
+                $akhirBulan = (int) substr($period['akhir'], 5, 2);
+                $tahun = (int) substr($period['awal'], 0, 4);
 
                 $label = "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$tahun}";
                 $periodeList[] = [
@@ -504,9 +505,9 @@ class PengambilanSaldoController extends Controller
 
                 if ($remaining >= 6) {
                     // gabung blok 12 bulan pertama per tahun
-                    $tahunAwal = (int)substr($periods[$i]['awal'], 0, 4);
+                    $tahunAwal = (int) substr($periods[$i]['awal'], 0, 4);
                     $j = $i;
-                    while ($j < $countPeriods && (int)substr($periods[$j]['awal'], 0, 4) === $tahunAwal) {
+                    while ($j < $countPeriods && (int) substr($periods[$j]['awal'], 0, 4) === $tahunAwal) {
                         $block[] = $periods[$j];
                         $j++;
                     }
@@ -517,7 +518,8 @@ class PengambilanSaldoController extends Controller
                     $j = $i + 2;
                 } elseif ($remaining === 5) {
                     // 5 periode → 3 blok: 2+2+1
-                    if (!isset($block[0])) $block = [];
+                    if (!isset($block[0]))
+                        $block = [];
                     // blok 1
                     $block1 = [$periods[$i], $periods[$i + 1]];
                     $label1 = $this->makeLabel($block1, $bulanIndo);
@@ -563,11 +565,11 @@ class PengambilanSaldoController extends Controller
 
         // ===== Judul gabungan seluruh periode (lintas tahun) =====
         $firstDetail = $trx->details->first();
-        $lastDetail  = $trx->details->last();
-        $firstBulan = (int)substr($firstDetail->periode_awal, 5, 2);
-        $firstTahun = (int)substr($firstDetail->periode_awal, 0, 4);
-        $lastBulan  = (int)substr($lastDetail->periode_akhir, 5, 2);
-        $lastTahun  = (int)substr($lastDetail->periode_akhir, 0, 4);
+        $lastDetail = $trx->details->last();
+        $firstBulan = (int) substr($firstDetail->periode_awal, 5, 2);
+        $firstTahun = (int) substr($firstDetail->periode_awal, 0, 4);
+        $lastBulan = (int) substr($lastDetail->periode_akhir, 5, 2);
+        $lastTahun = (int) substr($lastDetail->periode_akhir, 0, 4);
 
         $judulGabungan = ($firstTahun === $lastTahun)
             ? "PERIODE " . $bulanIndo($firstBulan) . " - " . $bulanIndo($lastBulan) . " " . $firstTahun
@@ -598,10 +600,10 @@ class PengambilanSaldoController extends Controller
     // ===== Helper function untuk buat label blok =====
     private function makeLabel(array $block, $bulanIndo)
     {
-        $awalBulan = (int)substr($block[0]['awal'], 5, 2);
-        $awalTahun = (int)substr($block[0]['awal'], 0, 4);
-        $akhirBulan = (int)substr($block[count($block) - 1]['akhir'], 5, 2);
-        $akhirTahun = (int)substr($block[count($block) - 1]['akhir'], 0, 4);
+        $awalBulan = (int) substr($block[0]['awal'], 5, 2);
+        $awalTahun = (int) substr($block[0]['awal'], 0, 4);
+        $akhirBulan = (int) substr($block[count($block) - 1]['akhir'], 5, 2);
+        $akhirTahun = (int) substr($block[count($block) - 1]['akhir'], 0, 4);
 
         return ($awalTahun === $akhirTahun)
             ? "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$awalTahun}"
