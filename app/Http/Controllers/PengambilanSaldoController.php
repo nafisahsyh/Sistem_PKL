@@ -460,37 +460,59 @@ class PengambilanSaldoController extends Controller
             'akhir' => $d->periode_akhir,
             'nominal' => $d->nominal
         ])->sortBy('awal')->values()->all();
-        
+
 
         $periodeList = [];
         $grandTotal = 0;
 
-        $splitYears = [];
-        foreach ($periods as $p) {
-            $year = (int)substr($p['awal'], 0, 4);
-            $splitYears[$year][] = $p;
-        }
-        ksort($splitYears);
+        if (count($periods) === 1) {
+            // hanya 1 periode → pecah per bulan
+            $start = new \DateTime($periods[0]['awal']);
+            $end = new \DateTime($periods[0]['akhir']);
+            $end->modify('first day of next month'); // supaya bulan terakhir ikut
+            $interval = new \DateInterval('P1M');
+            $period = new \DatePeriod($start, $interval, $end);
 
-        $years = array_keys($splitYears);
-        $firstYear = $years[0];
+            $bulanCount = iterator_count($period);
+            foreach ($period as $dt) {
+                $bulan = (int)$dt->format('m');
+                $tahun = (int)$dt->format('Y');
 
-        foreach ($splitYears as $year => $yearPeriods) {
-            if ($year === $firstYear && count($years) > 1) {
-                // Tahun pertama tapi ada tahun berikutnya → gabung semua jadi 1 blok
-                $chunks = [$yearPeriods];
-            } else {
-                // Tahun berikutnya → maksimal 3 blok
-                $chunks = $this->makeChunks($yearPeriods);
+                $periodeList[] = [
+                    'label' => "BULAN {$bulanIndo($bulan)} {$tahun}",
+                    'nominal' => $periods[0]['nominal'] / $bulanCount
+                ];
             }
 
-            foreach ($chunks as $chunk) {
-                $label = $this->makeLabel($chunk, $bulanIndo);
-                $total = array_sum(array_column($chunk, 'nominal'));
-                $periodeList[] = ['label' => $label, 'nominal' => $total];
-                $grandTotal += $total;
+            $grandTotal = $periods[0]['nominal'];
+        } else {
+            // logika lama → splitYears & makeChunks
+            $splitYears = [];
+            foreach ($periods as $p) {
+                $year = (int)substr($p['awal'], 0, 4);
+                $splitYears[$year][] = $p;
+            }
+            ksort($splitYears);
+
+            $years = array_keys($splitYears);
+            $firstYear = $years[0];
+
+            foreach ($splitYears as $year => $yearPeriods) {
+                if ($year === $firstYear && count($years) > 1) {
+                    $chunks = [$yearPeriods];
+                } else {
+                    $chunks = $this->makeChunks($yearPeriods);
+                }
+
+                foreach ($chunks as $chunk) {
+                    $label = $this->makeLabel($chunk, $bulanIndo);
+                    $total = array_sum(array_column($chunk, 'nominal'));
+                    $periodeList[] = ['label' => $label, 'nominal' => $total];
+                    $grandTotal += $total;
+                }
             }
         }
+
 
         // ===== Judul gabungan seluruh periode (lintas tahun) =====
         $firstDetail = $trx->details->first();
