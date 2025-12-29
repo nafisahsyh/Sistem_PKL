@@ -432,92 +432,179 @@ class PengambilanSaldoController extends Controller
         ]);
     }
 
-public function struk($id_transaksi)
-{
-    $trx = Transaksi::with('details')->findOrFail($id_transaksi);
-    $desa = Desa::find($trx->id_desa);
-    $petani = BagiHasilPetani::where('id_petani', $trx->id_petani)->first();
+    public function struk($id_transaksi)
+    {
+        $trx = Transaksi::with('details')->findOrFail($id_transaksi);
+        $desa = Desa::find($trx->id_desa);
+        $petani = BagiHasilPetani::where('id_petani', $trx->id_petani)->first();
 
-    $bulanIndo = function ($bulan) {
-        return [
-            1 => 'Januari',
-            2 => 'Februari',
-            3 => 'Maret',
-            4 => 'April',
-            5 => 'Mei',
-            6 => 'Juni',
-            7 => 'Juli',
-            8 => 'Agustus',
-            9 => 'September',
-            10 => 'Oktober',
-            11 => 'November',
-            12 => 'Desember'
-        ][$bulan] ?? '-';
-    };
+        $bulanIndo = function ($bulan) {
+            return [
+                1 => 'Januari',
+                2 => 'Februari',
+                3 => 'Maret',
+                4 => 'April',
+                5 => 'Mei',
+                6 => 'Juni',
+                7 => 'Juli',
+                8 => 'Agustus',
+                9 => 'September',
+                10 => 'Oktober',
+                11 => 'November',
+                12 => 'Desember'
+            ][$bulan] ?? '-';
+        };
 
-    $periodeList = [];
-    $grandTotal = 0;
+        $periods = $trx->details->map(fn($d) => [
+            'awal' => $d->periode_awal,
+            'akhir' => $d->periode_akhir,
+            'nominal' => $d->nominal
+        ])->sortBy('awal')->values()->all();
 
-    foreach ($trx->details as $detail) {
-        $bulanAwal = (int)substr($detail->periode_awal, 5, 2);
-        $tahunAwal = substr($detail->periode_awal, 0, 4);
-        $bulanAkhir = (int)substr($detail->periode_akhir, 5, 2);
-        $tahunAkhir = substr($detail->periode_akhir, 0, 4);
+        $periodeList = [];
+        $grandTotal = 0;
+        $countPeriods = count($periods);
 
-        // Jika cuma 1 periode, pecah jadi per bulan
-        if ($trx->details->count() === 1) {
-            for ($b = $bulanAwal; $b <= $bulanAkhir; $b++) {
-                $label = "BULAN " . $bulanIndo($b) . " " . $tahunAwal;
+        if ($countPeriods === 1) {
+            // ===== 1 periode → pecah per bulan =====
+            $period = $periods[0];
+            $awalBulan = (int)substr($period['awal'], 5, 2);
+            $akhirBulan = (int)substr($period['akhir'], 5, 2);
+            $tahun = (int)substr($period['awal'], 0, 4);
+            $bulanCount = $akhirBulan - $awalBulan + 1;
+            $nominalPerBulan = round($period['nominal'] / $bulanCount, 2);
+
+            for ($b = $awalBulan; $b <= $akhirBulan; $b++) {
+                $periodeList[] = [
+                    'label' => 'BULAN ' . $bulanIndo($b) . ' ' . $tahun,
+                    'nominal' => $nominalPerBulan
+                ];
+                $grandTotal += $nominalPerBulan;
+            }
+        } elseif ($countPeriods <= 3) {
+            // ===== 2–3 periode → tetap per periode =====
+            foreach ($periods as $period) {
+                $awalBulan = (int)substr($period['awal'], 5, 2);
+                $akhirBulan = (int)substr($period['akhir'], 5, 2);
+                $tahun = (int)substr($period['awal'], 0, 4);
+
+                $label = "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$tahun}";
                 $periodeList[] = [
                     'label' => $label,
-                    'nominal' => round($detail->nominal / ($bulanAkhir - $bulanAwal + 1), 2) // nominal dibagi jumlah bulan
+                    'nominal' => $period['nominal']
                 ];
-                $grandTotal += round($detail->nominal / ($bulanAkhir - $bulanAwal + 1), 2);
+                $grandTotal += $period['nominal'];
             }
         } else {
-            // Per periode seperti biasa
-            $label = ($tahunAwal === $tahunAkhir)
-                ? "PERIODE {$bulanIndo($bulanAwal)} - {$bulanIndo($bulanAkhir)} {$tahunAwal}"
-                : "PERIODE {$bulanIndo($bulanAwal)} {$tahunAwal} - {$bulanIndo($bulanAkhir)} {$tahunAkhir}";
+            // ===== ≥4 periode → gabung blok khusus =====
+            $i = 0;
+            while ($i < $countPeriods) {
+                $remaining = $countPeriods - $i;
+                $block = [];
 
-            $periodeList[] = [
-                'label' => $label,
-                'nominal' => $detail->nominal
-            ];
-            $grandTotal += $detail->nominal;
+                if ($remaining >= 6) {
+                    // gabung blok 12 bulan pertama per tahun
+                    $tahunAwal = (int)substr($periods[$i]['awal'], 0, 4);
+                    $j = $i;
+                    while ($j < $countPeriods && (int)substr($periods[$j]['awal'], 0, 4) === $tahunAwal) {
+                        $block[] = $periods[$j];
+                        $j++;
+                    }
+                } elseif ($remaining === 4) {
+                    // 4 periode → 2 blok: 2+2
+                    $block[] = $periods[$i];
+                    $block[] = $periods[$i + 1];
+                    $j = $i + 2;
+                } elseif ($remaining === 5) {
+                    // 5 periode → 3 blok: 2+2+1
+                    if (!isset($block[0])) $block = [];
+                    // blok 1
+                    $block1 = [$periods[$i], $periods[$i + 1]];
+                    $label1 = $this->makeLabel($block1, $bulanIndo);
+                    $total1 = array_sum(array_column($block1, 'nominal'));
+                    $periodeList[] = ['label' => $label1, 'nominal' => $total1];
+                    $grandTotal += $total1;
+
+                    // blok 2
+                    $block2 = [$periods[$i + 2], $periods[$i + 3]];
+                    $label2 = $this->makeLabel($block2, $bulanIndo);
+                    $total2 = array_sum(array_column($block2, 'nominal'));
+                    $periodeList[] = ['label' => $label2, 'nominal' => $total2];
+                    $grandTotal += $total2;
+
+                    // blok 3 (sisa 1 periode)
+                    $block3 = [$periods[$i + 4]];
+                    $label3 = $this->makeLabel($block3, $bulanIndo);
+                    $total3 = array_sum(array_column($block3, 'nominal'));
+                    $periodeList[] = ['label' => $label3, 'nominal' => $total3];
+                    $grandTotal += $total3;
+
+                    break; // semua periode sudah ditangani
+
+                } else {
+                    // sisanya 2–3 periode → tetap per periode
+                    $block[] = $periods[$i];
+                    $j = $i + 1;
+                }
+
+                if (!empty($block)) {
+                    $label = $this->makeLabel($block, $bulanIndo);
+                    $totalNominal = array_sum(array_column($block, 'nominal'));
+                    $periodeList[] = [
+                        'label' => $label,
+                        'nominal' => $totalNominal
+                    ];
+                    $grandTotal += $totalNominal;
+                }
+
+                $i = $j ?? ($i + 1);
+            }
         }
+
+        // ===== Judul gabungan seluruh periode (lintas tahun) =====
+        $firstDetail = $trx->details->first();
+        $lastDetail  = $trx->details->last();
+        $firstBulan = (int)substr($firstDetail->periode_awal, 5, 2);
+        $firstTahun = (int)substr($firstDetail->periode_awal, 0, 4);
+        $lastBulan  = (int)substr($lastDetail->periode_akhir, 5, 2);
+        $lastTahun  = (int)substr($lastDetail->periode_akhir, 0, 4);
+
+        $judulGabungan = ($firstTahun === $lastTahun)
+            ? "PERIODE " . $bulanIndo($firstBulan) . " - " . $bulanIndo($lastBulan) . " " . $firstTahun
+            : "PERIODE " . $bulanIndo($firstBulan) . " " . $firstTahun . " - " . $bulanIndo($lastBulan) . " " . $lastTahun;
+
+        return view('pengambilan_saldo.nota', [
+            'trx' => $trx,
+            'periodeList' => $periodeList,
+            'periodeGabungan' => $judulGabungan,
+            'grandTotal' => $grandTotal,
+            'punyaSaldoLalu' => $countPeriods > 1,
+            'desa' => $desa,
+            'tahunTanam' => Tahun_Tanam::find($trx->id_tahun_tanam),
+            'no_bukti' => $trx->no_bukti,
+            'bulan_awal' => $trx->bulan_awal,
+            'bulan_akhir' => $trx->bulan_akhir,
+            'p' => [
+                'nama_petani' => $petani->nama_petani_snapshot ?? '-',
+                'alamat_petani' => $petani->alamat_petani_snapshot ?? '-',
+                'desa' => $desa->desa ?? '-',
+                'no_plasma' => $petani->nomor_plasma_snapshot ?? '-',
+                'no_koperasi' => $petani->nomor_koperasi_snapshot ?? '-',
+                'no_urut' => $trx->no_urut,
+            ]
+        ]);
     }
 
-    // Judul gabungan tetap per periode awal dan akhir detail
-    $firstDetail = $trx->details->first();
-    $lastDetail  = $trx->details->last();
-    $judulGabungan = ($firstDetail && $lastDetail)
-        ? "PERIODE " .
-        $bulanIndo((int)substr($firstDetail->periode_awal, 5, 2)) . " - " .
-        $bulanIndo((int)substr($lastDetail->periode_akhir, 5, 2)) . " " .
-        substr($firstDetail->periode_awal, 0, 4)
-        : '';
+    // ===== Helper function untuk buat label blok =====
+    private function makeLabel(array $block, $bulanIndo)
+    {
+        $awalBulan = (int)substr($block[0]['awal'], 5, 2);
+        $awalTahun = (int)substr($block[0]['awal'], 0, 4);
+        $akhirBulan = (int)substr($block[count($block) - 1]['akhir'], 5, 2);
+        $akhirTahun = (int)substr($block[count($block) - 1]['akhir'], 0, 4);
 
-    return view('pengambilan_saldo.nota', [
-        'trx' => $trx,
-        'periodeList' => $periodeList,
-        'periodeGabungan' => $judulGabungan,
-        'grandTotal' => $grandTotal,
-        'punyaSaldoLalu' => $trx->details->count() > 1,
-        'desa' => $desa,
-        'tahunTanam' => Tahun_Tanam::find($trx->id_tahun_tanam),
-        'no_bukti' => $trx->no_bukti,
-        'bulan_awal' => $trx->bulan_awal,
-        'bulan_akhir' => $trx->bulan_akhir,
-        'p' => [
-            'nama_petani' => $petani->nama_petani_snapshot ?? '-',
-            'alamat_petani' => $petani->alamat_petani_snapshot ?? '-',
-            'desa' => $desa->desa ?? '-',
-            'no_plasma' => $petani->nomor_plasma_snapshot ?? '-',
-            'no_koperasi' => $petani->nomor_koperasi_snapshot ?? '-',
-            'no_urut' => $trx->no_urut,
-        ]
-    ]);
-}
-
+        return ($awalTahun === $akhirTahun)
+            ? "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$awalTahun}"
+            : "PERIODE {$bulanIndo($awalBulan)} {$awalTahun} - {$bulanIndo($akhirBulan)} {$akhirTahun}";
+    }
 }
