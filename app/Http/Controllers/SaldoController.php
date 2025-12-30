@@ -414,18 +414,19 @@ class SaldoController extends Controller
                 DB::raw('SUM(bhp.total_nominal) AS total_nominal')
             );
 
-        $subDebit = DB::table('transaksi')
-            ->where('tipe', 'debit_pengambilan')
-            ->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir')
+        $subDebit = DB::table('transaksi_detail as td')
+            ->join('transaksi as t', 'td.id_transaksi', '=', 't.id_transaksi')
+            ->where('t.tipe', 'debit_pengambilan')
             ->select(
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir',
-                DB::raw('SUM(nominal) AS nominal_debit'),
-                DB::raw('MAX(metode) AS metode')
-            );
+                't.id_petani',
+                't.id_desa',
+                't.id_tahun_tanam',
+                DB::raw("LEFT(td.periode_awal, 7) as periode_awal_short"),
+                DB::raw("LEFT(td.periode_akhir, 7) as periode_akhir_short"),
+                DB::raw('SUM(td.nominal) AS nominal_debit'),
+                DB::raw('MAX(t.metode) AS metode')
+            )
+            ->groupBy('t.id_petani', 't.id_desa', 't.id_tahun_tanam', 'periode_awal_short', 'periode_akhir_short');
 
         $query = DB::table(DB::raw("({$subSnapshot->toSql()}) as s"))
             ->mergeBindings($subSnapshot)
@@ -446,8 +447,8 @@ class SaldoController extends Controller
                 $join->on('s.id_petani', '=', 'dpt.id_petani')
                     ->on('s.id_desa', '=', 'dpt.id_desa')
                     ->on('s.id_tahun_tanam', '=', 'dpt.id_tahun_tanam')
-                    ->on('n.bulan_awal_short', '=', 'dpt.bulan_awal')
-                    ->on('n.bulan_akhir_short', '=', 'dpt.bulan_akhir');
+                    ->on('n.bulan_awal_short', '=', 'dpt.periode_awal_short')
+                    ->on('n.bulan_akhir_short', '=', 'dpt.periode_akhir_short');
             })
             ->join('desa as dd', 's.id_desa', '=', 'dd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')

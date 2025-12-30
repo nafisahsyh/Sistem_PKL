@@ -52,19 +52,38 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="bulan" class="form-label">Bulan <span class="text-danger">*</span></label>
+
                         <select name="bulan" id="bulan"
                             class="form-select text-kecil @error('bulan') is-invalid @enderror" required>
-                            @for ($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" {{ old('bulan') == $i ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::create()->month($i)->format('F') }}
+
+                            @php
+                                $bulan = [
+                                    1 => 'Januari',
+                                    2 => 'Februari',
+                                    3 => 'Maret',
+                                    4 => 'April',
+                                    5 => 'Mei',
+                                    6 => 'Juni',
+                                    7 => 'Juli',
+                                    8 => 'Agustus',
+                                    9 => 'September',
+                                    10 => 'Oktober',
+                                    11 => 'November',
+                                    12 => 'Desember',
+                                ];
+                            @endphp
+
+                            @foreach ($bulan as $key => $nama)
+                                <option value="{{ $key }}" {{ old('bulan') == $key ? 'selected' : '' }}>
+                                    {{ $nama }}
                                 </option>
-                            @endfor
+                            @endforeach
                         </select>
+
                         @error('bulan')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-md-4 mb-3">
                         <label for="tahun" class="form-label">Tahun <span class="text-danger">*</span></label>
                         <input type="number" name="tahun"
@@ -123,15 +142,23 @@
 
     {{-- Script Choices.js --}}
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            const hasFormError = {{ $errors->any() ? 'true' : 'false' }};
+            const disableAutoFetch = hasFormError;
+
             const desaSelect = document.getElementById('id_desa');
             const tahunSelect = document.getElementById('id_tahun_tanam');
             const bulanSelect = document.getElementById('bulan');
             const tahunInput = document.getElementsByName('tahun')[0];
             const bulanAwal = document.getElementById('bulan_awal');
             const totalLuasInput = document.getElementById('total_luas');
+            const sisaSaldoInput = document.getElementById('sisa_saldo');
+            const totalBagian = document.getElementById('total_bagian');
 
+            // === Fungsi Update Periode ===
             function updatePeriode() {
                 if (bulanSelect.value && tahunInput.value) {
                     const bulan1 = parseInt(bulanSelect.value);
@@ -142,62 +169,32 @@
             bulanSelect.addEventListener('change', updatePeriode);
             tahunInput.addEventListener('input', updatePeriode);
 
-            // Nama bulan Indonesia
-            const namaBulan = [
-                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-            ];
-
-            if (bulanSelect) {
-                bulanSelect.innerHTML = '';
-
-                namaBulan.forEach((bulan, index) => {
-                    const option = document.createElement('option');
-                    option.value = index + 1;
-                    option.text = bulan;
-
-                    if (@json(old('bulan')) == index + 1) {
-                        option.selected = true;
-                    }
-
-                    bulanSelect.appendChild(option);
-                });
-            }
-
-
-            // inputan sesuai Rp
-            const totalBagian = document.getElementById('total_bagian');
-
+            
+            // === Format Rupiah ===
             function formatRupiah(value) {
                 if (!value) return '';
-                // hapus semua selain angka
                 value = value.toString().replace(/\D/g, '');
                 return new Intl.NumberFormat('id-ID').format(value);
             }
 
-            // format saat load
             totalBagian.value = formatRupiah(totalBagian.value);
-
-            // format saat input
             totalBagian.addEventListener('input', function() {
                 this.value = formatRupiah(this.value);
             });
 
-            // Inisialisasi Choices.js dengan placeholder spesifik dan maxItemVisible
+            // === Inisialisasi Choices ===
             const choicesOptionsDesa = {
                 shouldSort: false,
                 placeholderValue: "Pilih Desa",
                 searchPlaceholderValue: "Cari desa...",
                 maxItemVisible: 5
             };
-
             const choicesOptionsTahun = {
                 shouldSort: false,
                 placeholderValue: "Pilih Tahun Tanam",
                 searchPlaceholderValue: "Cari tahun tanam...",
                 maxItemVisible: 5
             };
-
             const choicesOptionsBulan = {
                 shouldSort: false,
                 placeholderValue: "Pilih Bulan",
@@ -207,24 +204,25 @@
 
             if (desaSelect) new Choices(desaSelect, choicesOptionsDesa);
             if (tahunSelect) new Choices(tahunSelect, choicesOptionsTahun);
-            if (bulanSelect) new Choices(bulanSelect, choicesOptionsBulan);
 
+            // === Hanya rebuild bulan kalau TIDAK ada error ===
+            if (bulanSelect && !disableAutoFetch) {
+                new Choices(bulanSelect, choicesOptionsBulan);
+            }
 
+            // === Fetch Total Luas ===
             function fetchTotalLuas() {
+                if (disableAutoFetch) return;
+
                 const idDesa = desaSelect.value;
                 const idTahun = tahunSelect.value;
 
                 if (idDesa && idTahun) {
-                    fetch("{{ route('bagi-hasil.total-luas') }}?id_desa=" + idDesa + "&id_tahun_tanam=" + idTahun)
+                    fetch(`{{ route('bagi-hasil.total-luas') }}?id_desa=${idDesa}&id_tahun_tanam=${idTahun}`)
                         .then(res => res.json())
                         .then(data => {
-                            console.log(data);
-
-                            let luas = data.total_luas ?? 0;
-
-                            // Ganti titik menjadi koma untuk desimal
-                            let luasFormatted = luas.toString().replace('.', ',');
-
+                            const luas = data.total_luas ?? 0;
+                            const luasFormatted = luas.toString().replace('.', ',');
                             totalLuasInput.value = luasFormatted + ' Ha';
                         })
                         .catch(err => {
@@ -239,57 +237,51 @@
             desaSelect.addEventListener('change', fetchTotalLuas);
             tahunSelect.addEventListener('change', fetchTotalLuas);
 
-            const sisaSaldoInput = document.getElementById('sisa_saldo');
-
+            // === Fetch Sisa Saldo ===
             function isBulanAwalPeriode(bulan) {
                 return [1, 3, 5, 7, 9, 11].includes(parseInt(bulan));
             }
 
             function fetchSisaSaldo() {
-                // validasi dasar
+                if (disableAutoFetch) return;
+
                 if (!desaSelect.value || !tahunSelect.value || !bulanAwal.value) {
                     sisaSaldoInput.value = '0';
                     return;
                 }
 
                 const bulanDipilih = bulanSelect.value;
-
                 if (!isBulanAwalPeriode(bulanDipilih)) {
-                    // bukan bulan awal → saldo TIDAK BOLEH muncul
                     sisaSaldoInput.value = '0';
                     return;
                 }
 
                 fetch(
-                        `{{ route('bagi-hasil.sisa-saldo') }}?id_desa=${desaSelect.value}&id_tahun_tanam=${tahunSelect.value}&bulan_awal=${bulanAwal.value}`
-                    )
+                        `{{ route('bagi-hasil.sisa-saldo') }}?id_desa=${desaSelect.value}&id_tahun_tanam=${tahunSelect.value}&bulan_awal=${bulanAwal.value}`)
                     .then(res => res.json())
                     .then(data => {
-                        sisaSaldoInput.value =
-                            new Intl.NumberFormat('id-ID').format(data.sisa_saldo ?? 0);
+                        sisaSaldoInput.value = new Intl.NumberFormat('id-ID').format(data.sisa_saldo ?? 0);
                     });
             }
-
 
             desaSelect.addEventListener('change', () => {
                 fetchTotalLuas();
                 fetchSisaSaldo();
             });
-
             tahunSelect.addEventListener('change', () => {
                 fetchTotalLuas();
                 fetchSisaSaldo();
             });
-
             bulanSelect.addEventListener('change', () => {
                 updatePeriode();
                 fetchSisaSaldo();
             });
-
             tahunInput.addEventListener('input', () => {
                 updatePeriode();
                 fetchSisaSaldo();
             });
+
+            updatePeriode();
 
         });
     </script>

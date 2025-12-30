@@ -7,11 +7,6 @@
         <h4 class="mt-4 text-brown">Edit Bagi Hasil Per Bulan</h4>
 
         <div class="card p-4">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    {{ $errors->first() }}
-                </div>
-            @endif
             <form action="{{ route('bagi-hasil-bulanan.update', $bulanan) }}" method="POST">
                 @csrf
                 @method('PUT')
@@ -144,6 +139,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
+        const hasFormError = {{ $errors->any() ? 'true' : 'false' }};
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const desaSelect = document.getElementById('id_desa');
             const tahunSelect = document.getElementById('id_tahun_tanam');
@@ -174,7 +173,9 @@
 
             new Choices(desaSelect, choicesOptions("Pilih Desa", "Cari desa..."));
             new Choices(tahunSelect, choicesOptions("Pilih Tahun Tanam", "Cari tahun tanam..."));
-            new Choices(bulanSelect, choicesOptions("Pilih Bulan", "Cari bulan..."));
+            if (!hasFormError) {
+                new Choices(bulanSelect, choicesOptions("Pilih Bulan", "Cari bulan..."));
+            }
 
             function fetchTotalLuas() {
                 const idDesa = desaSelect.value;
