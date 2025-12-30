@@ -7,11 +7,12 @@ use DateTime;
 use Carbon\Carbon;
 use App\Models\Desa;
 use App\Models\Saldo;
+use App\Models\SaldoLalu;
 use App\Models\Transaksi;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use App\Models\BagiHasilPetani;
-use App\Models\SaldoLalu;
+use Illuminate\Validation\Rule;
 
 // Database dan Pagination
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 
 //Import PDF
 use Illuminate\Pagination\Paginator;
+use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 
@@ -121,10 +123,16 @@ class BagiHasilController extends Controller
         $data = $request->validate([
             'id_desa' => 'required|integer',
             'id_tahun_tanam' => 'required|integer',
-            'bulan' => 'required|integer|min:1|max:12',
+            'bulan' => [
+                'required',
+                'integer',
+                Rule::unique('bagi_hasil_bulanan')
+                    ->where('id_desa', $request->id_desa)
+                    ->where('id_tahun_tanam', $request->id_tahun_tanam),
+            ],
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
-            'total_bagian' => 'required|numeric|min:1',
+            'total_bagian' => 'required|numeric',
             'bulan_awal' => 'required|string',
         ]);
 
@@ -132,6 +140,7 @@ class BagiHasilController extends Controller
         $bulanAwalPeriode = strtotime($data['bulan_awal']);
         $bulanAkhirPeriode = strtotime("+1 month", $bulanAwalPeriode);
         $bulanAkhirPeriodeStr = date('Y-m', $bulanAkhirPeriode);
+
 
         DB::transaction(function () use ($data, $bulanAwalPeriode, $bulanAkhirPeriodeStr) {
 
@@ -332,7 +341,20 @@ class BagiHasilController extends Controller
         $data = $request->validate([
             'id_desa' => 'required|integer',
             'id_tahun_tanam' => 'required|integer',
-            'bulan' => 'required|integer|min:1|max:12',
+            'bulan' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:12',
+                Rule::unique('bagi_hasil_bulanan')
+                    ->where(function ($query) use ($request) {
+                        return $query
+                            ->where('id_desa', $request->id_desa)
+                            ->where('tahun', $request->tahun);
+                    })
+                    ->ignore($id, 'id_bagi_bulanan'),
+            ],
+
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
             'total_bagian' => 'required|numeric|min:1',

@@ -494,20 +494,26 @@ class PengambilanSaldoController extends Controller
             }
             ksort($splitYears);
 
-            $years = array_keys($splitYears);
-            $firstYear = $years[0];
+            $hasMultipleYears = count($splitYears) > 1;
 
             foreach ($splitYears as $year => $yearPeriods) {
-                if ($year === $firstYear && count($years) > 1) {
+
+                // JIKA LEBIH DARI 1 TAHUN → SETIAP TAHUN JADI SATU BLOK
+                if ($hasMultipleYears) {
                     $chunks = [$yearPeriods];
                 } else {
+                    // HANYA JIKA 1 TAHUN SAJA → boleh dipecah per bulan
                     $chunks = $this->makeChunks($yearPeriods);
                 }
 
                 foreach ($chunks as $chunk) {
                     $label = $this->makeLabel($chunk, $bulanIndo);
                     $total = array_sum(array_column($chunk, 'nominal'));
-                    $periodeList[] = ['label' => $label, 'nominal' => $total];
+
+                    $periodeList[] = [
+                        'label' => $label,
+                        'nominal' => $total
+                    ];
                     $grandTotal += $total;
                 }
             }

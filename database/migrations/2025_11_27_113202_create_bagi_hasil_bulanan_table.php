@@ -19,9 +19,15 @@ return new class extends Migration {
             $table->decimal('total_bagian', 15, 2);
             $table->timestamps();
 
-            // Foreign Key
+            // Foreign key
             $table->foreign('id_desa')->references('id_desa')->on('desa')->onDelete('cascade');
             $table->foreign('id_tahun_tanam')->references('id_tahun_tanam')->on('tahun_tanam')->onDelete('cascade');
+
+            // supaya tidak bisa dobel input
+            $table->unique(
+                ['id_desa', 'id_tahun_tanam', 'bulan', 'tahun'],
+                'unique_bagi_hasil_per_periode'
+            );
         });
     }
 
