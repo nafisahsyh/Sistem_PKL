@@ -223,7 +223,8 @@ class PengambilanSaldoController extends Controller
                     ->get()
                     ->map(function ($s) {
                         return [
-                            'periode' => $s->bulan_awal . ' - ' . $s->bulan_akhir,
+                            'bulan_awal' => $s->bulan_awal,
+                            'bulan_akhir' => $s->bulan_akhir,
                             'saldo' => $s->saldo,
                         ];
                     });
@@ -244,9 +245,9 @@ class PengambilanSaldoController extends Controller
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
                     ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
-                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
-                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
-                    })
+                    $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                        ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                })
                     ->exists();
 
                 $trxTerakhir = Transaksi::where('id_petani', $id_petani)
@@ -394,27 +395,27 @@ class PengambilanSaldoController extends Controller
             // === BUAT TRANSAKSI UTAMA ===
             $transaksi = Transaksi::create([
                 'id_bagi_bulanan' => null,
-                'id_petani'       => $idPetani,
-                'id_desa'         => $firstBulanan->id_desa,
-                'id_tahun_tanam'  => $firstBulanan->id_tahun_tanam,
-                'tipe'            => 'debit_pengambilan',
-                'metode'          => request('metode'),
-                'nominal'         => $totalSaldo,
-                'tanggal'         => $tanggalTransaksi,
-                'keterangan'      => 'Pengambilan saldo periode',
-                'no_bukti'        => request('no_bukti'),
-                'no_urut'         => request('no_urut'),
-                'bulan_awal'      => $bulanAwalTransaksi,
-                'bulan_akhir'     => $bulanAkhirTransaksi,
+                'id_petani' => $idPetani,
+                'id_desa' => $firstBulanan->id_desa,
+                'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
+                'tipe' => 'debit_pengambilan',
+                'metode' => request('metode'),
+                'nominal' => $totalSaldo,
+                'tanggal' => $tanggalTransaksi,
+                'keterangan' => 'Pengambilan saldo periode',
+                'no_bukti' => request('no_bukti'),
+                'no_urut' => request('no_urut'),
+                'bulan_awal' => $bulanAwalTransaksi,
+                'bulan_akhir' => $bulanAkhirTransaksi,
             ]);
 
             // === SIMPAN DETAIL PER PERIODE ===
             foreach ($saldoAktif as $saldo) {
                 TransaksiDetail::create([
-                    'id_transaksi'  => $transaksi->id_transaksi,
-                    'periode_awal'  => $saldo->bulan_awal,
+                    'id_transaksi' => $transaksi->id_transaksi,
+                    'periode_awal' => $saldo->bulan_awal,
                     'periode_akhir' => $saldo->bulan_akhir,
-                    'nominal'       => $saldo->saldo,
+                    'nominal' => $saldo->saldo,
                 ]);
             }
 
@@ -475,8 +476,8 @@ class PengambilanSaldoController extends Controller
 
             $bulanCount = iterator_count($period);
             foreach ($period as $dt) {
-                $bulan = (int)$dt->format('m');
-                $tahun = (int)$dt->format('Y');
+                $bulan = (int) $dt->format('m');
+                $tahun = (int) $dt->format('Y');
 
                 $periodeList[] = [
                     'label' => "BULAN {$bulanIndo($bulan)} {$tahun}",
@@ -489,7 +490,7 @@ class PengambilanSaldoController extends Controller
             // logika lama → splitYears & makeChunks
             $splitYears = [];
             foreach ($periods as $p) {
-                $year = (int)substr($p['awal'], 0, 4);
+                $year = (int) substr($p['awal'], 0, 4);
                 $splitYears[$year][] = $p;
             }
             ksort($splitYears);
@@ -522,11 +523,11 @@ class PengambilanSaldoController extends Controller
 
         // ===== Judul gabungan seluruh periode (lintas tahun) =====
         $firstDetail = $trx->details->first();
-        $lastDetail  = $trx->details->last();
-        $firstBulan = (int)substr($firstDetail->periode_awal, 5, 2);
-        $firstTahun = (int)substr($firstDetail->periode_awal, 0, 4);
-        $lastBulan  = (int)substr($lastDetail->periode_akhir, 5, 2);
-        $lastTahun  = (int)substr($lastDetail->periode_akhir, 0, 4);
+        $lastDetail = $trx->details->last();
+        $firstBulan = (int) substr($firstDetail->periode_awal, 5, 2);
+        $firstTahun = (int) substr($firstDetail->periode_awal, 0, 4);
+        $lastBulan = (int) substr($lastDetail->periode_akhir, 5, 2);
+        $lastTahun = (int) substr($lastDetail->periode_akhir, 0, 4);
 
         $judulGabungan = ($firstTahun === $lastTahun)
             ? "PERIODE {$bulanIndo($firstBulan)} - {$bulanIndo($lastBulan)} {$firstTahun}"
@@ -579,10 +580,10 @@ class PengambilanSaldoController extends Controller
     // ===== Helper function untuk buat label blok =====
     private function makeLabel(array $block, $bulanIndo)
     {
-        $awalBulan = (int)substr($block[0]['awal'], 5, 2);
-        $awalTahun = (int)substr($block[0]['awal'], 0, 4);
-        $akhirBulan = (int)substr($block[count($block) - 1]['akhir'], 5, 2);
-        $akhirTahun = (int)substr($block[count($block) - 1]['akhir'], 0, 4);
+        $awalBulan = (int) substr($block[0]['awal'], 5, 2);
+        $awalTahun = (int) substr($block[0]['awal'], 0, 4);
+        $akhirBulan = (int) substr($block[count($block) - 1]['akhir'], 5, 2);
+        $akhirTahun = (int) substr($block[count($block) - 1]['akhir'], 0, 4);
 
         return ($awalTahun === $akhirTahun)
             ? "PERIODE {$bulanIndo($awalBulan)} - {$bulanIndo($akhirBulan)} {$awalTahun}"

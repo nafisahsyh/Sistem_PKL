@@ -304,23 +304,23 @@
                                 @else
                                     {{-- MODE AKUMULASI PER PERIODE (FIELD RAPi) --}}
                                     <div class="row mb-3">
-
                                         @php
                                             \Carbon\Carbon::setLocale('id');
                                         @endphp
 
-                                        @foreach ($p['saldo_periode_list'] as $index => $sp)
+                                        @foreach ($p['saldo_periode_list'] as $sp)
                                             <div class="col-4 mb-3">
                                                 <label class="form-label fw-bold">
-                                                    {{ \Carbon\Carbon::createFromFormat('Y-m', substr($sp['periode'], 0, 7))->translatedFormat('M Y') }}
+                                                    {{ \Carbon\Carbon::parse($sp['bulan_awal'])->translatedFormat('M Y') }}
                                                     -
-                                                    {{ \Carbon\Carbon::createFromFormat('Y-m', substr($sp['periode'], 10, 7))->translatedFormat('M Y') }}
+                                                    {{ \Carbon\Carbon::parse($sp['bulan_akhir'])->translatedFormat('M Y') }}
                                                 </label>
 
                                                 <input type="text" class="form-control"
                                                     value="Rp {{ number_format($sp['saldo'], 0, ',', '.') }}" readonly>
                                             </div>
                                         @endforeach
+
 
                                         {{-- TOTAL --}}
                                         <div class="col-4 mb-3">

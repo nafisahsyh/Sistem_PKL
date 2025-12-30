@@ -16,6 +16,7 @@ class Saldo extends Model
         'bulan_awal',
         'bulan_akhir',
         'saldo',
+        'saldo_awal'
     ];
 
     public function petani()

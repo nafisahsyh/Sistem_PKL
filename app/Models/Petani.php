@@ -47,6 +47,11 @@ class Petani extends Model
         return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sebelum');
     }
 
+     public function saldo()
+    {
+        return $this->hasMany(Saldo::class, 'id_petani', 'id_petani');
+    }
+
     // app/Models/Petani.php
 
     public function detailKepemilikan()

@@ -1039,7 +1039,7 @@ tr.even-row td.striping {
     border: 1px solid rgba(0, 0, 0, 0.12); /* tipis tapi jelas */
     border-radius: 12px;
     padding: 12px 16px;
-    min-width: 180px;
+    min-width: 170px;
 
     display: flex;
     flex-direction: column;

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\InisiasiSaldo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\TahunTanamController;
 use App\Http\Controllers\KepemilikanController;
 use App\Http\Controllers\PengambilanSaldoController;
+use App\Http\Controllers\InisiasiSaldoController;
 
 
 Route::get('/', function () {
@@ -93,7 +95,7 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
         ->name('riwayat.update');
     Route::delete('/kepemilikan/riwayat/{id}', [KepemilikanController::class, 'deleteRiwayat'])
         ->name('riwayat.destroy');
-        
+
     Route::get('/bagi-hasil-bulanan/sisa-saldo', [BagiHasilController::class, 'getSisaSaldo'])
         ->name('bagi-hasil.sisa-saldo');
     Route::get('bagi-hasil-bulanan/total-luas', [BagiHasilController::class, 'getTotalLuas'])->name('bagi-hasil.total-luas');
@@ -125,6 +127,20 @@ Route::middleware(['auth', 'checkrole:super_admin,admin'])->group(function () {
 
     Route::get('/saldo', [SaldoController::class, 'index'])->name('saldo.index');
     Route::get('/saldo/pdf', [SaldoController::class, 'saldoPdf'])->name('saldo.pdf');
+
+    Route::get('/inisiasi-saldo', [InisiasiSaldoController::class, 'index'])
+        ->name('inisiasi-saldo.index');
+    Route::get('/inisiasi-saldo/create', [InisiasiSaldoController::class, 'create'])
+        ->name('inisiasi-saldo.create');
+    Route::post('/inisiasi-saldo', [InisiasiSaldoController::class, 'store'])
+        ->name('inisiasi-saldo.store');
+    Route::post('/inisiasi-saldo/store-petani', [InisiasiSaldoController::class, 'storePetani'])
+        ->name('inisiasi-saldo.storePetani');
+    Route::delete('/inisiasi-saldo/{saldo}', [InisiasiSaldoController::class, 'destroy'])
+        ->name('inisiasi-saldo.destroy');
+    Route::put('/inisiasi-saldo/{saldo}', [InisiasiSaldoController::class, 'update'])
+        ->name('inisiasi-saldo.update');
+
 });
 
 // hanya super admin

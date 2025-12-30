@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('bulan_akhir', 7)->nullable();
 
             $table->decimal('saldo', 15, 2)->default(0);
+            $table->decimal('saldo_awal', 15, 2)->default(0);
 
             $table->timestamps();
 

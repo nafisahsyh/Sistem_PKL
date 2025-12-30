@@ -97,7 +97,7 @@
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Sisa Saldo Periode Sebelumnya</label>
                         <div class="input-group">
-                            <span class="input-group-text">Rp</span>
+                            <span class="input-group-text rp-addon">Rp</span>
                             <input type="text" id="sisa_saldo" class="form-control text-kecil" value="0" readonly>
                         </div>
                     </div>
