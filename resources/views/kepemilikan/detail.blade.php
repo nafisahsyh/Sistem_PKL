@@ -58,14 +58,14 @@
                                 {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-normal text-start ps-3">Nomor Koperasi</th>
-                            <td class="text-normal-sm text-start ps-3">
-                                {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
-                        </tr>
-                        <tr>
                             <th class="text-normal text-start ps-3">Nomor Plasma</th>
                             <td class="text-normal-sm text-start ps-3">
                                 {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-normal text-start ps-3">Nomor Koperasi</th>
+                            <td class="text-normal-sm text-start ps-3">
+                                {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-normal text-start ps-3">Status Petani</th>

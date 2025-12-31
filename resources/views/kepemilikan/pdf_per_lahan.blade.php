@@ -164,12 +164,12 @@
             <td>: {{ $kepemilikan->petani->no_telepon ?? '-' }}</td>
         </tr>
         <tr>
-            <th>Nomor Koperasi</th>
-            <td>: {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
-        </tr>
-        <tr>
             <th>Nomor Plasma</th>
             <td>: {{ $kepemilikan->petani->nomor_anggota_plasma ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Koperasi</th>
+            <td>: {{ $kepemilikan->petani->nomor_anggota_koperasi ?? '-' }}</td>
         </tr>
         <tr>
             <th>Status Petani</th>

@@ -98,33 +98,44 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="tanggal_bagi" class="form-label">Tanggal Bagi <span class="text-danger">*</span></label>
+                        <label class="form-label">Sisa Saldo Periode Sebelumnya</label>
+                        <div class="input-group">
+                            <span class="input-group-text rp-addon">Rp</span>
+                            <input type="text" class="form-control text-kecil"
+                                value="{{ number_format($bulanan->sisa_saldo_snapshot ?? 0, 0, ',', '.') }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tanggal Bagi <span class="text-danger">*</span></label>
                         <input type="date" name="tanggal_bagi"
                             class="form-control text-kecil @error('tanggal_bagi') is-invalid @enderror"
-                            value="{{ old('tanggal_bagi', $bulanan->tanggal_bagi) }}" required>
+                            value="{{ old('tanggal_bagi', optional($bulanan->tanggal_bagi)->format('Y-m-d')) }}" required>
                         @error('tanggal_bagi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="total_bagian" class="form-label">Total Bagian (20%) <span
-                            class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text rp-addon">Rp</span>
+                    <div class="col-md-4 mb-3">
+                        <label for="total_bagian" class="form-label">Total Bagian (20%) <span
+                                class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rp-addon">Rp</span>
 
-                        @php
-                            $rawTotal = old('total_bagian', (int) $bulanan->total_bagian);
-                        @endphp
+                            @php
+                                $rawTotal = old('total_bagian', (int) $bulanan->total_bagian);
+                            @endphp
 
-                        <input type="text" name="total_bagian" id="total_bagian"
-                            class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
-                            value="{{ $rawTotal }}" placeholder="Masukkan total bagian" required>
+                            <input type="text" name="total_bagian" id="total_bagian"
+                                class="form-control text-kecil @error('total_bagian') is-invalid @enderror"
+                                value="{{ $rawTotal }}" placeholder="Masukkan total bagian" required>
 
-                        @error('total_bagian')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                            @error('total_bagian')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 

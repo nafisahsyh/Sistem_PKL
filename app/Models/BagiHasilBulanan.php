@@ -22,6 +22,10 @@ class BagiHasilBulanan extends Model
         'sisa_saldo_snapshot',
     ];
 
+    protected $casts = [
+        'tanggal_bagi' => 'date',
+    ];
+
     public function desa()
     {
         return $this->belongsTo(Desa::class, 'id_desa');
