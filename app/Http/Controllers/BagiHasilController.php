@@ -128,8 +128,10 @@ class BagiHasilController extends Controller
                 'integer',
                 Rule::unique('bagi_hasil_bulanan')
                     ->where('id_desa', $request->id_desa)
-                    ->where('id_tahun_tanam', $request->id_tahun_tanam),
+                    ->where('id_tahun_tanam', $request->id_tahun_tanam)
+                    ->where('tahun', $request->tahun),
             ],
+
             'tahun' => 'required|integer',
             'tanggal_bagi' => 'required|date',
             'total_bagian' => 'required|numeric',
