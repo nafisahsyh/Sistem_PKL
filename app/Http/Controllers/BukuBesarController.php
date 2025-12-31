@@ -172,48 +172,47 @@ class BukuBesarController extends Controller
         $subKredit->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir');
 
         // Ambil debit (per transaksi)
-        $subDebit = DB::table('transaksi')
+        $subDebit = DB::table('transaksi_detail as dt')
+            ->join('transaksi as t', 'dt.id_transaksi', '=', 't.id_transaksi')
             ->select(
-                'id_transaksi',
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir',
-                'nominal',
-                'metode'
+                't.id_transaksi',
+                't.id_petani',
+                't.id_desa',
+                't.id_tahun_tanam',
+                'dt.periode_awal as bulan_awal',
+                'dt.periode_akhir as bulan_akhir',
+                'dt.nominal',
+                't.metode'
             )
-            ->where('tipe', 'debit_pengambilan');
+            ->where('t.tipe', 'debit_pengambilan');
 
         if ($request->filled('periode') && $request->filled('tahun')) {
-            $periode = (int) $request->periode;
-            $tahun = $request->tahun;
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
 
-            $bulanAwal = ($periode - 1) * 2 + 1;
-            $bulanAkhir = $periode * 2;
+            $bulanAwal = $request->tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $request->tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
 
-            $bulanAwal = $tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
-            $bulanAkhir = $tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
-
-            $subDebit->where('bulan_awal', $bulanAwal)
-                ->where('bulan_akhir', $bulanAkhir);
+            $subDebit->where('dt.periode_awal', $bulanAwal)
+                ->where('dt.periode_akhir', $bulanAkhir);
         }
 
-        if ($request->filled('periode') && !$request->filled('tahun')) {
-            $periode = (int) $request->periode;
+        if ($request->filled('tahun') && $request->filled('periode')) {
+            $p = (int) $request->periode;
 
-            $bulanAwal = ($periode - 1) * 2 + 1;
-            $bulanAkhir = $periode * 2;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
 
-            $bulanAwalStr = '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
-            $bulanAkhirStr = '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+            $bulanAwal = $request->tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $request->tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
 
-            $subDebit->where('bulan_awal', 'LIKE', "%$bulanAwalStr")
-                ->where('bulan_akhir', 'LIKE', "%$bulanAkhirStr");
+            $subDebit->where('dt.periode_awal', $bulanAwal)
+                ->where('dt.periode_akhir', $bulanAkhir);
         }
 
         if ($request->filled('tahun')) {
-            $subDebit->where('bulan_awal', 'LIKE', $request->tahun . '%');
+            $subDebit->where('dt.periode_awal', 'LIKE', $request->tahun . '%');
         }
 
         // Gabungkan snapshot + luas + kredit
@@ -554,45 +553,47 @@ class BukuBesarController extends Controller
         $subKredit->groupBy('id_petani', 'id_desa', 'id_tahun_tanam', 'bulan_awal', 'bulan_akhir');
 
         // Debit
-        $subDebit = DB::table('transaksi')
+        $subDebit = DB::table('transaksi_detail as dt')
+            ->join('transaksi as t', 'dt.id_transaksi', '=', 't.id_transaksi')
             ->select(
-                'id_transaksi',
-                'id_petani',
-                'id_desa',
-                'id_tahun_tanam',
-                'bulan_awal',
-                'bulan_akhir',
-                'nominal',
-                'metode'
+                't.id_transaksi',
+                't.id_petani',
+                't.id_desa',
+                't.id_tahun_tanam',
+                'dt.periode_awal as bulan_awal',
+                'dt.periode_akhir as bulan_akhir',
+                'dt.nominal',
+                't.metode'
             )
-            ->where('tipe', 'debit_pengambilan');
+            ->where('t.tipe', 'debit_pengambilan');
 
-        // Filter debit
         if ($request->filled('periode') && $request->filled('tahun')) {
-            $periode = (int) $request->periode;
-            $tahun = $request->tahun;
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
 
-            $awal = ($periode - 1) * 2 + 1;
-            $akhir = $periode * 2;
+            $bulanAwal = $request->tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $request->tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
 
-            $bulanAwal = $tahun . '-' . str_pad($awal, 2, '0', STR_PAD_LEFT);
-            $bulanAkhir = $tahun . '-' . str_pad($akhir, 2, '0', STR_PAD_LEFT);
-
-            $subDebit->where('bulan_awal', $bulanAwal)->where('bulan_akhir', $bulanAkhir);
+            $subDebit->where('dt.periode_awal', $bulanAwal)
+                ->where('dt.periode_akhir', $bulanAkhir);
         }
 
-        if ($request->filled('periode') && !$request->filled('tahun')) {
-            $periode = (int) $request->periode;
+        if ($request->filled('tahun') && $request->filled('periode')) {
+            $p = (int) $request->periode;
 
-            $awal = ($periode - 1) * 2 + 1;
-            $akhir = $periode * 2;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $p * 2;
 
-            $subDebit->where('bulan_awal', 'LIKE', '%-' . str_pad($awal, 2, '0', STR_PAD_LEFT))
-                ->where('bulan_akhir', 'LIKE', '%-' . str_pad($akhir, 2, '0', STR_PAD_LEFT));
+            $bulanAwal = $request->tahun . '-' . str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = $request->tahun . '-' . str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $subDebit->where('dt.periode_awal', $bulanAwal)
+                ->where('dt.periode_akhir', $bulanAkhir);
         }
 
         if ($request->filled('tahun')) {
-            $subDebit->where('bulan_awal', 'LIKE', $request->tahun . '%');
+            $subDebit->where('dt.periode_awal', 'LIKE', $request->tahun . '%');
         }
 
         // Kredit gabungan
