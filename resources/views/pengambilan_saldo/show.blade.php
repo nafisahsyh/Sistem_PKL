@@ -187,7 +187,7 @@
                     <form action="{{ route('ambil-saldo.store') }}" method="POST" target="_blank" class="formAmbil">
                         @csrf
 
-                        <div class="modal-body" style="padding: 15px;">
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                             @php
                                 $bulanSingkat = [
                                     1 => 'Jan',
@@ -275,61 +275,50 @@
 
                             <div class="row mb-3">
                                 @if (!$p['pakai_mode_periode'])
-                                    {{-- MODE NORMAL (PER BULAN) --}}
-                                    <div class="row mb-3">
-                                        <div class="col-4">
-                                            <label class="form-label fw-bold">
-                                                Saldo Bulan {{ $bulanSingkat[$bulan_awal] }}
-                                            </label>
-                                            <input type="text" class="form-control"
-                                                value="Rp {{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}"
-                                                readonly>
-                                        </div>
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold">
+                                            Saldo Bulan {{ $bulanSingkat[$bulan_awal] }}
+                                        </label>
+                                        <input type="text" class="form-control"
+                                            value="Rp {{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}" readonly>
+                                    </div>
 
-                                        <div class="col-4">
-                                            <label class="form-label fw-bold">
-                                                Saldo Bulan {{ $bulanSingkat[$bulan_akhir] }}
-                                            </label>
-                                            <input type="text" class="form-control"
-                                                value="Rp {{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}"
-                                                readonly>
-                                        </div>
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold">
+                                            Saldo Bulan {{ $bulanSingkat[$bulan_akhir] }}
+                                        </label>
+                                        <input type="text" class="form-control"
+                                            value="Rp {{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}" readonly>
+                                    </div>
 
-                                        <div class="col-4">
-                                            <label class="form-label fw-bold">Total Saldo</label>
-                                            <input type="text" class="form-control"
-                                                value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}" readonly>
-                                        </div>
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold">Total Saldo</label>
+                                        <input type="text" class="form-control"
+                                            value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}" readonly>
                                     </div>
                                 @else
-                                    {{-- MODE AKUMULASI PER PERIODE (FIELD RAPi) --}}
-                                    <div class="row mb-3">
+                                    @foreach ($p['saldo_periode_list'] as $sp)
                                         @php
-                                            \Carbon\Carbon::setLocale('id');
+                                            $awal = \Carbon\Carbon::parse($sp['bulan_awal']);
+                                            $akhir = \Carbon\Carbon::parse($sp['bulan_akhir']);
                                         @endphp
-
-                                        @foreach ($p['saldo_periode_list'] as $sp)
-                                            <div class="col-4 mb-3">
-                                                <label class="form-label fw-bold">
-                                                    {{ \Carbon\Carbon::parse($sp['bulan_awal'])->translatedFormat('M Y') }}
-                                                    -
-                                                    {{ \Carbon\Carbon::parse($sp['bulan_akhir'])->translatedFormat('M Y') }}
-                                                </label>
-
-                                                <input type="text" class="form-control"
-                                                    value="Rp {{ number_format($sp['saldo'], 0, ',', '.') }}" readonly>
-                                            </div>
-                                        @endforeach
-
-
-                                        {{-- TOTAL --}}
                                         <div class="col-4 mb-3">
-                                            <label class="form-label fw-bold">Total Saldo</label>
-                                            <input type="text" class="form-control"
-                                                value="Rp {{ number_format($p['total_saldo_akumulasi'], 0, ',', '.') }}"
-                                                readonly>
-                                        </div>
+                                            <label class="form-label fw-bold">
+                                                {{ $bulanSingkat[$awal->month] }} {{ $awal->year }}
+                                                -
+                                                {{ $bulanSingkat[$akhir->month] }} {{ $akhir->year }}
 
+                                            </label>
+                                            <input type="text" class="form-control"
+                                                value="Rp {{ number_format($sp['saldo'], 0, ',', '.') }}" readonly>
+                                        </div>
+                                    @endforeach
+
+                                    <div class="col-4 mb-3">
+                                        <label class="form-label fw-bold">Total Saldo</label>
+                                        <input type="text" class="form-control"
+                                            value="Rp {{ number_format($p['total_saldo_akumulasi'], 0, ',', '.') }}"
+                                            readonly>
                                     </div>
                                 @endif
                             </div>
@@ -357,7 +346,6 @@
             </div>
         </div>
     @endforeach
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
