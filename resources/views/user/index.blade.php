@@ -17,7 +17,7 @@
                     {{-- Form Search --}}
                     <form action="{{ route('user.index') }}" method="GET" class="d-flex align-items-start">
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari nama, username, atau role..." value="{{ request('search') }}"
+                            placeholder="Cari Nama, Username/Role..." value="{{ request('search') }}"
                             style="width: 300px;">
                         <button class="btn btn-success" type="submit" title="Search">
                             <i class="fas fa-search"></i>

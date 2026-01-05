@@ -50,8 +50,8 @@
                                 @endif
                             @endforeach
 
-                            <input type="text" name="search" class="form-control" placeholder="Cari no/nama petani..."
-                                value="{{ request('search') }}" style="width: 250px;">
+                            <input type="text" name="search" class="form-control" placeholder="Cari Nama/No Plasma/Koperasi..."
+                                value="{{ request('search') }}" style="width: 300px;">
                             <button class="btn btn-success"><i class="fas fa-search"></i></button>
                             <a href="{{ route('inisiasi-saldo.index', [
                                 'id_desa' => request('id_desa'),

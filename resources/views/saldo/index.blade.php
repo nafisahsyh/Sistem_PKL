@@ -38,19 +38,19 @@
                     'text' => '#0B4F3F', // hijau sawit
                 ],
                 [
-                    'title' => 'Total Petani',
+                    'title' => 'Total Pengambilan',
                     'count' => $stat['total_petani'] ?? 0,
                     'bg' => '#E8EFEA', // hijau abu
                     'text' => '#1E4620', // hijau tua
                 ],
                 [
-                    'title' => 'Sudah Mengambil',
+                    'title' => 'Sudah Diambil',
                     'count' => $stat['total_sudah'] ?? 0,
                     'bg' => '#D1E7DD', // hijau sukses lembut
                     'text' => '#0F5132',
                 ],
                 [
-                    'title' => 'Belum Mengambil',
+                    'title' => 'Belum Diambil',
                     'count' => $stat['total_belum'] ?? 0,
                     'bg' => '#F3E8D8', // coklat krem
                     'text' => '#6B4F1D', // coklat tanah
@@ -168,7 +168,7 @@
                         @endforeach
 
                         <input type="text" name="search" class="form-control form-control-search"
-                            placeholder="Cari Nama/No Plasma..." value="{{ request('search') }}" style="width: 250px;">
+                            placeholder="Cari Nama/No Plasma..." value="{{ request('search') }}" style="width: 300px;">
 
                         <button class="btn btn-success" type="submit">
                             <i class="fas fa-search"></i>
