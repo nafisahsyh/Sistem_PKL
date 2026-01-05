@@ -119,6 +119,7 @@
             padding: 6px;
             text-align: center;
         }
+
     </style>
 </head>
 
@@ -146,8 +147,63 @@
 
     <h2 style="margin-top: 10px; margin-bottom: 20px;"><strong>LAPORAN CATATAN SALDO</strong></h2>
 
-    {{-- CARD SUMMARY --}}
-    @if (!empty($stat) && ($request->filled('periode') || $request->filled('tahun') || $request->filled('id_desa')))
+    @php
+        $hanyaFilterTahun =
+            request()->filled('tahun') &&
+            !request()->filled('id_desa') &&
+            !request()->filled('id_tahun_tanam') &&
+            !request()->filled('periode') &&
+            !request()->filled('metode');
+    @endphp
+
+    {{-- RINGKASAN / REKAP (KONDISIONAL) --}}
+    @if ($hanyaFilterTahun)
+
+        <div class="section-title">
+            Rekap Bagi Hasil per Tahun Tanam
+        </div>
+
+        <table class="table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                {{-- BARIS AKUMULASI SELURUH DESA --}}
+                <tr>
+                    <th colspan="3"
+                        style="
+            padding:5px; 
+            font-weight:bold; 
+            text-align: center; 
+            border-bottom: none; 
+            border-left: 1px solid #000; 
+            border-right: 1px solid #000; 
+            border-top: 1px solid #000;">
+                        AKUMULASI SELURUH DESA {{ $request->tahun ?? '' }}
+                    </th>
+                </tr>
+
+                {{-- BARIS HEADER NORMAL --}}
+                <tr>
+                    <th style="border:1px solid #000; padding:5px; text-align:center;">Tahun Tanam</th>
+                    <th style="border:1px solid #000; padding:5px; text-align:center;">Total Nominal</th>
+                    <th style="border:1px solid #000; padding:5px; text-align:center;">Sisa</th>
+                </tr>
+            </thead>
+
+            {{-- DATA REKAP --}}
+            @foreach ($rekapTahunan as $item)
+                <tr>
+                    <td style="border:1px solid #000; padding:5px; text-align:center">{{ $item->tahun_tanam }}</td>
+                    <td style="border:1px solid #000; padding:5px; text-align:right;">
+                        Rp {{ number_format($item->total_nominal, 0, ',', '.') }}
+                    </td>
+                    <td style="border:1px solid #000; padding:5px; text-align:right;">
+                        Rp {{ number_format($item->sisa, 0, ',', '.') }}
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    @elseif (!empty($stat) && !$hanyaFilterTahun)
+        {{-- MODE RINGKASAN DETAIL --}}
         <div class="section-title">RINGKASAN</div>
         <table cellpadding="5" cellspacing="0"
             style="border-collapse: collapse; width: 100%; text-align: center; border: 1px solid #000;">
@@ -191,42 +247,42 @@
                     {{ number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.') }}</td>
             </tr>
         </table>
-    @endif
 
-    {{-- Tabel Saldo per Petani --}}
-    <div class="section-title">Data Saldo per Petani</div>
-    <table>
-        <thead>
-            <tr class="text-center">
-                <th style="text-align: center">No</th>
-                <th style="text-align: center">No Plasma</th>
-                <th style="text-align: center">Nama Petani</th>
-                <th style="text-align: center">Desa</th>
-                <th style="text-align: center">Tahun Tanam</th>
-                <th style="text-align: center">Luas Lahan</th>
-                <th style="text-align: center">Periode</th>
-                <th style="text-align: center">Nominal</th>
-                <th style="text-align: center">Sisa</th>
-                <th style="text-align: center">Metode</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($dataSaldo as $i => $row)
-                <tr>
-                    <td class="text-center">{{ $i + 1 }}</td>
-                    <td class="text-center">{{ $row->nomor_plasma }}</td>
-                    <td>{{ $row->nama_petani }}</td>
-                    <td class="text-center">{{ $row->nama_desa }}</td>
-                    <td class="text-center">{{ $row->tahun_tanam }}</td>
-                    <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }} Ha</td>
-                    <td>{{ $row->periode }}</td>
-                    <td class="text-end">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</td>
-                    <td class="text-end">Rp {{ number_format($row->sisa, 0, ',', '.') }}</td>
-                    <td class="text-center">{{ ucfirst($row->status_metode) }}</td>
+        {{-- Tabel Saldo per Petani --}}
+        <div class="section-title">Data Saldo per Petani</div>
+        <table>
+            <thead>
+                <tr class="text-center">
+                    <th style="text-align: center">No</th>
+                    <th style="text-align: center">No Plasma</th>
+                    <th style="text-align: center">Nama Petani</th>
+                    <th style="text-align: center">Desa</th>
+                    <th style="text-align: center">Tahun Tanam</th>
+                    <th style="text-align: center">Luas Lahan</th>
+                    <th style="text-align: center">Periode</th>
+                    <th style="text-align: center">Nominal</th>
+                    <th style="text-align: center">Sisa</th>
+                    <th style="text-align: center">Metode</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($dataSaldo as $i => $row)
+                    <tr>
+                        <td class="text-center">{{ $i + 1 }}</td>
+                        <td class="text-center">{{ $row->nomor_plasma }}</td>
+                        <td>{{ $row->nama_petani }}</td>
+                        <td class="text-center">{{ $row->nama_desa }}</td>
+                        <td class="text-center">{{ $row->tahun_tanam }}</td>
+                        <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }} Ha</td>
+                        <td>{{ $row->periode }}</td>
+                        <td class="text-end">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</td>
+                        <td class="text-end">Rp {{ number_format($row->sisa, 0, ',', '.') }}</td>
+                        <td class="text-center">{{ ucfirst($row->status_metode) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     <div class="signature">
         <p>Mengetahui,</p>

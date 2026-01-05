@@ -283,7 +283,7 @@ class PengambilanSaldoController extends Controller
             ->values();
 
         // Pagination manual
-        $perPage = 10;
+        $perPage = 15;
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $perPage;
 

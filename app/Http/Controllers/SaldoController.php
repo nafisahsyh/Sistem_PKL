@@ -225,6 +225,13 @@ class SaldoController extends Controller
 
         $dataAll = $queryStat->get();
 
+        $dataAll->transform(function ($row) {
+            $nominal = (float) $row->total_nominal;
+            $debit = $row->nominal_debit !== null ? (float) $row->nominal_debit : 0.0;
+            $row->sisa = max($nominal - $debit, 0);
+            return $row;
+        });
+
         $totalPetani = $dataAll->count();
 
         $totalSudah = $dataAll->whereNotNull('nominal_debit')->count();
@@ -267,28 +274,17 @@ class SaldoController extends Controller
             'sisa' => $totalSisa,
         ];
 
-        $subTransaksiTahunan = DB::table('transaksi')
-            ->where('tipe', 'debit_pengambilan')
-            ->select(
-                'id_tahun_tanam',
-                DB::raw('SUM(nominal) as total_diambil')
-            )
-            ->groupBy('id_tahun_tanam');
-
-        $rekapTahunan = DB::table('bagi_hasil_petani as bhp')
-            ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
-            ->join('tahun_tanam as tt', 'bhb.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
-
-            ->leftJoinSub($subTransaksiTahunan, 'tr', function ($join) {
-                $join->on('bhb.id_tahun_tanam', '=', 'tr.id_tahun_tanam');
+        $rekapTahunan = $dataAll
+            ->groupBy('tahun_tanam')
+            ->map(function ($group, $tahun) {
+                return (object)[
+                    'tahun_tanam' => $tahun,
+                    'total_nominal' => $group->sum('total_nominal'),
+                    'sisa' => $group->sum('sisa'),
+                ];
             })
+            ->values();
 
-            ->select(
-                'tt.tahun as tahun_tanam',
-                DB::raw('SUM(bhp.total_nominal) as total_nominal'),
-                DB::raw('COALESCE(MAX(tr.total_diambil), 0) as total_diambil')
-            )
-            ->groupBy('tt.tahun'); // ✅ CUKUP INI
 
         // filter TAHUN (misalnya 2025)
         if ($request->filled('tahun')) {
@@ -305,16 +301,6 @@ class SaldoController extends Controller
                 ->whereBetween('bhb.bulan', [$bulanAwal, $bulanAkhir]);
         }
 
-        $rekapTahunan = $rekapTahunan
-            ->orderBy('tt.tahun')
-            ->get()
-            ->map(function ($row) {
-                $row->sisa = max(
-                    ($row->total_nominal ?? 0) - ($row->total_diambil ?? 0),
-                    0
-                );
-                return $row;
-            });
 
         $results->getCollection()->transform(function ($row) use ($namaBulan) {
             $bulanAwal = (int) substr($row->bulan_awal, 5, 2);
@@ -366,14 +352,28 @@ class SaldoController extends Controller
             12 => 'Desember'
         ];
 
-        // ------------------ QUERY UTAMA ------------------
         $subSnapshot = DB::table('bagi_hasil_petani as bh1')
-            ->join(DB::raw("(SELECT id_petani, MAX(id_bagi_petani) AS max_id 
-                FROM bagi_hasil_petani GROUP BY id_petani) bh2"), function ($join) {
-                $join->on('bh1.id_petani', '=', 'bh2.id_petani')
-                    ->on('bh1.id_bagi_petani', '=', 'bh2.max_id');
-            })
-            ->select('bh1.id_petani', 'bh1.nama_petani_snapshot', 'bh1.nomor_plasma_snapshot', 'bh1.id_desa', 'bh1.id_tahun_tanam');
+            ->join(
+                DB::raw("(
+            SELECT id_petani, id_desa, id_tahun_tanam, MAX(id_bagi_petani) AS max_id
+            FROM bagi_hasil_petani
+            GROUP BY id_petani, id_desa, id_tahun_tanam
+        ) bh2"),
+                function ($join) {
+                    $join->on('bh1.id_petani', '=', 'bh2.id_petani')
+                        ->on('bh1.id_desa', '=', 'bh2.id_desa')
+                        ->on('bh1.id_tahun_tanam', '=', 'bh2.id_tahun_tanam')
+                        ->on('bh1.id_bagi_petani', '=', 'bh2.max_id');
+                }
+            )
+            ->select(
+                'bh1.id_petani',
+                'bh1.nama_petani_snapshot',
+                'bh1.nomor_plasma_snapshot',
+                'bh1.id_desa',
+                'bh1.id_tahun_tanam'
+            );
+
 
         $subLuas = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
@@ -394,6 +394,16 @@ class SaldoController extends Controller
 
         $subNominal = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
+            ->select(
+                'bhp.id_petani',
+                'bhb.id_desa',
+                'bhb.id_tahun_tanam',
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0'), '-01') AS bulan_awal"),
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0'), '-28') AS bulan_akhir"),
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 1), 2, '0')) AS bulan_awal_short"),
+                DB::raw("CONCAT(bhb.tahun, '-', LPAD(((FLOOR((bhb.bulan - 1)/2) * 2) + 2), 2, '0')) AS bulan_akhir_short"),
+                DB::raw('SUM(bhp.total_nominal) AS total_nominal')
+            )
             ->groupBy(
                 'bhp.id_petani',
                 'bhb.id_desa',
@@ -402,16 +412,6 @@ class SaldoController extends Controller
                 DB::raw("bulan_akhir"),
                 DB::raw("bulan_awal_short"),
                 DB::raw("bulan_akhir_short")
-            )
-            ->select(
-                'bhp.id_petani',
-                'bhb.id_desa',
-                'bhb.id_tahun_tanam',
-                DB::raw("CONCAT(bhb.tahun,'-',LPAD(((FLOOR((bhb.bulan-1)/2)*2)+1),2,'0'),'-01') AS bulan_awal"),
-                DB::raw("CONCAT(bhb.tahun,'-',LPAD(((FLOOR((bhb.bulan-1)/2)*2)+2),2,'0'),'-28') AS bulan_akhir"),
-                DB::raw("CONCAT(bhb.tahun,'-',LPAD(((FLOOR((bhb.bulan-1)/2)*2)+1),2,'0')) AS bulan_awal_short"),
-                DB::raw("CONCAT(bhb.tahun,'-',LPAD(((FLOOR((bhb.bulan-1)/2)*2)+2),2,'0')) AS bulan_akhir_short"),
-                DB::raw('SUM(bhp.total_nominal) AS total_nominal')
             );
 
         $subDebit = DB::table('transaksi_detail as td')
@@ -428,7 +428,8 @@ class SaldoController extends Controller
             )
             ->groupBy('t.id_petani', 't.id_desa', 't.id_tahun_tanam', 'periode_awal_short', 'periode_akhir_short');
 
-        $query = DB::table(DB::raw("({$subSnapshot->toSql()}) as s"))
+        // ------------------ QUERY UTAMA (join pake short fields) ------------------
+        $query = DB::table(DB::raw("(" . $subSnapshot->toSql() . ") as s"))
             ->mergeBindings($subSnapshot)
             // JOIN subNominal
             ->joinSub($subNominal, 'n', function ($join) {
@@ -450,6 +451,7 @@ class SaldoController extends Controller
                     ->on('n.bulan_awal_short', '=', 'dpt.periode_awal_short')
                     ->on('n.bulan_akhir_short', '=', 'dpt.periode_akhir_short');
             })
+
             ->join('desa as dd', 's.id_desa', '=', 'dd.id_desa')
             ->join('tahun_tanam as tt', 's.id_tahun_tanam', '=', 'tt.id_tahun_tanam')
             ->select(
@@ -465,81 +467,171 @@ class SaldoController extends Controller
                 'dpt.metode',
                 'dpt.nominal_debit'
             );
-
-        // ---------------- FILTER -----------------
-        if ($request->filled('id_desa'))
+        // ---------------------- FILTER ----------------------
+        // Desa
+        if ($request->filled('id_desa')) {
             $query->where('s.id_desa', $request->id_desa);
-        if ($request->filled('id_tahun_tanam'))
+        }
+
+        // Tahun tanam
+        if ($request->filled('id_tahun_tanam')) {
             $query->where('s.id_tahun_tanam', $request->id_tahun_tanam);
+        }
+
+        // Periode (1–6)
         if ($request->filled('periode')) {
-            $p = (int) $request->periode;
-            $bAwal = str_pad(($p - 1) * 2 + 1, 2, '0', STR_PAD_LEFT);
-            $bAkhir = str_pad(($p - 1) * 2 + 2, 2, '0', STR_PAD_LEFT);
-            $query->where(DB::raw("SUBSTR(n.bulan_awal,6,2)"), $bAwal)
-                ->where(DB::raw("SUBSTR(n.bulan_akhir,6,2)"), $bAkhir);
+            $periode = (int) $request->periode;
+            $bulanAwal = ($periode - 1) * 2 + 1;
+            $bulanAkhir = $bulanAwal + 1;
+
+            $bulanAwal = str_pad($bulanAwal, 2, '0', STR_PAD_LEFT);
+            $bulanAkhir = str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT);
+
+            $query->where(DB::raw("SUBSTR(n.bulan_awal, 6, 2)"), $bulanAwal)
+                ->where(DB::raw("SUBSTR(n.bulan_akhir, 6, 2)"), $bulanAkhir);
         }
-        if ($request->filled('tahun'))
-            $query->where(DB::raw("SUBSTR(n.bulan_awal,1,4)"), $request->tahun);
+
+        // Tahun
+        if ($request->filled('tahun')) {
+            $query->where(DB::raw("SUBSTR(n.bulan_awal, 1, 4)"), $request->tahun);
+        }
+
+        // Metode
         if ($request->filled('metode')) {
-            if ($request->metode === 'belum')
+            if ($request->metode === 'belum') {
                 $query->whereNull('dpt.nominal_debit');
-            else
+            } else {
                 $query->where('dpt.metode', $request->metode);
+            }
         }
+
+        // SEARCH (nama / nomor plasma)
         if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $q->where('s.nama_petani_snapshot', 'LIKE', "%$s%")
-                    ->orWhere('s.nomor_plasma_snapshot', 'LIKE', "%$s%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('s.nama_petani_snapshot', 'LIKE', "%$search%")
+                    ->orWhere('s.nomor_plasma_snapshot', 'LIKE', "%$search%");
             });
         }
 
-        $dataSaldo = $query->orderBy('s.id_petani')->get();
+        $queryStat = clone $query;
 
-        // transform untuk PDF
-        $dataSaldo->transform(function ($row) use ($namaBulan) {
-            $bAwal = (int) substr($row->bulan_awal, 5, 2);
-            $bAkhir = (int) substr($row->bulan_akhir, 5, 2);
-            $row->periode = "{$namaBulan[$bAwal]} - {$namaBulan[$bAkhir]} " . substr($row->bulan_awal, 0, 4);
-            $debit = $row->nominal_debit ?? 0;
-            $row->sisa = max($row->total_nominal - $debit, 0);
-            $row->status_metode = $debit > 0 ? $row->metode : "Belum diambil";
+        $results = $query
+            ->orderBy('n.bulan_awal', 'desc')
+            ->orderBy('s.id_petani')
+            ->get();
+
+        $dataAll = $queryStat->get();
+
+        $dataAll->transform(function ($row) {
+            $nominal = (float) $row->total_nominal;
+            $debit = $row->nominal_debit !== null ? (float) $row->nominal_debit : 0.0;
+            $row->sisa = max($nominal - $debit, 0);
             return $row;
         });
 
-        // --- HITUNG STAT CARD ---
-        $totalNominalKeseluruhan = $dataSaldo->sum('total_nominal');
-        $totalPetani = $dataSaldo->count();
-        $sudahMengambil = $dataSaldo->where('status_metode', '!=', 'Belum diambil')->count();
-        $belumMengambil = $dataSaldo->where('status_metode', 'Belum diambil')->count();
+        $totalPetani = $dataAll->count();
 
-        $cash = $dataSaldo->where('status_metode', 'cash');
-        $transfer = $dataSaldo->where('status_metode', 'transfer');
+        $totalSudah = $dataAll->whereNotNull('nominal_debit')->count();
+        $totalBelum = $dataAll->whereNull('nominal_debit')->count();
+
+        // ================= CASH =================
+        $cash = $dataAll
+            ->where('metode', 'cash')
+            ->whereNotNull('nominal_debit');
 
         $jumlahCash = $cash->count();
-        $nominalCash = $cash->sum('total_nominal');
+        $nominalCash = $cash->sum('nominal_debit');
+
+        // ================= TRANSFER =================
+        $transfer = $dataAll
+            ->where('metode', 'transfer')
+            ->whereNotNull('nominal_debit');
 
         $jumlahTransfer = $transfer->count();
-        $nominalTransfer = $transfer->sum('total_nominal');
-        $totalSisaSaldo = $dataSaldo->sum('sisa');
+        $nominalTransfer = $transfer->sum('nominal_debit');
+
+        $totalNominal = $dataAll->sum('total_nominal');
+
+        $totalSisa = $dataAll->sum(function ($row) {
+            return max(
+                ($row->total_nominal ?? 0) - ($row->nominal_debit ?? 0),
+                0
+            );
+        });
 
         $stat = [
             'total_petani' => $totalPetani,
-            'total_sudah' => $sudahMengambil,
-            'total_belum' => $belumMengambil,
+            'total_sudah' => $totalSudah,
+            'total_belum' => $totalBelum,
             'jumlah_cash' => $jumlahCash,
             'nominal_cash' => $nominalCash,
             'jumlah_transfer' => $jumlahTransfer,
             'nominal_transfer' => $nominalTransfer,
-            'total_nominal' => $totalNominalKeseluruhan,
-            'sisa' => $totalSisaSaldo,
+            'total_nominal' => $totalNominal,
+            'sisa' => $totalSisa,
         ];
 
+        $rekapTahunan = $dataAll
+            ->groupBy('tahun_tanam')
+            ->map(function ($group, $tahun) {
+                return (object)[
+                    'tahun_tanam' => $tahun,
+                    'total_nominal' => $group->sum('total_nominal'),
+                    'sisa' => $group->sum('sisa'),
+                ];
+            })
+            ->values();
+
+
+        // filter TAHUN (misalnya 2025)
+        if ($request->filled('tahun')) {
+            $rekapTahunan->where('bhb.tahun', $request->tahun);
+        }
+
+        // filter PERIODE (2 bulanan)
+        if ($request->filled('periode')) {
+            $p = (int) $request->periode;
+            $bulanAwal = ($p - 1) * 2 + 1;
+            $bulanAkhir = $bulanAwal + 1;
+
+            $rekapTahunan
+                ->whereBetween('bhb.bulan', [$bulanAwal, $bulanAkhir]);
+        }
+
+
+        $results = $results->transform(function ($row) use ($namaBulan) {
+            $bulanAwal = (int) substr($row->bulan_awal, 5, 2);
+            $bulanAkhir = (int) substr($row->bulan_akhir, 5, 2);
+            $tahun = substr($row->bulan_awal, 0, 4);
+
+            $row->periode = "{$namaBulan[$bulanAwal]} - {$namaBulan[$bulanAkhir]} {$tahun}";
+
+            $nominal = (float) $row->total_nominal;
+            $debit = $row->nominal_debit !== null ? (float) $row->nominal_debit : 0.0;
+            $row->sisa = max($nominal - $debit, 0);
+            $row->status_metode = $debit > 0 ? $row->metode : "Belum diambil";
+
+            return $row;
+        });
+
+
+        $hanyaFilterTahun =
+            $request->filled('tahun')
+            && !$request->filled('id_desa')
+            && !$request->filled('id_tahun_tanam')
+            && !$request->filled('periode')
+            && !$request->filled('metode');
+
+
         $pdf = Pdf::loadView('saldo.pdf', [
-            'dataSaldo' => $dataSaldo,
+            'dataSaldo' => $results,
             'stat' => $stat,
-            'namaBulan' => $namaBulan,
-            'request' => $request
+            'rekapTahunan' => $rekapTahunan,
+            'desa' => Desa::all(),
+            'tahunTanam' => Tahun_Tanam::all(),
+            'hanyaFilterTahun' => $hanyaFilterTahun,
+            'request' => $request,
         ]);
 
         $pdf->setPaper('A4', 'landscape');
