@@ -140,11 +140,9 @@ class BagiHasilController extends Controller
 
         // Tentukan periode 2 bulan
         $bulanAwalPeriode = strtotime($data['bulan_awal']);
-        $bulanAkhirPeriode = strtotime("+1 month", $bulanAwalPeriode);
-        $bulanAkhirPeriodeStr = date('Y-m', $bulanAkhirPeriode);
 
 
-        DB::transaction(function () use ($data, $bulanAwalPeriode, $bulanAkhirPeriodeStr) {
+        DB::transaction(function () use ($data, $bulanAwalPeriode) {
 
             // Simpan data bulanan
             $bulan = BagiHasilBulanan::create($data);
@@ -182,6 +180,8 @@ class BagiHasilController extends Controller
             $bulan->sisa_saldo_snapshot = $sisaSaldo;
             $bulan->save();
 
+            $rekapPetani = [];
+
             foreach ($kelola as $kepemilikan) {
                 $luasHa = ($kepemilikan->lahan->luas_peta ?? 0) / 10000;
                 $nominalPetani = ($data['total_bagian'] / $totalLuasHa) * $luasHa;
@@ -205,14 +205,43 @@ class BagiHasilController extends Controller
                     'nomor_koperasi_snapshot' => $petani->nomor_anggota_koperasi ?? null,
                 ]);
 
-                $saldoTerakhir = Saldo::where('id_petani', $petani->id_petani)
+                if (!isset($rekapPetani[$petani->id_petani])) {
+                    $rekapPetani[$petani->id_petani] = 0;
+                }
+
+                $rekapPetani[$petani->id_petani] += $nominalPetani;
+            }
+
+            foreach ($rekapPetani as $idPetani => $totalNominalPetani) {
+
+                $saldoTerakhir = Saldo::where('id_petani', $idPetani)
                     ->where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->latest('created_at')
+                    ->orderBy('bulan_akhir', 'desc') // 🔑 WAJIB
+                    ->lockForUpdate()
                     ->first();
 
+                $bulanInput = date('Y-m', strtotime($data['bulan_awal']));
+                $bulanTerakhir = $saldoTerakhir?->bulan_akhir;
+
+                $nextMonth = $bulanTerakhir
+                    ? date('Y-m', strtotime('+1 month', strtotime($bulanTerakhir)))
+                    : null;
+
+                $selisihBulan = $saldoTerakhir
+                    ? (
+                        (int) date('Y', strtotime($bulanInput)) * 12 + (int) date('n', strtotime($bulanInput))
+                        -
+                        ((int) date('Y', strtotime($saldoTerakhir->bulan_awal)) * 12 + (int) date('n', strtotime($saldoTerakhir->bulan_awal)))
+                    )
+                    : null;
+
+                $periodeSaldo = $saldoTerakhir
+                    ? (int) date('n', strtotime($saldoTerakhir->bulan_awal))
+                    : null;
+
                 if ($bulanAwalValid) {
-                    $totalSaldoLalu = Saldo::where('id_petani', $petani->id_petani)
+                    $totalSaldoLalu = Saldo::where('id_petani', $idPetani) // ✅
                         ->where('id_desa', $data['id_desa'])
                         ->where('id_tahun_tanam', $data['id_tahun_tanam'])
                         ->where('saldo', '>', 0)
@@ -222,7 +251,7 @@ class BagiHasilController extends Controller
                     SaldoLalu::firstOrCreate(
                         [
                             'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
-                            'id_petani' => $petani->id_petani,
+                            'id_petani' => $idPetani, // ✅
                         ],
                         [
                             'id_desa' => $data['id_desa'],
@@ -232,41 +261,53 @@ class BagiHasilController extends Controller
                     );
                 }
 
-                if (!$saldoTerakhir || strtotime($saldoTerakhir->bulan_akhir) < $bulanAwalPeriode - 1) {
-                    // Buat saldo baru untuk periode 2 bulan
+                if (!$saldoTerakhir) {
+
+                    // SALDO PERTAMA
                     $saldo = Saldo::create([
-                        'id_petani' => $petani->id_petani,
+                        'id_petani' => $idPetani,
                         'id_desa' => $data['id_desa'],
                         'id_tahun_tanam' => $data['id_tahun_tanam'],
-                        'bulan_awal' => $data['bulan_awal'],
-                        'bulan_akhir' => $bulanAkhirPeriodeStr,
-                        'saldo' => $nominalPetani,
+                        'bulan_awal' => $bulanInput,
+                        'bulan_akhir' => $bulanInput,
+                        'saldo' => $totalNominalPetani,
                     ]);
-                } else {
-                    // Update saldo yang ada
-                    $saldoTerakhir->saldo += $nominalPetani;
-                    if (strtotime($data['bulan_awal']) > strtotime($saldoTerakhir->bulan_akhir)) {
-                        $saldoTerakhir->bulan_akhir = $data['bulan_awal'];
-                    }
+
+                } elseif (
+                    $bulanInput === $nextMonth
+                    && $selisihBulan === 1
+                ) {
+                    // EXTEND 2 BULAN SAJA
+                    $saldoTerakhir->bulan_akhir = $bulanInput;
+                    $saldoTerakhir->saldo += $totalNominalPetani;
                     $saldoTerakhir->save();
                     $saldo = $saldoTerakhir;
+                } else {
+
+                    // PERIODE BARU
+                    $saldo = Saldo::create([
+                        'id_petani' => $idPetani,
+                        'id_desa' => $data['id_desa'],
+                        'id_tahun_tanam' => $data['id_tahun_tanam'],
+                        'bulan_awal' => $bulanInput,
+                        'bulan_akhir' => $bulanInput,
+                        'saldo' => $totalNominalPetani,
+                    ]);
                 }
 
-                // Transaksi
                 Transaksi::create([
-                    'id_petani' => $petani->id_petani,
+                    'id_petani' => $idPetani,
                     'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
                     'id_desa' => $data['id_desa'],
                     'id_tahun_tanam' => $data['id_tahun_tanam'],
                     'tipe' => 'credit_bagihasil',
-                    'metode' => null,
-                    'nominal' => $nominalPetani,
+                    'nominal' => $totalNominalPetani,
                     'tanggal' => $data['tanggal_bagi'],
                     'bulan_awal' => $saldo->bulan_awal,
                     'bulan_akhir' => $saldo->bulan_akhir,
-                    'keterangan' => 'Bagi hasil periode ' . $saldo->bulan_awal . ' - ' . $saldo->bulan_akhir,
                 ]);
             }
+
         });
 
         return redirect()->route('bagi-hasil-bulanan.index')
@@ -489,22 +530,22 @@ class BagiHasilController extends Controller
 
             $bulan = BagiHasilBulanan::findOrFail($id);
 
-            // Ambil semua pembagian petani bulan ini
+            // AMBIL SEMUA PEMBAGIAN PETANI PADA BULAN INI
             $list = BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->get();
 
             foreach ($list as $d) {
 
-                // Ambil transaksi bulan ini
+                // AMBIL TRANSAKSI BULAN INI
                 $trx = Transaksi::where('id_petani', $d->id_petani)
                     ->where('id_bagi_bulanan', $bulan->id_bagi_bulanan)
                     ->where('tipe', 'credit_bagihasil')
                     ->first();
 
                 if (!$trx) {
-                    continue; // jika tidak ada transaksi, lewati
+                    continue; // JIKA TIDAK ADA TRANSAKSI, MAKA LEWATI
                 }
 
-                // Ambil saldo yang meng-cover periode transaksi ini
+                // AMBIL SALDO YANG MENGISI PADA PERIODE INI
                 $saldo = Saldo::where('id_petani', $d->id_petani)
                     ->where('id_desa', $bulan->id_desa)
                     ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
@@ -512,36 +553,62 @@ class BagiHasilController extends Controller
                     ->where('bulan_akhir', '>=', $trx->bulan_akhir)
                     ->lockForUpdate()
                     ->first();
-
-                if ($saldo) {
-                    // Kurangi saldo hanya dari nominal bulan ini
-                    $saldo->saldo -= $d->total_nominal;
-
-                    if ($saldo->saldo < 0) {
-                        throw new \Exception(
-                            'Saldo petani ID ' . $d->id_petani . ' menjadi negatif.'
-                        );
-                    }
-
-                    $saldo->save();
-                }
             }
 
-            // Hapus transaksi bulan ini saja
+            // HAPUS TRANSAKSI YANG ADA PADA BULAN ITU SAJA
             Transaksi::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)
                 ->where('tipe', 'credit_bagihasil')
                 ->delete();
 
-            // Hapus detail bagi hasil petani bulan ini
+            $petaniIds = $list->pluck('id_petani')->unique();
+
+            foreach ($petaniIds as $idPetani) {
+
+                $trxSisa = Transaksi::where('id_petani', $idPetani)
+                    ->where('id_desa', $bulan->id_desa)
+                    ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
+                    ->where('tipe', 'credit_bagihasil')
+                    ->orderBy('bulan_awal')
+                    ->get();
+
+                $saldo = Saldo::where('id_petani', $idPetani)
+                    ->where('id_desa', $bulan->id_desa)
+                    ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
+                    ->lockForUpdate()
+                    ->first();
+
+                // APABILA TIDAK ADA TRANSAKSI TERSISA, HAPUS SALDO
+                if ($trxSisa->isEmpty()) {
+                    if ($saldo) {
+                        $saldo->delete();
+                    }
+                    continue;
+                }
+
+                // BUAT ULANG SALDO
+                if (!$saldo) {
+                    $saldo = new Saldo();
+                    $saldo->id_petani = $idPetani;
+                    $saldo->id_desa = $bulan->id_desa;
+                    $saldo->id_tahun_tanam = $bulan->id_tahun_tanam;
+                }
+
+                $saldo->bulan_awal = $trxSisa->first()->bulan_awal;
+                $saldo->bulan_akhir = $trxSisa->last()->bulan_akhir;
+                $saldo->saldo = $trxSisa->sum('nominal');
+                $saldo->save();
+            }
+
+            // HAPUS DETAIL BAGI HASIL PETANI PADA BULAN INI
             BagiHasilPetani::where('id_bagi_bulanan', $bulan->id_bagi_bulanan)->delete();
 
-            // Hapus header bulanan
+            // HAPUS HEADER BULANAN
             $bulan->delete();
         });
 
         return redirect()
             ->route('bagi-hasil-bulanan.index')
-            ->with('success', 'Bagi hasil bulan ini berhasil dihapus dan saldo diperbarui.');
+            ->with('success', 'Bagi hasil bulan ini berhasil dihapus');
     }
 
     public function show($id)

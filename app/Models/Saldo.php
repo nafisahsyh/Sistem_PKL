@@ -33,4 +33,11 @@ class Saldo extends Model
     {
         return $this->belongsTo(Tahun_Tanam::class, 'id_tahun_tanam');
     }
+
+     public function transaksi()
+    {
+        return $this->hasMany(Transaksi::class, 'id_petani', 'id_petani')
+            ->whereColumn('transaksi.id_desa', 'saldo.id_desa')
+            ->whereColumn('transaksi.id_tahun_tanam', 'saldo.id_tahun_tanam');
+    }
 }

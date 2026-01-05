@@ -167,6 +167,11 @@
                         class="btn btn-info btn-sm text-dark">
                         <i class="fas fa-file-pdf"></i> Lihat
                     </a>
+
+                    <a href="{{ route('shm.download', $detail->id_detail_kepemilikan) }}"
+                        class="btn btn-success btn-sm">
+                        <i class="fas fa-download"></i> Unduh
+                    </a>
                 @else
                     <span class="text-muted">Tidak ada file</span>
                 @endif

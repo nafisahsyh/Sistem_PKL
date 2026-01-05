@@ -15,7 +15,7 @@
                     <div class="col-md-4 mb-3">
                         <label for="id_desa" class="form-label">Desa <span class="text-danger">*</span></label>
                         <select name="id_desa" id="id_desa"
-                            class="form-select text-kecil @error('id_desa') is-invalid @enderror" required>
+                            class="form-select text-kecil @error('id_desa') is-invalid @enderror" disabled>
                             <option value="">Pilih Desa</option>
                             @foreach ($desa as $d)
                                 <option value="{{ $d->id_desa }}"
@@ -29,11 +29,13 @@
                         @enderror
                     </div>
 
+                    <input type="hidden" name="id_desa" value="{{ $bulanan->id_desa }}">
+
                     <div class="col-md-4 mb-3">
                         <label for="id_tahun_tanam" class="form-label">Tahun Tanam <span
                                 class="text-danger">*</span></label>
                         <select name="id_tahun_tanam" id="id_tahun_tanam"
-                            class="form-select text-kecil @error('id_tahun_tanam') is-invalid @enderror" required>
+                            class="form-select text-kecil @error('id_tahun_tanam') is-invalid @enderror" disabled>
                             <option value="">Pilih Tahun Tanam</option>
                             @foreach ($tahunTanam as $t)
                                 <option value="{{ $t->id_tahun_tanam }}"
@@ -47,6 +49,8 @@
                         @enderror
                     </div>
 
+                    <input type="hidden" name="id_tahun_tanam" value="{{ $bulanan->id_tahun_tanam }}">
+
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Total Luas Lahan</label>
                         <input type="text" id="total_luas" class="form-control text-kecil"
@@ -58,7 +62,7 @@
                     <div class="col-md-4 mb-3">
                         <label for="bulan" class="form-label">Bulan <span class="text-danger">*</span></label>
                         <select name="bulan" id="bulan"
-                            class="form-select text-kecil @error('bulan') is-invalid @enderror" required>
+                            class="form-select text-kecil @error('bulan') is-invalid @enderror" disabled>
                             @php
                                 $namaBulan = [
                                     'Januari',
@@ -87,15 +91,19 @@
                         @enderror
                     </div>
 
+                    <input type="hidden" name="bulan" value="{{ $bulanan->bulan }}">
+
                     <div class="col-md-4 mb-3">
                         <label for="tahun" class="form-label">Tahun <span class="text-danger">*</span></label>
                         <input type="number" name="tahun"
                             class="form-control text-kecil @error('tahun') is-invalid @enderror"
-                            value="{{ old('tahun', $bulanan->tahun) }}" required>
+                            value="{{ old('tahun', $bulanan->tahun) }}" readonly>
                         @error('tahun')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <input type="hidden" name="tahun" value="{{ $bulanan->tahun }}">
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Sisa Saldo Periode Sebelumnya</label>
