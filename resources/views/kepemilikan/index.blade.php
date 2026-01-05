@@ -63,7 +63,7 @@
                         @endif
 
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari nama petani, nomor plasma, atau desa..." value="{{ request('search') }}"
+                            placeholder="Cari Nama, No Plasma/Desa..." value="{{ request('search') }}"
                             style="width: 300px;">
 
                         <button class="btn btn-success" type="submit" title="Cari">

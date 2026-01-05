@@ -16,7 +16,7 @@
                     {{-- Form Search --}}
                     <form action="{{ route('desa.index') }}" method="GET" class="d-flex align-items-start mb-3">
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari desa atau kecamatan..." value="{{ request('search') }}" style="width: 300px;">
+                            placeholder="Cari Desa/Kecamatan..." value="{{ request('search') }}" style="width: 300px;">
                         <button class="btn btn-success" type="submit" title="Search">
                             <i class="fas fa-search"></i>
                         </button>

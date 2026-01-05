@@ -19,8 +19,8 @@
                         <input type="hidden" name="status"
                             value="{{ is_array(request('status')) ? implode(',', request('status')) : request('status') }}">
                         <input type="text" name="search" class="form-control form-control-search me-2"
-                            placeholder="Cari nama, NIK, atau nomor anggota..." value="{{ request('search') }}"
-                            style="width: 300px;">
+                            placeholder="Cari Nama, NIK/No Plasma/Koperasi..." value="{{ request('search') }}"
+                            style="width: 350px;">
                         <button class="btn btn-success" type="submit" title="Search">
                             <i class="fas fa-search"></i>
                         </button>

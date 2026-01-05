@@ -211,9 +211,9 @@
             <tr style="font-weight: bold;">
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Nominal</td>
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sisa Saldo</td>
-                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Petani</td>
-                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Mengambil</td>
-                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Mengambil</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Total Pengambilan</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Sudah Diambil</td>
+                <td rowspan="2" style="border: 1px solid #000; text-align: center;">Belum Diambil</td>
                 <td colspan="2" style="border: 1px solid #000; text-align: center;">Metode</td>
             </tr>
 

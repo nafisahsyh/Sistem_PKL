@@ -91,8 +91,8 @@
 
                         {{-- Search input --}}
                         <input type="text" name="search" class="form-control form-control-search"
-                            placeholder="Cari No Plasma atau Nama Petani..." value="{{ request('search') }}"
-                            style="width: 250px;">
+                            placeholder="Cari Nama/No Plasma..." value="{{ request('search') }}"
+                            style="width: 300px;">
 
                         <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
 

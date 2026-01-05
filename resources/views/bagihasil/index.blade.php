@@ -83,7 +83,7 @@
 
                         <input type="text" name="search" class="form-control form-control-search me-2"
                             placeholder="Cari desa atau tahun tanam..." value="{{ request('search') }}"
-                            style="width: 250px;">
+                            style="width: 300px;">
 
                         <button class="btn btn-success" type="submit">
                             <i class="fas fa-search"></i>
