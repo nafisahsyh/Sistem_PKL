@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('periode_akhir');  // contoh: 2025-02
 
             $table->decimal('nominal', 15, 2); // nominal periode ini
+            $table->json('nominal_per_bulan')->nullable(); // nominal per bulan
 
             $table->timestamps();
 

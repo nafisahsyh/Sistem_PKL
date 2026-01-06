@@ -14,6 +14,11 @@ class TransaksiDetail extends Model
         'periode_awal',
         'periode_akhir',
         'nominal',
+        'nominal_per_bulan',
+    ];
+
+    protected $casts = [
+        'nominal_per_bulan' => 'array', // supaya otomatis jadi array saat diakses
     ];
 
     public function transaksi()
