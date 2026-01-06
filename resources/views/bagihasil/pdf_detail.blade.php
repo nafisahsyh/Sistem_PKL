@@ -198,13 +198,13 @@
     <table>
         <colgroup>
             <col style="width: 4%"> <!-- No -->
-            <col style="width: 20%"> <!-- Nama Petani -->
+            <col style="width: 22%"> <!-- Nama Petani -->
             <col style="width: 9%"> <!-- No Plasma -->
-            <col style="width: 7%"> <!-- No Koperasi -->
-            <col style="width: 10%"> <!-- Luas Lahan -->
-            <col style="width: 15%"> <!-- Nominal Bulan Ini -->
-            <col style="width: 10%"> <!-- Saldo Periode Lalu -->
-            <col style="width: 15%"> <!-- Total -->
+            <col style="width: 9%"> <!-- No Koperasi -->
+            <col style="width: 10%"> <!-- Luas -->
+            <col style="width: 15%"> <!-- Nominal -->
+            <col style="width: 15%"> <!-- Saldo -->
+            <col style="width: 16%"> <!-- Total -->
         </colgroup>
 
         <thead class="petani">
@@ -214,7 +214,7 @@
                 <th>No Plasma</th>
                 <th>No Koperasi</th>
                 <th>Luas Lahan</th>
-                <th>Nominal Bulan Ini</th>
+                <th>Nominal</th>
                 <th>Saldo Periode Lalu</th>
                 <th>Total</th>
             </tr>
@@ -228,15 +228,15 @@
                     <td style="text-align:center">{{ $p['no_koperasi'] ?? '-' }}</td>
                     <td style="text-align:center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
                     <td style="text-align: right">
-                        Rp {{ number_format($p['nominal_bulan_ini'], 0, ',', '.') }}
+                        Rp {{ number_format($p['nominal_bulan_ini'], 2, ',', '.') }}
                     </td>
 
                     <td style="text-align: right">
-                        Rp {{ number_format($p['sisa_saldo'], 0, ',', '.') }}
+                        Rp {{ number_format($p['sisa_saldo'], 2, ',', '.') }}
                     </td>
 
                     <td style="text-align: right">
-                        Rp {{ number_format($p['total_hak'], 0, ',', '.') }}
+                        Rp {{ number_format($p['total_hak'], 2, ',', '.') }}
                     </td>
                 </tr>
             @endforeach

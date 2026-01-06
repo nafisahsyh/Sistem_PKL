@@ -119,7 +119,6 @@
             padding: 6px;
             text-align: center;
         }
-
     </style>
 </head>
 
@@ -193,10 +192,10 @@
                 <tr>
                     <td style="border:1px solid #000; padding:5px; text-align:center">{{ $item->tahun_tanam }}</td>
                     <td style="border:1px solid #000; padding:5px; text-align:right;">
-                        Rp {{ number_format($item->total_nominal, 0, ',', '.') }}
+                        Rp {{ number_format($item->total_nominal, 2, ',', '.') }}
                     </td>
                     <td style="border:1px solid #000; padding:5px; text-align:right;">
-                        Rp {{ number_format($item->sisa, 0, ',', '.') }}
+                        Rp {{ number_format($item->sisa, 2, ',', '.') }}
                     </td>
                 </tr>
             @endforeach
@@ -226,9 +225,9 @@
             <!-- Baris 3: Jumlah orang -->
             <tr>
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp
-                    {{ number_format($stat['total_nominal'] ?? 0, 0, ',', '.') }}</td>
+                    {{ number_format($stat['total_nominal'] ?? 0, 2, ',', '.') }}</td>
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;"> Rp
-                    {{ number_format($stat['sisa'] ?? 0, 0, ',', '.') }}</td>
+                    {{ number_format($stat['sisa'] ?? 0, 2, ',', '.') }}</td>
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_petani'] ?? 0 }}
                 </td>
                 <td rowspan="2" style="border: 1px solid #000; text-align: center;">{{ $stat['total_sudah'] ?? 0 }}
@@ -242,9 +241,9 @@
             <!-- Baris 4: Nominal -->
             <tr>
                 <td style="border: 1px solid #000; text-align: right;">Rp
-                    {{ number_format($stat['nominal_cash'] ?? 0, 0, ',', '.') }}</td>
+                    {{ number_format($stat['nominal_cash'] ?? 0, 2, ',', '.') }}</td>
                 <td style="border: 1px solid #000; text-align: right;">Rp
-                    {{ number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.') }}</td>
+                    {{ number_format($stat['nominal_transfer'] ?? 0, 2, ',', '.') }}</td>
             </tr>
         </table>
 
@@ -261,6 +260,8 @@
                     <th style="text-align: center">Luas Lahan</th>
                     <th style="text-align: center">Periode</th>
                     <th style="text-align: center">Nominal</th>
+                    <th style="text-align: center">Saldo Lalu</th>
+                    <th style="text-align: center">Total Hak</th>
                     <th style="text-align: center">Sisa</th>
                     <th style="text-align: center">Metode</th>
                 </tr>
@@ -275,8 +276,15 @@
                         <td class="text-center">{{ $row->tahun_tanam }}</td>
                         <td class="text-center">{{ number_format($row->luasan, 2, ',', '.') }} Ha</td>
                         <td>{{ $row->periode }}</td>
-                        <td class="text-end">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</td>
-                        <td class="text-end">Rp {{ number_format($row->sisa, 0, ',', '.') }}</td>
+                        <td class="text-end">Rp {{ number_format($row->total_nominal, 2, ',', '.') }}</td>
+                        <td class="text-end">
+                            Rp {{ number_format($row->saldo_lalu ?? 0, 2, ',', '.') }}
+                        </td>
+
+                        <td class="text-end">
+                            Rp {{ number_format(($row->saldo_lalu ?? 0) + $row->total_nominal, 2, ',', '.') }}
+                        </td>
+                        <td class="text-end">Rp {{ number_format($row->sisa, 2, ',', '.') }}</td>
                         <td class="text-center">{{ ucfirst($row->status_metode) }}</td>
                     </tr>
                 @endforeach

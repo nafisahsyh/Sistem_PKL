@@ -184,7 +184,7 @@
 
                     {{-- NOMINAL --}}
                     <td class="text-right">
-                        Rp {{ number_format($trx->total_nominal, 0, ',', '.') }}
+                        Rp {{ number_format($trx->total_nominal, 2, ',', '.') }}
                     </td>
 
                     {{-- METODE (khusus debit) --}}

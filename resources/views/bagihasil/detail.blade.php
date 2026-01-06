@@ -74,8 +74,8 @@
                             <td>
                                 {{ $bulanan->tanggal_bagi ? \Carbon\Carbon::parse($bulanan->tanggal_bagi)->format('d-m-Y') : '-' }}
                             </td>
-                            <td>Rp {{ number_format($bulanan->total_bagian, 0, ',', '.') }}</td>
-                             <td>Rp {{ number_format($bulanan->sisa_saldo_snapshot, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($bulanan->total_bagian, 2, ',', '.') }}</td>
+                            <td>Rp {{ number_format($bulanan->sisa_saldo_snapshot, 2, ',', '.') }}</td>
 
                         </tr>
                     </tbody>
@@ -131,15 +131,15 @@
                                 <td>{{ $p['nama_petani'] }}</td>
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') ?? '-' }} Ha</td>
                                 <td class="text-right">
-                                    Rp {{ number_format($p['nominal_bulan_ini'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['nominal_bulan_ini'], 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-right">
-                                    Rp {{ number_format($p['sisa_saldo'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['sisa_saldo'], 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-right">
-                                    Rp {{ number_format($p['total_hak'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['total_hak'], 2, ',', '.') }}
                                 </td>
 
                             </tr>

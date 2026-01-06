@@ -173,10 +173,10 @@
                     <td>{{ $bulanIndonesia[$b->bulan] }}</td>
                     <td>{{ $b->tahun }}</td>
                     <td>{{ \Carbon\Carbon::parse($b->tanggal_bagi)->format('d-m-Y') }}</td>
-                    <td>Rp {{ number_format($b->total_bagian, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($b->sisa_saldo_snapshot, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($b->total_bagian, 2, ',', '.') }}</td>
+                    <td>Rp {{ number_format($b->sisa_saldo_snapshot, 2, ',', '.') }}</td>
                     <td>
-                        Rp {{ number_format($b->total_bagian + $b->sisa_saldo_snapshot, 0, ',', '.') }}
+                        Rp {{ number_format($b->total_bagian + $b->sisa_saldo_snapshot, 2, ',', '.') }}
                     </td>
                 </tr>
             @empty

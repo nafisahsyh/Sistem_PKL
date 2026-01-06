@@ -27,13 +27,13 @@
             $cards = [
                 [
                     'title' => 'Total Nominal',
-                    'count' => 'Rp ' . number_format($stat['total_nominal'] ?? 0, 0, ',', '.'),
+                    'count' => 'Rp ' . number_format($stat['total_nominal'] ?? 0, 2, ',', '.'),
                     'bg' => '#F4F6F5', // abu hijau sangat lembut
                     'text' => '#2F4F4F', // hijau gelap keabu
                 ],
                 [
                     'title' => 'Total Sisa Saldo',
-                    'count' => 'Rp ' . number_format($stat['sisa'] ?? 0, 0, ',', '.'),
+                    'count' => 'Rp ' . number_format($stat['sisa'] ?? 0, 2, ',', '.'),
                     'bg' => '#E3F2EC', // hijau pastel
                     'text' => '#0B4F3F', // hijau sawit
                 ],
@@ -58,14 +58,14 @@
                 [
                     'title' => 'Cash',
                     'count' => ($stat['jumlah_cash'] ?? 0) . ' orang',
-                    'extra' => 'Rp ' . number_format($stat['nominal_cash'] ?? 0, 0, ',', '.'),
+                    'extra' => 'Rp ' . number_format($stat['nominal_cash'] ?? 0, 2, ',', '.'),
                     'bg' => '#E6F0EB', // hijau muda
                     'text' => '#145A32',
                 ],
                 [
                     'title' => 'Transfer',
                     'count' => ($stat['jumlah_transfer'] ?? 0) . ' orang',
-                    'extra' => 'Rp ' . number_format($stat['nominal_transfer'] ?? 0, 0, ',', '.'),
+                    'extra' => 'Rp ' . number_format($stat['nominal_transfer'] ?? 0, 2, ',', '.'),
                     'bg' => '#EFEFEF', // abu natural
                     'text' => '#343A40',
                 ],
@@ -97,47 +97,47 @@
         @endif
 
         @if ($hanyaFilterTahun)
-        {{-- ================= REKAP TAHUN TANAM ================= --}}
-        <div class="card mb-4">
-            <div class="card-header fw-bold">
-                Rekap Bagi Hasil per Tahun Tanam
-                <span class="badge bg-secondary ms-2">
-                    Akumulasi seluruh desa
-                </span>
-            </div>
+            {{-- ================= REKAP TAHUN TANAM ================= --}}
+            <div class="card mb-4">
+                <div class="card-header fw-bold">
+                    Rekap Bagi Hasil per Tahun Tanam
+                    <span class="badge bg-secondary ms-2">
+                        Akumulasi seluruh desa
+                    </span>
+                </div>
 
-            <div class="card-body">
-                <div class="row">
-                    @forelse ($rekapTahunan as $item)
-                        <div class="col-md-3 mb-3">
-                            <div class="border rounded p-3 h-100">
-                                <div class="fw-bold fs-5">
-                                    {{ $item->tahun_tanam }}
-                                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @forelse ($rekapTahunan as $item)
+                            <div class="col-md-3 mb-3">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-bold fs-5">
+                                        {{ $item->tahun_tanam }}
+                                    </div>
 
-                                <div class="small text-muted mt-2">
-                                    Total Nominal
-                                </div>
-                                <div class="fw-semibold">
-                                    Rp {{ number_format($item->total_nominal, 0, ',', '.') }}
-                                </div>
+                                    <div class="small text-muted mt-2">
+                                        Total Nominal
+                                    </div>
+                                    <div class="fw-semibold">
+                                        Rp {{ number_format($item->total_nominal, 2, ',', '.') }}
+                                    </div>
 
-                                <div class="small text-muted mt-2">
-                                    Sisa
-                                </div>
-                                <div class="fw-semibold text-danger">
-                                    Rp {{ number_format($item->sisa, 0, ',', '.') }}
+                                    <div class="small text-muted mt-2">
+                                        Sisa
+                                    </div>
+                                    <div class="fw-semibold text-danger">
+                                        Rp {{ number_format($item->sisa, 2, ',', '.') }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="text-muted">
-                            Tidak ada data rekap.
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="text-muted">
+                                Tidak ada data rekap.
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
-        </div>
         @endif
 
         {{-- CARD --}}
@@ -200,6 +200,8 @@
                             <th>Luas Lahan</th>
                             <th>Periode</th>
                             <th>Nominal</th>
+                            <th>Saldo Lalu</th>
+                            <th>Total Hak</th>
                             <th>Sisa</th>
                             <th>Metode</th>
                         </tr>
@@ -227,11 +229,19 @@
                                 <td>{{ $row->periode }}</td>
 
                                 <td class="text-end">
-                                    Rp {{ number_format($row->total_nominal, 0, ',', '.') }}
+                                    Rp {{ number_format($row->total_nominal, 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-end">
-                                    Rp {{ number_format($row->sisa, 0, ',', '.') }}
+                                    Rp {{ number_format($row->saldo_lalu ?? 0, 2, ',', '.') }}
+                                </td>
+
+                                <td class="text-end">
+                                    Rp {{ number_format(($row->saldo_lalu ?? 0) + $row->total_nominal, 2, ',', '.') }}
+                                </td>
+
+                                <td class="text-end">
+                                    Rp {{ number_format($row->sisa, 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-center">
@@ -247,7 +257,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">
+                                <td colspan="12" class="text-center text-muted py-4">
                                     <i class="fas fa-folder-open fa-2x mb-2"></i><br>
                                     Belum ada data
                                 </td>

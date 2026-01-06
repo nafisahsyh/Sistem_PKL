@@ -1045,3 +1045,17 @@ tr.even-row td.striping {
     flex-direction: column;
     gap: 4px;
 }
+
+/* Judul card */
+.summary-card small {
+    font-size: 0.8rem;
+    line-height: 1.1;
+    opacity: 0.85;
+}
+
+/* Angka utama */
+.summary-card strong {
+    font-size: 1.0rem;   /* INI yang paling penting */
+    font-weight: 600;
+    line-height: 1.2;
+}

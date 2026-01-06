@@ -87,15 +87,15 @@
                                 </td>
 
                                 <td class="text-end">
-                                    Rp {{ number_format($p['total_periode'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['total_periode'], 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-end">
-                                    Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['saldo_periode_lalu'], 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-end">
-                                    Rp {{ number_format($p['total_saldo'], 0, ',', '.') }}
+                                    Rp {{ number_format($p['total_saldo'], 2, ',', '.') }}
                                 </td>
 
                                 <td class="text-center">

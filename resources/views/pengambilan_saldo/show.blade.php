@@ -62,13 +62,13 @@
                                 {{ $tahun }}
                             </td>
                             <td class="text-end">
-                                Rp {{ number_format($total_periode, 0, ',', '.') }}
+                                Rp {{ number_format($total_periode, 2, ',', '.') }}
                             </td>
                             <td class="text-end">
-                                Rp {{ number_format($saldo_periode_lalu, 0, ',', '.') }}
+                                Rp {{ number_format($saldo_periode_lalu, 2, ',', '.') }}
                             </td>
                             <td class="text-end">
-                                Rp {{ number_format($total_saldo_periode, 0, ',', '.') }}
+                                Rp {{ number_format($total_saldo_periode, 2, ',', '.') }}
                             </td>
                         </tr>
 
@@ -125,10 +125,10 @@
                                 <td class="text-center">{{ $p['no_koperasi'] ?? '-' }}</td>
                                 <td>{{ $p['nama_petani'] }}</td>
                                 <td class="text-center">{{ number_format($p['luas_ha'], 2, ',', '.') }} Ha</td>
-                                <td class="text-end">Rp {{ number_format($p['nominal'], 0, ',', '.') }}</td>
-                                <td class="text-end">Rp {{ number_format($p['saldo_periode_lalu'], 0, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($p['nominal'], 2, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($p['saldo_periode_lalu'], 2, ',', '.') }}</td>
                                 {{-- saldo periode lalu --}}
-                                <td class="text-end">Rp {{ number_format($p['total_hak'], 0, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($p['total_hak'], 2, ',', '.') }}</td>
                                 {{-- total hak --}}
                                 <td class="text-center">
                                     {{-- Aksi Ambil / Status --}}
@@ -280,7 +280,7 @@
                                             Saldo Bulan {{ $bulanSingkat[$bulan_awal] }}
                                         </label>
                                         <input type="text" class="form-control"
-                                            value="Rp {{ number_format($p['nominal_bulan_1'], 0, ',', '.') }}" readonly>
+                                            value="Rp {{ number_format($p['nominal_bulan_1'], 2, ',', '.') }}" readonly>
                                     </div>
 
                                     <div class="col-4">
@@ -288,13 +288,13 @@
                                             Saldo Bulan {{ $bulanSingkat[$bulan_akhir] }}
                                         </label>
                                         <input type="text" class="form-control"
-                                            value="Rp {{ number_format($p['nominal_bulan_2'], 0, ',', '.') }}" readonly>
+                                            value="Rp {{ number_format($p['nominal_bulan_2'], 2, ',', '.') }}" readonly>
                                     </div>
 
                                     <div class="col-4">
                                         <label class="form-label fw-bold">Total Saldo</label>
                                         <input type="text" class="form-control"
-                                            value="Rp {{ number_format($p['nominal'], 0, ',', '.') }}" readonly>
+                                            value="Rp {{ number_format($p['nominal'], 2, ',', '.') }}" readonly>
                                     </div>
                                 @else
                                     @foreach ($p['saldo_periode_list'] as $sp)
@@ -310,14 +310,14 @@
 
                                             </label>
                                             <input type="text" class="form-control"
-                                                value="Rp {{ number_format($sp['saldo'], 0, ',', '.') }}" readonly>
+                                                value="Rp {{ number_format($sp['saldo'], 2, ',', '.') }}" readonly>
                                         </div>
                                     @endforeach
 
                                     <div class="col-4 mb-3">
                                         <label class="form-label fw-bold">Total Saldo</label>
                                         <input type="text" class="form-control"
-                                            value="Rp {{ number_format($p['total_saldo_akumulasi'], 0, ',', '.') }}"
+                                            value="Rp {{ number_format($p['total_saldo_akumulasi'], 2, ',', '.') }}"
                                             readonly>
                                     </div>
                                 @endif

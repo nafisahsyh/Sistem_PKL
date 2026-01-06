@@ -50,8 +50,9 @@
                                 @endif
                             @endforeach
 
-                            <input type="text" name="search" class="form-control" placeholder="Cari Nama/No Plasma/Koperasi..."
-                                value="{{ request('search') }}" style="width: 300px;">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Cari Nama/No Plasma/Koperasi..." value="{{ request('search') }}"
+                                style="width: 300px;">
                             <button class="btn btn-success"><i class="fas fa-search"></i></button>
                             <a href="{{ route('inisiasi-saldo.index', [
                                 'id_desa' => request('id_desa'),
@@ -107,8 +108,8 @@
                                 <td class="text-center">{{ $row->desa }}</td>
                                 <td class="text-center">{{ $row->tahun_tanam }}</td>
 
-                                <td class="text-end">
-                                    {{ $saldoAwal ? 'Rp ' . number_format($saldoAwal->saldo_awal, 0, ',', '.') : '-' }}
+                                <td class="{{ $saldoAwal ? 'text-end' : 'text-center' }}">
+                                    {{ $saldoAwal ? 'Rp ' . number_format($saldoAwal->saldo_awal, 2, ',', '.') : '-' }}
                                 </td>
 
                                 <td class="text-center">

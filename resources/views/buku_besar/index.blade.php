@@ -152,7 +152,7 @@
                                     {{ number_format($luasan, 2, ',', '.') }} Ha
                                 </td>
                                 <td>{{ $periode }}</td>
-                                <td class="text-end">Rp {{ number_format($totalNominal, 0, ',', '.') }}</td>
+                                <td class="text-end">Rp {{ number_format($totalNominal, 2, ',', '.') }}</td>
                                 {{-- KOLM TERAKHIR KONDISIONAL --}}
                                 @if (request('tipe') == 'debit_pengambilan')
                                     <td class="text-center">{{ ucfirst($metode) }}</td>
