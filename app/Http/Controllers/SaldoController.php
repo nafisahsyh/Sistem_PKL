@@ -734,7 +734,7 @@ class SaldoController extends Controller
             'request' => $request,
         ]);
 
-        $pdf->setPaper('A4', 'landscape');
+        $pdf->setPaper('A4', $hanyaFilterTahun ? 'portrait' : 'landscape');
 
         //Mengambil nama desa
         $desa = $request->filled('id_desa')
