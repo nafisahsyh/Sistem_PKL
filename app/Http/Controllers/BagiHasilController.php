@@ -571,32 +571,45 @@ class BagiHasilController extends Controller
                     ->orderBy('bulan_awal')
                     ->get();
 
-                $saldo = Saldo::where('id_petani', $idPetani)
+                // AMBIL SALDO AWAL
+                $saldoAwal = Saldo::where('id_petani', $idPetani)
                     ->where('id_desa', $bulan->id_desa)
                     ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
+                    ->where('saldo_awal', '>', 0)
+                    ->first();
+
+                // AMBIL SALDO AKUMULASI
+                $saldoAkumulasi = Saldo::where('id_petani', $idPetani)
+                    ->where('id_desa', $bulan->id_desa)
+                    ->where('id_tahun_tanam', $bulan->id_tahun_tanam)
+                    ->where('saldo_awal', 0)
                     ->lockForUpdate()
                     ->first();
 
                 // APABILA TIDAK ADA TRANSAKSI TERSISA, HAPUS SALDO
                 if ($trxSisa->isEmpty()) {
-                    if ($saldo) {
-                        $saldo->delete();
+                    if ($saldoAkumulasi) {
+                        $saldoAkumulasi->delete();
                     }
                     continue;
                 }
 
                 // BUAT ULANG SALDO
-                if (!$saldo) {
-                    $saldo = new Saldo();
-                    $saldo->id_petani = $idPetani;
-                    $saldo->id_desa = $bulan->id_desa;
-                    $saldo->id_tahun_tanam = $bulan->id_tahun_tanam;
+                if (!$saldoAkumulasi) {
+                    $saldoAkumulasi = new Saldo();
+                    $saldoAkumulasi->id_petani = $idPetani;
+                    $saldoAkumulasi->id_desa = $bulan->id_desa;
+                    $saldoAkumulasi->id_tahun_tanam = $bulan->id_tahun_tanam;
+                    $saldoAkumulasi->saldo_awal = 0;
                 }
 
-                $saldo->bulan_awal = $trxSisa->first()->bulan_awal;
-                $saldo->bulan_akhir = $trxSisa->last()->bulan_akhir;
-                $saldo->saldo = $trxSisa->sum('nominal');
-                $saldo->save();
+                $saldoAkumulasi->bulan_awal = $trxSisa->first()->bulan_awal;
+                $saldoAkumulasi->bulan_akhir = $trxSisa->last()->bulan_akhir;
+
+                $saldoAkumulasi->saldo =
+                    ($saldoAwal->saldo ?? 0) + $trxSisa->sum('nominal');
+
+                $saldoAkumulasi->save();
             }
 
             // HAPUS DETAIL BAGI HASIL PETANI PADA BULAN INI
