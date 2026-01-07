@@ -75,7 +75,7 @@
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                         data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
                         <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
-                        Transaksi
+                        Bagi Hasil KSM
                     </a>
 
                     <div class="collapse 
@@ -91,12 +91,12 @@
                             <a class="nav-link {{ request()->is('bagi-hasil-bulanan') ? 'active' : '' }}"
                                 href="/bagi-hasil-bulanan">
                                 <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
-                                Kelola KSM
+                                Bulanan
                             </a>
                             <a class="nav-link {{ request()->is('pengambilan-saldo*') ? 'active' : '' }}"
                                 href="{{ route('pengambilan.index') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-people-arrows"></i></div>
-                                Bagi Hasil
+                                Periode
                             </a>
                             <a class="nav-link {{ request()->is('inisiasi-saldo*') ? 'active' : '' }}"
                                 href="{{ route('inisiasi-saldo.index') }}">
