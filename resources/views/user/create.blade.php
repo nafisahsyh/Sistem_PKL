@@ -50,7 +50,6 @@
                             <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }}>Super Admin
                             </option>
                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="karyawan" {{ old('role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
                         </select>
                         @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>

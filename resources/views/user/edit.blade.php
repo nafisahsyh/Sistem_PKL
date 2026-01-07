@@ -57,8 +57,6 @@
                                 Super Admin</option>
                             <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin
                             </option>
-                            <option value="karyawan" {{ old('role', $user->role) == 'karyawan' ? 'selected' : '' }}>
-                                Karyawan</option>
                         </select>
 
                         @if ($user->id_user == auth()->user()->id_user || ($user->role == 'super_admin' && $superAdminCount == 1))
