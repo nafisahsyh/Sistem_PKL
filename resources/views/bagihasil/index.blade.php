@@ -11,7 +11,7 @@
 
         {{-- HEADER + BUTTON TAMBAH --}}
         <div class="d-flex justify-content-between align-items-end mb-3">
-            <h3 class="text-brown mb-0">Bagi Hasil Per Bulan</h3>
+            <h3 class="text-brown mb-0">Bagi Hasil Bulanan</h3>
             <a href="{{ route('bagi-hasil-bulanan.list-pdf') }}?id_desa={{ request('id_desa') }}&id_tahun_tanam={{ request('id_tahun_tanam') }}&bulan_start={{ request('bulan_start') }}&bulan_end={{ request('bulan_end') }}"
                 target="_blank" class="btn btn-danger">
                 <i class="fas fa-file-pdf"></i> Cetak PDF
