@@ -691,11 +691,7 @@ class KepemilikanController extends Controller
         $lahanList = $request->lahan;
 
         foreach ($lahanList as $index => $lahanData) {
-            // Kalau status_kepemilikan = nonaktif → otomatis status_pengelolaan = Perusahaan
-            if ($lahanData['status_kepemilikan'] === 'nonaktif') {
-                $lahanList[$index]['status_pengelolaan'] = 'Perusahaan';
-            }
-
+            
             // Kalau status_pengelolaan = Perusahaan → otomatis status_kepemilikan = nonaktif
             if ($lahanData['status_pengelolaan'] === 'Perusahaan') {
                 $lahanList[$index]['status_kepemilikan'] = 'nonaktif';

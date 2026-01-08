@@ -325,36 +325,13 @@
                         );
                         if (!kepemilikanSelect) return;
 
-                        let targetValue = 'aktif';
-                        if (this.value === 'Perusahaan') targetValue = 'nonaktif';
-                        //Jangan paksa value untuk Mandiri/KSM
-                        if (kepemilikanSelect.choicesInstance) {
-                            kepemilikanSelect.choicesInstance.setChoiceByValue(targetValue);
-                        } else {
-                            kepemilikanSelect.value = targetValue;
-                        }
-
-                        kepemilikanSelect.dispatchEvent(new Event('change'));
-                    });
-                });
-
-                // Dari Status Kepemilikan → Pengelolaan
-                context.querySelectorAll('select[name$="[status_kepemilikan]"]').forEach(kepemilikanSelect => {
-                    kepemilikanSelect.addEventListener('change', function() {
-                        const index = this.name.match(/\d+/)[0];
-                        const pengelolaanSelect = context.querySelector(
-                            `select[name="lahan[${index}][status_pengelolaan]"]`
-                        );
-                        if (!pengelolaanSelect) return;
-
-                        //Hanya ubah jika status_kepemilikan = nonaktif
-                        if (this.value === 'nonaktif') {
-                            if (pengelolaanSelect.choicesInstance) {
-                                pengelolaanSelect.choicesInstance.setChoiceByValue('Perusahaan');
+                        // HANYA paksa jika Perusahaan
+                        if (this.value === 'Perusahaan') {
+                            if (kepemilikanSelect.choicesInstance) {
+                                kepemilikanSelect.choicesInstance.setChoiceByValue('nonaktif');
                             } else {
-                                pengelolaanSelect.value = 'Perusahaan';
+                                kepemilikanSelect.value = 'nonaktif';
                             }
-                            pengelolaanSelect.dispatchEvent(new Event('change'));
                         }
                     });
                 });
