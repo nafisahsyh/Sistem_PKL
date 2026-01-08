@@ -102,9 +102,13 @@
 
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_ktp" class="form-label">Scan KTP</label>
-                        <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp" class="form-control text-kecil"
+                        <input type="file" name="pdf_scan_ktp" id="pdf_scan_ktp"
+                            class="form-control text-kecil @error('pdf_scan_ktp') is-invalid @enderror"
                             accept="application/pdf">
 
+                        @error('pdf_scan_ktp')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                         <input type="hidden" name="hapus_ktp" id="hapus_ktp" value="0">
                         <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                         @if ($petani->pdf_scan_ktp)
@@ -126,9 +130,13 @@
 
                     <div class="col-md-6 mb-3">
                         <label for="pdf_scan_kk" class="form-label">Scan KK</label>
-                        <input type="file" name="pdf_scan_kk" id="pdf_scan_kk" class="form-control text-kecil"
+                        <input type="file" name="pdf_scan_kk" id="pdf_scan_kk"
+                            class="form-control text-kecil @error('pdf_scan_kk') is-invalid @enderror"
                             accept="application/pdf">
 
+                        @error('pdf_scan_kk')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                         <input type="hidden" name="hapus_kk" id="hapus_kk" value="0">
                         <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                         @if ($petani->pdf_scan_kk)

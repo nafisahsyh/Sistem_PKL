@@ -19,15 +19,6 @@
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <form action="{{ route('petani.storeKepemilikan') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -176,7 +167,8 @@
                                 <input type="text" name="lahan[0][nama_SHM]" class="form-control text-kecil">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Luas Sesuai Lapangan (M²)<span class="text-danger">*</span></label>
+                                <label class="form-label">Luas Sesuai Lapangan (M²)<span
+                                        class="text-danger">*</span></label>
                                 <input type="number" step="0.01" name="lahan[0][luas_peta]"
                                     class="form-control text-kecil" min="0" required>
                             </div>
@@ -267,14 +259,26 @@
                         <div class="row mt-2">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM</label>
-                                <input type="file" name="lahan[0][pdf_scan_shm]" class="form-control"
+                                <input type="file" name="lahan[0][pdf_scan_shm]"
+                                    class="form-control text-kecil @error('lahan.0.pdf_scan_shm') is-invalid @enderror"
                                     accept="application/pdf">
+                                @error('lahan.0.pdf_scan_shm')
+                                    <div class="text-danger fst-italic small mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                                 <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan Peta</label>
                                 <input type="file" name="lahan[0][pdf_scan_peta]" class="form-control"
+                                    class="form-control text-kecil @error('lahan.0.pdf_scan_peta') is-invalid @enderror"
                                     accept="application/pdf">
+                                @error('lahan.0.pdf_scan_peta')
+                                    <div class="text-danger fst-italic small mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                                 <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>
                             </div>
                         </div>
@@ -523,15 +527,21 @@
                         <div class="row mt-2">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan SHM</label>
-                                <input type="file" name="lahan[${lahanIndex}][pdf_scan_shm]" 
-                                    class="form-control"
+                                <input type="file"
+                                    name="lahan[${lahanIndex}][pdf_scan_shm]"
+                                    class="form-control pdf-input"
+                                    data-label="SHM"
+                                    data-max="30720"
                                     accept="application/pdf">
                                 <small class="text-muted-small">Jenis file diterima: PDF (maks. 30MB).</small>                                    
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Scan Peta</label>
-                                <input type="file" name="lahan[${lahanIndex}][pdf_scan_peta]" 
-                                    class="form-control"
+                                <input type="file"
+                                    name="lahan[${lahanIndex}][pdf_scan_peta]"
+                                    class="form-control pdf-input"
+                                    data-label="Peta"
+                                    data-max="10240"
                                     accept="application/pdf">
                                 <small class="text-muted-small">Jenis file diterima: PDF (maks. 10MB).</small>                                    
                             </div>
@@ -589,5 +599,4 @@
 
         });
     </script>
-
 @endsection
