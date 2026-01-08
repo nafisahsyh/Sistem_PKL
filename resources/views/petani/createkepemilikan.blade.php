@@ -298,7 +298,7 @@
             {{-- STATUS KEPEMILIKAN --}}
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-success me-2">Simpan</button>
-                <a href="{{ route('kepemilikan.index') }}" class="btn btn-danger">Batal</a>
+                <a href="{{ route('petani.index') }}" class="btn btn-danger">Batal</a>
             </div>
         </form>
     </div>
