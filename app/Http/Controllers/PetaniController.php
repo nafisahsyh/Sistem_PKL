@@ -42,7 +42,7 @@ class PetaniController extends Controller
         }
 
         // Urutkan & paginasi
-        $petani = $query->orderBy('id_petani', 'desc')->paginate(10);
+        $petani = $query->orderBy('id_petani', 'desc')->paginate(15);
         $petani->appends($request->only(['search', 'status']));
 
         return view('petani.index', compact('petani', 'status'));
