@@ -270,6 +270,21 @@ class SaldoController extends Controller
 
         $dataAll = $queryStat->get();
 
+        $multiPeriode = !$request->filled('periode');
+
+        if ($multiPeriode) {
+            // Ambil 1 baris TERAKHIR per petani
+            $dataStat = $dataAll
+                ->groupBy('id_petani')
+                ->map(function ($group) {
+                    return $group->sortByDesc('bulan_awal')->first();
+                })
+                ->values();
+        } else {
+            // Periode tunggal → aman
+            $dataStat = $dataAll;
+        }
+
         $dataAll->transform(function ($row) {
 
             $row->total_hak = round(
@@ -284,13 +299,13 @@ class SaldoController extends Controller
             return $row;
         });
 
-        $totalPetani = $dataAll->count();
+        $totalPetani = $dataStat->count();
 
-        $totalSudah = $dataAll->whereNotNull('nominal_debit')->count();
-        $totalBelum = $dataAll->whereNull('nominal_debit')->count();
+        $totalSudah = $dataStat->whereNotNull('nominal_debit')->count();
+        $totalBelum = $dataStat->whereNull('nominal_debit')->count();
 
         // ================= CASH =================
-        $cash = $dataAll
+        $cash = $dataStat
             ->where('metode', 'cash');
 
         $jumlahCash = $cash->count();
@@ -299,7 +314,7 @@ class SaldoController extends Controller
         });
 
         // ================= TRANSFER =================
-        $transfer = $dataAll
+        $transfer = $dataStat
             ->where('metode', 'transfer');
 
         $jumlahTransfer = $transfer->count();
@@ -307,9 +322,9 @@ class SaldoController extends Controller
             return ($row->saldo_lalu ?? 0) + ($row->total_nominal ?? 0);
         });
 
-        $totalNominal = $dataAll->sum('total_hak');
+        $totalNominal = $dataStat->sum('total_hak');
 
-        $totalSisa = $dataAll->sum('sisa');
+        $totalSisa = $dataStat->sum('sisa');
 
         $stat = [
             'total_petani' => $totalPetani,
@@ -324,12 +339,24 @@ class SaldoController extends Controller
         ];
 
         $rekapTahunan = $dataAll
+            // Kelompokkan per tahun
             ->groupBy('tahun_tanam')
-            ->map(function ($group, $tahun) {
+            ->map(function ($tahunGroup, $tahun) {
+
+                // Di dalam 1 tahun, ambil saldo TERAKHIR per petani
+                $perPetaniTerakhir = $tahunGroup
+                    ->groupBy('id_petani')
+                    ->map(function ($petaniGroup) {
+                    return $petaniGroup
+                        ->sortByDesc('bulan_awal')
+                        ->first();
+                });
+
+                // Rekap tahunan = jumlah saldo terakhir tiap petani
                 return (object) [
                     'tahun_tanam' => $tahun,
-                    'total_nominal' => $group->sum('total_hak'),
-                    'sisa' => $group->sum('sisa'),
+                    'total_nominal' => $perPetaniTerakhir->sum('total_hak'),
+                    'sisa' => $perPetaniTerakhir->sum('sisa'),
                 ];
             })
             ->values();
@@ -614,6 +641,21 @@ class SaldoController extends Controller
 
         $dataAll = $queryStat->get();
 
+        $multiPeriode = !$request->filled('periode');
+
+        if ($multiPeriode) {
+            // Ambil 1 baris TERAKHIR per petani
+            $dataStat = $dataAll
+                ->groupBy('id_petani')
+                ->map(function ($group) {
+                    return $group->sortByDesc('bulan_awal')->first();
+                })
+                ->values();
+        } else {
+            // Periode tunggal → aman
+            $dataStat = $dataAll;
+        }
+
         $dataAll->transform(function ($row) {
             $row->total_hak = round(
                 ($row->total_nominal ?? 0) + ($row->saldo_lalu ?? 0),
@@ -627,13 +669,13 @@ class SaldoController extends Controller
             return $row;
         });
 
-        $totalPetani = $dataAll->count();
+        $totalPetani = $dataStat->count();
 
-        $totalSudah = $dataAll->whereNotNull('nominal_debit')->count();
-        $totalBelum = $dataAll->whereNull('nominal_debit')->count();
+        $totalSudah = $dataStat->whereNotNull('nominal_debit')->count();
+        $totalBelum = $dataStat->whereNull('nominal_debit')->count();
 
         // ================= CASH =================
-        $cash = $dataAll
+        $cash = $dataStat
             ->where('metode', 'cash')
             ->whereNotNull('nominal_debit');
 
@@ -643,7 +685,7 @@ class SaldoController extends Controller
         });
 
         // ================= TRANSFER =================
-        $transfer = $dataAll
+        $transfer = $dataStat
             ->where('metode', 'transfer')
             ->whereNotNull('nominal_debit');
 
@@ -652,8 +694,8 @@ class SaldoController extends Controller
             return ($row->saldo_lalu ?? 0) + ($row->total_nominal ?? 0);
         });
 
-        $totalNominal = $dataAll->sum('total_hak');
-        $totalSisa = $dataAll->sum('sisa');
+        $totalNominal = $dataStat->sum('total_hak');
+        $totalSisa = $dataStat->sum('sisa');
 
         $stat = [
             'total_petani' => $totalPetani,
@@ -668,16 +710,27 @@ class SaldoController extends Controller
         ];
 
         $rekapTahunan = $dataAll
+            // Kelompokkan per tahun
             ->groupBy('tahun_tanam')
-            ->map(function ($group, $tahun) {
+            ->map(function ($tahunGroup, $tahun) {
+
+                // Di dalam 1 tahun, ambil saldo TERAKHIR per petani
+                $perPetaniTerakhir = $tahunGroup
+                    ->groupBy('id_petani')
+                    ->map(function ($petaniGroup) {
+                    return $petaniGroup
+                        ->sortByDesc('bulan_awal')
+                        ->first();
+                });
+
+                // Rekap tahunan = jumlah saldo terakhir tiap petani
                 return (object) [
                     'tahun_tanam' => $tahun,
-                    'total_nominal' => $group->sum('total_hak'),
-                    'sisa' => $group->sum('sisa'),
+                    'total_nominal' => $perPetaniTerakhir->sum('total_hak'),
+                    'sisa' => $perPetaniTerakhir->sum('sisa'),
                 ];
             })
             ->values();
-
 
         // filter TAHUN (misalnya 2025)
         if ($request->filled('tahun')) {

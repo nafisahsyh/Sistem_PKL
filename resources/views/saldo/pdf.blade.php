@@ -199,6 +199,18 @@
                     </td>
                 </tr>
             @endforeach
+            {{-- GRAND TOTAL --}}
+            <tr style="font-weight:bold; background:#f5f5f5;">
+                <td style="border:1px solid #000; padding:5px; text-align:center;">
+                    Grand Total
+                </td>
+                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                    Rp {{ number_format($rekapTahunan->sum('total_nominal'), 2, ',', '.') }}
+                </td>
+                <td style="border:1px solid #000; padding:5px; text-align:right;">
+                    Rp {{ number_format($rekapTahunan->sum('sisa'), 2, ',', '.') }}
+                </td>
+            </tr>
             </tbody>
         </table>
     @elseif (!empty($stat) && !$hanyaFilterTahun)
