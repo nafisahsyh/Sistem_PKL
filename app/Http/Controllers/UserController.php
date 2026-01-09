@@ -27,7 +27,6 @@ class UserController extends Controller
         });
         }
 
-        // Pagination 10 per halaman, keep query string untuk search
         $users = $query->paginate(10)->withQueryString();
 
         return view('user.index', compact('users'));

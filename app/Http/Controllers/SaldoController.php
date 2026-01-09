@@ -273,7 +273,6 @@ class SaldoController extends Controller
         $multiPeriode = !$request->filled('periode');
 
         if ($multiPeriode) {
-            // Ambil 1 baris TERAKHIR per petani
             $dataStat = $dataAll
                 ->groupBy('id_petani')
                 ->map(function ($group) {
@@ -281,7 +280,7 @@ class SaldoController extends Controller
                 })
                 ->values();
         } else {
-            // Periode tunggal → aman
+
             $dataStat = $dataAll;
         }
 
@@ -361,7 +360,6 @@ class SaldoController extends Controller
             })
             ->values();
 
-        // filter TAHUN (misalnya 2025)
         if ($request->filled('tahun')) {
             $rekapTahunan->where('bhb.tahun', $request->tahun);
         }
@@ -380,8 +378,8 @@ class SaldoController extends Controller
                         'tahun_tanam' => $tahun,
                         'total_nominal' => $group->sum('total_nominal'),
                         'sisa' => $group->sum('sisa'),
-                        'bulan_awal' => $first->bulan_awal, // tambahkan ini
-                        'bulan_akhir' => $first->bulan_akhir, // tambahkan ini
+                        'bulan_awal' => $first->bulan_awal,
+                        'bulan_akhir' => $first->bulan_akhir, 
                     ];
                 })
                 ->values();

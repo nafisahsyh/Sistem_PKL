@@ -7,7 +7,6 @@ use App\Models\Desa;
 use App\Models\Saldo;
 use App\Models\SaldoLalu;
 use App\Models\Transaksi;
-use Nette\Utils\Paginator;
 use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use App\Models\BagiHasilPetani;
@@ -53,7 +52,7 @@ class PengambilanSaldoController extends Controller
         // =========================
         $bulanan = $query
             ->orderBy('tahun', 'desc')
-            ->orderBy('bulan', 'desc') // <- ini bikin periode terbaru di atas
+            ->orderBy('bulan', 'desc')
             ->get();
 
         // =========================

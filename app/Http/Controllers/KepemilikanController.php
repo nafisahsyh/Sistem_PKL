@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-//Models
+
 use App\Models\Kepemilikan;
 use App\Models\DetailKepemilikan;
 use App\Models\Petani;
@@ -12,15 +12,9 @@ use App\Models\Tahun_Tanam;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Pbb;
 use App\Models\RiwayatKepemilikan;
-
-//Tanggal//
 use Carbon\Carbon;
-
-//PDF//
 use Barryvdh\DomPDF\Facade\Pdf;
 use setasign\Fpdi\Fpdi;
-use FPDF;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -159,7 +153,7 @@ class KepemilikanController extends Controller
                 // ===================== PETANI BERHENTI =====================
                 if ($statusPetani === 'berhenti') {
 
-                    // Jika search aktif → TAMPILKAN semua detail yang cocok
+                    // Jika search aktif --> TAMPILKAN semua detail yang cocok
                     if (!empty($search)) {
                         return $byDesa && $byTahun;
                     }
@@ -176,25 +170,25 @@ class KepemilikanController extends Controller
 
                 // ===================== PETANI AKTIF =====================
                 if ($statusPetani === 'aktif') {
-                    // Jika ada filter pengelolaan → tampil sesuai filter
+                    // Jika ada filter pengelolaan --> tampil sesuai filter
                     if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
                         return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
                     }
 
-                    // Perusahaan nonaktif → tampil hanya kalau search atau filter pengelolaan
+                    // Perusahaan nonaktif --> tampil hanya kalau search atau filter pengelolaan
                     if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan === 'perusahaan') {
                         if ($isSearch || (!empty($filterPengelolaan) && strtolower($filterPengelolaan) === 'perusahaan')) {
                             return $byDesa && $byTahun;
                         }
-                        return false; // index default → tidak tampil
+                        return false; // index default --> tidak tampil
                     }
 
-                    // Lahan aktif Mandiri → tampil selalu
+                    // Lahan aktif Mandiri --> tampil selalu
                     if ($statusKepemilikan === 'aktif') {
                         return $byDesa && $byTahun;
                     }
 
-                    return false; // nonaktif Mandiri → tidak tampil
+                    return false; // nonaktif Mandiri --> tidak tampil
                 }
 
 
@@ -585,7 +579,7 @@ class KepemilikanController extends Controller
         DB::beginTransaction();
 
         try {
-            // 🔹 Buat kepemilikan dulu
+            //Buat kepemilikan dulu
             $kepemilikan = Kepemilikan::create([
                 'id_petani' => $request->id_petani,
                 'status_kepemilikan' => $request->status_kepemilikan,
@@ -593,7 +587,7 @@ class KepemilikanController extends Controller
                 'tanggal_selesai' => $request->tanggal_selesai,
             ]);
 
-            // 🔹 Loop setiap lahan yang dikirim
+            //Loop setiap lahan yang dikirim
             foreach ($request->lahan as $lahanData) {
                 $lahan = Lahan::create([
                     'id_desa' => $lahanData['id_desa'],
@@ -606,7 +600,7 @@ class KepemilikanController extends Controller
                     'Mandiri', 'KSM' => 'aktif',
                 };
 
-                // 🔹 Simpan detail kepemilikan
+                //Simpan detail kepemilikan
                 DetailKepemilikan::create([
                     'id_kepemilikan' => $kepemilikan->id_kepemilikan,
                     'id_lahan' => $lahan->id_lahan,
@@ -687,12 +681,12 @@ class KepemilikanController extends Controller
             'lahan.*.tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
 
-        // 🔹 Gunakan salinan array agar bisa dimodifikasi
+        //Gunakan salinan array agar bisa dimodifikasi
         $lahanList = $request->lahan;
 
         foreach ($lahanList as $index => $lahanData) {
             
-            // Kalau status_pengelolaan = Perusahaan → otomatis status_kepemilikan = nonaktif
+            // Kalau status_pengelolaan = Perusahaan --> otomatis status_kepemilikan = nonaktif
             if ($lahanData['status_pengelolaan'] === 'Perusahaan') {
                 $lahanList[$index]['status_kepemilikan'] = 'nonaktif';
             }
@@ -719,11 +713,11 @@ class KepemilikanController extends Controller
                 $detailId = $lahanData['id_detail_kepemilikan'] ?? null;
 
                 if ($detailId) {
-                    // data lama → update
+                    // data lama --> update
                     $detail = DetailKepemilikan::find($detailId);
                     $lahan = Lahan::find($lahanData['id_lahan']);
                 } else {
-                    // data baru → buat baru
+                    // data baru --> buat baru
                     $lahan = new Lahan();
                     $detail = new DetailKepemilikan();
                     $detail->id_kepemilikan = $kepemilikan->id_kepemilikan;
@@ -1132,14 +1126,14 @@ class KepemilikanController extends Controller
 
         // ===================== FILTER STATUS PETANI =====================
         if (!empty($request->status_petani) && strtolower($request->status_petani) === 'berhenti') {
-            // Petani berhenti → punya lahan tapi nonaktif
+            // Petani berhenti --> punya lahan tapi nonaktif
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'berhenti');
             })->whereHas('detailKepemilikan', function ($q) {
                 $q->where('status_kepemilikan', 'nonaktif');
             });
         } else {
-            // Default → petani & lahan aktif
+            // Default --> petani & lahan aktif
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'aktif');
             })->whereHas('detailKepemilikan', function ($q) {

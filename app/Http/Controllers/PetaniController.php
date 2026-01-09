@@ -18,7 +18,7 @@ class PetaniController extends Controller
     {
         $query = Petani::withCount('kepemilikan');
 
-        // 🔹 Filter berdasarkan status (aktif / tidak_aktif / berhenti)
+        //Filter berdasarkan status (aktif / tidak_aktif / berhenti)
         $status = $request->query('status');
         if ($status) {
             if (is_array($status)) {
@@ -176,7 +176,6 @@ class PetaniController extends Controller
             'pdf_scan_kk' => $kkName,
         ];
 
-        // MASUKKAN DI SINI
         $dataUpdate['status'] = $request->status;
 
         // // Status tidak berubah jika sudah berhenti
@@ -250,7 +249,7 @@ class PetaniController extends Controller
                 // ambil dari input user dulu, jangan paksa KSM
                 $statusPengelolaan = $lahanData['status_pengelolaan'] ?? null;
 
-                // 🔹 sinkronisasi hanya berlaku jika status kepemilikan nonaktif dan bukan Mandiri
+                // sinkronisasi hanya berlaku jika status kepemilikan nonaktif dan bukan Mandiri
                 if ($statusPengelolaan === 'Perusahaan') {
                     $statusKepemilikan = 'nonaktif';
                 }

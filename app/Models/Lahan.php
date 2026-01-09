@@ -7,10 +7,9 @@ use Illuminate\Support\Facades\Storage;
 
 class Lahan extends Model
 {
-    // Nama tabel di database
     protected $table = 'lahan';
     protected $primaryKey = 'id_lahan';
-    public $timestamps = false; // karena di migrasi tidak ada created_at dan updated_at
+    public $timestamps = false;
 
     // Field yang bisa diisi
     protected $fillable = [

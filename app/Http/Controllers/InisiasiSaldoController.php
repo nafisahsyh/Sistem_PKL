@@ -29,7 +29,7 @@ class InisiasiSaldoController extends Controller
         $desa = Desa::orderBy('desa')->get();
         $tahunTanam = Tahun_Tanam::orderBy('tahun')->get();
 
-        // Periode inisiasi (FIX)
+        // Periode inisiasi
         $bulanInisiasiAwal = '2024-11';
         $bulanInisiasiAkhir = '2024-12';
 
@@ -89,7 +89,7 @@ class InisiasiSaldoController extends Controller
         // Bersihkan format rupiah
         $saldo = (int) str_replace(['Rp', '.', ' '], '', $request->saldo);
 
-        // Periode saldo (FIX)
+        // Periode saldo
         $bulanAwal = '2024-11';
         $bulanAkhir = '2024-12';
 

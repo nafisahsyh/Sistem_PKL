@@ -8,8 +8,8 @@ class BagiHasilBulanan extends Model
 {
     protected $table = 'bagi_hasil_bulanan';
     protected $primaryKey = 'id_bagi_bulanan';
-    public $incrementing = true;    // <-- tambahkan ini
-    protected $keyType = 'int';     // <-- tambahkan ini
+    public $incrementing = true;   
+    protected $keyType = 'int'; 
 
     protected $fillable = [
         'id_desa',

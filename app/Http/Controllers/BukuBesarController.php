@@ -14,7 +14,7 @@ class BukuBesarController extends Controller
 {
     public function index(Request $request)
     {
-        //===== FILTER AUTO ON =======//
+        // FILTER AUTO ON //
         if (empty($request->query())) {
 
             $default = DB::table('bagi_hasil_bulanan')
@@ -77,7 +77,7 @@ class BukuBesarController extends Controller
             );
 
 
-        // Ambil id_bulanan sesuai filter periode (seperti di SHOW)
+        // Ambil id_bulanan sesuai filter periode
         $subLuas = DB::table('bagi_hasil_petani as bhp')
             ->join('bagi_hasil_bulanan as bhb', 'bhp.id_bagi_bulanan', '=', 'bhb.id_bagi_bulanan')
             ->select(
@@ -293,7 +293,7 @@ class BukuBesarController extends Controller
                 's.id_tahun_tanam',
                 's.nama_petani_snapshot AS nama_petani',
                 's.nomor_plasma_snapshot AS nomor_plasma',
-                'l.total_luas AS luasan',         // <-- sesuai periode transaksi!
+                'l.total_luas AS luasan',
                 'desaTbl.desa AS nama_desa',
                 'tt.tahun AS tahun_tanam',
                 'd.bulan_awal',
@@ -331,7 +331,6 @@ class BukuBesarController extends Controller
             );
         }
 
-        // Pilih tipe transaksi sesuai filter
         if ($request->tipe == 'debit_pengambilan') {
             $dataTransaksi = $debit;
         } else {
@@ -341,7 +340,7 @@ class BukuBesarController extends Controller
         // Optional sorting
         $dataTransaksi = $dataTransaksi
             ->sortByDesc(function ($row) {
-                return $row->bulan_awal; // YYYY-MM → otomatis urut waktu
+                return $row->bulan_awal;
             })
             ->sortBy(function ($row) {
                 return $row->id_petani;
@@ -350,7 +349,6 @@ class BukuBesarController extends Controller
         $page = request()->get('page', 1);
         $perPage = 20;
 
-        // Buat paginator dari collection
         $dataTransaksi = new LengthAwarePaginator(
             $dataTransaksi->forPage($page, $perPage),
             $dataTransaksi->count(),
@@ -414,7 +412,7 @@ class BukuBesarController extends Controller
             ->orderBy('bulan_awal')
             ->get();
 
-        // 🔑 Group aman (snapshot identity)
+        // Group aman (snapshot identity)
         $groupLahan = $bagiHasil->groupBy(function ($item) {
             return implode('|', [
                 $item->id_lahan,

@@ -10,9 +10,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Tampilkan halaman login
-     */
     public function showLoginForm()
     { 
         if (Auth::check()) {
@@ -72,9 +69,6 @@ class AuthController extends Controller
         ])->withInput();
     }
 
-    /**
-     * Logout user
-     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -88,7 +82,7 @@ class AuthController extends Controller
 
     public function showLinkRequestForm()
     {
-        return view('auth.reset'); // <-- sesuai folder dan nama file kamu
+        return view('auth.reset'); 
     }
 
     // Kirim link reset

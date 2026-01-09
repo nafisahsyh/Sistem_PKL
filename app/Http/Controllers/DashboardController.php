@@ -8,7 +8,6 @@ use App\Models\Desa;
 use App\Models\User;
 use App\Models\Petani;
 use App\Models\Lahan;
-use App\models\DetailKepemilikan;
 use App\Models\Kepemilikan;
 
 use Illuminate\Support\Facades\DB;
@@ -38,7 +37,7 @@ class DashboardController extends Controller
         $jumlahPetani = Petani::count();
         $jumlahLahan = Lahan::whereHas('detailKepemilikan', function ($q) {
             $q->where('status_kepemilikan', 'aktif')
-                ->where('status_pengelolaan', 'KSM'); // ⬅ Tambahkan ini
+                ->where('status_pengelolaan', 'KSM');
         })->count();
 
         $jumlahPetaniAktif = Petani::where('status', 'aktif')->count();
@@ -126,7 +125,7 @@ class DashboardController extends Controller
                     ->distinct()
                     ->count('id_lahan'),
 
-                // TOTAL LUAS SURAT → tabel detail_kepemilikan
+                // TOTAL LUAS SURAT --> tabel detail_kepemilikan
                 'Mandiri_surat' => DB::table('detail_kepemilikan')
                     ->where('status_pengelolaan', 'Mandiri')
                     ->where('status_kepemilikan', 'aktif') // hanya lahan aktif
@@ -137,7 +136,7 @@ class DashboardController extends Controller
                     ->where('status_kepemilikan', 'aktif') // hanya lahan aktif
                     ->sum('luas_surat'),
 
-                // TOTAL LUAS PETA → tabel lahan dengan relasi detail_kepemilikan aktif
+                // TOTAL LUAS PETA --> tabel lahan dengan relasi detail_kepemilikan aktif
                 'Mandiri_peta' => Lahan::whereHas('detailKepemilikan', function ($q) {
                     $q->where('status_pengelolaan', 'Mandiri')
                         ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
@@ -165,10 +164,10 @@ class DashboardController extends Controller
         )
             ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
             ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
-            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')   // ⬅ WAJIB
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani') 
             ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
             ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam')
-            ->where('petani.status', 'aktif');     // ⬅ WAJIB BANGET
+            ->where('petani.status', 'aktif'); 
 
         // Hanya filter khusus untuk grafik Kelola
         if ($filterDesaKelola && $filterDesaKelola != 'all') {

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-// Model yang terikat
-use DateTime;
 use Carbon\Carbon;
 use App\Models\Desa;
 use App\Models\Saldo;
@@ -13,16 +11,11 @@ use App\Models\Tahun_Tanam;
 use Illuminate\Http\Request;
 use App\Models\BagiHasilPetani;
 use Illuminate\Validation\Rule;
-
-// Database dan Pagination
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\BagiHasilBulanan;
 use App\Models\DetailKepemilikan;
 use Illuminate\Support\Facades\DB;
-
-//Import PDF
 use Illuminate\Pagination\Paginator;
-use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 
@@ -80,7 +73,7 @@ class BagiHasilController extends Controller
                 ->where('id_desa', $b->id_desa)
                 ->where('id_tahun_tanam', $b->id_tahun_tanam)
 
-                // 🔑 BULAN INI ADA DI DALAM PERIODE TRANSAKSI
+                // BULAN INI ADA DI DALAM PERIODE TRANSAKSI
                 ->where('bulan_awal', '<=', $bulanIni)
                 ->where('bulan_akhir', '>=', $bulanIni)
 
@@ -217,7 +210,7 @@ class BagiHasilController extends Controller
                 $saldoTerakhir = Saldo::where('id_petani', $idPetani)
                     ->where('id_desa', $data['id_desa'])
                     ->where('id_tahun_tanam', $data['id_tahun_tanam'])
-                    ->orderBy('bulan_akhir', 'desc') // 🔑 WAJIB
+                    ->orderBy('bulan_akhir', 'desc')
                     ->lockForUpdate()
                     ->first();
 
@@ -241,7 +234,7 @@ class BagiHasilController extends Controller
                     : null;
 
                 if ($bulanAwalValid) {
-                    $totalSaldoLalu = Saldo::where('id_petani', $idPetani) // ✅
+                    $totalSaldoLalu = Saldo::where('id_petani', $idPetani) 
                         ->where('id_desa', $data['id_desa'])
                         ->where('id_tahun_tanam', $data['id_tahun_tanam'])
                         ->where('saldo', '>', 0)
@@ -251,7 +244,7 @@ class BagiHasilController extends Controller
                     SaldoLalu::firstOrCreate(
                         [
                             'id_bagi_bulanan' => $bulan->id_bagi_bulanan,
-                            'id_petani' => $idPetani, // ✅
+                            'id_petani' => $idPetani,
                         ],
                         [
                             'id_desa' => $data['id_desa'],
@@ -369,7 +362,6 @@ class BagiHasilController extends Controller
         $desa = Desa::all();
         $tahunTanam = Tahun_Tanam::all();
 
-        // Pakai snapshot — ini nilai paling akurat
         $total_luas = $bulanan->luasan_total_snapshot;
 
         return view('bagihasil.edit', compact('bulanan', 'desa', 'tahunTanam', 'total_luas'));
@@ -668,7 +660,6 @@ class BagiHasilController extends Controller
             })
             ->values();
 
-        // Filter search jika ada
         $search = request('search');
         if ($search) {
             $petaniData = $petaniData->filter(function ($p) use ($search) {
@@ -678,7 +669,6 @@ class BagiHasilController extends Controller
             })->values();
         }
 
-        // Pagination manual
         $perPage = 10;
         $page = request()->get('page', 1);
         $offset = ($page - 1) * $perPage;
@@ -859,8 +849,6 @@ class BagiHasilController extends Controller
         }
 
         $judul .= '.pdf';
-
-        // ============================
 
         $pdf = PDF::loadView('bagihasil.pdf_index', compact('bulanan'))
             ->setPaper('a4', 'landscape');
