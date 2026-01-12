@@ -48,11 +48,36 @@
                 </script>
             @endif
 
+            @error('email')
+                <div id="alert-error" class="alert alert-danger" style="transition: opacity .5s;">
+                    {{ $message }}
+                </div>
+            @enderror
+
+            <script>
+                setTimeout(() => {
+                    const success = document.getElementById('alert-success');
+                    const error = document.getElementById('alert-error');
+
+                    if (success) {
+                        success.style.opacity = '0';
+                        setTimeout(() => success.remove(), 500);
+                    }
+
+                    if (error) {
+                        error.style.opacity = '0';
+                        setTimeout(() => error.remove(), 500);
+                    }
+                }, 3000);
+            </script>
+
             <form action="{{ route('password.email') }}" method="POST">
                 @csrf
                 <div class="form-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="email" class="form-control" placeholder="Email" required>
+                    <input type="text" name="email" class="form-control" placeholder="Email"
+                        value="{{ old('email') }}" required>
+
                 </div>
                 <button type="submit" class="btn-login">Kirim Email</button>
                 <div class="back-login">

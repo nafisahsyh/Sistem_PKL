@@ -11,17 +11,17 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function showLoginForm()
-    { 
+    {
         if (Auth::check()) {
-        // Kalau user sudah login, arahkan langsung sesuai role
-        $user = Auth::user();
-        switch ($user->role) {
-            case 'super_admin':
-                return redirect()->route('dashboard.super');
-            case 'admin':
-                return redirect()->route('dashboard.admin');
-            default:
-                return redirect()->route('login');
+            // Kalau user sudah login, arahkan langsung sesuai role
+            $user = Auth::user();
+            switch ($user->role) {
+                case 'super_admin':
+                    return redirect()->route('dashboard.super');
+                case 'admin':
+                    return redirect()->route('dashboard.admin');
+                default:
+                    return redirect()->route('login');
             }
         }
         return view('auth.login');
@@ -59,7 +59,7 @@ class AuthController extends Controller
                     return redirect()->route('dashboard.admin')->with('success', 'Selamat datang Admin!');
                 default:
                     Auth::logout();
-                return redirect('/login')->withErrors(['login' => 'Role tidak dikenali.']);
+                    return redirect('/login')->withErrors(['login' => 'Role tidak dikenali.']);
             }
         }
 
@@ -82,24 +82,37 @@ class AuthController extends Controller
 
     public function showLinkRequestForm()
     {
-        return view('auth.reset'); 
+        return view('auth.reset');
     }
 
-    // Kirim link reset
     public function sendResetLinkEmail(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
+        // VALIDASI (email tidak terdaftar akan masuk sini)
+        $request->validate(
+            [
+                'email' => 'required|email|exists:users,email',
+            ],
+            [
+                'email.exists' => 'Email tidak terdaftar dalam sistem.',
+                'email.email'  => 'Format email tidak valid.',
+                'email.required' => 'Email wajib diisi.',
+            ]
+        );
 
+        // Kirim link reset
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', 'Tautan ubah kata sandi berhasil dikirim ke email Anda!')
-            : back()->withErrors(['email' => 'Gagal mengirim tautan ubah kata sandi.']);
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with('status', 'Tautan ubah kata sandi berhasil dikirim ke email Anda!');
+        }
+
+        return back()->withErrors([
+            'email' => 'Gagal mengirim tautan ubah kata sandi. Silakan coba lagi.'
+        ]);
     }
+
 
     public function showResetForm($token)
     {
@@ -121,12 +134,12 @@ class AuthController extends Controller
 
         // Reset password
         $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            // Jangan hash di sini karena mutator di model sudah handle
-            $user->password = $password;
-            $user->save();
-        }
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                // Jangan hash di sini karena mutator di model sudah handle
+                $user->password = $password;
+                $user->save();
+            }
         );
 
         if ($status == Password::PASSWORD_RESET) {
@@ -135,5 +148,4 @@ class AuthController extends Controller
             return back()->withErrors(['email' => __($status)]);
         }
     }
-
 }
