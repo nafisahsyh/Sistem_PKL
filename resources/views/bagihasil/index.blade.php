@@ -183,14 +183,16 @@
                                         </a>
 
                                         {{-- HAPUS --}}
-                                        <form action="{{ route('bagi-hasil-bulanan.destroy', $b) }}" method="POST"
-                                            class="d-inline delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-danger btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if (!$b->sudah_diambil && $b->boleh_hapus)
+                                            <form action="{{ route('bagi-hasil-bulanan.destroy', $b) }}" method="POST"
+                                                class="d-inline delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-danger btn-delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endif
 
                                 </td>
