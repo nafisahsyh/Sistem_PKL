@@ -6,7 +6,7 @@
     <!-- Navbar Brand dengan logo berlatarkan lengkung -->
     <a class="navbar-brand ps-3 d-flex align-items-center" href="{{ auth()->user()->role == 'super_admin' ? route('dashboard.super') : route('dashboard.admin') }}">
         <div class="logo-container mr-2">
-            <img src="{{ asset('/storage/img/logo.png') }}" alt="logo">
+            <img src="{{ asset('logo.png') }}" alt="logo">
         </div>
         <span class="brand-text">SisPlasma</span>
     </a>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Nota Pengeluaran</title>
-    <link rel="icon" type="image/png" href="{{ asset('storage/img/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
 
     <style>

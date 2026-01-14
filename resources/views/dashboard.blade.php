@@ -373,77 +373,91 @@
         </div>
 
 
-        {{-- ==================== LIBRARY ==================== --}}
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-        {{-- ==================== CHART 1: LUAS LAHAN ==================== --}}
-        @if (count($chartData) > 0)
-            <script>
-                const chartLabels = @json(array_map(fn($row) => "{$row['desa']} ({$row['tahun']})", $chartData));
-                const lapanganData = @json(array_map(fn($row) => $row['lapangan'], $chartData));
-                const suratData = @json(array_map(fn($row) => $row['surat'], $chartData));
 
-                new Chart(document.getElementById('chartLahanVertical'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                                label: 'Luas Lapangan (M²)',
-                                data: lapanganData,
-                                backgroundColor: 'rgba(2, 102, 60, 0.85)',
-                                borderColor: '#02663C',
-                                borderWidth: 1,
-                                borderRadius: 5
-                            },
-                            {
-                                label: 'Luas Surat (M²)',
-                                data: suratData,
-                                backgroundColor: 'rgba(242, 201, 76, 0.85)',
-                                borderColor: '#F2C94C',
-                                borderWidth: 1,
-                                borderRadius: 5
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        layout: {
-                            padding: {
-                                top: 20
-                            } // ➜ tambah ruang di atas
+        <script>
+            Chart.register(ChartDataLabels);
+
+            const chartLabels = @json(array_map(fn($row) => $row['desa'] . ' (' . $row['tahun'] . ')', $chartData));
+            const lapanganData = @json(array_map(fn($row) => $row['lapangan'], $chartData));
+            const suratData = @json(array_map(fn($row) => $row['surat'], $chartData));
+
+            new Chart(document.getElementById('chartLahanVertical'), {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                            label: 'Luas Lapangan (M²)',
+                            data: lapanganData,
+                            backgroundColor: 'rgba(2, 102, 60, 0.85)',
+                            borderColor: '#02663C',
+                            borderWidth: 1,
+                            borderRadius: 6
                         },
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            },
-                            datalabels: {
-                                color: '#000',
-                                anchor: 'end',
-                                align: 'top',
-                                font: {
-                                    size: 11
-                                },
-                                formatter: value => value.toLocaleString(),
-                                clip: false // ➜ biar label gak kepotong
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            },
-                            x: {
-                                ticks: {
-                                    autoSkip: false,
-                                    maxRotation: 45,
-                                    minRotation: 20
-                                }
+                        {
+                            label: 'Luas Surat (M²)',
+                            data: suratData,
+                            backgroundColor: 'rgba(242, 201, 76, 0.85)',
+                            borderColor: '#F2C94C',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+
+                    animations: {
+                        y: {
+                            from: (ctx) => {
+                                const yScale = ctx.chart.scales.y;
+                                return yScale.getPixelForValue(0);
                             }
                         }
                     },
-                    plugins: [ChartDataLabels]
-                });
-            </script>
-        @endif
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeOutQuart'
+                    },
+
+                    layout: {
+                        padding: {
+                            top: 30
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            animation: false,
+                            color: '#000',
+                            anchor: 'end',
+                            align: 'top',
+                            font: {
+                                size: 10
+                            },
+                            formatter: v => v.toLocaleString(),
+                            clip: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 20
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
 
         <script>
             const petaniMandiri = {{ $statusData['petani']['Mandiri'] }};
@@ -563,6 +577,18 @@
                         ]
                     },
                     options: {
+                        responsive: true,
+
+                        animations: {
+                            y: {
+                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0)
+                            }
+                        },
+                        animation: {
+                            duration: 1200,
+                            easing: 'easeOutQuart'
+                        },
+
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -571,6 +597,24 @@
                                     color: '#333'
                                 }
                             },
+
+                            // ⬇️ INI BAGIAN PENTING
+                            datalabels: {
+                                display: true,
+                                anchor: 'end',
+                                align: 'top',
+                                color: '#555',
+                                font: {
+                                    size: 10
+                                },
+                                offset: 4,
+                                clip: false,
+                                formatter: (value) => {
+                                    if (value === 0) return null; // HILANGKAN ANGKA 0
+                                    return value.toLocaleString();
+                                }
+                            },
+
                             tooltip: {
                                 backgroundColor: 'rgba(0,0,0,0.8)',
                                 titleFont: {
@@ -587,26 +631,19 @@
                                         const index = ctx.dataIndex;
                                         const row = chartKelolaData[index];
 
-                                        // Format tooltip lebih rapi
-                                        const petaniKSM = row.petani_ksm.toLocaleString();
-                                        const petaniMandiri = row.petani_mandiri.toLocaleString();
-                                        const luasSuratKSM = row.luas_surat_ksm.toLocaleString();
-                                        const luasSuratMandiri = row.luas_surat_mandiri.toLocaleString();
-                                        const luasPetaKSM = row.luas_peta_ksm.toLocaleString();
-                                        const luasPetaMandiri = row.luas_peta_mandiri.toLocaleString();
-
                                         return [
-                                            `Petani KSM             : ${petaniKSM}`,
-                                            `Petani Mandiri         : ${petaniMandiri}`,
-                                            `Luas Surat KSM      : ${luasSuratKSM} m²`,
-                                            `Luas Surat Mandiri  : ${luasSuratMandiri} m²`,
-                                            `Luas Peta KSM       : ${luasPetaKSM} m²`,
-                                            `Luas Peta Mandiri   : ${luasPetaMandiri} m²`
+                                            `Petani KSM           : ${row.petani_ksm.toLocaleString()}`,
+                                            `Petani Mandiri       : ${row.petani_mandiri.toLocaleString()}`,
+                                            `Luas Surat KSM       : ${row.luas_surat_ksm.toLocaleString()} m²`,
+                                            `Luas Surat Mandiri   : ${row.luas_surat_mandiri.toLocaleString()} m²`,
+                                            `Luas Peta KSM        : ${row.luas_peta_ksm.toLocaleString()} m²`,
+                                            `Luas Peta Mandiri    : ${row.luas_peta_mandiri.toLocaleString()} m²`
                                         ];
                                     }
                                 }
                             }
                         },
+
                         scales: {
                             x: {
                                 ticks: {
@@ -617,6 +654,7 @@
                             },
                             y: {
                                 beginAtZero: true,
+                                grace: '10%',
                                 title: {
                                     display: true,
                                     text: 'Jumlah Lahan',
@@ -631,6 +669,7 @@
                 });
             </script>
         @endif
+
 
         {{-- CHOICES --}}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />

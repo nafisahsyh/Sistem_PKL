@@ -153,8 +153,8 @@ class DashboardController extends Controller
         $pengelolaanQuery = Kepemilikan::select(
             'desa.desa',
             'tahun_tanam.tahun',
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as petani_ksm"),
-            DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as petani_mandiri"),
+            DB::raw("COUNT(DISTINCT CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN kepemilikan.id_petani END) as petani_ksm"),
+            DB::raw("COUNT(DISTINCT CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN kepemilikan.id_petani END) as petani_mandiri"),
             DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN 1 ELSE 0 END) as lahan_ksm"),
             DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'Mandiri' THEN 1 ELSE 0 END) as lahan_mandiri"),
             DB::raw("SUM(CASE WHEN detail_kepemilikan.status_pengelolaan = 'KSM' THEN detail_kepemilikan.luas_surat ELSE 0 END) as luas_surat_ksm"),
@@ -164,10 +164,10 @@ class DashboardController extends Controller
         )
             ->join('detail_kepemilikan', 'kepemilikan.id_kepemilikan', '=', 'detail_kepemilikan.id_kepemilikan')
             ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
-            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani') 
+            ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
             ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
             ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam')
-            ->where('petani.status', 'aktif'); 
+            ->where('petani.status', 'aktif');
 
         // Hanya filter khusus untuk grafik Kelola
         if ($filterDesaKelola && $filterDesaKelola != 'all') {

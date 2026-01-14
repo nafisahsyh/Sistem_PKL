@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SisPlasma</title>
-    <link rel="icon" type="image/png" href="{{ asset('storage/img/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
     <div class="login-container">
         <!-- Bagian kiri (form login) -->
         <div class="login-form text-center">
-            <img src="{{ asset('storage/img/logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
+            <img src="{{ asset('logo.png') }}" alt="Logo SisPlasma" class="login-logo mb-3">
 
             <h3 class="fw-bold mb-4">Login</h3>
 
