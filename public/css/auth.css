@@ -34,7 +34,7 @@ body {
 .login-image {
     flex: 1.2;
     position: relative;
-    background: url('/sawit.jpg') center/cover no-repeat;
+    background: url('/sawit.webp') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -190,7 +190,7 @@ body {
 .reset-image {
     flex: 1.2;
     position: relative;
-    background: url('/sawit.jpg') center/cover no-repeat;
+    background: url('/sawit.webp') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;

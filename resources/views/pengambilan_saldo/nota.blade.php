@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Nota Pengeluaran</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.webp') }}">
 
 
     <style>
@@ -114,7 +114,7 @@
         <table>
             <tr>
                 <td width="15%" style="text-align:center; vertical-align:top;">
-                    <img src="{{ asset('logo.png') }}" alt="Logo" style="width:70px;">
+                    <img src="{{ asset('logo.webp') }}" alt="Logo" style="width:70px;">
 
                 </td>
 

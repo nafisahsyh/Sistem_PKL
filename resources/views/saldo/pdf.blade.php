@@ -145,7 +145,7 @@
         <table>
             <tr>
                 <td width="15%" style="text-align:center;">
-                    <img src="{{ public_path('logo.png') }}" alt="Logo">
+                    <img src="{{ public_path('logo.webp') }}" alt="Logo">
                 </td>
                 <td width="85%" style="text-align:center; transform: translateX(-40px);">
                     <h2><strong>KOPERASI SAWIT MAKMUR</strong></h2>
