@@ -165,7 +165,9 @@
                         @endif
 
                         @if (!in_array('nama', $exclude))
-                            <td>{{ $i === 0 ? $k->petani->nama ?? '-' : '' }}</td>
+                            <td style="text-align: left;">
+                                {{ $i === 0 ? $k->petani->nama ?? '-' : '' }}
+                            </td>
                         @endif
 
                         @if (!in_array('riwayat', $exclude))
