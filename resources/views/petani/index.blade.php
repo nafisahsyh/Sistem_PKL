@@ -123,15 +123,14 @@
                                 @endphp
 
                                 @php
-                                    // cek apakah petani punya lahan sama sekali (aktif / nonaktif)
                                     $punyaLahan = $p->detailKepemilikan()->exists();
                                 @endphp
 
                                 <td class="text-center" style="width: {{ $adaLahanAktif ? '125px' : '145px' }};">
                                     {{-- tombol tambah muncul hanya kalau belum punya lahan aktif dan petani tidak berhenti --}}
-                                    @if (!$punyaLahan && $p->status === 'aktif')
+                                    @if (!$punyaLahan)
                                         <a href="{{ route('petani.createkepemilikan', $p->id_petani) }}"
-                                            class="btn btn-success btn-sm me-1" title="Tambah Kepemilikan">
+                                            class="btn btn-success btn-sm" title="Tambah Kepemilikan">
                                             <i class="fas fa-plus"></i>
                                         </a>
                                     @endif
