@@ -118,20 +118,7 @@ class Petani extends Model
 
     public function updateStatusPetani()
     {
-        // Jangan ubah status kalau petani berhenti
-        // if (in_array($this->status, ['berhenti'])) {
-        //     return;
-        // }
-
-        $jumlahLahanAktif = DetailKepemilikan::whereHas('kepemilikan', function ($q) {
-            $q->where('id_petani', $this->id_petani);
-        })->where('status_kepemilikan', 'aktif')->count();
-
-        if ($jumlahLahanAktif === 0 && $this->status !== 'tidak_aktif') {
-            $this->update(['status' => 'tidak_aktif']);
-        } elseif ($jumlahLahanAktif > 0 && $this->status !== 'aktif') {
-            $this->update(['status' => 'aktif']);
-        }
+        return;
     }
 
 }

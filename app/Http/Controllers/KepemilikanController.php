@@ -175,12 +175,9 @@ class KepemilikanController extends Controller
                         return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
                     }
 
-                    // Perusahaan nonaktif --> tampil hanya kalau search atau filter pengelolaan
+                    // Menampilkan data kepemilikan lahan perusahaan
                     if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan === 'perusahaan') {
-                        if ($isSearch || (!empty($filterPengelolaan) && strtolower($filterPengelolaan) === 'perusahaan')) {
-                            return $byDesa && $byTahun;
-                        }
-                        return false; // index default --> tidak tampil
+                        return $byDesa && $byTahun;
                     }
 
                     // Lahan aktif Mandiri --> tampil selalu
@@ -190,7 +187,6 @@ class KepemilikanController extends Controller
 
                     return false; // nonaktif Mandiri --> tidak tampil
                 }
-
 
                 return false;
             })->values();
@@ -685,7 +681,7 @@ class KepemilikanController extends Controller
         $lahanList = $request->lahan;
 
         foreach ($lahanList as $index => $lahanData) {
-            
+
             // Kalau status_pengelolaan = Perusahaan --> otomatis status_kepemilikan = nonaktif
             if ($lahanData['status_pengelolaan'] === 'Perusahaan') {
                 $lahanList[$index]['status_kepemilikan'] = 'nonaktif';
@@ -789,13 +785,13 @@ class KepemilikanController extends Controller
                 $detail->save();
             }
 
-            $hasActiveLand = DetailKepemilikan::where('id_kepemilikan', $kepemilikan->id_kepemilikan)
-                ->where('status_kepemilikan', 'aktif')
-                ->exists();
+            // $hasActiveLand = DetailKepemilikan::where('id_kepemilikan', $kepemilikan->id_kepemilikan)
+            //     ->where('status_kepemilikan', 'aktif')
+            //     ->exists();
 
-            $kepemilikan->petani->update([
-                'status' => $hasActiveLand ? 'aktif' : 'berhenti'
-            ]);
+            // $kepemilikan->petani->update([
+            //     'status' => $hasActiveLand ? 'aktif' : 'berhenti'
+            // ]);
 
             DB::commit();
 
@@ -1133,11 +1129,9 @@ class KepemilikanController extends Controller
                 $q->where('status_kepemilikan', 'nonaktif');
             });
         } else {
-            // Default --> petani & lahan aktif
+            // Petani aktif --> tampilkan SEMUA lahan (aktif / nonaktif perusahaan)
             $query->whereHas('petani', function ($q) {
                 $q->where('status', 'aktif');
-            })->whereHas('detailKepemilikan', function ($q) {
-                $q->where('status_kepemilikan', 'aktif');
             });
         }
 
@@ -1149,7 +1143,7 @@ class KepemilikanController extends Controller
             // Jika aktif, baru gunakan filter normal
             $statusPengelolaan = $request->filled('status_pengelolaan')
                 ? (array) $request->status_pengelolaan
-                : ['KSM', 'Mandiri'];
+                : ['KSM', 'Mandiri', 'Perusahaan'];
         }
 
         $query->whereHas('detailKepemilikan', fn($q2) => $q2->whereIn('status_pengelolaan', $statusPengelolaan));

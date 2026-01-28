@@ -301,14 +301,14 @@ class PetaniController extends Controller
             }
 
             // cek status petani
-            $adaLahanAktif = $kepemilikan->petani->kepemilikan()
-                ->whereHas('detailKepemilikan', fn($q) => $q->where('status_kepemilikan', 'aktif'))
-                ->exists();
+            // $adaLahanAktif = $kepemilikan->petani->kepemilikan()
+            //     ->whereHas('detailKepemilikan', fn($q) => $q->where('status_kepemilikan', 'aktif'))
+            //     ->exists();
 
-            if (!$adaLahanAktif) {
-                $kepemilikan->petani->status = 'berhenti';
-                $kepemilikan->petani->save();
-            }
+            // if (!$adaLahanAktif) {
+            //     $kepemilikan->petani->status = 'berhenti';
+            //     $kepemilikan->petani->save();
+            // }
 
             DB::commit();
 
