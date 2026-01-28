@@ -47,7 +47,7 @@ class Petani extends Model
         return $this->hasMany(RiwayatKepemilikan::class, 'id_petani_sebelum');
     }
 
-     public function saldo()
+    public function saldo()
     {
         return $this->hasMany(Saldo::class, 'id_petani', 'id_petani');
     }
@@ -118,7 +118,21 @@ class Petani extends Model
 
     public function updateStatusPetani()
     {
-        return;
+        // hitung total lahan (tanpa peduli aktif / nonaktif)
+        $jumlahLahan = DetailKepemilikan::whereHas('kepemilikan', function ($q) {
+            $q->where('id_petani', $this->id_petani);
+        })->count();
+
+        // kalau TIDAK punya lahan sama sekali → tidak_aktif
+        if ($jumlahLahan === 0 && $this->status !== 'tidak_aktif') {
+            $this->updateQuietly(['status' => 'tidak_aktif']);
+            return;
+        }
+
+        // kalau punya minimal 1 lahan → aktif
+        if ($jumlahLahan > 0 && $this->status !== 'aktif') {
+            $this->updateQuietly(['status' => 'aktif']);
+        }
     }
 
 }
