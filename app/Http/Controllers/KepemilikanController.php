@@ -1373,7 +1373,6 @@ class KepemilikanController extends Controller
         return view('kepemilikan.riwayat_lahan', compact('riwayat', 'lahan', 'petaniSekarang', 'id_kepemilikan'));
     }
 
-
     public function updateKepemilikan(Request $request, $id_kepemilikan, $id_lahan)
     {
         $kepemilikan = Kepemilikan::with('detailKepemilikan')->findOrFail($id_kepemilikan);
@@ -1435,6 +1434,17 @@ class KepemilikanController extends Controller
             }
             if ($kkName) {
                 $request->file('pdf_scan_kk')->storeAs('ktp_pdf', $kkName, 'public');
+            }
+
+            // Cek nomor plasma sudah dipakai atau belum
+            if (!empty($validated['nomor_anggota_plasma'])) {
+                $cekPlasma = Petani::where('nomor_anggota_plasma', $validated['nomor_anggota_plasma'])->exists();
+
+                if ($cekPlasma) {
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Nomor anggota plasma sudah terdaftar pada petani lain.');
+                }
             }
 
             // Buat petani baru dengan assign nama file PDF
