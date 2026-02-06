@@ -45,6 +45,12 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="id_petani" value="{{ $kepemilikan->id_petani }}">
+            <input type="hidden" name="page" value="{{ request('page') }}">
+            <input type="hidden" name="search" value="{{ request('search') }}">
+            <input type="hidden" name="desa" value="{{ request('desa') }}">
+            <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+            <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+            <input type="hidden" name="status" value="{{ request('status') }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
@@ -173,8 +179,8 @@
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
-                                    data-bs-target="#modalGantiKepemilikan"
+                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan"
+                                    data-bs-toggle="modal" data-bs-target="#modalGantiKepemilikan"
                                     data-lahan-id="{{ optional($detail->lahan)->id_lahan }}"
                                     onclick="setLahanId({{ optional($detail->lahan)->id_lahan }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
