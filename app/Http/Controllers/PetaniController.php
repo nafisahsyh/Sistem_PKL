@@ -42,7 +42,9 @@ class PetaniController extends Controller
         }
 
         // Urutkan & paginasi
-        $petani = $query->orderBy('id_petani', 'desc')->paginate(15);
+        $petani = $query
+            ->orderByRaw('CAST(nomor_anggota_plasma AS UNSIGNED) DESC')
+            ->paginate(20);
         $petani->appends($request->only(['search', 'status']));
 
         return view('petani.index', compact('petani', 'status'));
