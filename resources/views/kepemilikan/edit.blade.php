@@ -43,6 +43,12 @@
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="page" value="{{ request('page') }}">
+            <input type="hidden" name="search" value="{{ request('search') }}">
+            <input type="hidden" name="desa" value="{{ request('desa') }}">
+            <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+            <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+            <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
             <input type="hidden" name="id_petani" value="{{ $kepemilikan->id_petani }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
@@ -173,8 +179,8 @@
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan" data-bs-toggle="modal"
-                                    data-bs-target="#modalGantiKepemilikan"
+                                <button type="button" class="btn btn-sm btn-warning btn-ganti-lahan"
+                                    data-bs-toggle="modal" data-bs-target="#modalGantiKepemilikan"
                                     onclick="setLahanId({{ $detail->id_lahan ?? 0 }})">
                                     <i class="fas fa-sync-alt"></i> Ganti Kepemilikan
                                 </button>
@@ -460,6 +466,13 @@
                     method="POST" enctype="multipart/form-data">
                     @csrf
 
+                    <input type="hidden" name="page" value="{{ request('page') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="desa" value="{{ request('desa') }}">
+                    <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                    <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+                    <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
+
                     <input type="hidden" name="id_lahan" id="id_lahan_modal">
                     <input type="hidden" name="id_petani_lama" value="{{ $kepemilikan->id_petani }}">
 
@@ -572,6 +585,13 @@
                     method="POST" enctype="multipart/form-data">
 
                     @csrf
+
+                    <input type="hidden" name="page" value="{{ request('page') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="desa" value="{{ request('desa') }}">
+                    <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                    <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
+                    <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
 
                     <div class="modal-content rounded-4">
 

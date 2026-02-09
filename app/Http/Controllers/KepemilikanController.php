@@ -459,25 +459,25 @@ class KepemilikanController extends Controller
                 $path = $request->file("lahan.$index.pdf_scan_peta")->store('pdf_scan_peta', 'public');
                 $detail->update(['pdf_scan_peta' => $path]);
             }
-        }
 
-        // Sinkronisasi jumlah PBB
-        $tahunSekarang = Carbon::now()->year;
-        $pbb = Pbb::where('id_detail_kepemilikan', $detail->id_detail_kepemilikan)
-            ->where('tahun', $tahunSekarang)
-            ->first();
+            //Sinkronasi jumlah PBB
+            $tahunSekarang = Carbon::now()->year;
+            $pbb = Pbb::where('id_detail_kepemilikan', $detail->id_detail_kepemilikan)
+                ->where('tahun', $tahunSekarang)
+                ->first();
 
-        if ($pbb) {
-            if ($pbb->status === 'belum') {
-                $pbb->update(['jumlah' => $data['jumlah_pbb'] ?? 0]);
+            if ($pbb) {
+                if ($pbb->status === 'belum') {
+                    $pbb->update(['jumlah' => $data['jumlah_pbb'] ?? 0]);
+                }
+            } else {
+                Pbb::create([
+                    'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
+                    'tahun' => $tahunSekarang,
+                    'jumlah' => $data['jumlah_pbb'] ?? 0,
+                    'status' => 'belum',
+                ]);
             }
-        } else {
-            Pbb::create([
-                'id_detail_kepemilikan' => $detail->id_detail_kepemilikan,
-                'tahun' => $tahunSekarang,
-                'jumlah' => $data['jumlah_pbb'] ?? 0,
-                'status' => 'belum',
-            ]);
         }
 
         $hasActive = DetailKepemilikan::where('id_kepemilikan', $kepemilikan->id_kepemilikan)
@@ -1491,10 +1491,14 @@ class KepemilikanController extends Controller
         ]);
 
 
-        return redirect()->route('kepemilikan.editPerLahan', [$kepemilikanBaru->id_kepemilikan, $id_lahan])
-            ->with($filters)
-            ->with('page', $page)
-            ->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
+        return redirect()->route(
+            'kepemilikan.editPerLahan',
+            array_merge(
+                [$kepemilikanBaru->id_kepemilikan, $id_lahan],
+                ['page' => $page],
+                $filters
+            )
+        )->with('success', 'Kepemilikan lahan berhasil dipindahkan.');
     }
 
     public function updateKepemilikanSemua(Request $request, $id_kepemilikan)
@@ -1612,10 +1616,14 @@ class KepemilikanController extends Controller
         // Setelah semua dipindah → hapus kepemilikan lama
         $kepemilikan->delete();
 
-        return redirect()->route('kepemilikan.edit', $kepemilikanBaru->id_kepemilikan)
-            ->with($filters)
-            ->with('page', $page)
-            ->with('success', 'Kepemilikan seluruh lahan berhasil dipindahkan.');
+        return redirect()->route(
+            'kepemilikan.edit',
+            array_merge(
+                [$kepemilikanBaru->id_kepemilikan],
+                ['page' => $page],
+                $filters
+            )
+        )->with('success', 'Kepemilikan seluruh lahan berhasil dipindahkan.');
     }
 
     public function updateRiwayat(Request $request, $id)
