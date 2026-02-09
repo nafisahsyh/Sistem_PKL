@@ -255,8 +255,6 @@ class PetaniController extends Controller
                 if ($statusPengelolaan === 'Perusahaan') {
                     $statusKepemilikan = 'nonaktif';
                 }
-                // jika tetap null (user tidak pilih), baru default ke KSM
-                $statusPengelolaan = $statusPengelolaan ?? 'KSM';
 
                 // simpan data lahan
                 $lahan = Lahan::create([
