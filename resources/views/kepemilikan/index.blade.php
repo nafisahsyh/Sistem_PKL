@@ -98,6 +98,7 @@
                             <th>Tahun Tanam</th>
                             <th>Kode</th>
                             <th>Status Kelola</th>
+                            <th>Status Lahan</th>
                             <th style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
@@ -168,7 +169,37 @@
                                         {{-- kolom kode lahan, tampil tiap baris --}}
                                         <td class="align-middle text-center striping">{{ $detail->kode_lahan ?? '-' }}</td>
                                         <td class="align-middle text-center striping">
-                                            {{ $detail->status_pengelolaan ?? '-' }}
+                                            @if ($detail->status_pengelolaan === 'KSM')
+                                                <span class="badge bg-success">KSM</span>
+                                            @elseif ($detail->status_pengelolaan === 'Mandiri')
+                                                <span class="badge bg-primary">Mandiri</span>
+                                            @elseif ($detail->status_pengelolaan === 'Perusahaan')
+                                                <span class="badge bg-warning text-dark">Perusahaan</span>
+                                            @elseif (!empty($detail->status_pengelolaan))
+                                                <span class="badge bg-secondary">
+                                                    {{ ucfirst($detail->status_pengelolaan) }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">-</span>
+                                            @endif
+                                        </td>
+
+                                        @php
+                                            $status = strtolower(trim($detail->status_kepemilikan));
+                                        @endphp
+
+                                        <td class="align-middle text-center striping">
+                                            @if ($status === 'aktif')
+                                                <span class="badge bg-success">Aktif</span>
+                                            @elseif ($status === 'nonaktif' || $status === 'tidak aktif')
+                                                <span class="badge bg-danger">Tidak Aktif</span>
+                                            @elseif (!empty($status))
+                                                <span class="badge bg-secondary">
+                                                    {{ ucfirst($detail->status_kepemilikan) }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">-</span>
+                                            @endif
                                         </td>
 
                                         {{-- tombol aksi tampil sekali di baris pertama petani --}}
@@ -432,6 +463,8 @@
                                 <label><input type="checkbox" name="exclude[]" value="luas_surat"> Luas Surat</label><br>
                                 <label><input type="checkbox" name="exclude[]" value="status_pengelolaan"> Status
                                     Kelola</label><br>
+                                <label><input type="checkbox" name="exclude[]" value="status_kepemilikan"> Status
+                                    Lahan</label><br>
                             </div>
                         </div>
 

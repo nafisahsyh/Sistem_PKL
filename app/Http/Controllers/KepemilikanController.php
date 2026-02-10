@@ -180,12 +180,7 @@ class KepemilikanController extends Controller
                         return $byDesa && $byTahun;
                     }
 
-                    // Lahan aktif Mandiri --> tampil selalu
-                    if ($statusKepemilikan === 'aktif') {
-                        return $byDesa && $byTahun;
-                    }
-
-                    return false; // nonaktif Mandiri --> tidak tampil
+                    return $byDesa && $byTahun;
                 }
 
                 return false;
@@ -668,7 +663,7 @@ class KepemilikanController extends Controller
             'lahan.*.kode_lahan' => 'nullable|string|max:15',
             'lahan.*.koordinat_x' => 'nullable|numeric|between:-180,180',
             'lahan.*.koordinat_y' => 'nullable|numeric|between:-90,90',
-            'lahan.*.posisi surat' => 'nullable|in:Notaris,PTP,Koperasi,Petani',
+            'lahan.*.posisi_surat' => 'nullable|in:Notaris,PTP,Koperasi,Petani',
             'lahan.*.status_penyerahan' => 'nullable|string|max:100',
             'lahan.*.pdf_scan_shm' => 'nullable|file|mimes:pdf|max:30720',
             'lahan.*.pdf_scan_peta' => 'nullable|file|mimes:pdf|max:10240',
@@ -795,7 +790,7 @@ class KepemilikanController extends Controller
 
             DB::commit();
 
-            $queryParams = request()->only(['page', 'search', 'desa', 'tahun', 'status_pengelolaan', 'status']);
+            $queryParams = request()->only(['page', 'search', 'desa', 'tahun', 'status_pengelolaan', 'status_petani']);
             return redirect()->route('kepemilikan.index', $queryParams)
                 ->with('success', 'Data kepemilikan berhasil diperbarui.');
         } catch (\Exception $e) {
@@ -960,7 +955,6 @@ class KepemilikanController extends Controller
             'Data Kepemilikan Lahan ' . ucwords(strtolower($kepemilikan->petani->nama)) . '.pdf'
         );
     }
-
 
     public function cetakPDFPerLahan($id_kepemilikan, $id_detail)
     {

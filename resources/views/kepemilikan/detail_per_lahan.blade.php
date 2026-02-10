@@ -172,19 +172,19 @@
                                 <td class="text-normal-sm text-start ps-3">{{ $detail->kode_lahan ?? '-' }}</td>
                             </tr>
                             <tr>
-                                <th class="text-normal text-start ps-3">Luas Sesuai Lapangan</th>
-                                <td class="text-normal-sm text-start ps-3">
-                                    {{ number_format($detail->lahan->luas_peta ?? 0, 2, ',', '.') }} M²
-                                </td>
-                            </tr>
-                            <tr>
                                 <th class="text-normal text-start ps-3">Nomor Kavling</th>
                                 <td class="text-normal-sm text-start ps-3">{{ $detail->nomor_kavling ?? '-' }}</td>
                             </tr>
                             <tr>
+                                <th class="text-normal text-start ps-3">Luas Sesuai Lapangan</th>
+                                <td class="text-normal-sm text-start ps-3">
+                                    {{ number_format($detail->lahan->luas_peta ?? 0, 0, ',', '.') }} M²
+                                </td>
+                            </tr>
+                            <tr>
                                 <th class="text-normal text-start ps-3">Luas Sesuai Surat</th>
                                 <td class="text-normal-sm text-start ps-3">
-                                    {{ number_format($detail->luas_surat ?? 0, 2, ',', '.') }} M²
+                                    {{ number_format($detail->luas_surat ?? 0, 0, ',', '.') }} M²
                                 </td>
                             </tr>
                             <tr>
@@ -308,16 +308,23 @@
                             <tr>
                                 <th class="text-normal text-start ps-3">Status Lahan</th>
                                 <td class="text-normal-sm text-start ps-3">
-                                    <span
-                                        class="badge {{ $detail->status_kepemilikan == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                                        {{ ucfirst(strtolower($detail->status_kepemilikan)) }}
+                                    @php
+                                        $status = strtolower(trim($detail->status_kepemilikan));
+                                    @endphp
+
+                                    <span class="badge {{ $status === 'aktif' ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $status === 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
                                     </span>
                                 </td>
                             </tr>
                             <tr>
                                 <th class="text-normal text-start ps-3">Tanggal Mulai</th>
                                 <td class="text-normal-sm text-start ps-3">
-                                    {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}
+                                    @if (!empty($detail->tanggal_mulai))
+                                        {{ \Carbon\Carbon::parse($detail->tanggal_mulai)->format('d-m-Y') }}
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                             </tr>
                             <tr>

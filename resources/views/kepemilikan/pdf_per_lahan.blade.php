@@ -216,12 +216,16 @@
                     <td>{{ $detail->kode_lahan ?? '-' }}</td>
                 </tr>
                 <tr>
+                    <th>No. Kavling</th>
+                    <td>{{ $detail->nomor_kavling ?? '-' }}</td>
+                </tr>
+                <tr>
                     <th>Luas Sesuai Lapangan</th>
-                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} M²</td>
+                    <td>{{ number_format($detail->lahan->luas_peta, 0, ',', '.') }} M²</td>
                 </tr>
                 <tr>
                     <th>Luas Sesuai Surat</th>
-                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} M²</td>
+                    <td>{{ number_format($detail->luas_surat, 0, ',', '.') }} M²</td>
                 </tr>
                 <tr>
                     <th>Nomor SHM</th>

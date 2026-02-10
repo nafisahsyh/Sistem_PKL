@@ -126,6 +126,9 @@
                 @if (!in_array('status_pengelolaan', $exclude))
                     <th style="width: 9%;">Status Kelola</th>
                 @endif
+                @if (!in_array('status_kepemilikan', $exclude))
+                    <th style="width: 9%;">Status Lahan</th>
+                @endif
             </tr>
         </thead>
 
@@ -209,11 +212,15 @@
                         @endif
 
                         @if (!in_array('luas_peta', $exclude))
-                            <td>{{ $lahan->luas_peta ? $luasPeta : '-' }}</td>
+                            <td>
+                                {{ $lahan->luas_peta !== null ? number_format((float) $lahan->luas_peta, 0, ',', '.') . ' M²' : '-' }}
+                            </td>
                         @endif
 
                         @if (!in_array('luas_surat', $exclude))
-                            <td>{{ $detail->luas_surat ? $luasSurat : '-' }}</td>
+                            <td>
+                                {{ $detail->luas_surat !== null ? number_format((float) $detail->luas_surat, 0, ',', '.') . ' M²' : '-' }}
+                            </td>
                         @endif
 
                         @if (!in_array('shm', $exclude))
@@ -227,6 +234,17 @@
                         @if (!in_array('status_pengelolaan', $exclude))
                             <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
                         @endif
+
+                        @if (!in_array('status_kepemilikan', $exclude))
+                            <td>
+                                @php
+                                    $status = strtolower(trim($detail->status_kepemilikan));
+                                @endphp
+
+                                {{ $status === 'nonaktif' ? 'Tidak Aktif' : ucfirst($status) ?? '-' }}
+                            </td>
+                        @endif
+
                     </tr>
                 @endforeach
             @endforeach

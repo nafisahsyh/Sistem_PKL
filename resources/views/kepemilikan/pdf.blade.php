@@ -171,7 +171,7 @@
     <div class="section-title">Data Petani</div>
     <table class="no-border">
         <tr>
-            <th width="30%">Nama Lengkap</th>
+            <th width="30%">Nama</th>
             <td>: {{ $kepemilikan->petani->nama ?? '-' }}</td>
         </tr>
         <tr>
@@ -237,12 +237,16 @@
                     <td>{{ $detail->kode_lahan ?? '-' }}</td>
                 </tr>
                 <tr>
+                    <th>No. Kavling</th>
+                    <td>{{ $detail->nomor_kavling ?? '-' }}</td>
+                </tr>
+                <tr>
                     <th>Luas Sesuai Lapangan</th>
-                    <td>{{ number_format($detail->lahan->luas_peta, 2, ',', '.') }} M²</td>
+                    <td>{{ number_format($detail->lahan->luas_peta, 0, ',', '.') }} M²</td>
                 </tr>
                 <tr>
                     <th>Luas Sesuai Surat</th>
-                    <td>{{ number_format($detail->luas_surat, 2, ',', '.') }} M²</td>
+                    <td>{{ number_format($detail->luas_surat, 0, ',', '.') }} M²</td>
                 </tr>
                 <tr>
                     <th>Nomor SHM</th>

@@ -140,6 +140,7 @@
                         'desa' => request('desa'),
                         'tahun' => request('tahun'),
                         'status_pengelolaan' => request('status_pengelolaan'),
+                        'status_petani' => request('status_petani'),
                     ]) }}"
                         class="btn btn-info btn-sm text-dark">
                         <i class="fas fa-history"></i> Riwayat

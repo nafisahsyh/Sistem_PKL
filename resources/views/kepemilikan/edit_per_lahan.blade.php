@@ -12,6 +12,8 @@
                 'search' => request('search'),
                 'desa' => request('desa'),
                 'tahun' => request('tahun'),
+                'status_pengelolaan' => request('status_pengelolaan'),
+                'status_petani' => request('status_petani'),
             ]) }}"
                 class="btn btn-success p-2" title="Kembali ke Data Kepemilikan">
                 <i class="fas fa-chevron-left fa-lg"></i>
@@ -50,7 +52,7 @@
             <input type="hidden" name="desa" value="{{ request('desa') }}">
             <input type="hidden" name="tahun" value="{{ request('tahun') }}">
             <input type="hidden" name="status_pengelolaan" value="{{ request('status_pengelolaan') }}">
-            <input type="hidden" name="status" value="{{ request('status') }}">
+            <input type="hidden" name="status_petani" value="{{ request('status_petani') }}">
 
             {{-- ===================== DATA PETANI ===================== --}}
             <div class="card p-4 mb-4 shadow-sm rounded-4 border-0">
@@ -434,7 +436,7 @@
                     'desa' => request('desa'),
                     'tahun' => request('tahun'),
                     'status_pengelolaan' => request('status_pengelolaan'),
-                    'status' => request('status'),
+                    'status_petani' => request('status_petani'),
                 ]) }}"
                     class="btn btn-danger">
                     Batal
