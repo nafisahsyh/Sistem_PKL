@@ -660,7 +660,7 @@ class KepemilikanController extends Controller
             'lahan.*.id_desa' => 'required|exists:desa,id_desa',
             'lahan.*.id_tahun_tanam' => 'required|exists:tahun_tanam,id_tahun_tanam',
             'lahan.*.luas_peta' => 'required|numeric|min:0',
-            'lahan.*.kode_lahan' => 'nullable|string|max:15',
+            'lahan.*.kode_lahan' => 'nullable|string',
             'lahan.*.koordinat_x' => 'nullable|numeric|between:-180,180',
             'lahan.*.koordinat_y' => 'nullable|numeric|between:-90,90',
             'lahan.*.posisi_surat' => 'nullable|in:Notaris,PTP,Koperasi,Petani',
