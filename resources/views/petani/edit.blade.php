@@ -13,7 +13,6 @@
 
                 <input type="hidden" name="page" value="{{ $page }}">
                 <input type="hidden" name="search" value="{{ $search }}">
-                <input type="hidden" name="status" value="{{ $status }}">
 
                 <div class="row">
                     <div class="col-md-6 mb-3">

@@ -113,7 +113,6 @@ class PetaniController extends Controller
         'petani' => $petani,
         'page' => $request->query('page', 1),
         'search' => $request->query('search'),
-        'status' => $request->query('status'),
     ]);
     }
 
@@ -196,7 +195,7 @@ class PetaniController extends Controller
         $page = $request->input('page', 1);
         return redirect()->route(
             'petani.index',
-            $request->only(['page', 'search', 'status'])
+            $request->only(['page', 'search'])
         )->with('success', 'Data petani berhasil diperbarui.');
     }
 

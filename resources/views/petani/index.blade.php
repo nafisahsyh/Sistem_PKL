@@ -138,7 +138,6 @@
                                         'petani' => $p->id_petani,
                                         'page' => request('page'),
                                         'search' => request('search'),
-                                        'status' => request('status'),
                                     ]) }}"
                                         class="btn btn-warning btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
