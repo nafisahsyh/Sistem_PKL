@@ -489,7 +489,7 @@ class KepemilikanController extends Controller
             'desa' => $request->input('desa'),
             'tahun' => $request->input('tahun'),
             'status_pengelolaan' => $request->input('status_pengelolaan'),
-            'status' => $request->input('status'),
+             'status_petani' => $request->input('status_petani'),
         ])->with('success', 'Data Kepemilikan Berhasil Diperbarui!');
     }
 

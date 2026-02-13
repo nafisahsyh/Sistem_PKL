@@ -45,7 +45,7 @@ class PetaniController extends Controller
         $petani = $query
             ->orderByRaw('CAST(nomor_anggota_plasma AS UNSIGNED) DESC')
             ->paginate(20);
-        $petani->appends($request->only(['search', 'status']));
+        $petani->withQueryString();
 
         return view('petani.index', compact('petani', 'status'));
     }
@@ -109,8 +109,12 @@ class PetaniController extends Controller
 
     public function edit(Petani $petani, Request $request)
     {
-        $page = $request->query('page', 1); // ambil page dari query string, default 1
-        return view('petani.edit', compact('petani', 'page'));
+        return view('petani.edit', [
+        'petani' => $petani,
+        'page' => $request->query('page', 1),
+        'search' => $request->query('search'),
+        'status' => $request->query('status'),
+    ]);
     }
 
     public function update(Request $request, Petani $petani)
@@ -190,8 +194,10 @@ class PetaniController extends Controller
 
         // Redirect, tetap di page yang sama
         $page = $request->input('page', 1);
-        return redirect()->route('petani.index', ['page' => $page])
-            ->with('success', 'Data petani berhasil diperbarui.');
+        return redirect()->route(
+            'petani.index',
+            $request->only(['page', 'search', 'status'])
+        )->with('success', 'Data petani berhasil diperbarui.');
     }
 
     public function destroy(Petani $petani)
