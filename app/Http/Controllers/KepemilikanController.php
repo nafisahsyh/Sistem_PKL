@@ -190,11 +190,11 @@ class KepemilikanController extends Controller
         });
 
         // hapus data tanpa detail
-        $kepemilikan->setCollection(
-            $kepemilikan->getCollection()->filter(function ($item) {
-                return $item->detailKepemilikan->isNotEmpty();
-            })->values()
-        );
+        // $kepemilikan->setCollection(
+        //     $kepemilikan->getCollection()->filter(function ($item) {
+        //         return $item->detailKepemilikan->isNotEmpty();
+        //     })->values()
+        // );
 
         // dropdown data
         $daftarDesa = Desa::orderBy('desa')->get();
