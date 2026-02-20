@@ -33,6 +33,33 @@ class KepemilikanController extends Controller
 
         $query = Kepemilikan::with([
             'petani.desa.kecamatan',
+
+            'detailKepemilikan' => function ($q) use ($statusPengelolaan, $desa, $tahun, $search) {
+
+                if (!empty($statusPengelolaan) && $statusPengelolaan !== 'semua') {
+                    $q->whereRaw('LOWER(status_pengelolaan) = ?', [$statusPengelolaan]);
+                }
+
+                if (!empty($desa) && strtolower($desa) !== 'semua') {
+                    $q->whereHas('lahan.desa', function ($q2) use ($desa) {
+                        $q2->where('desa', $desa);
+                    });
+                }
+
+                if (!empty($tahun) && strtolower($tahun) !== 'semua') {
+                    $q->whereHas('lahan.tahunTanam', function ($q2) use ($tahun) {
+                        $q2->where('tahun', $tahun);
+                    });
+                }
+
+                if (!empty($search)) {
+                    $q->where(function ($sub) use ($search) {
+                        $sub->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
+                            ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
+                    });
+                }
+            },
+
             'detailKepemilikan.lahan.desa.kecamatan',
             'detailKepemilikan.lahan.tahunTanam'
         ])
