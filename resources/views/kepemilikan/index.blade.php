@@ -107,6 +107,11 @@
                         @php $rowIndex = 0; @endphp
 
                         @forelse ($kepemilikan as $index => $k)
+
+                            @if (!empty($k->hidden))
+                                @continue
+                            @endif
+
                             @php
                                 $grouped = $k->detailKepemilikan->groupBy(
                                     fn($d) => ($d->lahan->desa->desa ?? '-') .
@@ -120,7 +125,7 @@
                                         ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
                                         : 0);
                             @endphp
-
+                            
                             @php $firstRow = true; @endphp
 
                             @foreach ($grouped as $group)

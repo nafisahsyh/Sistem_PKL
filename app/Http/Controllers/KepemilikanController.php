@@ -189,19 +189,13 @@ class KepemilikanController extends Controller
             return $item;
         });
 
-        // hapus data tanpa detail
+        // // hapus data tanpa detail
         // $kepemilikan->setCollection(
         //     $kepemilikan->getCollection()->filter(function ($item) {
         //         return $item->detailKepemilikan->isNotEmpty();
         //     })->values()
         // );
 
-        // $kepemilikan->getCollection()->transform(function ($item) {
-        //     if ($item->detailKepemilikan->isEmpty()) {
-        //         $item->hide_from_view = true;
-        //     }
-        //     return $item;
-        // });
         // dropdown data
         $daftarDesa = Desa::orderBy('desa')->get();
         $daftarTahun = Tahun_Tanam::orderBy('tahun', 'desc')->get();
@@ -222,6 +216,13 @@ class KepemilikanController extends Controller
         } else {
             $mode = 'normal';
         }
+
+        $kepemilikan->getCollection()->transform(function ($item) {
+            if ($item->detailKepemilikan->isEmpty()) {
+                $item->hidden = true;
+            }
+            return $item;
+        });
 
         return view('kepemilikan.index', [
             'kepemilikan' => $kepemilikan,
