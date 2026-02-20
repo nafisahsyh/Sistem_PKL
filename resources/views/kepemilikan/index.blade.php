@@ -121,6 +121,13 @@
                                         : 0);
                             @endphp
 
+                            <tr>
+                                <td colspan="10" style="background: #fff3cd;">
+                                    detailCount: {{ $k->detailKepemilikan->count() }} |
+                                    groupedCount: {{ $grouped->count() }}
+                                </td>
+                            </tr>
+
                             @php $firstRow = true; @endphp
 
                             @foreach ($grouped as $group)
