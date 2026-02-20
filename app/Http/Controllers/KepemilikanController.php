@@ -31,38 +31,40 @@ class KepemilikanController extends Controller
         $desa = $request->desa;
         $tahun = $request->tahun;
 
-        $query = Kepemilikan::with([
-            'petani.desa.kecamatan',
+        $query = Kepemilikan::select('kepemilikan.*')
+            ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
+            ->with([
+                'petani.desa.kecamatan',
 
-            'detailKepemilikan' => function ($q) use ($statusPengelolaan, $desa, $tahun, $search) {
+                'detailKepemilikan' => function ($q) use ($statusPengelolaan, $desa, $tahun, $search) {
 
-                if (!empty($statusPengelolaan) && $statusPengelolaan !== 'semua') {
-                    $q->whereRaw('LOWER(status_pengelolaan) = ?', [$statusPengelolaan]);
-                }
+                    if (!empty($statusPengelolaan) && $statusPengelolaan !== 'semua') {
+                        $q->whereRaw('LOWER(status_pengelolaan) = ?', [$statusPengelolaan]);
+                    }
 
-                if (!empty($desa) && strtolower($desa) !== 'semua') {
-                    $q->whereHas('lahan.desa', function ($q2) use ($desa) {
-                        $q2->where('desa', $desa);
-                    });
-                }
+                    if (!empty($desa) && strtolower($desa) !== 'semua') {
+                        $q->whereHas('lahan.desa', function ($q2) use ($desa) {
+                            $q2->where('desa', $desa);
+                        });
+                    }
 
-                if (!empty($tahun) && strtolower($tahun) !== 'semua') {
-                    $q->whereHas('lahan.tahunTanam', function ($q2) use ($tahun) {
-                        $q2->where('tahun', $tahun);
-                    });
-                }
+                    if (!empty($tahun) && strtolower($tahun) !== 'semua') {
+                        $q->whereHas('lahan.tahunTanam', function ($q2) use ($tahun) {
+                            $q2->where('tahun', $tahun);
+                        });
+                    }
 
-                if (!empty($search)) {
-                    $q->where(function ($sub) use ($search) {
-                        $sub->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
-                            ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
-                    });
-                }
-            },
+                    if (!empty($search)) {
+                        $q->where(function ($sub) use ($search) {
+                            $sub->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
+                                ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
+                        });
+                    }
+                },
 
-            'detailKepemilikan.lahan.desa.kecamatan',
-            'detailKepemilikan.lahan.tahunTanam'
-        ])
+                'detailKepemilikan.lahan.desa.kecamatan',
+                'detailKepemilikan.lahan.tahunTanam'
+            ])
             ->whereHas('petani', function ($q) use ($statusPetani) {
                 $q->where('status', $statusPetani === 'berhenti' ? 'berhenti' : 'aktif');
             })
@@ -110,7 +112,7 @@ class KepemilikanController extends Controller
         }
 
         $kepemilikan = $query
-            ->orderBy('id_kepemilikan', 'asc')
+            ->orderBy('petani.nomor_anggota_plasma', 'asc')
             ->paginate(10)
             ->appends($request->all());
 
