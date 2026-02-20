@@ -132,7 +132,8 @@
                                         @php $rowIndex++; @endphp
 
                                         {{-- tampilkan kolom petani hanya di baris pertama --}}
-                                        @if ($firstRow)
+                                        {{-- @if ($firstRow) --}}
+                                        @if ($loop->first && $loop->parent->first)
                                             <td class="text-center align-middle"
                                                 rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $rowNumber }}
@@ -206,7 +207,8 @@
                                         </td>
 
                                         {{-- tombol aksi tampil sekali di baris pertama petani --}}
-                                        @if ($firstRow)
+                                        {{-- @if ($firstRow) --}}
+                                        @if ($loop->first && $loop->parent->first)
                                             @php
                                                 // Ambil parameter request supaya aman digunakan
                                                 $search = request('search');
@@ -325,7 +327,7 @@
                                                     </form>
                                                 @endif
                                             </td>
-                                            @php $firstRow = false; @endphp
+                                            {{-- @php $firstRow = false; @endphp --}}
                                         @endif
                                 @endforeach
                             @endforeach
