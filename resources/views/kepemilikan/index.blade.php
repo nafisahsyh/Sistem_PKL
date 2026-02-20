@@ -106,27 +106,25 @@
 
                         @php $rowIndex = 0; @endphp
 
-                        @forelse ($kepemilikan as $index => $k)
+@forelse ($kepemilikan as $index => $k)
 
-                            @if (!empty($k->hidden))
-                                @continue
-                            @endif
+    @if ($k->detailKepemilikan->isEmpty())
+        @continue
+    @endif
 
-                            @php
-                                $grouped = $k->detailKepemilikan->groupBy(
-                                    fn($d) => ($d->lahan->desa->desa ?? '-') .
-                                        '-' .
-                                        ($d->lahan->tahunTanam->tahun ?? '-'),
-                                );
+    @php
+        $grouped = $k->detailKepemilikan->groupBy(
+            fn($d) => ($d->lahan->desa->desa ?? '-') .
+                '-' .
+                ($d->lahan->tahunTanam->tahun ?? '-'),
+        );
 
-                                $rowNumber =
-                                    $loop->iteration +
-                                    ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
-                                        ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
-                                        : 0);
-                            @endphp
-                            
-                            @php $firstRow = true; @endphp
+        $rowNumber =
+            $loop->iteration +
+            ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
+                ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
+                : 0);
+    @endphp
 
                             @foreach ($grouped as $group)
                                 @foreach ($group as $i => $detail)

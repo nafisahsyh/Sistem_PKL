@@ -142,8 +142,8 @@ class KepemilikanController extends Controller
                 $statusPengelolaan = strtolower($detail->status_pengelolaan ?? '');
                 $filterPengelolaan = strtolower($request->status_pengelolaan ?? '');
                 $filterPetani = strtolower($request->status_petani ?? '');
-                $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' || strtolower($detail->lahan->desa->desa ?? '') === strtolower($request->desa);
-                $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
+                // $byDesa = empty($request->desa) || strtolower($request->desa) === 'semua' || strtolower($detail->lahan->desa->desa ?? '') === strtolower($request->desa);
+                // $byTahun = empty($request->tahun) || strtolower($request->tahun) === 'semua' || ($detail->lahan->tahunTanam->tahun ?? '') == $request->tahun;
                 $isSearch = !empty($search);
 
                 if ($filterPetani === 'berhenti' && $statusPetani !== 'berhenti') {
@@ -151,37 +151,65 @@ class KepemilikanController extends Controller
                 }
 
                 // ===================== PETANI BERHENTI =====================
-                if ($statusPetani === 'berhenti') {
+                // if ($statusPetani === 'berhenti') {
 
-                    // Jika search aktif --> TAMPILKAN semua detail yang cocok
-                    if (!empty($search)) {
-                        return $byDesa && $byTahun;
-                    }
-                    if ($filterPetani !== 'berhenti')
-                        return false;
+                //     // Jika search aktif --> TAMPILKAN semua detail yang cocok
+                //     if (!empty($search)) {
+                //         return $byDesa && $byTahun;
+                //     }
+                //     if ($filterPetani !== 'berhenti')
+                //         return false;
 
-                    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
-                        return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
-                    }
+                //     if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+                //         return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
+                //     }
 
-                    // tampil semua lahan berhenti (Mandiri/Perusahaan)
-                    return $byDesa && $byTahun;
-                }
+                //     // tampil semua lahan berhenti (Mandiri/Perusahaan)
+                //     return $byDesa && $byTahun;
+                // }
+
+                // ===================== PETANI BERHENTI =====================
+if ($statusPetani === 'berhenti') {
+
+    if ($filterPetani !== 'berhenti') {
+        return false;
+    }
+
+    // jika ada filter pengelolaan
+    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+        return $statusPengelolaan === $filterPengelolaan;
+    }
+
+    // tampilkan semua detail (desa & tahun sudah difilter di query)
+    return true;
+}
 
                 // ===================== PETANI AKTIF =====================
-                if ($statusPetani === 'aktif') {
-                    // Jika ada filter pengelolaan --> tampil sesuai filter
-                    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
-                        return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
-                    }
+                // if ($statusPetani === 'aktif') {
+                //     // Jika ada filter pengelolaan --> tampil sesuai filter
+                //     if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+                //         return $statusPengelolaan === $filterPengelolaan && $byDesa && $byTahun;
+                //     }
 
-                    // Menampilkan data kepemilikan lahan perusahaan
-                    if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan === 'perusahaan') {
-                        return $byDesa && $byTahun;
-                    }
+                //     // Menampilkan data kepemilikan lahan perusahaan
+                //     if ($statusKepemilikan === 'nonaktif' && $statusPengelolaan === 'perusahaan') {
+                //         return $byDesa && $byTahun;
+                //     }
 
-                    return $byDesa && $byTahun;
-                }
+                //     return $byDesa && $byTahun;
+                // }
+
+                // ===================== PETANI AKTANI =====================
+if ($statusPetani === 'aktif') {
+
+    // jika ada filter pengelolaan
+    if (!empty($filterPengelolaan) && $filterPengelolaan !== 'semua') {
+        return $statusPengelolaan === $filterPengelolaan;
+    }
+
+    // tampilkan semua
+    return true;
+}
 
                 return false;
             })->values();
@@ -189,13 +217,30 @@ class KepemilikanController extends Controller
             return $item;
         });
 
-        // hapus data tanpa detail
-        $kepemilikan->setCollection(
-            $kepemilikan->getCollection()->filter(function ($item) {
-                return $item->detailKepemilikan->isNotEmpty();
-            })->values()
-        );
+        // // hapus data tanpa detail
+        // $kepemilikan->setCollection(
+        //     $kepemilikan->getCollection()->filter(function ($item) {
+        //         return $item->detailKepemilikan->isNotEmpty();
+        //     })->values()
+        // );
 
+
+        // ===================== BUANG PARENT YANG DETAILNYA KOSONG =====================
+$filteredCollection = $kepemilikan->getCollection()
+    ->filter(function ($item) {
+        return $item->detailKepemilikan->isNotEmpty();
+    })
+    ->values();
+
+$kepemilikan->setCollection($filteredCollection);
+
+// jika halaman sekarang kosong, mundur 1 halaman
+if ($kepemilikan->currentPage() > 1 && $filteredCollection->isEmpty()) {
+    return redirect()->route('kepemilikan.index', array_merge(
+        $request->all(),
+        ['page' => $kepemilikan->currentPage() - 1]
+    ));
+}
         // dropdown data
         $daftarDesa = Desa::orderBy('desa')->get();
         $daftarTahun = Tahun_Tanam::orderBy('tahun', 'desc')->get();
@@ -217,12 +262,12 @@ class KepemilikanController extends Controller
             $mode = 'normal';
         }
 
-        $kepemilikan->getCollection()->transform(function ($item) {
-            if ($item->detailKepemilikan->isEmpty()) {
-                $item->hidden = true;
-            }
-            return $item;
-        });
+        // $kepemilikan->getCollection()->transform(function ($item) {
+        //     if ($item->detailKepemilikan->isEmpty()) {
+        //         $item->hidden = true;
+        //     }
+        //     return $item;
+        // });
 
         return view('kepemilikan.index', [
             'kepemilikan' => $kepemilikan,
