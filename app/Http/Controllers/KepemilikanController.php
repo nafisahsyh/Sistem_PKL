@@ -102,7 +102,13 @@ class KepemilikanController extends Controller
             ->paginate(10)
             ->appends($request->all());
 
-        dd($kepemilikan->pluck('id_kepemilikan'));
+        foreach ($kepemilikan as $item) {
+            dump(
+                $item->id_kepemilikan,
+                $item->detailKepemilikan->count()
+            );
+        }
+        dd('selesai');
 
         // pastikan detail unik per kepemilikan
         $kepemilikan->getCollection()->transform(function ($item) {
