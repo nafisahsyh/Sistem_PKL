@@ -75,45 +75,35 @@ class KepemilikanController extends Controller
             });
         }
 
-        // ===================== FILTER STATUS PENGELOLAAN =====================
-        if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
-            $query->whereHas('detailKepemilikan', function ($q) use ($request) {
-                $q->whereRaw('LOWER(status_pengelolaan) = ?', [strtolower($request->status_pengelolaan)]);
-            });
-        }
 
-        // ===================== FILTER DESA & TAHUN =====================
-        if (
-            (!empty($request->desa) && strtolower($request->desa) !== 'semua') ||
-            (!empty($request->tahun) && strtolower($request->tahun) !== 'semua')
-        ) {
-            $query->whereHas('detailKepemilikan.lahan', function ($q) use ($request) {
+        // ===================== AMBIL DATA =====================
+        $kepemilikan = $query
+            ->whereHas('detailKepemilikan', function ($q) use ($request) {
 
                 if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
-                    $q->whereHas('desa', function ($q2) use ($request) {
+                    $q->whereHas('lahan.desa', function ($q2) use ($request) {
                         $q2->whereRaw('LOWER(desa) = ?', [strtolower($request->desa)]);
                     });
                 }
 
                 if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
-                    $q->whereHas('tahunTanam', function ($q2) use ($request) {
+                    $q->whereHas('lahan.tahunTanam', function ($q2) use ($request) {
                         $q2->where('tahun', $request->tahun);
                     });
                 }
-            });
-        }
 
-        // ===================== AMBIL DATA =====================
-        $kepemilikan = $query
-            ->whereHas('detailKepemilikan')
+                if (!empty($request->status_pengelolaan) && strtolower($request->status_pengelolaan) !== 'semua') {
+                    $q->whereRaw('LOWER(status_pengelolaan) = ?', [strtolower($request->status_pengelolaan)]);
+                }
+            })
             ->paginate(10)
             ->appends($request->all());
 
         // // pastikan detail unik per kepemilikan
-        // $kepemilikan->getCollection()->transform(function ($item) {
-        //     $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan')->values();
-        //     return $item;
-        // });
+        $kepemilikan->getCollection()->transform(function ($item) {
+            $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan')->values();
+            return $item;
+        });
 
         // // pagination
         // $kepemilikan->onEachSide(1);
