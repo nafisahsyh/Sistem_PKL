@@ -102,6 +102,8 @@ class KepemilikanController extends Controller
             ->paginate(10)
             ->appends($request->all());
 
+        dd($kepemilikan->pluck('id_kepemilikan'));
+
         // pastikan detail unik per kepemilikan
         $kepemilikan->getCollection()->transform(function ($item) {
             $item->detailKepemilikan = $item->detailKepemilikan->unique('id_lahan')->values();
@@ -489,7 +491,7 @@ class KepemilikanController extends Controller
             'desa' => $request->input('desa'),
             'tahun' => $request->input('tahun'),
             'status_pengelolaan' => $request->input('status_pengelolaan'),
-             'status_petani' => $request->input('status_petani'),
+            'status_petani' => $request->input('status_petani'),
         ])->with('success', 'Data Kepemilikan Berhasil Diperbarui!');
     }
 
