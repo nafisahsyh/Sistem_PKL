@@ -82,17 +82,24 @@ class KepemilikanController extends Controller
             });
         }
 
-        // ===================== FILTER DESA =====================
-        if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
-            $query->whereHas('detailKepemilikan.lahan.desa', function ($q) use ($request) {
-                $q->where('desa', $request->desa);
-            });
-        }
+        // ===================== FILTER DESA & TAHUN =====================
+        if (
+            (!empty($request->desa) && strtolower($request->desa) !== 'semua') ||
+            (!empty($request->tahun) && strtolower($request->tahun) !== 'semua')
+        ) {
+            $query->whereHas('detailKepemilikan.lahan', function ($q) use ($request) {
 
-        // ===================== FILTER TAHUN TANAM =====================
-        if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
-            $query->whereHas('detailKepemilikan.lahan.tahunTanam', function ($q) use ($request) {
-                $q->where('tahun', $request->tahun);
+                if (!empty($request->desa) && strtolower($request->desa) !== 'semua') {
+                    $q->whereHas('desa', function ($q2) use ($request) {
+                        $q2->whereRaw('LOWER(desa) = ?', [strtolower($request->desa)]);
+                    });
+                }
+
+                if (!empty($request->tahun) && strtolower($request->tahun) !== 'semua') {
+                    $q->whereHas('tahunTanam', function ($q2) use ($request) {
+                        $q2->where('tahun', $request->tahun);
+                    });
+                }
             });
         }
 
@@ -489,7 +496,7 @@ class KepemilikanController extends Controller
             'desa' => $request->input('desa'),
             'tahun' => $request->input('tahun'),
             'status_pengelolaan' => $request->input('status_pengelolaan'),
-             'status_petani' => $request->input('status_petani'),
+            'status_petani' => $request->input('status_petani'),
         ])->with('success', 'Data Kepemilikan Berhasil Diperbarui!');
     }
 
@@ -1057,9 +1064,9 @@ class KepemilikanController extends Controller
         return response()->download(
             $finalPath,
             'Data Kepemilikan Lahan '
-            . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
-            . ' - ' . $desaTarget
-            . ' (' . $tahunTarget . ').pdf'
+                . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
+                . ' - ' . $desaTarget
+                . ' (' . $tahunTarget . ').pdf'
         );
     }
 
