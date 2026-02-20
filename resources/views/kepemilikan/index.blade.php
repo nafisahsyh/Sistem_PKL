@@ -106,25 +106,22 @@
 
                         @php $rowIndex = 0; @endphp
 
-@forelse ($kepemilikan as $index => $k)
+                        @forelse ($kepemilikan as $index => $k)
+                            @php
+                                $grouped = $k->detailKepemilikan->groupBy(
+                                    fn($d) => ($d->lahan->desa->desa ?? '-') .
+                                        '-' .
+                                        ($d->lahan->tahunTanam->tahun ?? '-'),
+                                );
 
-    @if ($k->detailKepemilikan->isEmpty())
-        @continue
-    @endif
+                                $rowNumber =
+                                    $loop->iteration +
+                                    ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
+                                        ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
+                                        : 0);
+                            @endphp
 
-    @php
-        $grouped = $k->detailKepemilikan->groupBy(
-            fn($d) => ($d->lahan->desa->desa ?? '-') .
-                '-' .
-                ($d->lahan->tahunTanam->tahun ?? '-'),
-        );
-
-        $rowNumber =
-            $loop->iteration +
-            ($kepemilikan instanceof \Illuminate\Pagination\LengthAwarePaginator
-                ? ($kepemilikan->currentPage() - 1) * $kepemilikan->perPage()
-                : 0);
-    @endphp
+                            @php $firstRow = true; @endphp
 
                             @foreach ($grouped as $group)
                                 @foreach ($group as $i => $detail)
@@ -132,8 +129,7 @@
                                         @php $rowIndex++; @endphp
 
                                         {{-- tampilkan kolom petani hanya di baris pertama --}}
-                                        {{-- @if ($firstRow) --}}
-                                        @if ($loop->first && $loop->parent->first)
+                                        @if ($firstRow)
                                             <td class="text-center align-middle"
                                                 rowspan="{{ $k->detailKepemilikan->count() }}">
                                                 {{ $rowNumber }}
@@ -207,8 +203,7 @@
                                         </td>
 
                                         {{-- tombol aksi tampil sekali di baris pertama petani --}}
-                                        {{-- @if ($firstRow) --}}
-                                        @if ($loop->first && $loop->parent->first)
+                                        @if ($firstRow)
                                             @php
                                                 // Ambil parameter request supaya aman digunakan
                                                 $search = request('search');
@@ -327,7 +322,7 @@
                                                     </form>
                                                 @endif
                                             </td>
-                                            {{-- @php $firstRow = false; @endphp --}}
+                                            @php $firstRow = false; @endphp
                                         @endif
                                 @endforeach
                             @endforeach
