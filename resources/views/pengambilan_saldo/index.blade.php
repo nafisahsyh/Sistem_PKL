@@ -63,7 +63,6 @@
                             <th>Desa</th>
                             <th>Tahun Tanam</th>
                             <th>Periode</th>
-                            <th>Tanggal Bagi</th>
                             <th>Total Nominal</th>
                             <th>Saldo Periode Lalu</th>
                             <th>Total Saldo</th>
@@ -80,10 +79,6 @@
                                 <td>
                                     {{ $namaBulan[$p['bulan_awal']] ?? $p['bulan_awal'] }} -
                                     {{ $namaBulan[$p['bulan_akhir']] ?? $p['bulan_akhir'] }} {{ $p['tahun'] }}
-                                </td>
-
-                                <td class="text-center">
-                                    {{ \Carbon\Carbon::parse($p['tanggal_bagi'])->format('d-m-Y') }}
                                 </td>
 
                                 <td class="text-end">
