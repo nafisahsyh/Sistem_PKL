@@ -244,15 +244,19 @@ class PengambilanSaldoController extends Controller
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
                     ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
-                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
-                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
-                    })
+                    $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                        ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                })
                     ->exists();
 
-                $trxTerakhir = Transaksi::where('id_petani', $id_petani)
+                $trxPeriode = Transaksi::where('id_petani', $id_petani)
                     ->where('tipe', 'debit_pengambilan')
                     ->where('id_desa', $id_desa)
                     ->where('id_tahun_tanam', $id_tahun_tanam)
+                    ->where(function ($q) use ($bulan_awal, $bulan_akhir, $tahun) {
+                        $q->where('bulan_awal', '<=', sprintf('%04d-%02d', $tahun, $bulan_akhir))
+                            ->where('bulan_akhir', '>=', sprintf('%04d-%02d', $tahun, $bulan_awal));
+                    })
                     ->orderByDesc('tanggal')
                     ->first();
 
@@ -275,7 +279,7 @@ class PengambilanSaldoController extends Controller
                     'id_desa' => $id_desa,
                     'id_tahun_tanam' => $id_tahun_tanam,
                     'sudah_diambil' => $sudahDiambil,
-                    'trx_terakhir' => $trxTerakhir,
+                    'trx_periode' => $trxPeriode,
                     'periode_berlanjut' => $periodeBerlanjut,
                 ];
             })
@@ -347,31 +351,24 @@ class PengambilanSaldoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_petani'  => 'required',
+            'id_petani' => 'required',
             'id_bulanan' => 'required|array',
-            'metode'     => 'required',
-            'no_urut'    => 'required',
-            'no_bukti'   => 'required',
-            'tanggal'    => 'nullable|date',
+            'metode' => 'required',
+            'no_urut' => 'required',
+            'no_bukti' => 'required',
+            'tanggal' => 'nullable|date',
         ]);
 
-        $idPetani    = $request->id_petani;
-        $bulanAwal   = $request->bulan_awal;   // ex: 2026-01
-        $bulanAkhir  = $request->bulan_akhir;  // ex: 2026-04
-        $tanggal     = $request->tanggal
+        $idPetani = $request->id_petani;
+        $bulanAwal = $request->bulan_awal;   // ex: 2026-01
+        $bulanAkhir = $request->bulan_akhir;  // ex: 2026-04
+        $tanggal = $request->tanggal
             ? Carbon::parse($request->tanggal)
             : now();
 
         $firstBulanan = BagiHasilBulanan::findOrFail($request->id_bulanan[0]);
 
-        $transaksi = DB::transaction(function () use (
-            $request,
-            $idPetani,
-            $bulanAwal,
-            $bulanAkhir,
-            $tanggal,
-            $firstBulanan
-        ) {
+        $transaksi = DB::transaction(function () use ($request, $idPetani, $bulanAwal, $bulanAkhir, $tanggal, $firstBulanan) {
 
             // ================= AMBIL SALDO =================
             $saldoAktif = Saldo::where('id_petani', $idPetani)
@@ -391,18 +388,18 @@ class PengambilanSaldoController extends Controller
 
             // ================= TRANSAKSI =================
             $transaksi = Transaksi::create([
-                'id_petani'      => $idPetani,
-                'id_desa'        => $firstBulanan->id_desa,
+                'id_petani' => $idPetani,
+                'id_desa' => $firstBulanan->id_desa,
                 'id_tahun_tanam' => $firstBulanan->id_tahun_tanam,
-                'tipe'           => 'debit_pengambilan',
-                'metode'         => $request->metode,
-                'nominal'        => $totalSaldo,
-                'tanggal'        => $tanggal,
-                'keterangan'     => 'Pengambilan saldo periode',
-                'no_bukti'       => $request->no_bukti,
-                'no_urut'        => $request->no_urut,
-                'bulan_awal'     => $saldoAktif->first()->bulan_awal,
-                'bulan_akhir'    => $bulanAkhir,
+                'tipe' => 'debit_pengambilan',
+                'metode' => $request->metode,
+                'nominal' => $totalSaldo,
+                'tanggal' => $tanggal,
+                'keterangan' => 'Pengambilan saldo periode',
+                'no_bukti' => $request->no_bukti,
+                'no_urut' => $request->no_urut,
+                'bulan_awal' => $saldoAktif->first()->bulan_awal,
+                'bulan_akhir' => $bulanAkhir,
             ]);
 
             // ================= TRANSAKSI DETAIL (PER PERIODE SALDO) =================
@@ -410,10 +407,10 @@ class PengambilanSaldoController extends Controller
 
             foreach ($saldoAktif as $saldo) {
                 $details[] = TransaksiDetail::create([
-                    'id_transaksi'      => $transaksi->id_transaksi,
-                    'periode_awal'      => $saldo->bulan_awal,
-                    'periode_akhir'     => $saldo->bulan_akhir,
-                    'nominal'           => $saldo->saldo,
+                    'id_transaksi' => $transaksi->id_transaksi,
+                    'periode_awal' => $saldo->bulan_awal,
+                    'periode_akhir' => $saldo->bulan_akhir,
+                    'nominal' => $saldo->saldo,
                     'nominal_per_bulan' => null, // default
                 ]);
             }
@@ -423,7 +420,7 @@ class PengambilanSaldoController extends Controller
 
                 $detail = $details[0];
 
-                $awal  = Carbon::parse($detail->periode_awal);
+                $awal = Carbon::parse($detail->periode_awal);
                 $akhir = Carbon::parse($detail->periode_akhir);
 
                 // HARUS TEPAT 2 BULAN BERURUTAN
@@ -438,16 +435,17 @@ class PengambilanSaldoController extends Controller
 
                     foreach ([$awal, $akhir] as $tgl) {
                         $periode = $tgl->format('Y-m');
-                        $bulan   = (int) $tgl->format('m');
+                        $bulan = (int) $tgl->format('m');
 
-                        if (!isset($bulanMap[$bulan])) continue;
+                        if (!isset($bulanMap[$bulan]))
+                            continue;
 
                         $nominalPerBulan[$periode] =
                             BagiHasilPetani::where('id_petani', $idPetani)
-                            ->where('id_desa', $firstBulanan->id_desa)
-                            ->where('id_tahun_tanam', $firstBulanan->id_tahun_tanam)
-                            ->where('id_bagi_bulanan', $bulanMap[$bulan])
-                            ->sum('total_nominal');
+                                ->where('id_desa', $firstBulanan->id_desa)
+                                ->where('id_tahun_tanam', $firstBulanan->id_tahun_tanam)
+                                ->where('id_bagi_bulanan', $bulanMap[$bulan])
+                                ->sum('total_nominal');
                     }
 
                     $detail->update([
@@ -517,7 +515,7 @@ class PengambilanSaldoController extends Controller
                     $tahun = (int) substr($periode, 0, 4);
 
                     $periodeList[] = [
-                        'label'   => 'BULAN ' . $bulanIndo($bulan) . ' ' . $tahun,
+                        'label' => 'BULAN ' . $bulanIndo($bulan) . ' ' . $tahun,
                         'nominal' => $nominal
                     ];
 

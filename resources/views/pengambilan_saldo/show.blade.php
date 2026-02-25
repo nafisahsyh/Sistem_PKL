@@ -146,8 +146,8 @@
                                     @endif
 
                                     {{-- Print Nota (TIDAK BOLEH KETUTUP) --}}
-                                    @if ($p['sudah_diambil'] && !empty($p['trx_terakhir']))
-                                        <a href="{{ route('ambil-saldo.struk', $p['trx_terakhir']->id_transaksi) }}"
+                                    @if ($p['sudah_diambil'] && !empty($p['trx_periode']))
+                                        <a href="{{ route('ambil-saldo.struk', $p['trx_periode']->id_transaksi) }}"
                                             target="_blank" class="btn btn-primary btn-sm ms-1">
                                             <i class="fa fa-print"></i>
                                         </a>
