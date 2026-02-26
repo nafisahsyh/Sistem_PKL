@@ -35,81 +35,59 @@ class KepemilikanController extends Controller
             ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
             ->with([
                 'petani.desa.kecamatan',
-
-                'detailKepemilikan' => function ($q) use ($statusPengelolaan, $desa, $tahun, $search) {
-
-                    if (!empty($statusPengelolaan) && $statusPengelolaan !== 'semua') {
-                        $q->whereRaw('LOWER(status_pengelolaan) = ?', [$statusPengelolaan]);
-                    }
-
-                    if (!empty($desa) && strtolower($desa) !== 'semua') {
-                        $q->whereHas('lahan.desa', function ($q2) use ($desa) {
-                            $q2->where('desa', $desa);
-                        });
-                    }
-
-                    if (!empty($tahun) && strtolower($tahun) !== 'semua') {
-                        $q->whereHas('lahan.tahunTanam', function ($q2) use ($tahun) {
-                            $q2->where('tahun', $tahun);
-                        });
-                    }
-
-                    if (!empty($search)) {
-                        $q->where(function ($sub) use ($search) {
-                            $sub->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
-                                ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
-                        });
-                    }
-                },
-
                 'detailKepemilikan.lahan.desa.kecamatan',
                 'detailKepemilikan.lahan.tahunTanam'
             ])
             ->whereHas('petani', function ($q) use ($statusPetani) {
                 $q->where('status', $statusPetani === 'berhenti' ? 'berhenti' : 'aktif');
             })
-            ->whereHas('detailKepemilikan', function ($q) use ($search, $statusPengelolaan, $desa, $tahun) {
 
-                if (!empty($statusPengelolaan) && $statusPengelolaan !== 'semua') {
-                    $q->whereRaw('LOWER(status_pengelolaan) = ?', [$statusPengelolaan]);
-                }
+            // FILTER DETAIL (hanya jika ada filter)
+            ->when($statusPengelolaan && $statusPengelolaan !== 'semua', function ($q) use ($statusPengelolaan) {
+                $q->whereHas('detailKepemilikan', function ($sub) use ($statusPengelolaan) {
+                    $sub->where('status_pengelolaan', $statusPengelolaan);
+                });
+            })
 
-                if (!empty($desa) && strtolower($desa) !== 'semua') {
-                    $q->whereHas('lahan.desa', function ($q2) use ($desa) {
-                        $q2->where('desa', $desa);
-                    });
-                }
+            ->when($desa && strtolower($desa) !== 'semua', function ($q) use ($desa) {
+                $q->whereHas('detailKepemilikan.lahan.desa', function ($sub) use ($desa) {
+                    $sub->where('desa', $desa);
+                });
+            })
 
-                if (!empty($tahun) && strtolower($tahun) !== 'semua') {
-                    $q->whereHas('lahan.tahunTanam', function ($q2) use ($tahun) {
-                        $q2->where('tahun', $tahun);
-                    });
-                }
+            ->when($tahun && strtolower($tahun) !== 'semua', function ($q) use ($tahun) {
+                $q->whereHas('detailKepemilikan.lahan.tahunTanam', function ($sub) use ($tahun) {
+                    $sub->where('tahun', $tahun);
+                });
+            })
 
-                if (!empty($search)) {
-                    $q->where(function ($sub) use ($search) {
-                        $sub->whereRaw('LOWER(kode_lahan) like ?', ["%{$search}%"])
-                            ->orWhereRaw('LOWER(status_pengelolaan) like ?', ["%{$search}%"]);
-                    });
-                }
-            });
+            // Searching data
+            ->when($search, function ($q) use ($search) {
 
-        // search di petani (dipisah agar tidak bentrok)
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('petani', function ($q2) use ($search) {
-                    $q2->whereRaw('LOWER(nama) like ?', ["%{$search}%"])
-                        ->orWhereRaw('LOWER(nomor_anggota_plasma) like ?', ["%{$search}%"])
-                        ->orWhereRaw('LOWER(nomor_anggota_koperasi) like ?', ["%{$search}%"]);
-                })
-                    ->orWhereHas('detailKepemilikan.lahan.desa', function ($q2) use ($search) {
-                        $q2->whereRaw('LOWER(desa) like ?', ["%{$search}%"]);
+                $q->where(function ($sub) use ($search) {
+
+                    $sub->whereHas('petani', function ($p) use ($search) {
+                        $p->where('nama', 'like', "%$search%")
+                            ->orWhere('nomor_anggota_plasma', 'like', "%$search%")
+                            ->orWhere('nomor_anggota_koperasi', 'like', "%$search%");
                     })
-                    ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($q2) use ($search) {
-                        $q2->whereRaw('LOWER(tahun) like ?', ["%{$search}%"]);
-                    });
+
+                        ->orWhereHas('detailKepemilikan', function ($d) use ($search) {
+                            $d->where('kode_lahan', 'like', "%$search%")
+                                ->orWhere('status_pengelolaan', 'like', "%$search%");
+                        })
+
+                        ->orWhereHas('detailKepemilikan.lahan.desa', function ($ds) use ($search) {
+                            $ds->where('desa', 'like', "%$search%");
+                        })
+
+                        ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($th) use ($search) {
+                            $th->where('tahun', 'like', "%$search%");
+                        });
+
+                });
+
             });
-        }
 
         $kepemilikan = $query
             ->orderBy('petani.nomor_anggota_plasma', 'asc')
