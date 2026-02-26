@@ -35,6 +35,26 @@ class KepemilikanController extends Controller
             ->leftJoin('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
             ->with([
                 'petani.desa.kecamatan',
+
+                'detailKepemilikan' => function ($q) use ($statusPengelolaan, $desa, $tahun) {
+
+                    if ($statusPengelolaan && $statusPengelolaan !== 'semua') {
+                        $q->where('status_pengelolaan', $statusPengelolaan);
+                    }
+
+                    if ($desa && strtolower($desa) !== 'semua') {
+                        $q->whereHas('lahan.desa', function ($sub) use ($desa) {
+                            $sub->where('desa', $desa);
+                        });
+                    }
+
+                    if ($tahun && strtolower($tahun) !== 'semua') {
+                        $q->whereHas('lahan.tahunTanam', function ($sub) use ($tahun) {
+                            $sub->where('tahun', $tahun);
+                        });
+                    }
+                },
+
                 'detailKepemilikan.lahan.desa.kecamatan',
                 'detailKepemilikan.lahan.tahunTanam'
             ])
