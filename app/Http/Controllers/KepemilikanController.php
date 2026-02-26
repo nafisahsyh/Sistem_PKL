@@ -53,32 +53,29 @@ class KepemilikanController extends Controller
                             $sub->where('tahun', $tahun);
                         });
                     }
-                },
 
+                },
                 'detailKepemilikan.lahan.desa.kecamatan',
                 'detailKepemilikan.lahan.tahunTanam'
             ])
-            ->whereHas('petani', function ($q) use ($statusPetani) {
-                $q->where('status', $statusPetani === 'berhenti' ? 'berhenti' : 'aktif');
-            })
+            ->whereHas('detailKepemilikan', function ($q) use ($statusPengelolaan, $desa, $tahun) {
 
-            // FILTER DETAIL (hanya jika ada filter)
-            ->when($statusPengelolaan && $statusPengelolaan !== 'semua', function ($q) use ($statusPengelolaan) {
-                $q->whereHas('detailKepemilikan', function ($sub) use ($statusPengelolaan) {
-                    $sub->where('status_pengelolaan', $statusPengelolaan);
-                });
-            })
+                if ($statusPengelolaan && $statusPengelolaan !== 'semua') {
+                    $q->where('status_pengelolaan', $statusPengelolaan);
+                }
 
-            ->when($desa && strtolower($desa) !== 'semua', function ($q) use ($desa) {
-                $q->whereHas('detailKepemilikan.lahan.desa', function ($sub) use ($desa) {
-                    $sub->where('desa', $desa);
-                });
-            })
+                if ($desa && strtolower($desa) !== 'semua') {
+                    $q->whereHas('lahan.desa', function ($sub) use ($desa) {
+                        $sub->where('desa', $desa);
+                    });
+                }
 
-            ->when($tahun && strtolower($tahun) !== 'semua', function ($q) use ($tahun) {
-                $q->whereHas('detailKepemilikan.lahan.tahunTanam', function ($sub) use ($tahun) {
-                    $sub->where('tahun', $tahun);
-                });
+                if ($tahun && strtolower($tahun) !== 'semua') {
+                    $q->whereHas('lahan.tahunTanam', function ($sub) use ($tahun) {
+                        $sub->where('tahun', $tahun);
+                    });
+                }
+
             })
 
             // Searching data
