@@ -58,6 +58,7 @@ class KepemilikanController extends Controller
                 'detailKepemilikan.lahan.desa.kecamatan',
                 'detailKepemilikan.lahan.tahunTanam'
             ])
+            ->where('petani.status', $statusPetani === 'berhenti' ? 'berhenti' : 'aktif')
             ->whereHas('detailKepemilikan', function ($q) use ($statusPengelolaan, $desa, $tahun) {
 
                 if ($statusPengelolaan && $statusPengelolaan !== 'semua') {
