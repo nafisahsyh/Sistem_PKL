@@ -385,9 +385,11 @@ class KepemilikanController extends Controller
             ->where('status_kepemilikan', 'aktif')
             ->exists();
 
-        $kepemilikan->petani->update([
-            'status' => $hasActive ? 'aktif' : 'berhenti'
-        ]);
+        if ($hasActive) {
+            $kepemilikan->petani->update([
+                'status' => 'aktif'
+            ]);
+        }
 
         return redirect()->route('kepemilikan.index', [
             'page' => $request->input('page'),
