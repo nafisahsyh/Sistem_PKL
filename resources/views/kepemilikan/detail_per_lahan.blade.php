@@ -144,12 +144,14 @@
                                 <th class="text-normal text-start ps-3">Status Kelola</th>
                                 <td class="text-normal-sm text-start ps-3">
                                     <span
-                                        class="badge 
-            @if ($detail->status_pengelolaan == 'KSM') bg-success
-            @elseif ($detail->status_pengelolaan == 'Mandiri') bg-primary
-            @elseif ($detail->status_pengelolaan == 'Perusahaan') bg-warning text-dark
-            @else bg-secondary @endif">
-                                        {{ $detail->status_pengelolaan ?? '-' }}
+                                        class="badge
+        @if ($detail->status_pengelolaan == 'KSM') bg-success
+        @elseif ($detail->status_pengelolaan == 'Mandiri') bg-primary
+        @elseif ($detail->status_pengelolaan == 'Perusahaan') bg-warning text-dark
+        @else bg-secondary @endif">
+
+                                        {{ $detail->status_pengelolaan == 'Perusahaan' ? 'HSU-SSA' : $detail->status_pengelolaan ?? '-' }}
+
                                     </span>
                                 </td>
                             </tr>

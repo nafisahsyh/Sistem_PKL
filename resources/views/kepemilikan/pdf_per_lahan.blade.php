@@ -197,7 +197,9 @@
             <tbody>
                 <tr>
                     <th>Status Kelola</th>
-                    <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
+                    <td>
+                        {{ $detail->status_pengelolaan == 'Perusahaan' ? 'HSU-SSA' : $detail->status_pengelolaan ?? '-' }}
+                    </td>
                 </tr>
                 <tr>
                     <th width="35%">Desa</th>

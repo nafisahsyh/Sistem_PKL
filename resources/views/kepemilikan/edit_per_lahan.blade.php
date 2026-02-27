@@ -286,7 +286,7 @@
                                             {{ $detail->status_pengelolaan == 'Mandiri' ? 'selected' : '' }}>Mandiri
                                         </option>
                                         <option value="Perusahaan"
-                                            {{ $detail->status_pengelolaan == 'Perusahaan' ? 'selected' : '' }}>Perusahaan
+                                            {{ $detail->status_pengelolaan == 'Perusahaan' ? 'selected' : '' }}>HSU-SSA
                                         </option>
                                     </select>
                                 </div>

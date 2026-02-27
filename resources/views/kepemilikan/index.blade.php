@@ -175,7 +175,7 @@
                                             @elseif ($detail->status_pengelolaan === 'Mandiri')
                                                 <span class="badge bg-primary">Mandiri</span>
                                             @elseif ($detail->status_pengelolaan === 'Perusahaan')
-                                                <span class="badge bg-warning text-dark">Perusahaan</span>
+                                                <span class="badge bg-warning text-dark">HSU-SSA</span>
                                             @elseif (!empty($detail->status_pengelolaan))
                                                 <span class="badge bg-secondary">
                                                     {{ ucfirst($detail->status_pengelolaan) }}
@@ -402,7 +402,7 @@
                                 <option value="Mandiri"
                                     {{ request('status_pengelolaan') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
                                 <option value="Perusahaan"
-                                    {{ request('status_pengelolaan') == 'Perusahaan' ? 'selected' : '' }}>Perusahaan
+                                    {{ request('status_pengelolaan') == 'Perusahaan' ? 'selected' : '' }}>HSU-SSA
                                 </option>
                             </select>
                         </div>

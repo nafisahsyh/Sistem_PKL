@@ -232,7 +232,9 @@
                         @endif
 
                         @if (!in_array('status_pengelolaan', $exclude))
-                            <td>{{ $detail->status_pengelolaan ?? '-' }}</td>
+                            <td>
+                                {{ $detail->status_pengelolaan == 'Perusahaan' ? 'HSU-SSA' : $detail->status_pengelolaan ?? '-' }}
+                            </td>
                         @endif
 
                         @if (!in_array('status_kepemilikan', $exclude))
