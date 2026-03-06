@@ -96,7 +96,7 @@ class DashboardController extends Controller
             'petani' => [
                 'Mandiri' => Petani::whereHas('kepemilikan.detailKepemilikan', function ($q) {
                     $q->where('status_pengelolaan', 'Mandiri')
-                        ->where('status_kepemilikan', 'aktif'); // hanya yang aktif
+                        ->where('status_kepemilikan', 'nonaktif'); // hanya yang aktif
                 })
                     ->distinct()
                     ->count('id_petani'),
@@ -113,7 +113,7 @@ class DashboardController extends Controller
             'lahan' => [
                 'Mandiri' => Lahan::whereHas('detailKepemilikan', function ($q) {
                     $q->where('status_pengelolaan', 'Mandiri')
-                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                        ->where('status_kepemilikan', 'nonaktif'); // hanya lahan aktif
                 })
                     ->distinct()
                     ->count('id_lahan'),
@@ -128,7 +128,7 @@ class DashboardController extends Controller
                 // TOTAL LUAS SURAT --> tabel detail_kepemilikan
                 'Mandiri_surat' => DB::table('detail_kepemilikan')
                     ->where('status_pengelolaan', 'Mandiri')
-                    ->where('status_kepemilikan', 'aktif') // hanya lahan aktif
+                    ->where('status_kepemilikan', 'nonaktif') // hanya lahan aktif
                     ->sum('luas_surat'),
 
                 'KSM_surat' => DB::table('detail_kepemilikan')
@@ -139,7 +139,7 @@ class DashboardController extends Controller
                 // TOTAL LUAS PETA --> tabel lahan dengan relasi detail_kepemilikan aktif
                 'Mandiri_peta' => Lahan::whereHas('detailKepemilikan', function ($q) {
                     $q->where('status_pengelolaan', 'Mandiri')
-                        ->where('status_kepemilikan', 'aktif'); // hanya lahan aktif
+                        ->where('status_kepemilikan', 'nonaktif'); // hanya lahan aktif
                 })->sum('luas_peta'),
 
                 'KSM_peta' => Lahan::whereHas('detailKepemilikan', function ($q) {
