@@ -195,7 +195,7 @@
                                     <option value="">Pilih Status Kelola</option>
                                     <option value="KSM">KSM</option>
                                     <option value="Mandiri">Mandiri</option>
-                                    <option value="Perusahaan">Perusahaan</option>
+                                    <option value="Perusahaan">HSU-SSA</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -441,7 +441,7 @@
                                     <option value="">Pilih Status Kelola</option>
                                     <option value="KSM">KSM</option>
                                     <option value="Mandiri">Mandiri</option>
-                                    <option value="Perusahaan">Perusahaan</option>
+                                    <option value="Perusahaan">HSU-SSA</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
