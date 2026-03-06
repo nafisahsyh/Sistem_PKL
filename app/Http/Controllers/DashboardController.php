@@ -166,8 +166,7 @@ class DashboardController extends Controller
             ->join('lahan', 'detail_kepemilikan.id_lahan', '=', 'lahan.id_lahan')
             ->join('petani', 'kepemilikan.id_petani', '=', 'petani.id_petani')
             ->join('desa', 'lahan.id_desa', '=', 'desa.id_desa')
-            ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam')
-            ->where('petani.status', 'aktif');
+            ->join('tahun_tanam', 'lahan.id_tahun_tanam', '=', 'tahun_tanam.id_tahun_tanam');
 
         // Hanya filter khusus untuk grafik Kelola
         if ($filterDesaKelola && $filterDesaKelola != 'all') {
