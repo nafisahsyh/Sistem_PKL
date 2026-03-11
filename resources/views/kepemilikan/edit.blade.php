@@ -726,8 +726,8 @@
                         const isPetaniLama = select.id === 'selectPetaniLama';
 
                         const choices = new Choices(select, {
-                            searchEnabled: isPetaniLama, // hanya petani lama bisa search
-                            shouldSort: false,
+                            searchEnabled: isPetaniLama,
+                            searchFields: ['label', 'value'],
                             itemSelectText: '',
                             allowHTML: true,
                             placeholder: true,
@@ -803,12 +803,10 @@
 
                             const choices = new Choices(select, {
                                 searchEnabled: !isModeSelect,
-                                // MODE dropdown TIDAK BISA search
-                                // Petani Lama tetap BISA search
                                 placeholder: true,
                                 placeholderValue: 'Pilih Petani',
                                 searchPlaceholderValue: 'Cari...',
-                                shouldSort: false,
+                                searchFields: ['label', 'value'],
                                 itemSelectText: '',
                                 allowHTML: true
                             });
