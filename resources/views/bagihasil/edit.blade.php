@@ -164,8 +164,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const desaSelect = document.getElementById('id_desa');
+            desaChoices.setChoiceByValue("{{ $bulanan->id_desa }}");
             const tahunSelect = document.getElementById('id_tahun_tanam');
+            tahunChoices.setChoiceByValue("{{ $bulanan->id_tahun_tanam }}");
             const bulanSelect = document.getElementById('bulan');
+            bulanChoices.setChoiceByValue("{{ $bulanan->bulan }}");
             const totalLuasInput = document.getElementById('total_luas');
 
             // Choices.js
