@@ -20,7 +20,7 @@
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
 
-            <h4 class="text-brown mb-0 ms-2">Edit Data Kepemilikan</h4>
+            <h4 class="text-brown mb-0 ms-2">Edit Kepemilikan</h4>
         </div>
 
         {{-- ALERT PESAN --}}

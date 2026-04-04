@@ -105,11 +105,11 @@ class AuthController extends Controller
         );
 
         if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('status', 'Tautan ubah kata sandi berhasil dikirim ke email Anda!');
+            return back()->with('status', 'Tautan reset password berhasil dikirim ke email Anda!');
         }
 
         return back()->withErrors([
-            'email' => 'Gagal mengirim tautan ubah kata sandi. Silakan coba lagi.'
+            'email' => 'Gagal mengirim tautan reset password. Silakan coba lagi.'
         ]);
     }
 
@@ -143,7 +143,7 @@ class AuthController extends Controller
         );
 
         if ($status == Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('success', 'Kata sandi berhasil diubah!');
+            return redirect()->route('login')->with('success', 'Password berhasil diubah!');
         } else {
             return back()->withErrors(['email' => __($status)]);
         }

@@ -29,7 +29,7 @@
         <!-- Form kanan -->
         <div class="login-form text-center">
             <img src="{{ asset('logo.webp') }}"alt="Logo SisPlasma" class="login-logo mb-3">
-            <h3 class="fw-bold mb-4">Ubah Password</h3>
+            <h3 class="fw-bold mb-4">Reset Password</h3>
 
             {{-- Notifikasi sukses --}}
             @if (session('status'))
