@@ -27,9 +27,6 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -516,7 +513,7 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label>Nama Lengkap</label>
-                                        <input type="text" name="nama" class="form-control">
+                                        <input type="text" name="nama" class="form-control" required>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label>NIK</label>
@@ -528,7 +525,10 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Plasma</label>
-                                        <input type="text" name="nomor_anggota_plasma" class="form-control">
+                                        <input type="text" name="nomor_anggota_plasma" class="form-control" required>
+                                        <small class="text-muted" style="font-style: italic">
+                                            Nomor plasma terakhir: {{ $lastPlasma ?? '-' }}
+                                        </small>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label>Nomor Koperasi</label>
@@ -1277,8 +1277,6 @@
                         });
                     });
                 }
-
-
             });
 
             // ========== FUNGSI GANTI ID LAHAN (GLOBAL) ==========

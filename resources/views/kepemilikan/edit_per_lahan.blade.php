@@ -27,9 +27,6 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -423,7 +420,7 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>    
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -490,7 +487,6 @@
                                     @endif
                                 @endforeach
                             </select>
-
                         </div>
 
                         {{-- MODE: PETANI BARU --}}
@@ -498,7 +494,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label>Nama Lengkap</label>
-                                    <input type="text" name="nama" class="form-control">
+                                    <input type="text" name="nama" class="form-control" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label>NIK</label>
@@ -510,7 +506,11 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Nomor Plasma</label>
-                                    <input type="text" name="nomor_anggota_plasma" class="form-control">
+                                    <input type="text" name="nomor_anggota_plasma" class="form-control"
+                                        value="{{ old('nomor_anggota_plasma') }}" required>
+                                    <small class="text-muted" style="font-style: italic">
+                                        Nomor plasma terakhir: {{ $lastPlasma ?? '-' }}
+                                    </small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Nomor Koperasi</label>
@@ -538,7 +538,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Tanggal Ganti</label>
                                 <input type="date" name="tanggal_ganti" class="form-control"
-                                    value="{{ date('Y-m-d') }}">
+                                    value="{{ old('tanggal_ganti') }}">
                             </div>
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Keterangan</label>

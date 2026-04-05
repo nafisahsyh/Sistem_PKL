@@ -248,6 +248,8 @@ class KepemilikanController extends Controller
 
         $petani = Petani::with('desa.kecamatan')
             ->where('id_petani', '!=', $id_petani_saat_ini)
+            ->orderByRaw('nomor_anggota_plasma IS NULL OR nomor_anggota_plasma = ""')
+            ->orderByRaw('CAST(nomor_anggota_plasma AS UNSIGNED) ASC')
             ->get();
 
         $desa = Desa::with('kecamatan')->get();
@@ -258,6 +260,8 @@ class KepemilikanController extends Controller
             'Perusahaan'
         ];
 
+        $lastPlasma = Petani::max('nomor_anggota_plasma');
+
         return view('kepemilikan.edit_per_lahan', compact(
             'kepemilikan',
             'selectedDetail',
@@ -265,7 +269,8 @@ class KepemilikanController extends Controller
             'petani',
             'desa',
             'tahun_tanam',
-            'statusPengelolaanOptions'
+            'statusPengelolaanOptions',
+            'lastPlasma'
         ));
     }
 
@@ -549,9 +554,9 @@ class KepemilikanController extends Controller
         $desa = Desa::with('kecamatan')->get();
         $tahun_tanam = Tahun_Tanam::orderBy('tahun', 'desc')->get();
         $lahan = $kepemilikan->detailKepemilikan->pluck('lahan');
+        $lastPlasma = Petani::max('nomor_anggota_plasma');
 
-
-        return view('kepemilikan.edit', compact('kepemilikan', 'petani', 'desa', 'tahun_tanam', 'lahan'));
+        return view('kepemilikan.edit', compact('kepemilikan', 'petani', 'desa', 'tahun_tanam', 'lahan', 'lastPlasma'));
     }
 
     /**
@@ -1371,7 +1376,6 @@ class KepemilikanController extends Controller
             ['tanggal_kepemilikan' => now(), 'status' => 'aktif']
         );
 
-        // Pindahkan lahan ke petani baru
         // Pindahkan lahan ke petani baru
         $detail->update([
             'id_kepemilikan' => $kepemilikanBaru->id_kepemilikan,
