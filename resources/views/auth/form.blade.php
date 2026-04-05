@@ -25,7 +25,7 @@
         <!-- Form kanan -->
         <div class="login-form text-center">
             <img src="{{ asset('logo.webp') }}" alt="Logo SisPlasma" class="login-logo mb-3">
-            <h3 class="fw-bold mb-4">Ubah Password</h3>
+            <h3 class="fw-bold mb-4">Reset Password</h3>
 
             {{-- Alert error --}}
             @if ($errors->any())
@@ -61,7 +61,7 @@
                     <span id="toggle-password-confirmation" class="password-toggle"><i class="fas fa-eye"></i></span>
                 </div>
 
-                <button type="submit" class="btn-login">Ubah Kata Sandi</button>
+                <button type="submit" class="btn-login">Reset Password</button>
 
                 <div class="back-login mt-3">
                     <a href="{{ route('login') }}">Kembali ke login</a>

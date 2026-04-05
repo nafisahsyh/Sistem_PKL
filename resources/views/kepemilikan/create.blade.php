@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h4 class="mt-4 text-brown">Tambah Data Kepemilikan</h4>
+        <h4 class="mt-4 text-brown">Tambah Kepemilikan</h4>
 
         {{-- ALERT PESAN --}}
         @if (session('success'))

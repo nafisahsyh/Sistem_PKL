@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container-fluid px-4 mt-5">
-        <h4 class="mt-4 text-brown">Edit Data Petani</h4>
+        <h4 class="mt-4 text-brown">Edit Petani</h4>
 
         <div class="card p-4 shadow-sm rounded-3">
             <form action="{{ route('petani.update', $petani->id_petani) }}" method="POST" enctype="multipart/form-data">

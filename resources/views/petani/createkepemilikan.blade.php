@@ -9,7 +9,7 @@
             <a href="{{ route('petani.index') }}" class="btn btn-success p-2 me-2">
                 <i class="fas fa-chevron-left fa-lg"></i>
             </a>
-            <h4 class="text-brown mb-0">Tambah Data Kepemilikan</h4>
+            <h4 class="text-brown mb-0">Tambah Kepemilikan</h4>
         </div>
 
         {{-- ALERT --}}
