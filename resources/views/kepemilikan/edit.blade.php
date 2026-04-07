@@ -638,7 +638,7 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label>Nama Lengkap</label>
-                                        <input type="text" name="nama" class="form-control">
+                                        <input type="text" name="nama" class="form-control" required>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label>NIK</label>
@@ -771,6 +771,22 @@
                 function toggleModeSemua(value) {
                     petaniLamaSemua.style.display = (value === 'lama') ? 'block' : 'none';
                     petaniBaruSemua.style.display = (value === 'baru') ? 'block' : 'none';
+
+                    const inputsBaru = petaniBaruSemua.querySelectorAll('input, textarea');
+
+                    if (value === 'baru') {
+                        // aktifkan required
+                        inputsBaru.forEach(el => {
+                            if (el.name === 'nama') {
+                                el.setAttribute('required', true);
+                            }
+                        });
+                    } else {
+                        // hapus required
+                        inputsBaru.forEach(el => {
+                            el.removeAttribute('required');
+                        });
+                    }
                 }
 
                 // ========== DEFAULT MODE: lama ==========
@@ -1243,6 +1259,23 @@
                 function toggleMode(value) {
                     petaniLama.style.display = (value === 'lama') ? 'block' : 'none';
                     petaniBaru.style.display = (value === 'baru') ? 'block' : 'none';
+
+                    // ambil semua input di petani baru
+                    const inputsBaru = petaniBaru.querySelectorAll('input, textarea');
+
+                    if (value === 'baru') {
+                        // aktifkan required
+                        inputsBaru.forEach(el => {
+                            if (el.name === 'nama' || el.name === 'nomor_anggota_plasma') {
+                                el.setAttribute('required', true);
+                            }
+                        });
+                    } else {
+                        // hapus required
+                        inputsBaru.forEach(el => {
+                            el.removeAttribute('required');
+                        });
+                    }
                 }
 
                 // Default dan event listener
