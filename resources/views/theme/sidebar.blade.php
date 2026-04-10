@@ -31,10 +31,16 @@
                     @endif
 
                     {{-- Menu umum untuk admin & super admin --}}
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                        data-bs-target="#collapseAreaTanam" aria-expanded="false" aria-controls="collapseAreaTanam">
-                        <div class="sb-nav-link-icon"><i class="fas fa-seedling"></i></div>
-                        Area Tanam
+                    <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#"
+                        data-bs-toggle="collapse" data-bs-target="#collapseAreaTanam" aria-expanded="false"
+                        aria-controls="collapseAreaTanam">
+
+                        <div>
+                            <span class="sb-nav-link-icon"><i class="fas fa-seedling"></i></span>
+                            Area Tanam
+                        </div>
+
+                        <i class="fas fa-chevron-down"></i>
                     </a>
 
                     <div class="collapse 
@@ -72,10 +78,18 @@
                     </a>
 
                     {{-- Transaksi --}}
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                        data-bs-target="#collapseTransaksi" aria-expanded="false" aria-controls="collapseTransaksi">
-                        <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
-                        Bagi Hasil KSM
+                    <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#"
+                        data-bs-toggle="collapse" data-bs-target="#collapseTransaksi" aria-expanded="false"
+                        aria-controls="collapseTransaksi">
+
+                        <div class="d-flex align-items-center">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            Bagi Hasil KSM
+                        </div>
+
+                        <i class="fas fa-chevron-down"></i>
                     </a>
 
                     <div class="collapse 
@@ -110,10 +124,18 @@
 
 
                     {{-- Laporan --}}
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                        data-bs-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLaporan">
-                        <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
-                        Laporan
+                    <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#"
+                        data-bs-toggle="collapse" data-bs-target="#collapseLaporan" aria-expanded="false"
+                        aria-controls="collapseLaporan">
+
+                        <div class="d-flex align-items-center">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            Laporan
+                        </div>
+
+                        <i class="fas fa-chevron-down"></i>
                     </a>
 
                     <div class="collapse {{ request()->is('buku-besar*') || request()->is('saldo*') ? 'show' : '' }}"

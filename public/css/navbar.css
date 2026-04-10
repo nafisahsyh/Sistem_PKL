@@ -81,6 +81,14 @@
     margin-right: 10px;
 }
 
+.nav-link .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+.nav-link[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
 .logo-container img {
     width: 70%;
     height: auto;

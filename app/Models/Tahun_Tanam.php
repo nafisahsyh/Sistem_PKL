@@ -18,4 +18,8 @@ class Tahun_Tanam extends Model
     // kalau BIGINT, Laravel sudah otomatis baca sebagai int (bukan string)
     protected $keyType = 'int';
     
+    public function lahan()
+    {
+        return $this->hasMany(Lahan::class, 'id_tahun_tanam', 'id_tahun_tanam');
+    }
 }

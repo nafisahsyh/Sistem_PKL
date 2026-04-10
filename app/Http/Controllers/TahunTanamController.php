@@ -10,7 +10,10 @@ class TahunTanamController extends Controller
     // Menampilkan semua data tahun
     public function index()
     {
-        $tahun_tanam = Tahun_Tanam::orderBy('id_tahun_tanam', 'desc')->get();
+        $tahun_tanam = Tahun_Tanam::withCount('lahan')
+            ->orderBy('id_tahun_tanam', 'desc')
+            ->get();
+
         return view('tahun_tanam.index', compact('tahun_tanam'));
     }
 
@@ -59,9 +62,14 @@ class TahunTanamController extends Controller
     // Menghapus data tahun
     public function destroy($id)
     {
-        $tahun_tanam = Tahun_Tanam::findOrFail($id);
+        $tahun_tanam = Tahun_Tanam::withCount('lahan')->findOrFail($id);
+
+        if ($tahun_tanam->lahan_count > 0) {
+            return back()->with('error', 'Tahun tanam Sedang Digunakan!');
+        }
+
         $tahun_tanam->delete();
 
-        return redirect()->route('tahun_tanam.index')->with('success', 'Data tahun berhasil dihapus.');
+        return redirect()->route('tahun_tanam.index')->with('success', 'Data tahun tanam berhasil dihapus.');
     }
 }

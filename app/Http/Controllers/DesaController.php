@@ -11,18 +11,19 @@ class DesaController extends Controller
     // Menampilkan semua data desa + search
     public function index(Request $request)
     {
-        $query = Desa::with('kecamatan');
+        $query = Desa::with('kecamatan')->withCount('lahan');
 
-        // Filter jika ada keyword search
         if ($request->has('search') && !empty($request->search)) {
             $keyword = $request->search;
             $query->where('desa', 'like', "%{$keyword}%")
-                ->orWhereHas('kecamatan', function($q) use ($keyword) {
+                ->orWhereHas('kecamatan', function ($q) use ($keyword) {
                     $q->where('kecamatan', 'like', "%{$keyword}%");
                 });
         }
 
-       $desa = $query->orderBy('id_desa', 'desc')->paginate(10)->withQueryString(); // keep search in pagination links
+        $desa = $query->orderBy('id_desa', 'desc')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('desa.index', compact('desa'));
     }
@@ -78,7 +79,12 @@ class DesaController extends Controller
     // Hapus data desa
     public function destroy($id)
     {
-        $desa = Desa::findOrFail($id);
+        $desa = Desa::withCount('lahan')->findOrFail($id);
+
+        if ($desa->lahan_count > 0) {
+            return back()->with('error', 'Desa Sedang Digunakan!');
+        }
+
         $desa->delete();
 
         return redirect()->route('desa.index')->with('success', 'Data desa berhasil dihapus.');

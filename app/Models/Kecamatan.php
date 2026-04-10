@@ -17,4 +17,10 @@ class Kecamatan extends Model
 
     // kalau BIGINT, Laravel sudah otomatis baca sebagai int (bukan string)
     protected $keyType = 'int';
+
+    public function desa()
+{
+    return $this->hasMany(Desa::class, 'id_kecamatan', 'id_kecamatan');
+}
+
 }

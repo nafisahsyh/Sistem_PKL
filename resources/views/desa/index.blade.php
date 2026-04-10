@@ -48,14 +48,16 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <form action="{{ route('desa.destroy', $item->id_desa) }}" method="POST"
-                                        class="d-inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn btn-danger btn-sm btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if ($item->lahan_count == 0)
+                                        <form action="{{ route('desa.destroy', $item->id_desa) }}" method="POST"
+                                            class="d-inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-danger btn-sm btn-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -115,6 +117,17 @@
                         confirmButtonColor: '#198754',
                         timer: 1800,
                         showConfirmButton: false
+                    });
+                </script>
+            @endif
+
+            @if (session('error'))
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: "<h3 style='font-size:15px;margin-bottom:0;'>Gagal</h3>",
+                        text: "{{ session('error') }}",
+                        confirmButtonColor: '#dc3545'
                     });
                 </script>
             @endif

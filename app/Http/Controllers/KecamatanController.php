@@ -10,10 +10,12 @@ class KecamatanController extends Controller
     // Menampilkan semua data kecamatan
     public function index()
     {
-        $kecamatan = Kecamatan::orderBy('id_kecamatan', 'desc')->get();
+        $kecamatan = Kecamatan::withCount('desa')
+            ->orderBy('id_kecamatan', 'desc')
+            ->get();
+
         return view('kecamatan.index', compact('kecamatan'));
     }
-
     // Menampilkan form tambah kecamatan
     public function create()
     {
@@ -57,12 +59,17 @@ class KecamatanController extends Controller
         return redirect()->route('kecamatan.index')->with('success', 'Data kecamatan berhasil diperbarui.');
     }
 
-    // Menghapus data kecamatan
     public function destroy($id)
     {
-        $kecamatan = Kecamatan::findOrFail($id);
+        $kecamatan = Kecamatan::withCount('desa')->findOrFail($id);
+
+        // Kalau masih dipakai
+        if ($kecamatan->desa_count > 0) {
+            return back()->with('error', 'Kecamatan Sedang Digunakan!');
+        }
+
         $kecamatan->delete();
 
-        return redirect()->route('kecamatan.index')->with('success', 'Data kecamatan berhasil dihapus.');
+        return back()->with('success', 'Data kecamatan berhasil dihapus.');
     }
 }
