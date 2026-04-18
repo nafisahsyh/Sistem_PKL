@@ -89,6 +89,96 @@
     transform: rotate(180deg);
 }
 
+
+.tab-slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.scroll-btn {
+    background: white;
+    border: none;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.scroll-btn:hover {
+    background: #f1f3f5;
+    color: #000;
+}
+
+.scroll-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* area scroll */
+.tab-slider {
+    overflow: hidden;
+    flex: 1;
+}
+
+/* tab container */
+.tab-slider .nav-tabs {
+    flex-wrap: nowrap;
+    display: flex;
+    border-bottom: 2px solid #dee2e6;
+    transition: transform 0.3s ease;
+}
+
+/* tombol kiri kanan */
+.scroll-btn {
+    background: white;
+    border: none;
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    color: #198754;
+    z-index: 10;
+}
+
+.scroll-btn:hover {
+    color: #000;
+}
+
+/* hanya untuk tab kamu */
+.custom-tabs .nav-link {
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 8px 16px;
+
+    background-color: #f1f3f5;
+    color: #333;
+
+    border: none;
+    border-radius: 999px;
+
+    height: 38px;
+    display: flex;
+    align-items: center;
+
+    transition: 0.2s;
+}
+
+/* hover */
+.custom-tabs .nav-link:hover {
+    background-color: #e2e6ea;
+    color: #333; /* ⬅️ INI FIX teks putih */
+}
+
+/* active */
+.custom-tabs .nav-link.active {
+    background-color: #198754;
+    color: #fff !important;
+}
+
 .logo-container img {
     width: 70%;
     height: auto;
@@ -1044,7 +1134,8 @@ tr.even-row td.striping {
 }
 
 .summary-card {
-    border: 1px solid rgba(0, 0, 0, 0.12); /* tipis tapi jelas */
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    /* tipis tapi jelas */
     border-radius: 12px;
     padding: 12px 16px;
     min-width: 170px;
@@ -1063,7 +1154,8 @@ tr.even-row td.striping {
 
 /* Angka utama */
 .summary-card strong {
-    font-size: 1.0rem;   /* INI yang paling penting */
+    font-size: 1.0rem;
+    /* INI yang paling penting */
     font-weight: 600;
     line-height: 1.2;
 }

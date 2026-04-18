@@ -125,52 +125,55 @@
             $totalLahan = $details->count();
         @endphp
 
-        {{-- LAHAN PERTAMA --}}
         @if ($totalLahan > 0)
-            @php $detail = $details->first(); @endphp
+            <div class="tab-slider-wrapper">
 
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header bg-light text-success d-flex justify-content-between align-items-center">
-                    <strong>Lahan 1</strong>
-
-                    <a href="{{ route('kepemilikan.riwayatLahan', [
-                        'id_lahan' => $detail->id_lahan,
-                        'page' => request('page'),
-                        'search' => request('search'),
-                        'desa' => request('desa'),
-                        'tahun' => request('tahun'),
-                        'status_pengelolaan' => request('status_pengelolaan'),
-                        'status_petani' => request('status_petani'),
-                    ]) }}"
-                        class="btn btn-info btn-sm text-dark">
-                        <i class="fas fa-history"></i> Riwayat
-                    </a>
-                </div>
-
-                <div class="card-body p-0">
-                    @include('kepemilikan._tabel_lahan_full', ['detail' => $detail])
-                </div>
-            </div>
-        @endif
-
-        {{-- TOMBOL LIHAT/TUTUP --}}
-        @if ($totalLahan > 1)
-            <div class="d-flex justify-content-end my-3">
-                <button id="toggleLahanBtn" class="btn btn-success" data-bs-toggle="collapse" data-bs-target="#semuaLahan">
-                    Lihat Semua Lahan ({{ $totalLahan - 1 }} lainnya)
+                {{-- tombol kiri --}}
+                <button id="btnLeft" class="scroll-btn left" onclick="scrollTabs(-200)">
+                    &#10094;
                 </button>
+
+                {{-- tab container --}}
+                <div class="tab-slider" id="tabSlider">
+                    <ul class="nav flex-nowrap gap-2 custom-tabs">
+
+                        @foreach ($details as $index => $detail)
+                            <li class="nav-item">
+                                <button class="nav-link {{ $index == 0 ? 'active' : '' }}" data-bs-toggle="tab"
+                                    data-bs-target="#lahan{{ $index }}">
+
+                                    {{ $index + 1 }} {{ $detail->lahan->desa->desa ?? '-' }}
+                                    {{ $detail->lahan->tahunTanam->tahun ?? '-' }}
+
+                                </button>
+                            </li>
+                        @endforeach
+
+                    </ul>
+                </div>
+
+                {{-- tombol kanan --}}
+                <button id="btnRight" class="scroll-btn right" onclick="scrollTabs(200)">
+                    &#10095;
+                </button>
+
             </div>
         @endif
+        <div class="tab-content mt-3">
 
+            @foreach ($details as $index => $detail)
+                <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" id="lahan{{ $index }}">
 
-        {{-- COLLAPSE UNTUK SEMUA LAHAN --}}
-        @if ($totalLahan > 1)
-            <div id="semuaLahan" class="collapse">
-                @foreach ($details->skip(1) as $index => $detail)
-                    <div class="card mb-3 shadow-sm">
+                    <div class="card shadow-sm">
+
+                        {{-- HEADER --}}
                         <div class="card-header bg-light text-success d-flex justify-content-between align-items-center">
-                            <strong>Lahan {{ $index + 1 }}</strong>
 
+                            <strong>
+                                Lahan {{ $index + 1 }}
+                            </strong>
+
+                            {{-- RIWAYAT --}}
                             <a href="{{ route('kepemilikan.riwayatLahan', [
                                 'id_lahan' => $detail->id_lahan,
                                 'page' => request('page'),
@@ -182,34 +185,72 @@
                                 class="btn btn-info btn-sm text-dark">
                                 <i class="fas fa-history"></i> Riwayat
                             </a>
+
                         </div>
 
+                        {{-- TABEL --}}
                         <div class="card-body p-0">
                             @include('kepemilikan._tabel_lahan_full', ['detail' => $detail])
                         </div>
+
                     </div>
-                @endforeach
-            </div>
-        @endif
+
+                </div>
+            @endforeach
+
+        </div>
 
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var collapseEl = document.getElementById('semuaLahan');
-            var btn = document.getElementById('toggleLahanBtn');
+        const slider = document.getElementById('tabSlider');
+        const btnLeft = document.getElementById('btnLeft');
+        const btnRight = document.getElementById('btnRight');
 
-            collapseEl.addEventListener('show.bs.collapse', function() {
-                btn.textContent = 'Sembunyikan Lahan';
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-danger');
+        function scrollTabs(amount) {
+            slider.scrollBy({
+                left: amount,
+                behavior: 'smooth'
             });
+        }
 
-            collapseEl.addEventListener('hide.bs.collapse', function() {
-                btn.textContent = 'Lihat Semua Lahan ({{ $totalLahan - 1 }} lainnya)';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-success');
+        function updateButtons() {
+            const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+            if (slider.scrollLeft <= 0) {
+                btnLeft.classList.add('hidden');
+            } else {
+                btnLeft.classList.remove('hidden');
+            }
+
+            if (slider.scrollLeft >= maxScroll - 5) {
+                btnRight.classList.add('hidden');
+            } else {
+                btnRight.classList.remove('hidden');
+            }
+        }
+
+        function centerActiveTab() {
+            const activeTab = slider.querySelector('.nav-link.active');
+            if (!activeTab) return;
+
+            const tabRect = activeTab.getBoundingClientRect();
+            const sliderRect = slider.getBoundingClientRect();
+
+            const offset = tabRect.left - sliderRect.left - (sliderRect.width / 2) + (tabRect.width / 2);
+
+            slider.scrollBy({
+                left: offset,
+                behavior: 'smooth'
             });
+        }
+
+        // event
+        slider.addEventListener('scroll', updateButtons);
+        window.addEventListener('load', () => {
+            updateButtons();
+            centerActiveTab();
         });
+        window.addEventListener('resize', updateButtons);
     </script>
 @endsection

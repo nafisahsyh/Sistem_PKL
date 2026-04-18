@@ -53,7 +53,6 @@ class KepemilikanController extends Controller
                             $sub->where('tahun', $tahun);
                         });
                     }
-
                 },
                 'detailKepemilikan.lahan.desa.kecamatan',
                 'detailKepemilikan.lahan.tahunTanam'
@@ -76,7 +75,6 @@ class KepemilikanController extends Controller
                         $sub->where('tahun', $tahun);
                     });
                 }
-
             })
 
             // Searching data
@@ -102,9 +100,7 @@ class KepemilikanController extends Controller
                         ->orWhereHas('detailKepemilikan.lahan.tahunTanam', function ($th) use ($search) {
                             $th->where('tahun', 'like', "%$search%");
                         });
-
                 });
-
             });
 
         $kepemilikan = $query
@@ -970,9 +966,9 @@ class KepemilikanController extends Controller
         return response()->download(
             $finalPath,
             'Data Kepemilikan Lahan '
-            . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
-            . ' - ' . $desaTarget
-            . ' (' . $tahunTarget . ').pdf'
+                . ucwords(strtolower($petani->nama ?? 'Tanpa Nama'))
+                . ' - ' . $desaTarget
+                . ' (' . $tahunTarget . ').pdf'
         );
     }
 
@@ -1132,11 +1128,7 @@ class KepemilikanController extends Controller
         // Refresh data agar view langsung pakai data terkini
         $detail->refresh();
 
-        return redirect()
-            ->route('kepemilikan.showPerLahan', [
-                'id_kepemilikan' => $detail->id_kepemilikan,
-                'id_lahan' => $detail->id_lahan
-            ])
+        return redirect()->back()
             ->with('success', 'PBB tahun ' . $pbb->tahun . ' telah ditandai lunas.');
     }
 

@@ -105,7 +105,8 @@
                             </span>
 
                             @if ($p->status == 'belum')
-                                <form action="{{ route('pbb.lunas', $p->id_pbb) }}" method="POST" class="d-inline">
+                                <form action="{{ route('pbb.lunas', $p->id_pbb) }}#lahan{{ $index }}"
+                                    method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-sm btn-success ms-2">
